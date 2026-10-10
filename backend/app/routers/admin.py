@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import datetime, date, timedelta
 import logging
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy import text
 from sqlalchemy import select, delete, func
@@ -47,6 +47,69 @@ def stats(user=Depends(roles('Quản trị nội dung', 'Quản trị hệ thố
     counts['favorite_dish_count'] = len(favorite_dishes)
     counts['top_dishes'] = favorite_dishes[:5]
     return counts
+
+@router.get('/system-overview')
+def system_overview(user=Depends(system_user), db: Session = Depends(get_db)):
+    users = list(db.scalars(select(m.NguoiDung)))
+    role_names = ['Người dùng', 'Quản trị nội dung', 'Quản trị hệ thống']
+    roles_data = [{'name': role, 'count': sum(1 for row in users if row.vaiTro == role)} for role in role_names]
+    status_data = [{'name': 'Đang hoạt động', 'count': sum(1 for row in users if row.trangThai == 'Đang hoạt động')},
+                   {'name': 'Tạm khóa', 'count': sum(1 for row in users if row.trangThai == 'Tạm khóa')}]
+    locked = [{'id': row.maNguoiDung, 'name': row.hoTen, 'email': row.thuDienTu, 'role': row.vaiTro, 'status': row.trangThai}
+              for row in users if row.trangThai == 'Tạm khóa'][:5]
+    return {'users': {'total': len(users), 'active': status_data[0]['count'], 'locked': status_data[1]['count']},
+            'roles': roles_data, 'content': {'dishes': db.scalar(select(func.count()).select_from(m.MonAn)) or 0},
+            'meal_plans': db.scalar(select(func.count()).select_from(m.ThucDon)) or 0,
+            'planned_items': db.scalar(select(func.count()).select_from(m.ChiTietThucDon)) or 0,
+            'locked_users': locked}
+
+@router.get('/system-reports')
+def system_reports(from_date: date | None = Query(None), to_date: date | None = Query(None),
+                   user=Depends(system_user), db: Session = Depends(get_db)):
+    """Operational reporting based only on planned menu rows in the selected period."""
+    if from_date and to_date and from_date > to_date:
+        raise HTTPException(422, 'Ngày bắt đầu không được lớn hơn ngày kết thúc.')
+    end = to_date or date.today()
+    start = from_date or (end - timedelta(days=29))
+    item_filter = [m.ChiTietThucDon.ngayDung >= start, m.ChiTietThucDon.ngayDung <= end]
+    rows_items = db.execute(select(m.ChiTietThucDon, m.MonAn.tenMonAn).join(
+        m.MonAn, m.MonAn.maMonAn == m.ChiTietThucDon.maMonAn).where(*item_filter)).all()
+    top = {}
+    trend = {}
+    for item, name in rows_items:
+        key = item.maMonAn
+        entry = top.setdefault(key, {'id': key, 'name': name or key, 'selections': 0, 'servings': 0})
+        entry['selections'] += 1
+        entry['servings'] += int(item.soKhauPhan or 0)
+        day = item.ngayDung.isoformat() if item.ngayDung else None
+        if day: trend[day] = trend.get(day, 0) + 1
+    ingredients = {}
+    ingredient_rows = db.execute(select(m.ThanhPhanCongThuc, m.NguyenLieu.tenNguyenLieu,
+                                        m.DonViTinh.tenDonVi).join(
+        m.CongThuc, m.CongThuc.maCongThuc == m.ThanhPhanCongThuc.maCongThuc).join(
+        m.ChiTietThucDon, m.ChiTietThucDon.maMonAn == m.CongThuc.maMonAn).join(
+        m.NguyenLieu, m.NguyenLieu.maNguyenLieu == m.ThanhPhanCongThuc.maNguyenLieu).join(
+        m.DonViTinh, m.DonViTinh.maDonVi == m.ThanhPhanCongThuc.maDonVi).where(*item_filter)).all()
+    for part, name, unit in ingredient_rows:
+        key = part.maNguyenLieu
+        row = ingredients.setdefault(key, {'id': key, 'name': name or key, 'unit': unit or '', 'quantity': 0})
+        row['quantity'] += float(part.soLuong or 0)
+    total_servings = sum(row['servings'] for row in top.values())
+    taste_counts = {}
+    taste_rows = db.execute(select(m.KhauVi.maKhauVi, m.KhauVi.tenKhauVi).join(
+        m.KhauViMonAn, m.KhauViMonAn.maKhauVi == m.KhauVi.maKhauVi).join(
+        m.ChiTietThucDon, m.ChiTietThucDon.maMonAn == m.KhauViMonAn.maMonAn).where(*item_filter)).all()
+    for taste_id, taste_name in taste_rows:
+        key = taste_id
+        taste_counts[key] = {'id': key, 'name': taste_name or key, 'selections': taste_counts.get(key, {}).get('selections', 0) + 1}
+    return {'period': {'from': start.isoformat(), 'to': end.isoformat()},
+            'kpis': {'planned_items': len(rows_items), 'selections': len(rows_items),
+                     'planned_servings': total_servings},
+            'trend': [{'date': day, 'selections': trend.get(day, 0)}
+                      for day in sorted(trend)],
+            'top_dishes': sorted(top.values(), key=lambda x: (-x['selections'], x['name']))[:10],
+            'ingredients': sorted(ingredients.values(), key=lambda x: -x['quantity'])[:10],
+            'taste': sorted(taste_counts.values(), key=lambda x: (-x['selections'], x['name']))}
 
 @router.post('/categories', status_code=201)
 def create_category(data: s.Category, user=Depends(content_user), db: Session = Depends(get_db)):

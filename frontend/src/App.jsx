@@ -9,6 +9,9 @@ import { SettingsPage } from './pages/SettingsPage';
 import Admin, { Dashboard } from './pages/Admin';
 import AdminAccount from './pages/AdminAccount';
 import SystemAdminLayout from './components/SystemAdminLayout';
+import SystemOverview from './pages/SystemOverview';
+import SystemUsers from './pages/SystemUsers';
+import SystemReports from './pages/SystemReports';
 
 function AccountSettings() {
   const {user}=useAuth();
@@ -41,9 +44,9 @@ export default function App() {
     </Route></Route>
     <Route element={<Guard roles={['Quản trị hệ thống']}/>}>
       <Route element={<SystemAdminLayout/>}>
-        <Route path="/system-admin" element={<Dashboard system/>}/>
-        <Route path="/system-admin/reports" element={<Dashboard report system/>}/>
-        <Route path="/system-admin/users" element={<Admin kind="users"/>}/>
+        <Route path="/system-admin" element={<SystemOverview/>}/>
+    <Route path="/system-admin/reports" element={<SystemReports/>}/>
+        <Route path="/system-admin/users" element={<SystemUsers/>}/>
         <Route path="/system-admin/account" element={<AdminAccount/>}/>
       </Route>
     </Route>
