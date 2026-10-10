@@ -1,0 +1,2 @@
+# Keep application secrets and Python sources private when PHP runs on Apache.
+Require all denied

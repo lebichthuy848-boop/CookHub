@@ -1,0 +1,3 @@
+.profile-preferences .preference-bubble{justify-content:flex-start;flex-direction:row}
+.profile-preferences .preference-bubble>i{position:static;flex:0 0 auto;opacity:1}
+.profile-preferences .preference-bubble.picked::after{inset:-2px;border-color:#0d7a5360}

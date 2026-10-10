@@ -1,0 +1,568 @@
+[
+  {
+    "id": "CT061",
+    "dish_id": "MA061",
+    "description": "Công thức Bò xào nấm cho 2 khẩu phần.",
+    "servings": 2,
+    "ingredients": [
+      {
+        "name": "Thịt bò",
+        "ingredient_id": "NL011",
+        "quantity": 320,
+        "unit_id": "DVT001",
+        "unit": "g"
+      },
+      {
+        "name": "Nấm đùi gà",
+        "ingredient_id": "NL032",
+        "quantity": 180,
+        "unit_id": "DVT001",
+        "unit": "g"
+      },
+      {
+        "name": "Nấm rơm",
+        "ingredient_id": "NL033",
+        "quantity": 120,
+        "unit_id": "DVT001",
+        "unit": "g"
+      },
+      {
+        "name": "Hành tây",
+        "ingredient_id": "NL048",
+        "quantity": 100,
+        "unit_id": "DVT001",
+        "unit": "g"
+      },
+      {
+        "name": "Tỏi",
+        "ingredient_id": "NL051",
+        "quantity": 12,
+        "unit_id": "DVT001",
+        "unit": "g"
+      },
+      {
+        "name": "Nước tương",
+        "ingredient_id": "NL071",
+        "quantity": 18,
+        "unit_id": "DVT001",
+        "unit": "g"
+      },
+      {
+        "name": "Dầu ăn",
+        "ingredient_id": "NL072",
+        "quantity": 18,
+        "unit_id": "DVT001",
+        "unit": "g"
+      },
+      {
+        "name": "Tiêu đen",
+        "ingredient_id": "NL075",
+        "quantity": 3,
+        "unit_id": "DVT001",
+        "unit": "g"
+      },
+      {
+        "name": "Muối",
+        "ingredient_id": "NL073",
+        "quantity": 2,
+        "unit_id": "DVT001",
+        "unit": "g"
+      }
+    ],
+    "steps": [
+      "Thái thịt bò thành lát mỏng ngang thớ rồi ướp với nước tương và tiêu trong khoảng 10 phút.",
+      "Làm sạch nấm đùi gà và nấm rơm, cắt thành miếng vừa ăn. Thái hành tây và băm nhỏ tỏi.",
+      "Làm nóng một nửa lượng dầu, cho thịt bò vào xào nhanh trên lửa lớn đến khi vừa săn rồi lấy ra.",
+      "Cho phần dầu còn lại vào chảo, phi tỏi thơm rồi thêm hành tây và các loại nấm.",
+      "Xào nấm đến khi vừa chín và lượng nước tiết ra giảm bớt.",
+      "Cho thịt bò trở lại chảo, đảo nhanh với nấm và nêm thêm một ít muối nếu cần.",
+      "Khi thịt bò vừa chín tới, rắc thêm tiêu rồi tắt bếp."
+    ],
+    "videos": [],
+    "dish": {
+      "id": "MA061",
+      "name": "Bò xào nấm",
+      "category_id": "DM004",
+      "category": "Thịt và gia cầm",
+      "description": "Thịt bò xào nhanh với nấm đùi gà, nấm rơm và hành tây.",
+      "time": 30,
+      "difficulty": "Trung bình",
+      "step_count": 7,
+      "image": "images/mon-an/bo-xao-nam.jpg",
+      "images": [
+        "images/mon-an/bo-xao-nam.jpg"
+      ],
+      "rating": 0,
+      "review_count": 0,
+      "favorite_count": 0,
+      "cost": 0,
+      "diets": [
+        {
+          "id": "CDA002",
+          "name": "Ít tinh bột"
+        },
+        {
+          "id": "CDA004",
+          "name": "Giàu đạm"
+        },
+        {
+          "id": "CDA008",
+          "name": "Không hải sản"
+        }
+      ],
+      "recipe": {
+        "id": "CT061",
+        "dish_id": "MA061",
+        "description": "Công thức Bò xào nấm cho 2 khẩu phần.",
+        "servings": 2,
+        "ingredients": [
+          {
+            "name": "Thịt bò",
+            "ingredient_id": "NL011",
+            "quantity": 320,
+            "unit_id": "DVT001",
+            "unit": "g"
+          },
+          {
+            "name": "Nấm đùi gà",
+            "ingredient_id": "NL032",
+            "quantity": 180,
+            "unit_id": "DVT001",
+            "unit": "g"
+          },
+          {
+            "name": "Nấm rơm",
+            "ingredient_id": "NL033",
+            "quantity": 120,
+            "unit_id": "DVT001",
+            "unit": "g"
+          },
+          {
+            "name": "Hành tây",
+            "ingredient_id": "NL048",
+            "quantity": 100,
+            "unit_id": "DVT001",
+            "unit": "g"
+          },
+          {
+            "name": "Tỏi",
+            "ingredient_id": "NL051",
+            "quantity": 12,
+            "unit_id": "DVT001",
+            "unit": "g"
+          },
+          {
+            "name": "Nước tương",
+            "ingredient_id": "NL071",
+            "quantity": 18,
+            "unit_id": "DVT001",
+            "unit": "g"
+          },
+          {
+            "name": "Dầu ăn",
+            "ingredient_id": "NL072",
+            "quantity": 18,
+            "unit_id": "DVT001",
+            "unit": "g"
+          },
+          {
+            "name": "Tiêu đen",
+            "ingredient_id": "NL075",
+            "quantity": 3,
+            "unit_id": "DVT001",
+            "unit": "g"
+          },
+          {
+            "name": "Muối",
+            "ingredient_id": "NL073",
+            "quantity": 2,
+            "unit_id": "DVT001",
+            "unit": "g"
+          }
+        ],
+        "steps": [
+          "Thái thịt bò thành lát mỏng ngang thớ rồi ướp với nước tương và tiêu trong khoảng 10 phút.",
+          "Làm sạch nấm đùi gà và nấm rơm, cắt thành miếng vừa ăn. Thái hành tây và băm nhỏ tỏi.",
+          "Làm nóng một nửa lượng dầu, cho thịt bò vào xào nhanh trên lửa lớn đến khi vừa săn rồi lấy ra.",
+          "Cho phần dầu còn lại vào chảo, phi tỏi thơm rồi thêm hành tây và các loại nấm.",
+          "Xào nấm đến khi vừa chín và lượng nước tiết ra giảm bớt.",
+          "Cho thịt bò trở lại chảo, đảo nhanh với nấm và nêm thêm một ít muối nếu cần.",
+          "Khi thịt bò vừa chín tới, rắc thêm tiêu rồi tắt bếp."
+        ],
+        "videos": []
+      },
+      "home_display": true,
+      "foods_display": true,
+      "home_order": 0,
+      "foods_order": 0
+    }
+  },
+  {
+    "id": "CT062",
+    "dish_id": "MA062",
+    "description": "Công thức Cá hồi sốt mật ong chanh cho 2 khẩu phần.",
+    "servings": 2,
+    "ingredients": [
+      {
+        "name": "Cá hồi",
+        "ingredient_id": "NL019",
+        "quantity": 320,
+        "unit_id": "DVT001",
+        "unit": "g"
+      },
+      {
+        "name": "Mật ong",
+        "ingredient_id": "NL076",
+        "quantity": 22,
+        "unit_id": "DVT001",
+        "unit": "g"
+      },
+      {
+        "name": "Chanh",
+        "ingredient_id": "NL062",
+        "quantity": 35,
+        "unit_id": "DVT001",
+        "unit": "g"
+      },
+      {
+        "name": "Tỏi",
+        "ingredient_id": "NL051",
+        "quantity": 10,
+        "unit_id": "DVT001",
+        "unit": "g"
+      },
+      {
+        "name": "Nước tương",
+        "ingredient_id": "NL071",
+        "quantity": 12,
+        "unit_id": "DVT001",
+        "unit": "g"
+      },
+      {
+        "name": "Dầu ăn",
+        "ingredient_id": "NL072",
+        "quantity": 12,
+        "unit_id": "DVT001",
+        "unit": "g"
+      },
+      {
+        "name": "Muối",
+        "ingredient_id": "NL073",
+        "quantity": 2,
+        "unit_id": "DVT001",
+        "unit": "g"
+      },
+      {
+        "name": "Tiêu đen",
+        "ingredient_id": "NL075",
+        "quantity": 2,
+        "unit_id": "DVT001",
+        "unit": "g"
+      }
+    ],
+    "steps": [
+      "Thấm khô cá hồi rồi nêm nhẹ muối và tiêu ở hai mặt.",
+      "Vắt chanh lấy nước, trộn với mật ong và nước tương để tạo hỗn hợp sốt.",
+      "Băm nhỏ tỏi. Làm nóng dầu trong chảo rồi cho cá hồi vào áp chảo đến khi mặt đầu tiên vàng.",
+      "Lật cá, cho tỏi vào chảo và đảo nhanh đến khi thơm.",
+      "Rót hỗn hợp mật ong chanh vào chảo, hạ lửa vừa và liên tục rưới sốt lên mặt cá.",
+      "Nấu đến khi cá vừa chín và sốt giảm còn độ sánh nhẹ.",
+      "Tắt bếp, để cá nghỉ ngắn rồi dùng nóng cùng phần sốt."
+    ],
+    "videos": [],
+    "dish": {
+      "id": "MA062",
+      "name": "Cá hồi sốt mật ong chanh",
+      "category_id": "DM005",
+      "category": "Cá và hải sản",
+      "description": "Cá hồi áp chảo phủ sốt mật ong chanh chua ngọt, thơm tỏi.",
+      "time": 30,
+      "difficulty": "Trung bình",
+      "step_count": 7,
+      "image": "images/mon-an/ca-hoi-sot-mat-ong-chanh.jpg",
+      "images": [
+        "images/mon-an/ca-hoi-sot-mat-ong-chanh.jpg"
+      ],
+      "rating": 0,
+      "review_count": 0,
+      "favorite_count": 0,
+      "cost": 0,
+      "diets": [
+        {
+          "id": "CDA002",
+          "name": "Ít tinh bột"
+        },
+        {
+          "id": "CDA004",
+          "name": "Giàu đạm"
+        },
+        {
+          "id": "CDA006",
+          "name": "Không thịt đỏ"
+        }
+      ],
+      "recipe": {
+        "id": "CT062",
+        "dish_id": "MA062",
+        "description": "Công thức Cá hồi sốt mật ong chanh cho 2 khẩu phần.",
+        "servings": 2,
+        "ingredients": [
+          {
+            "name": "Cá hồi",
+            "ingredient_id": "NL019",
+            "quantity": 320,
+            "unit_id": "DVT001",
+            "unit": "g"
+          },
+          {
+            "name": "Mật ong",
+            "ingredient_id": "NL076",
+            "quantity": 22,
+            "unit_id": "DVT001",
+            "unit": "g"
+          },
+          {
+            "name": "Chanh",
+            "ingredient_id": "NL062",
+            "quantity": 35,
+            "unit_id": "DVT001",
+            "unit": "g"
+          },
+          {
+            "name": "Tỏi",
+            "ingredient_id": "NL051",
+            "quantity": 10,
+            "unit_id": "DVT001",
+            "unit": "g"
+          },
+          {
+            "name": "Nước tương",
+            "ingredient_id": "NL071",
+            "quantity": 12,
+            "unit_id": "DVT001",
+            "unit": "g"
+          },
+          {
+            "name": "Dầu ăn",
+            "ingredient_id": "NL072",
+            "quantity": 12,
+            "unit_id": "DVT001",
+            "unit": "g"
+          },
+          {
+            "name": "Muối",
+            "ingredient_id": "NL073",
+            "quantity": 2,
+            "unit_id": "DVT001",
+            "unit": "g"
+          },
+          {
+            "name": "Tiêu đen",
+            "ingredient_id": "NL075",
+            "quantity": 2,
+            "unit_id": "DVT001",
+            "unit": "g"
+          }
+        ],
+        "steps": [
+          "Thấm khô cá hồi rồi nêm nhẹ muối và tiêu ở hai mặt.",
+          "Vắt chanh lấy nước, trộn với mật ong và nước tương để tạo hỗn hợp sốt.",
+          "Băm nhỏ tỏi. Làm nóng dầu trong chảo rồi cho cá hồi vào áp chảo đến khi mặt đầu tiên vàng.",
+          "Lật cá, cho tỏi vào chảo và đảo nhanh đến khi thơm.",
+          "Rót hỗn hợp mật ong chanh vào chảo, hạ lửa vừa và liên tục rưới sốt lên mặt cá.",
+          "Nấu đến khi cá vừa chín và sốt giảm còn độ sánh nhẹ.",
+          "Tắt bếp, để cá nghỉ ngắn rồi dùng nóng cùng phần sốt."
+        ],
+        "videos": []
+      },
+      "home_display": true,
+      "foods_display": true,
+      "home_order": 0,
+      "foods_order": 0
+    }
+  },
+  {
+    "id": "CT063",
+    "dish_id": "MA063",
+    "description": "Công thức Tôm rang me cho 2 khẩu phần.",
+    "servings": 2,
+    "ingredients": [
+      {
+        "name": "Tôm",
+        "ingredient_id": "NL026",
+        "quantity": 350,
+        "unit_id": "DVT001",
+        "unit": "g"
+      },
+      {
+        "name": "Me chua",
+        "ingredient_id": "NL077",
+        "quantity": 35,
+        "unit_id": "DVT001",
+        "unit": "g"
+      },
+      {
+        "name": "Tỏi",
+        "ingredient_id": "NL051",
+        "quantity": 12,
+        "unit_id": "DVT001",
+        "unit": "g"
+      },
+      {
+        "name": "Ớt tươi",
+        "ingredient_id": "NL054",
+        "quantity": 5,
+        "unit_id": "DVT001",
+        "unit": "g"
+      },
+      {
+        "name": "Nước mắm",
+        "ingredient_id": "NL070",
+        "quantity": 15,
+        "unit_id": "DVT001",
+        "unit": "g"
+      },
+      {
+        "name": "Đường",
+        "ingredient_id": "NL074",
+        "quantity": 18,
+        "unit_id": "DVT001",
+        "unit": "g"
+      },
+      {
+        "name": "Dầu ăn",
+        "ingredient_id": "NL072",
+        "quantity": 18,
+        "unit_id": "DVT001",
+        "unit": "g"
+      },
+      {
+        "name": "Hành lá",
+        "ingredient_id": "NL050",
+        "quantity": 20,
+        "unit_id": "DVT001",
+        "unit": "g"
+      }
+    ],
+    "steps": [
+      "Làm sạch tôm, cắt bớt râu và để thật ráo.",
+      "Ngâm me với một ít nước nóng, dằm kỹ rồi lọc lấy phần nước me.",
+      "Băm nhỏ tỏi và ớt, cắt nhỏ hành lá.",
+      "Làm nóng dầu, cho tỏi vào phi thơm rồi thêm tôm và rang trên lửa vừa đến khi tôm đổi màu.",
+      "Cho nước me, nước mắm và đường vào chảo, đảo đều để gia vị hòa tan.",
+      "Tiếp tục rang đến khi nước sốt me sánh lại và bám đều quanh tôm.",
+      "Thêm ớt và hành lá, đảo nhanh rồi tắt bếp."
+    ],
+    "videos": [],
+    "dish": {
+      "id": "MA063",
+      "name": "Tôm rang me",
+      "category_id": "DM005",
+      "category": "Cá và hải sản",
+      "description": "Tôm rang với sốt me chua ngọt, nước mắm, tỏi và ớt.",
+      "time": 30,
+      "difficulty": "Trung bình",
+      "step_count": 7,
+      "image": "images/mon-an/tom-rang-me.jpg",
+      "images": [
+        "images/mon-an/tom-rang-me.jpg"
+      ],
+      "rating": 0,
+      "review_count": 0,
+      "favorite_count": 0,
+      "cost": 0,
+      "diets": [
+        {
+          "id": "CDA002",
+          "name": "Ít tinh bột"
+        },
+        {
+          "id": "CDA004",
+          "name": "Giàu đạm"
+        },
+        {
+          "id": "CDA006",
+          "name": "Không thịt đỏ"
+        }
+      ],
+      "recipe": {
+        "id": "CT063",
+        "dish_id": "MA063",
+        "description": "Công thức Tôm rang me cho 2 khẩu phần.",
+        "servings": 2,
+        "ingredients": [
+          {
+            "name": "Tôm",
+            "ingredient_id": "NL026",
+            "quantity": 350,
+            "unit_id": "DVT001",
+            "unit": "g"
+          },
+          {
+            "name": "Me chua",
+            "ingredient_id": "NL077",
+            "quantity": 35,
+            "unit_id": "DVT001",
+            "unit": "g"
+          },
+          {
+            "name": "Tỏi",
+            "ingredient_id": "NL051",
+            "quantity": 12,
+            "unit_id": "DVT001",
+            "unit": "g"
+          },
+          {
+            "name": "Ớt tươi",
+            "ingredient_id": "NL054",
+            "quantity": 5,
+            "unit_id": "DVT001",
+            "unit": "g"
+          },
+          {
+            "name": "Nước mắm",
+            "ingredient_id": "NL070",
+            "quantity": 15,
+            "unit_id": "DVT001",
+            "unit": "g"
+          },
+          {
+            "name": "Đường",
+            "ingredient_id": "NL074",
+            "quantity": 18,
+            "unit_id": "DVT001",
+            "unit": "g"
+          },
+          {
+            "name": "Dầu ăn",
+            "ingredient_id": "NL072",
+            "quantity": 18,
+            "unit_id": "DVT001",
+            "unit": "g"
+          },
+          {
+            "name": "Hành lá",
+            "ingredient_id": "NL050",
+            "quantity": 20,
+            "unit_id": "DVT001",
+            "unit": "g"
+          }
+        ],
+        "steps": [
+          "Làm sạch tôm, cắt bớt râu và để thật ráo.",
+          "Ngâm me với một ít nước nóng, dằm kỹ rồi lọc lấy phần nước me.",
+          "Băm nhỏ tỏi và ớt, cắt nhỏ hành lá.",
+          "Làm nóng dầu, cho tỏi vào phi thơm rồi thêm tôm và rang trên lửa vừa đến khi tôm đổi màu.",
+          "Cho nước me, nước mắm và đường vào chảo, đảo đều để gia vị hòa tan.",
+          "Tiếp tục rang đến khi nước sốt me sánh lại và bám đều quanh tôm.",
+          "Thêm ớt và hành lá, đảo nhanh rồi tắt bếp."
+        ],
+        "videos": []
+      },
+      "home_display": true,
+      "foods_display": true,
+      "home_order": 0,
+      "foods_order": 0
+    }
+  }
+]

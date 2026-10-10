@@ -1,0 +1,39 @@
+# ==========================================
+# COOKHUB - GITIGNORE
+# ==========================================
+
+# Python Backend
+backend/.venv/
+backend/venv/
+**/__pycache__/
+**/.pytest_cache/
+*.pyc
+*.pyo
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.tools/
+frontend/coverage/
+
+# Environment - thông tin bảo mật
+.env
+.env.*
+!.env.example
+
+# Database local và backup
+*.sqlite3
+*.bak
+*.mdf
+*.ldf
+backend/backups/
+
+# Log và file tạm
+*.log
+*.tmp
+*.swp
+
+# Windows / macOS
+Thumbs.db
+.DS_Store

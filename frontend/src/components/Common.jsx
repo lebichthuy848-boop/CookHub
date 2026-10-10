@@ -1,0 +1,11 @@
+import { Link } from 'react-router-dom';
+import { media } from '../api';
+import { useAuth } from '../auth';
+export function State({resource,children}){if(resource.loading)return <p className="empty">Đang tải dữ liệu…</p>;if(resource.error)return <div className="error" role="alert">{resource.error} <button onClick={resource.reload}>Thử lại</button></div>;return children(resource.data);}
+export function Banner({page,title,subtitle}){return <section className={'banner banner-'+page+' '+(page==='suggest'?'recommendation-banner':'')}><span>COOKHUB / NẤU NGON MỖI NGÀY</span><h1>{title}</h1>{subtitle&&<p>{subtitle}</p>}</section>}
+export function MatchProgress({ value = 0 }) { const score = Math.max(0, Math.min(100, Number(value) || 0)); return <div className="match-progress" aria-label={`${score}% Hợp vị`}><div className="match-progress-fill" style={{width:`${score}%`}}/><span>✨ Mức độ phù hợp</span><b>{score}% Hợp vị</b></div>; }
+export function DishCard({dish,favorite,favoriteCount=dish.favorite_count,onFavorite,onHide}){const {favoriteCounts}=useAuth(); const count=favoriteCounts[dish.id] ?? favoriteCount; return <article className="dish-card premium-dish-card"><Link className="dish-image" to={'/dish/'+dish.id}><img src={media(dish.image)} alt={dish.name} loading="lazy"/></Link><button type="button" className={'heart '+(favorite?'selected':'')} aria-label={(favorite?'Bỏ yêu thích ':'Yêu thích ')+dish.name} onClick={()=>onFavorite(dish.id)}>{favorite?'♥':'♡'}</button><div className="dish-body"><small className="dish-category">{dish.category}</small>{dish.match_percent!==undefined&&<MatchProgress value={dish.match_percent}/>}<h3><Link to={'/dish/'+dish.id}>{dish.name}</Link></h3><p className="dish-meta"><b>★ {dish.rating}</b><span className="favorite-count">♥ {count||0}</span><span>◷ {dish.time} phút</span></p>{onHide&&<button className="text-button" onClick={()=>onHide(dish.id)}>Ẩn khỏi gợi ý</button>}<Link className="add-menu-button" to={'/dish/'+dish.id+'#them-vao-thuc-don'}>＋ Thêm vào thực đơn</Link></div></article>}
+export function Notice({error,message}){return <>{error&&<p className="error" role="alert">{error}</p>}{message&&<p className="notice">{message}</p>}</>}
+export function Field({label,children,...props}){return <label className="field">{label&&<span>{label}</span>}{children||<input {...props}/>}</label>}
+
+
