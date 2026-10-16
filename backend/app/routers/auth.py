@@ -14,6 +14,15 @@ logger = logging.getLogger(__name__)
 def by_email(db, email):
     return db.scalar(select(m.NguoiDung).where(func.lower(m.NguoiDung.thuDienTu) == email.lower()))
 
+@router.get('/{provider}/start')
+def social_start(provider: str):
+    # OAuth is intentionally blocked until callback/state verification and a
+    # persistent provider-link table are available. Never start a flow that
+    # cannot safely complete account linking.
+    if provider.lower() not in {'google', 'facebook'}:
+        raise HTTPException(404, 'Nhà cung cấp đăng nhập không hợp lệ.')
+    raise HTTPException(501, 'Đăng nhập mạng xã hội chưa thể bật: cần cấu hình callback OAuth và nơi lưu liên kết tài khoản.')
+
 @router.post('/login')
 def login(data: s.Login, response: Response, db: Session = Depends(get_db)):
     user = by_email(db, data.email)
@@ -111,3 +120,4 @@ def forgot():
 @router.post('/reset', status_code=501)
 def reset():
     raise HTTPException(501, 'Schema V2 không hỗ trợ mã khôi phục mật khẩu.')
+

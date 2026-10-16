@@ -1207,56 +1207,46 @@ SELECT
 FROM @KQ;
 GO
 
-USE QuanLyThucDon;
+
+USE [QuanLyThucDon];
 GO
 
--- Kiểm tra ràng buộc CHECK
-SELECT
-    name AS TenRangBuoc,
-    is_disabled AS DaVoHieuHoa,
-    is_not_trusted AS KhongDuocTinCay
-FROM sys.check_constraints
-WHERE parent_object_id IN (
-    OBJECT_ID(N'dbo.BoSuuTapYeuThich'),
-    OBJECT_ID(N'dbo.ChiTietBoSuuTapYeuThich')
-);
+IF OBJECT_ID(N'dbo.LienKetOAuth', N'U') IS NULL
+BEGIN
+    CREATE TABLE dbo.LienKetOAuth
+    (
+        MaLienKet          NVARCHAR(50)  NOT NULL,
+        MaNguoiDung        NVARCHAR(20)  NOT NULL,
+        NhaCungCap         NVARCHAR(20)  NOT NULL,
+        MaNguoiDungNgoai   NVARCHAR(255) NOT NULL,
+        EmailXacMinh       NVARCHAR(255) NULL,
+        TenHienThi         NVARCHAR(200) NULL,
+        NgayTao            DATETIME2(0) NOT NULL
+            CONSTRAINT DF_LienKetOAuth_NgayTao
+            DEFAULT SYSUTCDATETIME(),
+        NgayCapNhat        DATETIME2(0) NULL,
 
--- Kiểm tra khóa ngoại
-SELECT
-    name AS TenKhoaNgoai,
-    delete_referential_action_desc AS KhiXoa,
-    is_disabled AS DaVoHieuHoa,
-    is_not_trusted AS KhongDuocTinCay
-FROM sys.foreign_keys
-WHERE parent_object_id IN (
-    OBJECT_ID(N'dbo.BoSuuTapYeuThich'),
-    OBJECT_ID(N'dbo.ChiTietBoSuuTapYeuThich')
-);
+        CONSTRAINT PK_LienKetOAuth
+            PRIMARY KEY (MaLienKet),
 
--- Kiểm tra không có dữ liệu chi tiết mồ côi
-SELECT ct.*
-FROM dbo.ChiTietBoSuuTapYeuThich ct
-LEFT JOIN dbo.BoSuuTapYeuThich b
-    ON b.MaBoSuuTap = ct.MaBoSuuTap
-   AND b.MaNguoiDung = ct.MaNguoiDung
-WHERE b.MaBoSuuTap IS NULL;
+        CONSTRAINT FK_LienKetOAuth_NguoiDung
+            FOREIGN KEY (MaNguoiDung)
+            REFERENCES dbo.NguoiDung(MaNguoiDung),
 
--- Kiểm tra không có món trùng trong cùng BST
-SELECT
-    MaBoSuuTap,
-    MaMonAn,
-    COUNT(*) AS SoLan
-FROM dbo.ChiTietBoSuuTapYeuThich
-GROUP BY MaBoSuuTap, MaMonAn
-HAVING COUNT(*) > 1;
+        CONSTRAINT CK_LienKetOAuth_NhaCungCap
+            CHECK (NhaCungCap IN (N'google', N'facebook'))
+    );
+END;
+GO
 
--- Kiểm tra bộ cấp mã
-SELECT
-    LoaiMa,
-    TienTo,
-    SoHienTai
-FROM dbo.QuyUocMaHeThong
-WHERE LoaiMa IN (
-    N'BoSuuTapYeuThich',
-    N'ChiTietBoSuuTapYeuThich'
-);
+CREATE UNIQUE INDEX UX_LienKetOAuth_NhaCungCap_MaNgoai
+ON dbo.LienKetOAuth(NhaCungCap, MaNguoiDungNgoai);
+GO
+
+CREATE UNIQUE INDEX UX_LienKetOAuth_NguoiDung_NhaCungCap
+ON dbo.LienKetOAuth(MaNguoiDung, NhaCungCap);
+GO
+
+CREATE INDEX IX_LienKetOAuth_MaNguoiDung
+ON dbo.LienKetOAuth(MaNguoiDung);
+GO

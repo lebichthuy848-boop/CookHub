@@ -2,7 +2,8 @@ from datetime import datetime, date, timedelta
 import logging
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from sqlalchemy import text
+from sqlalchemy import text, cast
+from sqlalchemy import Date as SQLDate
 from sqlalchemy import select, delete, func
 from sqlalchemy.orm import Session
 from .. import models as m, schemas as s
@@ -14,6 +15,15 @@ from .auth import by_email
 
 router = APIRouter(prefix='/admin', tags=['Administration'])
 logger = logging.getLogger(__name__)
+
+@router.get('/system-health')
+def system_health(user=Depends(system_user), db: Session = Depends(get_db)):
+    checked_at = datetime.now().isoformat(timespec='seconds')
+    try:
+        db.execute(text('SELECT 1'))
+        return {'backend': 'Hoạt động', 'database': 'Kết nối thành công', 'checked_at': checked_at}
+    except SQLAlchemyError:
+        return {'backend': 'Hoạt động', 'database': 'Kết nối thất bại', 'checked_at': checked_at}
 
 @router.get('/dishes')
 def admin_dishes(user=Depends(roles('Quản trị nội dung', 'Quản trị hệ thống')), db: Session = Depends(get_db)):
@@ -72,8 +82,27 @@ def system_reports(from_date: date | None = Query(None), to_date: date | None = 
     end = to_date or date.today()
     start = from_date or (end - timedelta(days=29))
     item_filter = [m.ChiTietThucDon.ngayDung >= start, m.ChiTietThucDon.ngayDung <= end]
+    period_days = (end - start).days + 1
+    previous_start, previous_end = start - timedelta(days=period_days), start - timedelta(days=1)
     rows_items = db.execute(select(m.ChiTietThucDon, m.MonAn.tenMonAn).join(
         m.MonAn, m.MonAn.maMonAn == m.ChiTietThucDon.maMonAn).where(*item_filter)).all()
+    previous_count = db.scalar(select(func.count()).select_from(m.ChiTietThucDon).where(
+        m.ChiTietThucDon.ngayDung >= previous_start, m.ChiTietThucDon.ngayDung <= previous_end)) or 0
+    favorite_count = db.scalar(select(func.count()).select_from(m.MonYeuThich).where(
+        m.MonYeuThich.ngayThem >= start, m.MonYeuThich.ngayThem <= end)) or 0
+    new_users = db.scalar(select(func.count()).select_from(m.NguoiDung).where(
+        m.NguoiDung.ngayTao >= start, m.NguoiDung.ngayTao < end + timedelta(days=1))) or 0
+    new_menus = db.scalar(select(func.count()).select_from(m.ThucDon).where(
+        m.ThucDon.ngayTao >= start, m.ThucDon.ngayTao < end + timedelta(days=1))) or 0
+    def daily_counts(model, column):
+        result = db.execute(select(cast(column, SQLDate), func.count()).where(
+            column >= start, column < end + timedelta(days=1)).group_by(
+                cast(column, SQLDate))).all()
+        return {day.isoformat(): count for day, count in result if day}
+    user_trend = daily_counts(m.NguoiDung, m.NguoiDung.ngayTao)
+    menu_trend = daily_counts(m.ThucDon, m.ThucDon.ngayTao)
+    favorite_trend = daily_counts(m.MonYeuThich, m.MonYeuThich.ngayThem)
+    calendar = [(start + timedelta(days=offset)).isoformat() for offset in range(period_days)]
     top = {}
     trend = {}
     for item, name in rows_items:
@@ -102,11 +131,24 @@ def system_reports(from_date: date | None = Query(None), to_date: date | None = 
     for taste_id, taste_name in taste_rows:
         key = taste_id
         taste_counts[key] = {'id': key, 'name': taste_name or key, 'selections': taste_counts.get(key, {}).get('selections', 0) + 1}
+    change = None if previous_count == 0 else round((len(rows_items) - previous_count) / previous_count * 100, 1)
     return {'period': {'from': start.isoformat(), 'to': end.isoformat()},
             'kpis': {'planned_items': len(rows_items), 'selections': len(rows_items),
-                     'planned_servings': total_servings},
-            'trend': [{'date': day, 'selections': trend.get(day, 0)}
-                      for day in sorted(trend)],
+                     'planned_servings': total_servings, 'new_users': new_users,
+                     'new_menus': new_menus, 'favorite_saves': favorite_count},
+            'kpi_sources': {'new_users': 'NguoiDung.NgayTao trong kỳ.',
+                           'new_menus': 'ThucDon.NgayTao trong kỳ.',
+                           'favorite_saves': 'MonYeuThich.NgayThem'},
+            'trends': {
+                'new_users': [{'date': day, 'value': user_trend.get(day, 0)} for day in calendar],
+                'new_menus': [{'date': day, 'value': menu_trend.get(day, 0)} for day in calendar],
+                'favorite_saves': [{'date': day, 'value': favorite_trend.get(day, 0)} for day in calendar],
+            },
+            'comparison': {'current': len(rows_items), 'previous': previous_count, 'change': change},
+            'active_days': len(trend),
+            'trend': [{'date': (start + timedelta(days=offset)).isoformat(),
+                       'selections': trend.get((start + timedelta(days=offset)).isoformat(), 0)}
+                      for offset in range(period_days)],
             'top_dishes': sorted(top.values(), key=lambda x: (-x['selections'], x['name']))[:10],
             'ingredients': sorted(ingredients.values(), key=lambda x: -x['quantity'])[:10],
             'taste': sorted(taste_counts.values(), key=lambda x: (-x['selections'], x['name']))}

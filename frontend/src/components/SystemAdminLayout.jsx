@@ -3,6 +3,7 @@ import { useAuth, landing } from '../auth';
 import { Icon } from './Layout';
 import '../system-admin.css';
 import '../admin.css';
+import '../system-sidebar-fix.css';
 
 export default function SystemAdminLayout() {
   const { user, logout } = useAuth();

@@ -13,6 +13,7 @@ class NguoiDung(Base):
     matKhauBam = Column("MatKhauBam", String(255), nullable=False)
     vaiTro = Column(String(50), nullable=True)
     trangThai = Column(String(50), nullable=True)
+    ngayTao = Column('NgayTao', DateTime, nullable=True)
 
 
 class UserPreferences(Base):
@@ -203,6 +204,7 @@ class ThucDon(Base):
     ngayBatDau = Column(Date, nullable=True)
     ngayKetThuc = Column(Date, nullable=True)
     trangThai = Column(String(50), nullable=True)
+    ngayTao = Column('NgayTao', DateTime, nullable=True)
 
 
 class ChiTietThucDon(Base):

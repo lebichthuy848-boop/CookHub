@@ -17,6 +17,12 @@ class Settings(BaseSettings):
     smtp_password: str = ''
     smtp_from: str = ''
     smtp_starttls: bool = True
+    google_client_id: str = ''
+    google_client_secret: str = ''
+    google_redirect_uri: str = ''
+    facebook_app_id: str = ''
+    facebook_app_secret: str = ''
+    facebook_redirect_uri: str = ''
 
 settings = Settings()
 
