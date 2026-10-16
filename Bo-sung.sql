@@ -1239,14 +1239,125 @@ BEGIN
 END;
 GO
 
-CREATE UNIQUE INDEX UX_LienKetOAuth_NhaCungCap_MaNgoai
-ON dbo.LienKetOAuth(NhaCungCap, MaNguoiDungNgoai);
+USE QuanLyThucDon;
 GO
 
-CREATE UNIQUE INDEX UX_LienKetOAuth_NguoiDung_NhaCungCap
-ON dbo.LienKetOAuth(MaNguoiDung, NhaCungCap);
+BEGIN TRANSACTION;
+
+BEGIN TRY
+
+    /* 1. Tự động ghi ngày tạo tài khoản mới */
+    IF NOT EXISTS (
+        SELECT 1
+        FROM sys.default_constraints dc
+        JOIN sys.columns c
+            ON dc.parent_object_id = c.object_id
+           AND dc.parent_column_id = c.column_id
+        WHERE dc.parent_object_id = OBJECT_ID('dbo.NguoiDung')
+          AND c.name = 'NgayTao'
+    )
+    BEGIN
+        ALTER TABLE dbo.NguoiDung
+        ADD CONSTRAINT DF_NguoiDung_NgayTao
+        DEFAULT SYSDATETIME() FOR NgayTao;
+    END;
+
+
+    /* 2. Tự động ghi ngày tạo thực đơn mới */
+    IF NOT EXISTS (
+        SELECT 1
+        FROM sys.default_constraints dc
+        JOIN sys.columns c
+            ON dc.parent_object_id = c.object_id
+           AND dc.parent_column_id = c.column_id
+        WHERE dc.parent_object_id = OBJECT_ID('dbo.ThucDon')
+          AND c.name = 'NgayTao'
+    )
+    BEGIN
+        ALTER TABLE dbo.ThucDon
+        ADD CONSTRAINT DF_ThucDon_NgayTao
+        DEFAULT SYSDATETIME() FOR NgayTao;
+    END;
+
+
+    /* 3. Tạo index để lọc báo cáo nhanh hơn */
+    IF NOT EXISTS (
+        SELECT 1
+        FROM sys.indexes
+        WHERE name = 'IX_NguoiDung_NgayTao'
+          AND object_id = OBJECT_ID('dbo.NguoiDung')
+    )
+    BEGIN
+        CREATE INDEX IX_NguoiDung_NgayTao
+        ON dbo.NguoiDung(NgayTao);
+    END;
+
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM sys.indexes
+        WHERE name = 'IX_ThucDon_NgayTao'
+          AND object_id = OBJECT_ID('dbo.ThucDon')
+    )
+    BEGIN
+        CREATE INDEX IX_ThucDon_NgayTao
+        ON dbo.ThucDon(NgayTao);
+    END;
+
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM sys.indexes
+        WHERE name = 'IX_MonYeuThich_NgayThem'
+          AND object_id = OBJECT_ID('dbo.MonYeuThich')
+    )
+    BEGIN
+        CREATE INDEX IX_MonYeuThich_NgayThem
+        ON dbo.MonYeuThich(NgayThem);
+    END;
+
+
+    COMMIT TRANSACTION;
+    PRINT N'Cập nhật database thành công.';
+
+END TRY
+BEGIN CATCH
+    ROLLBACK TRANSACTION;
+    THROW;
+END CATCH;
 GO
 
-CREATE INDEX IX_LienKetOAuth_MaNguoiDung
-ON dbo.LienKetOAuth(MaNguoiDung);
+USE QuanLyThucDon;
+GO
+
+CREATE OR ALTER TRIGGER dbo.TR_NguoiDung_SetNgayTao
+ON dbo.NguoiDung
+AFTER INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE nd
+    SET NgayTao = SYSDATETIME()
+    FROM dbo.NguoiDung nd
+    INNER JOIN inserted i
+        ON i.MaNguoiDung = nd.MaNguoiDung
+    WHERE nd.NgayTao IS NULL;
+END;
+GO
+
+CREATE OR ALTER TRIGGER dbo.TR_ThucDon_SetNgayTao
+ON dbo.ThucDon
+AFTER INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    UPDATE td
+    SET NgayTao = SYSDATETIME()
+    FROM dbo.ThucDon td
+    INNER JOIN inserted i
+        ON i.MaThucDon = td.MaThucDon
+    WHERE td.NgayTao IS NULL;
+END;
 GO
