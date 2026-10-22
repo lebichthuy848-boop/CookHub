@@ -106,7 +106,8 @@ def recommendations(mode: Literal['for_you', 'taste', 'quick', 'healthy', 'trend
     answers = load_preferences(db, user.maNguoiDung)
     if answers and mode in {'for_you', 'taste'}:
         if mode == 'taste':
-            answers = {**answers, 'ingredients': [], 'occasions': [], 'tools': [], 'time': ''}
+            answers = {**answers, 'ingredients': [], 'occasions': [], 'tools': [], 'time': '',
+                       'regions': [], 'budget': '', 'skill': '', 'meals': []}
         return rank_dishes(db, user.maNguoiDung, answers)
     if mode == 'healthy':
         mode = 'quick'

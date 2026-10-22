@@ -266,7 +266,8 @@ def menu(start: date, end: date, user=Depends(current_user), db: Session = Depen
     if (end-start).days not in range(0, 367):
         raise HTTPException(422, 'Khoảng ngày phải từ 0 đến 366 ngày.')
     meal_labels = {'Bữa sáng': 'Sáng', 'Bữa trưa': 'Trưa', 'Bữa tối': 'Tối', 'Bữa phụ': 'Ăn nhẹ'}
-    return [dict(id=x.maChiTiet, dish_id=x.maMonAn, date=x.ngayDung, meal=meal_labels.get(x.buaAn, x.buaAn), servings=x.soKhauPhan)
+    return [dict(id=x.maChiTiet, dish_id=x.maMonAn, date=x.ngayDung,
+            meal=meal_labels.get((x.buaAn or '').strip(), (x.buaAn or '').strip()), servings=x.soKhauPhan)
             for x in db.scalars(select(m.ChiTietThucDon).join(m.ThucDon,
                 m.ThucDon.maThucDon == m.ChiTietThucDon.maThucDon).where(
                 m.ThucDon.maNguoiDung == user.maNguoiDung, m.ChiTietThucDon.ngayDung >= start,

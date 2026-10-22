@@ -55,3 +55,13 @@ def test_accented_ingredient_matching_is_precise():
     assert matches(normalize('Cá hồi'), 'seafood')
     assert not matches(normalize('Cà chua'), 'seafood')
     assert not matches(normalize('Bơ, sữa'), 'beef')
+
+
+def test_avoided_seafood_is_removed_from_recommendations(client):
+    login(client)
+    answers = {**ANSWERS, 'avoid': ['seafood_allergy']}
+    assert client.post('/api/v1/user/preferences', json=answers).status_code == 200
+    from app.personalization import conflicts_with_avoid
+    assert conflicts_with_avoid({'name': 'Salad cá ngừ', 'recipe': {'ingredients': []}}, answers['avoid'])
+    assert conflicts_with_avoid({'name': 'Salad rau', 'recipe': {'ingredients': [{'name': 'Tôm tươi'}]}}, answers['avoid'])
+    assert not conflicts_with_avoid({'name': 'Salad cà chua', 'recipe': {'ingredients': []}}, answers['avoid'])
