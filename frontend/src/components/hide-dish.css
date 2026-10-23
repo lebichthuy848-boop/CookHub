@@ -1,0 +1,56 @@
+.premium-dish-card .hide-dish {
+  position: absolute;
+  top: 11px;
+  left: 11px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid #d8e3d2;
+  border-radius: 50%;
+  background: #fffffff0;
+  color: #426a59;
+}
+
+.premium-dish-card .hide-dish:hover {
+  background: #e8f4ee;
+  color: #145a42;
+}
+
+.premium-dish-card .hide-dish:focus-visible {
+  outline: 3px solid #30b87f;
+  outline-offset: 2px;
+}
+
+html[data-theme="dark"] .premium-dish-card .hide-dish {
+  background: #193128e8;
+  border-color: #527263;
+  color: #d6efe1;
+}
+
+.hide-confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: #061b13b8;
+}
+
+.hide-confirm-dialog {
+  width: min(100%, 420px);
+  padding: 26px;
+  border: 1px solid var(--border, #d8e3d2);
+  border-radius: 18px;
+  background: var(--color-bg-card, #fff);
+  color: var(--color-text-primary, #214637);
+  box-shadow: 0 24px 70px #061b1359;
+}
+
+.hide-confirm-dialog h2 { margin: 0 0 10px; }
+.hide-confirm-dialog p { margin: 0 0 22px; line-height: 1.5; }
+.hide-confirm-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.hide-confirm-actions button { min-width: 90px; }

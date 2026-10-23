@@ -4,6 +4,7 @@ from difflib import SequenceMatcher
 import re
 import unicodedata
 from urllib.parse import urlparse
+from .cloudinary_media import cloudinary_image_url, original_image_path, is_cloudinary_image, image_map
 from uuid import uuid4
 from fastapi import HTTPException
 from sqlalchemy import select, delete, text
@@ -20,12 +21,8 @@ def allocate_code(db, kind, fallback_prefix=None):
     test-only fallback. Production SQL Server writes always use this path.
     """
     if db.bind is not None and db.bind.dialect.name == 'mssql':
-        result = db.execute(text("""
-            DECLARE @R TABLE (MaMoi NVARCHAR(20), LoaiMa SYSNAME);
-            DECLARE @M NVARCHAR(20);
-            INSERT INTO @R EXEC dbo.SpCapMaMoi @LoaiMa=:kind, @MaMoi=@M OUTPUT;
-            SELECT MaMoi FROM @R;
-        """), {'kind': kind}).mappings().first()
+        result = db.execute(text('EXEC dbo.SpCapMaMoi @LoaiMa=:kind'),
+                            {'kind': kind}).mappings().first()
         value = result.get('MaMoi') if result else None
         if not value:
             raise RuntimeError(f'SpCapMaMoi không trả về mã cho {kind}')
@@ -73,7 +70,12 @@ def _image_slug(value):
     return re.sub(r'[^a-z0-9]+', '-', ascii_text.lower()).strip('-')
 
 def local_image(path, dish_name=None):
+    if is_cloudinary_image(path):
+        return path
     path = (path or '').replace('\\', '/').lstrip('/')
+    cloud_url = cloudinary_image_url(path)
+    if cloud_url:
+        return cloud_url
     target = (MEDIA_ROOT / path).resolve()
     image_root = (MEDIA_ROOT / 'images').resolve()
     if target.is_relative_to(image_root) and target.is_file():
@@ -84,6 +86,9 @@ def local_image(path, dish_name=None):
     if slug:
         for extension in ('jpg', 'png', 'webp', 'jpeg'):
             candidate = image_root / 'mon-an' / f'{slug}.{extension}'
+            cloud_url = cloudinary_image_url(f'images/mon-an/{slug}.{extension}')
+            if cloud_url:
+                return cloud_url
             if candidate.is_file():
                 return f'images/mon-an/{slug}.{extension}'
     return 'images/logo.jpg'
@@ -94,19 +99,37 @@ def local_images(path, dish_name=None):
     slug = _image_slug(dish_name)
     if not slug:
         return [primary]
-    primary_path = PurePosixPath(primary)
+    primary_path = PurePosixPath(original_image_path(primary) or primary or '')
+    if not primary_path.parts or primary_path.parts[0] != 'images':
+        return [primary]
     root = (MEDIA_ROOT / primary_path.parent).resolve()
     variant_slug = primary_path.stem
     variants = []
     for extension in ('jpg', 'png', 'webp', 'jpeg'):
+        prefix = str(primary_path.parent / f'{variant_slug}-')
+        for local_path, url in sorted(image_map().items()):
+            if local_path.startswith(prefix) and re.fullmatch(
+                    r'\d+\.' + extension, local_path[len(prefix):]):
+                variants.append(url)
         for candidate in sorted(root.glob(f'{variant_slug}-*.{extension}')):
-            variants.append(str(primary_path.parent / candidate.name))
+            if not re.fullmatch(re.escape(variant_slug) + r'-\d+\.' + extension, candidate.name):
+                continue
+            local_path = str(primary_path.parent / candidate.name)
+            url = cloudinary_image_url(local_path) or local_path
+            if url not in variants:
+                variants.append(url)
     if primary not in variants and primary != 'images/logo.jpg':
         variants.insert(0, primary)
     return variants or [primary]
 
 def validate_media(path, kind='image'):
     parsed = urlparse(path)
+    if kind == 'image' and is_cloudinary_image(path):
+        return path
+    if kind == 'image':
+        mapped = cloudinary_image_url(path)
+        if mapped:
+            return mapped
     if kind == 'video' and parsed.scheme in {'http', 'https'} and parsed.netloc:
         return path
     clean = PurePosixPath(path.replace('\\', '/'))
@@ -152,13 +175,41 @@ def dish_data(db):
     for x in sorted(rows(db, m.GiaNguyenLieu), key=lambda x: x.ngayApDung or date.min):
         if x.ngayApDung and x.ngayApDung > date.today():
             continue
-        prices[(x.maNguyenLieu, x.maDonVi)] = float(x.giaThamKhao or 0)
+        if x.giaThamKhao is not None:
+            prices[x.maNguyenLieu] = x
+    units = {x.maDonVi: x for x in rows(db, m.DonViTinh)}
+    conversions = {(x.maNguyenLieu, x.maDonVi): float(x.khoiLuongQuyDoiGram)
+                   for x in rows(db, m.QuyDoiDonViNguyenLieu)}
+
+    def unit_grams(ingredient_id, unit_id):
+        unit = units[unit_id]
+        return conversions.get((ingredient_id, unit_id)) or float(unit.heSoGramChuan or 0)
+
+    def recipe_cost(recipe):
+        if not recipe or not recipe['ingredients']:
+            return None
+        total = 0.0
+        for item in recipe['ingredients']:
+            ingredient_id = item['ingredient_id']
+            price = prices.get(ingredient_id)
+            if price is None:
+                if item['name'].casefold() == 'nước lọc':
+                    continue
+                return None
+            if price.maDonVi == item['unit_id']:
+                total += item['quantity'] * float(price.giaThamKhao)
+                continue
+            amount_grams = unit_grams(ingredient_id, item['unit_id'])
+            price_grams = unit_grams(ingredient_id, price.maDonVi)
+            if not amount_grams or not price_grams:
+                return None
+            total += item['quantity'] * amount_grams / price_grams * float(price.giaThamKhao)
+        return round(total)
     result = []
     for x in rows(db, m.MonAn):
         recipe = recipes.get(x.maMonAn)
         ratings = reviews.get(x.maMonAn, [])
-        cost = sum(i['quantity'] * prices.get((i['ingredient_id'], i['unit_id']), 0)
-                   for i in recipe['ingredients']) if recipe else 0
+        cost = recipe_cost(recipe)
         step_count = len(recipe['steps']) if recipe else 0
         cooking_time = x.thoiGianCheBien or 0
         auto_difficulty = 'Dễ' if cooking_time < 30 and step_count <= 5 else 'Khó' if cooking_time > 60 or step_count > 10 else 'Trung bình'

@@ -3,7 +3,9 @@ from pathlib import Path
 from uuid import uuid4
 from PIL import Image, UnidentifiedImageError
 from fastapi import APIRouter, Depends, HTTPException, UploadFile
-from ..config import MEDIA_ROOT
+from starlette.concurrency import run_in_threadpool
+from ..config import MEDIA_ROOT, settings
+from ..cloudinary_media import upload_image
 from ..security import dish_editor, content_user
 
 router = APIRouter(prefix='/uploads', tags=['Uploads'])
@@ -18,13 +20,23 @@ async def image(file: UploadFile, user=Depends(dish_editor)):
             if decoded.format not in {'JPEG','PNG','WEBP'} or decoded.width * decoded.height > 25000000:
                 raise HTTPException(415, 'Chỉ hỗ trợ ảnh JPG, PNG, WEBP tối đa 25 megapixel.')
             decoded.load()
-            target = MEDIA_ROOT / 'images' / 'uploads' / 'dishes' / (uuid4().hex + '.webp')
-            target.parent.mkdir(parents=True, exist_ok=True)
-            decoded.convert('RGB').save(target, 'WEBP', quality=88)
+            output = BytesIO()
+            decoded.convert('RGB').save(output, 'WEBP', quality=88)
     except (UnidentifiedImageError, OSError, Image.DecompressionBombError) as exc:
         raise HTTPException(415, 'Tệp ảnh không hợp lệ.') from exc
     finally:
         await file.close()
+    if settings.cloudinary_url:
+        try:
+            output.seek(0)
+            url = await run_in_threadpool(upload_image, output,
+                                          'cookhub/uploads/dishes/' + uuid4().hex)
+        except Exception as exc:
+            raise HTTPException(502, 'Không tải được ảnh lên Cloudinary. Vui lòng thử lại.') from exc
+        return {'path': url}
+    target = MEDIA_ROOT / 'images' / 'uploads' / 'dishes' / (uuid4().hex + '.webp')
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(output.getvalue())
     return {'path': target.relative_to(MEDIA_ROOT).as_posix()}
 
 @router.post('/videos', status_code=201)

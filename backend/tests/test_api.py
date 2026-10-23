@@ -24,6 +24,18 @@ def test_favorite_hidden_and_menu_v2(client):
     assert client.get('/api/hidden').json()==['MA001']
     assert client.post('/api/menu',json={'dish_id':'MA001','date':'2026-10-01','meal':'Trưa','servings':2}).status_code==201
 
+def test_pantry_add_uses_schema_code_and_reuses_existing_item(client):
+    login(client)
+    payload = {'name': 'Nước mắm', 'quantity': 100, 'unit_id': 'DV001'}
+    created = client.post('/api/pantry', json=payload)
+    assert created.status_code == 201
+    assert created.json()['id'].startswith('NLHC')
+    repeated = client.post('/api/pantry', json=payload)
+    assert repeated.status_code == 201
+    assert repeated.json()['id'] == created.json()['id']
+    items = client.get('/api/pantry').json()
+    assert len(items) == 1 and items[0]['quantity'] == 200
+
 def test_v2_model_list_has_core_tables_and_preferences():
     from app.database import Base
     assert len(Base.metadata.tables)==31

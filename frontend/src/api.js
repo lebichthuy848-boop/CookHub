@@ -1,3 +1,5 @@
+import cloudinaryImages from './cloudinary-images.json';
+
 export async function api(path, { method = 'GET', body, signal } = {}) {
   const headers = { 'X-CookHub-Client': 'web' };
   if (body && !(body instanceof FormData)) headers['Content-Type'] = 'application/json';
@@ -20,11 +22,13 @@ export const money = amount => Number(amount || 0).toLocaleString('vi-VN') + ' Ä
 const DISH_IMAGE_VERSION = '20261006-1';
 export function media(path) {
   if (/^https:\/\//i.test(path || '')) return path;
+  const cloudUrl = cloudinaryImages[(path || '').replace(/^\//, '')];
+  if (cloudUrl) return cloudUrl;
   if (/^(images|videos)\/[\w\-./]+$/.test(path || '') && !path.includes('..')) {
     const url = (path.startsWith('videos/') ? '/media/' : '/') + path;
     return path.startsWith('images/mon-an/') ? `${url}?v=${DISH_IMAGE_VERSION}` : url;
   }
-  return '/images/logo.jpg';
+  return cloudinaryImages['images/logo.jpg'] || '/images/logo.jpg';
 }
 export function today() {
   const now = new Date();

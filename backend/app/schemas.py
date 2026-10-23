@@ -100,8 +100,8 @@ class Preferences(Input):
     time: Literal['quick', 'medium', 'relaxed']
     tools: list[Literal['stove', 'air_fryer', 'pressure_cooker', 'oven', 'no_cook']] = Field(min_length=1, max_length=5)
     regions: list[str] = Field(default_factory=list, max_length=5)
-    avoid: list[str] = Field(default_factory=list, max_length=5)
-    budget: str = ''
+    avoid: list[Literal['none', 'seafood_allergy', 'peanut', 'lactose', 'spicy_avoid']] = Field(default_factory=list, max_length=5)
+    budget: Literal['', 'saving', 'normal', 'comfortable'] = ''
     skill: str = ''
     meals: list[str] = Field(default_factory=list, max_length=4)
 
