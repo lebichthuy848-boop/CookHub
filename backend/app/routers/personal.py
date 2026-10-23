@@ -231,7 +231,7 @@ def add_pantry(data: s.Ingredient, user=Depends(current_user), db: Session = Dep
         existing.ngayCapNhat = date.today()
         db.commit()
         return {'id': existing.maChiTiet}
-    key = new_id('NHC')
+    key = allocate_code(db, 'NguyenLieuHienCo', 'NLHC')
     db.add(m.NguyenLieuHienCo(maChiTiet=key, maNguoiDung=user.maNguoiDung,
         maNguyenLieu=ingredient.maNguyenLieu, maDonVi=data.unit_id,
         soLuong=data.quantity, ngayCapNhat=date.today()))
@@ -266,7 +266,7 @@ def menu(start: date, end: date, user=Depends(current_user), db: Session = Depen
     if (end-start).days not in range(0, 367):
         raise HTTPException(422, 'Khoảng ngày phải từ 0 đến 366 ngày.')
     meal_labels = {'Bữa sáng': 'Sáng', 'Bữa trưa': 'Trưa', 'Bữa tối': 'Tối', 'Bữa phụ': 'Ăn nhẹ'}
-    return [dict(id=x.maChiTiet, dish_id=x.maMonAn, date=x.ngayDung, meal=meal_labels.get(x.buaAn, x.buaAn), servings=x.soKhauPhan)
+    return [dict(id=x.maChiTiet, dish_id=x.maMonAn, date=x.ngayDung, meal=meal_labels.get((x.buaAn or '').strip(), (x.buaAn or '').strip()), servings=x.soKhauPhan)
             for x in db.scalars(select(m.ChiTietThucDon).join(m.ThucDon,
                 m.ThucDon.maThucDon == m.ChiTietThucDon.maThucDon).where(
                 m.ThucDon.maNguoiDung == user.maNguoiDung, m.ChiTietThucDon.ngayDung >= start,
@@ -306,15 +306,26 @@ def add_menu(data: s.MenuItem, user=Depends(current_user), db: Session = Depends
         return {'id': key}
 
     try:
+        monday = data.date - timedelta(days=data.date.weekday())
+        sunday = monday + timedelta(days=6)
+        # Serialize creation of a user's week. The SQL Server driver binds the
+        # model's String column as VARCHAR, so comparing it to 'Tuần' misses
+        # existing NVARCHAR rows and creates a new plan on every request.
+        lock_result = db.execute(text("""
+            DECLARE @result INT;
+            EXEC @result = sys.sp_getapplock
+                @Resource=:resource, @LockMode='Exclusive',
+                @LockOwner='Transaction', @LockTimeout=10000;
+            SELECT @result;
+        """), {'resource': f'CookHub:menu:{user.maNguoiDung}:{monday.isoformat()}'}).scalar_one()
+        if lock_result < 0:
+            raise HTTPException(503, 'Không thể mở thực đơn tuần lúc này. Vui lòng thử lại.')
         plan = db.scalar(select(m.ThucDon).where(
             m.ThucDon.maNguoiDung == user.maNguoiDung,
-            m.ThucDon.loaiThucDon == 'Tuần',
-            m.ThucDon.ngayBatDau <= data.date,
-            m.ThucDon.ngayKetThuc >= data.date,
-        ).order_by(m.ThucDon.ngayBatDau.desc()).limit(1))
+            m.ThucDon.ngayBatDau == monday,
+            m.ThucDon.ngayKetThuc == sunday,
+        ).order_by(m.ThucDon.maThucDon).limit(1))
         if plan is None:
-            monday = data.date - timedelta(days=data.date.weekday())
-            sunday = monday + timedelta(days=6)
             plan_id = _next_code(db, 'ThucDon')
             db.execute(text("""
                 DECLARE @plan_type NVARCHAR(30) = NCHAR(84)+NCHAR(117)+NCHAR(7847)+NCHAR(110);
@@ -332,13 +343,13 @@ def add_menu(data: s.MenuItem, user=Depends(current_user), db: Session = Depends
         else:
             plan_id_value = plan.maThucDon
 
-        duplicate = db.scalar(select(m.ChiTietThucDon).where(
-            m.ChiTietThucDon.maThucDon == plan_id_value,
+        possible_duplicates = db.scalars(select(m.ChiTietThucDon).join(
+            m.ThucDon, m.ThucDon.maThucDon == m.ChiTietThucDon.maThucDon).where(
+            m.ThucDon.maNguoiDung == user.maNguoiDung,
             m.ChiTietThucDon.maMonAn == data.dish_id,
             m.ChiTietThucDon.ngayDung == data.date,
-            m.ChiTietThucDon.buaAn == meal,
-        ))
-        if duplicate:
+        )).all()
+        if any((item.buaAn or '').strip() == meal for item in possible_duplicates):
             raise HTTPException(409, 'Món này đã có trong bữa ăn đã chọn.')
 
         item_id = _next_code(db, 'ChiTietThucDon')
@@ -366,12 +377,31 @@ def add_menu(data: s.MenuItem, user=Depends(current_user), db: Session = Depends
 
 
 def _next_code(db, kind):
-    result = db.execute(text("""
-        DECLARE @R TABLE (MaMoi NVARCHAR(20), LoaiMa SYSNAME);
-        DECLARE @M NVARCHAR(20);
-        INSERT INTO @R EXEC dbo.SpCapMaMoi @LoaiMa=:kind, @MaMoi=@M OUTPUT;
-        SELECT @M AS MaMoi;
-    """), {'kind': kind}).mappings().first()
+    # Older CookHub databases have the menu procedures but predate the shared
+    # code allocator. Keep code generation serialized for those installations.
+    if db.execute(text("SELECT OBJECT_ID(N'dbo.SpCapMaMoi', N'P')")).scalar() is None:
+        legacy_codes = {
+            'ThucDon': ('ThucDon', 'MaThucDon', 'TD'),
+            'ChiTietThucDon': ('ChiTietThucDon', 'MaChiTiet', 'CTTD'),
+        }
+        table, column, prefix = legacy_codes[kind]
+        lock_result = db.execute(text("""
+            DECLARE @result INT;
+            EXEC @result = sys.sp_getapplock
+                @Resource=:resource, @LockMode='Exclusive',
+                @LockOwner='Transaction', @LockTimeout=10000;
+            SELECT @result;
+        """), {'resource': f'CookHub:code:{kind}'}).scalar_one()
+        if lock_result < 0:
+            raise HTTPException(503, 'Không thể cấp mã thực đơn lúc này. Vui lòng thử lại.')
+        current = db.execute(text(f"""
+            SELECT MAX(TRY_CONVERT(INT, SUBSTRING({column}, :start, 20)))
+            FROM dbo.{table} WHERE {column} LIKE :prefix
+        """), {'start': len(prefix) + 1, 'prefix': prefix + '%'}).scalar()
+        return f'{prefix}{(current or 0) + 1:03d}'
+
+    result = db.execute(text('EXEC dbo.SpCapMaMoi @LoaiMa=:kind'),
+                        {'kind': kind}).mappings().first()
     value = result.get('MaMoi') if result else None
     if not value:
         raise HTTPException(500, 'Không thể cấp mã dữ liệu mới.')
@@ -414,9 +444,15 @@ def history(user=Depends(current_user), db: Session = Depends(get_db)):
     result = []
     plans = db.scalars(select(m.ThucDon).where(m.ThucDon.maNguoiDung == user.maNguoiDung)
         .order_by(m.ThucDon.ngayBatDau.desc())).all()
+    by_period = {}
     for plan in plans:
+        by_period.setdefault((plan.ngayBatDau, plan.ngayKetThuc), []).append(plan)
+    for group in by_period.values():
+        plan = group[0]
         items = db.scalars(select(m.ChiTietThucDon).where(
-            m.ChiTietThucDon.maThucDon == plan.maThucDon)).all()
+            m.ChiTietThucDon.maThucDon.in_([entry.maThucDon for entry in group]))).all()
+        if not items:
+            continue
         day_count = max(1, (plan.ngayKetThuc - plan.ngayBatDau).days + 1)
         daily_energy = []
         for offset in range(min(day_count, 7)):

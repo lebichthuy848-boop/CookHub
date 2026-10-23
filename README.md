@@ -1,103 +1,58 @@
-﻿# CookHub — FastAPI, React và SQL Server 2022
+# CookHub
 
-Ứng dụng chạy trên SQL Server 2022 database `QuanLyThucDon`, FastAPI và React/Vite. Không dùng Apache, PHP hay MySQL/XAMPP.
+Ứng dụng FastAPI + React/Vite dùng **SQL Server 2022**. Ảnh món ăn và ảnh giao diện được tải từ Cloudinary; video mẫu vẫn nằm trong repo.
 
-## Địa chỉ khi chạy
+## Máy mới cần có
 
-- Giao diện web: <http://127.0.0.1:5173>
-- API: <http://127.0.0.1:8000>
-- Tài liệu API: <http://127.0.0.1:8000/docs>
+- Python 3.11 trở lên và Node.js 22 trở lên.
+- SQL Server 2022 đang chạy, cùng tài khoản có quyền tạo database hoặc một database `QuanLyThucDon` đã được chuẩn bị.
+- Internet để cài thư viện và tải ảnh từ Cloudinary.
 
-`localhost` và `127.0.0.1` đều là máy hiện tại.
+Clone Git không tự cài Python, Node hay SQL Server, và **không chứa `backend/.env`**. Không dùng tên máy hoặc mật khẩu SQL Server của người khác.
 
-## Chạy dự án theo thứ tự
+## Cài lần đầu trên Windows
 
-### 1. Khởi động SQL Server
+1. Clone repo và mở PowerShell tại thư mục gốc.
+2. Tạo database mới bằng SSMS ở chế độ **Query → SQLCMD Mode**: chạy [QuanLyThucDon.sql](QuanLyThucDon.sql), sau đó [Bo-sung.sql](Bo-sung.sql). File đầu chỉ dành cho database chưa tồn tại. Không chạy lại trên database đang có dữ liệu.
+3. Chạy `powershell -ExecutionPolicy Bypass -File .\setup.ps1`. Script tạo Python virtual environment, cài thư viện backend và frontend, tạo `backend/.env` nếu thiếu, hỏi `DATABASE_URL` của máy này và kiểm tra schema.
+4. Mở hai terminal tại thư mục gốc:
 
-Mở **SQL Server Configuration Manager** và xác nhận dịch vụ `SQL Server (SQLEXPRESS)` có trạng thái **Running**.
+   ```powershell
+   .\backend\start.ps1
+   ```
 
-Database cần dùng là `QuanLyThucDon` trên instance:
+   ```powershell
+   .\frontend\start.ps1
+   ```
 
-```text
-DESKTOP-RIDON54\SQLEXPRESS
+5. Mở <http://127.0.0.1:5173> và đăng ký tài khoản mới.
+
+Ví dụ `DATABASE_URL` với SQL Authentication (đổi user, password, host và port theo máy):
+
+```dotenv
+DATABASE_URL=mssql+pymssql://USER:PASSWORD@127.0.0.1:1433/QuanLyThucDon
 ```
 
-Nếu chưa có database, mở SSMS và chạy file [QuanLyThucDon.sql](QuanLyThucDon.sql) để tạo schema và dữ liệu mẫu.
+Nếu mật khẩu chứa ký tự đặc biệt, mã hóa URL cho phần user/password. Với Windows Authentication, có thể dùng `mssql+pyodbc` và ODBC Driver 18 for SQL Server. Xem mẫu trong [backend/.env.example](backend/.env.example); không commit `.env`.
 
-### 2. Mở backend
+Đã cài xong thì kiểm tra lại bằng `powershell -ExecutionPolicy Bypass -File .\setup.ps1 -CheckOnly`.
 
-Mở một cửa sổ **Command Prompt** mới, chạy:
+## Cloudinary và ảnh
 
-```cmd
-cd C:\Users\BThuyy\Desktop\KLCN\GiaoDienThucDon\backend
-.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload
-```
+Hai file [manifest backend](backend/app/cloudinary_images.json) và [manifest frontend](frontend/src/cloudinary-images.json) phải có trong commit khi push. Chúng chứa URL ảnh công khai, không chứa API secret. Người clone **xem được ảnh cũ mà không cần khóa Cloudinary**.
 
-Chờ đến khi thấy:
+Muốn **upload ảnh mới từ trang quản trị**, mỗi máy chạy backend cần `CLOUDINARY_URL` trong `backend/.env`. Chủ tài khoản Cloudinary phải cấp khóa qua kênh riêng hoặc cấu hình nó trực tiếp trên máy đó. Không đưa API secret lên Git. Nếu chưa có khóa, các phần còn lại vẫn chạy; ảnh upload mới chỉ được lưu cục bộ trên máy đó.
 
-```text
-Application startup complete.
-```
+Chi tiết chuyển ảnh và khôi phục: [backend/docs/cloudinary.md](backend/docs/cloudinary.md).
 
-Giữ nguyên cửa sổ này trong khi dùng web. Backend chạy ở cổng `8000`.
+## Kiểm tra
 
-> Cấu hình kết nối SQL Server nằm trong `backend/.env`. Không đổi file này nếu không thay đổi instance SQL Server hoặc tài khoản kết nối.
-
-### 3. Mở frontend
-
-Mở **cửa sổ Command Prompt thứ hai**, chạy:
-
-```cmd
-cd C:\Users\BThuyy\Desktop\KLCN\GiaoDienThucDon\frontend
-set "PATH=%CD%\.tools\node-v22.16.0-win-x64;%PATH%"
-npm run dev
-```
-
-Chờ Vite hiển thị:
-
-```text
-Local: http://127.0.0.1:5173/
-```
-
-Giữ nguyên cửa sổ này. Frontend gọi API qua proxy tới backend ở cổng `8000`.
-
-### 4. Mở web
-
-Mở trình duyệt tại:
-
-```text
-http://127.0.0.1:5173
-```
-
-Nếu giao diện hiện “Không thể hoàn tất yêu cầu”, kiểm tra cửa sổ backend còn hiển thị `Application startup complete` hay không.
-
-## Đăng nhập thử
-
-Tài khoản có thể đăng ký trực tiếp tại giao diện. Mật khẩu được lưu dưới dạng bcrypt trong cột `MatKhauBam`; không thể xem lại mật khẩu gốc từ database.
-
-## Kiểm tra hệ thống
-
-Backend, dùng Command Prompt:
-
-```cmd
-cd C:\Users\BThuyy\Desktop\KLCN\GiaoDienThucDon\backend
+```powershell
+cd backend
 .\.venv\Scripts\python.exe -m pytest tests -q
-.\.venv\Scripts\python.exe -m pytest tests\test_real_db.py -q --real-db
-```
-
-Frontend, dùng Command Prompt:
-
-```cmd
-cd C:\Users\BThuyy\Desktop\KLCN\GiaoDienThucDon\frontend
-set "PATH=%CD%\.tools\node-v22.16.0-win-x64;%PATH%"
+cd ..\frontend
 npm test
 npm run build
 ```
 
-## Cấu trúc chính
-
-```text
-QuanLyThucDon.sql     Schema SQL Server 2022 và dữ liệu mẫu
-backend/              FastAPI, ORM SQLAlchemy, API, ảnh/video
-frontend/             React/Vite
-```
+Frontend: <http://127.0.0.1:5173> · API: <http://127.0.0.1:8000> · API docs: <http://127.0.0.1:8000/docs>.

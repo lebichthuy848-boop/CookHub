@@ -8,7 +8,7 @@ from ..database import get_db
 from ..security import current_user
 from ..services import dish_data, require, rows, ingredient_similarity, normalize_ingredient_text
 from ..nutrition import dish_nutrition
-from ..personalization import load_preferences, rank_dishes
+from ..personalization import load_preferences, rank_dishes, conflicts_with_avoid, within_budget
 
 router = APIRouter(tags=['Catalog'], dependencies=[Depends(current_user)])
 
@@ -47,27 +47,53 @@ def recipe_generator(ingredient: str = ''):
 @router.get('/dishes')
 def dishes(q: str = '', category: list[str] = Query(default=[]),
            max_time: int | None = Query(default=None, ge=1), difficulty: str = '',
-           ingredient: str = '', display: Literal['all', 'home', 'foods'] = 'all', include_drafts: bool = False,
+           ingredient: str = '', calories: int | None = Query(default=None, ge=1),
+           display: Literal['all', 'home', 'foods'] = 'all', include_drafts: bool = False,
            db: Session = Depends(get_db)):
     result = dish_data(db)
     if not include_drafts:
         result = [x for x in result if x.get('recipe')]
-    ingredient_terms = [term.strip() for term in ingredient.split(',') if term.strip()]
+    ingredient_terms = [normalize_ingredient_text(term) for term in ingredient.split(',') if term.strip()]
     normalized_q = normalize_ingredient_text(q)
+    def contains_words(haystack, needle):
+        return bool(needle) and f' {needle} ' in f' {haystack} '
+
     def matches_query(item):
         if not normalized_q:
             return True
         text = normalize_ingredient_text(item['name'] + ' ' + item['description'])
         query_words = normalized_q.split()
-        return normalized_q in text or all(any(word in part for part in text.split()) for word in query_words) or ingredient_similarity(normalized_q, item['name']) >= .45
+        recipe_names = [normalize_ingredient_text(part['name'])
+                        for part in (item['recipe'] or {}).get('ingredients', [])]
+        return (contains_words(text, normalized_q)
+                or all(word in text.split() for word in query_words)
+                or any(contains_words(name, normalized_q) for name in recipe_names))
+
+    def has_ingredients(item):
+        names = [normalize_ingredient_text(part['name'])
+                 for part in (item['recipe'] or {}).get('ingredients', [])]
+        def matches_ingredient(name, term):
+            if term == 'thit ga' and name in {'uc ga', 'dui ga', 'canh ga', 'ga ta'}:
+                return True
+            return contains_words(name, term)
+        return all(any(matches_ingredient(name, term) for name in names)
+                   for term in ingredient_terms)
+
     result = [x for x in result if matches_query(x)
               and (not category or x['category_id'] in category)
               and (max_time is None or x['time'] <= max_time)
               and (not difficulty or x['difficulty'] == difficulty)
-              and (not ingredient_terms or any(ingredient_similarity(term, i['name']) >= .62
-                   for term in ingredient_terms
-                   for i in (x['recipe'] or {}).get('ingredients', [])))
+              and (not ingredient_terms or has_ingredients(x))
               and (display == 'all' or x[display + '_display'])]
+    if calories is not None:
+        filtered = []
+        for item in result:
+            nutrition = dish_nutrition(db, item['id'], 1, date.today())
+            energy = (nutrition.get('totals') or {}).get('nang_luong')
+            if energy is not None and energy <= calories:
+                item['calories'] = round(energy)
+                filtered.append(item)
+        result = filtered
     if display != 'all':
         result.sort(key=lambda x: x[display + '_order'])
     return result
@@ -111,6 +137,10 @@ def recommendations(mode: Literal['for_you', 'taste', 'quick', 'healthy', 'trend
     if mode == 'healthy':
         mode = 'quick'
     result = [x for x in dish_data(db) if x.get('recipe')]
+    if answers and answers.get('avoid'):
+        result = [dish for dish in result if not conflicts_with_avoid(dish, answers['avoid'])]
+    if answers and answers.get('budget'):
+        result = [dish for dish in result if within_budget(dish, answers['budget'])]
     hidden = set(db.scalars(select(m.MonKhongThich.maMonAn)
                            .where(m.MonKhongThich.maNguoiDung == user.maNguoiDung)))
     preferred = set()
