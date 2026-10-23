@@ -1,0 +1,72 @@
+/* Tablet layout: 768–1199 CSS pixels. Desktop styles remain untouched. */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .shell, .system-shell { min-width: 0; }
+  .shell .premium-sidebar, .system-shell .system-sidebar {
+    position: fixed; inset: 0 auto 0 0; z-index: 101; width: min(320px, 85vw);
+    height: 100dvh; overflow-y: auto; transform: translateX(-105%);
+    transition: transform .25s ease; box-shadow: 14px 0 38px #17302026;
+  }
+  .shell .premium-sidebar.open, .system-shell .system-sidebar.open { transform: translateX(0); }
+  .sidebar-scrim { display: block; position: fixed; z-index: 100; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; border-radius: 0; background: #12291d85; }
+  .shell .main-wrap, .system-shell .system-main { width: 100%; min-width: 0; margin-left: 0; }
+  .shell .main-wrap > main { width: 100%; max-width: none; min-width: 0; margin: 0; padding: 24px; }
+  .shell .topbar, .system-shell .system-header { position: relative; z-index: 2; min-height: 72px; height: auto; padding: 12px 24px; gap: 16px; }
+  .shell .mobile-menu, .system-shell .mobile-menu { display: grid; place-items: center; flex: none; width: 42px; height: 42px; padding: 0; border: 1px solid #dce9df; border-radius: 12px; background: #eef7ef; color: #1c684c; font-size: 23px; }
+  .shell .top-search { max-width: none; min-width: 0; }
+  .shell .account { flex: none; }
+  .system-shell .system-content { width: 100%; max-width: none; min-width: 0; margin: 0; padding: 24px; }
+  .system-shell .system-header-user { display: flex; }
+  .system-shell .system-header > div:first-of-type { min-width: 0; }
+
+  .home-hero { min-height: 230px; padding: 30px 34px; }
+  .home-hero > div:first-child { max-width: min(68%, 650px); }
+  .home-hero h1 { font-size: clamp(27px, 3.2vw, 35px); }
+  .collection-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .community-feed { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dish-grid, .discover-grid, .favorite-card-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .explore-dishes.list-view { grid-template-columns: 1fr; }
+  .explore-filters { position: static; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .search-hub .ingredient-hub { flex-wrap: wrap; gap: 14px; }
+  .search-hub .ingredient-hub > div:first-child { max-width: none; }
+  .ingredient-chips { justify-content: flex-start; }
+  .menu-page, .menu-columns, .menu-columns > main { min-width: 0; }
+  .menu-columns { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; }
+  .menu-aside { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+  .menu-aside .nutrition-card { grid-row: span 2; }
+  .menu-columns > main { width: 100%; margin: 0; padding: 0; }
+  .week-calendar { min-width: 0; }
+  .meal-planner-tabs nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .meal-planner-tabs nav button { min-width: 0; padding: 10px; }
+  .meal-planner-tabs nav button small { display: none; }
+  .template-grid, .pantry-item-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pantry-preset-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .recipe-layout { grid-template-columns: minmax(0, 1fr); }
+  .favorite-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .favorite-filters > button { min-height: 42px; }
+  .settings-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-metric-grid, .system-kpis, .system-user-stats, .user-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .admin-chart-grid, .admin-bottom-grid, .system-overview-grid { grid-template-columns: minmax(0, 1fr); }
+  .system-users-toolbar { grid-template-columns: minmax(0, 1fr) minmax(140px, .5fr); }
+  .account-password-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .table-wrap { max-width: 100%; overflow-x: auto; }
+
+  .auth-page { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; padding: 24px; background: #f8f4e9; }
+  .auth-page::before { display: none; }
+  .auth-responsive-banner, .auth-side { grid-area: 1 / 1; }
+  .auth-responsive-banner { display: block; position: relative; width: 100%; aspect-ratio: 4 / 5; max-height: none; overflow: hidden; border-radius: 26px; background: #fbf4e7 url('/images/auth-responsive-v2.png') center / 100% 100% no-repeat; box-shadow: 0 18px 42px #2b462a22; }
+  .auth-banner-copy { position: absolute; top: 2%; left: 8%; right: 8%; color: #174d39; }
+  .auth-banner-brand { display: flex; align-items: center; gap: 8px; line-height: 1; }
+  .auth-banner-brand > span { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 11px; background: #f46b1c; color: #fff; font-size: 25px; }
+  .auth-banner-brand strong { font-size: 21px; }
+  .auth-banner-brand strong span { color: #f46b1c; }
+  .auth-banner-brand small { display: block; margin-top: 4px; color: #66766b; font-size: 8px; letter-spacing: 1px; }
+  .auth-banner-copy h2 { margin: 4% 0 6px; color: #186344; font-size: clamp(23px, 2.9vw, 36px); line-height: 1.2; }
+  .auth-banner-copy h2 span { color: #ee631f; }
+  .auth-banner-copy p { max-width: 35ch; color: #476856; font-size: clamp(12px, 1.3vw, 15px); line-height: 1.45; }
+  .auth-side { position: relative; z-index: 1; justify-self: center; align-self: center; width: min(66%, 580px); min-height: 0; margin: 0; padding: 0; background: none; }
+  .auth-card { width: 100%; max-width: 580px; max-height: none; margin: auto; box-shadow: 0 30px 60px #1c3c2b4d; }
+}
+
+@media (min-width: 768px) and (max-width: 850px) {
+  .auth-side { align-self: center; margin-bottom: 0; transform: translateY(55px); }
+}

@@ -75,6 +75,7 @@ export function Settings() {
 }
 export function DailyNutritionCard({ day, nutrition }) {
   const [dinersByDay, setDinersByDay] = useState({});
+  const [showDetails, setShowDetails] = useState(false);
   const diners = dinersByDay[day] ?? '';
   const result = nutrition.data?.date === day ? nutrition.data : null;
   const totals = result?.totals;
@@ -82,6 +83,7 @@ export function DailyNutritionCard({ day, nutrition }) {
   const average = key => Number((totals[key] / diners).toFixed(2));
   const percent = key => goals?.[key] ? Math.round(average(key) / goals[key] * 100) : 0;
   const format = value => Number(value).toLocaleString('vi-VN', { maximumFractionDigits: 2 });
+  const metrics = [['nang_luong','Năng lượng','kcal'],['chat_dam','Protein','g'],['chat_bot_duong','Carbs','g'],['chat_beo','Chất béo','g'],['chat_xo','Chất xơ','g'],['natri','Natri','mg']];
   return <section id="nutrition-detail" className="nutrition-card">
     <h3>Dinh dưỡng thực đơn ngày {new Intl.DateTimeFormat('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date(day+'T12:00:00'))}</h3>
     {totals ? <>
@@ -90,7 +92,8 @@ export function DailyNutritionCard({ day, nutrition }) {
       {diners && <p className="nutrition-assumption">Ước tính chia đều toàn bộ thực đơn cho {diners} người.</p>}
       <h4>{diners ? 'Trung bình mỗi người so với mục tiêu của tài khoản' : 'Mục tiêu dinh dưỡng cá nhân'}</h4>
       <div className="nutrition-score"><div style={{'--nutrition-percent': `${diners ? Math.min(100, Math.max(0, percent('nang_luong'))) : 0}%`}}><b>{diners ? `${percent('nang_luong')}%` : Number(totals.nang_luong) === 0 ? '0%' : '—'}</b></div>{diners ? <p><strong>{format(average('nang_luong'))} / {format(goals.nang_luong)} kcal</strong><span>Protein <i><b style={{width: `${Math.min(100,percent('chat_dam'))}%`}}/></i> {format(average('chat_dam'))} / {format(goals.chat_dam)}g</span><span>Carbs <i><b style={{width: `${Math.min(100,percent('chat_bot_duong'))}%`}}/></i> {format(average('chat_bot_duong'))} / {format(goals.chat_bot_duong)}g</span><span>Chất béo <i><b style={{width: `${Math.min(100,percent('chat_beo'))}%`}}/></i> {format(average('chat_beo'))} / {format(goals.chat_beo)}g</span></p> : <p className="nutrition-pending"><strong>Chọn số người cùng ăn</strong></p>}</div>
-
+      <button type="button" className="nutrition-detail-toggle" aria-expanded={showDetails} aria-controls="nutrition-breakdown" onClick={() => setShowDetails(value => !value)}>{showDetails ? 'Thu gọn chi tiết ↑' : 'Xem chi tiết dinh dưỡng →'}</button>
+      {showDetails && <div id="nutrition-breakdown" className="nutrition-breakdown"><h4>Chi tiết dinh dưỡng trong ngày</h4><div className="nutrition-breakdown-list">{metrics.map(([key,label,unit]) => <div key={key}><span>{label}</span><strong>{format(diners ? average(key) : totals[key])} / {format(goals?.[key] || 0)} {unit}</strong><small>{diners ? `${percent(key)}% mục tiêu mỗi người` : 'Tổng của thực đơn'}</small></div>)}</div></div>}
     </> : <p className="empty">Chưa đủ dữ liệu dinh dưỡng cho ngày này.</p>}
   </section>;
 }

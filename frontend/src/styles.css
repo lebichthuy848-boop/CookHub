@@ -52,7 +52,7 @@
 .auth-side{position:absolute;top:7.5%;right:5.8%;bottom:8%;width:40%;padding:0;background:transparent;display:grid;place-items:center}
 .auth-card{width:100%;max-width:455px;max-height:100%;overflow:auto;padding:30px 34px;border-radius:26px;background:rgba(255,252,246,.72);border:1px solid rgba(255,255,255,.78);box-shadow:0 22px 48px rgba(69,75,35,.20);backdrop-filter:blur(13px)}
 .auth-card h1{font-size:27px}.auth-intro{margin-bottom:18px}.auth-tabs{margin-bottom:20px}.auth-fields .field{margin-bottom:12px}.auth-input-wrap input{height:45px}.auth-cta{padding:11px 16px}.auth-divider{margin:18px 0 12px}
-@media(max-width:850px){.auth-page{background-size:cover;background-position:center}.auth-side{position:relative;top:auto;right:auto;bottom:auto;width:100%;min-height:100vh;padding:42px 18px;background:linear-gradient(90deg,rgba(255,252,246,.38),rgba(255,252,246,.86))}.auth-card{max-width:480px;padding:29px 24px;background:rgba(255,252,246,.86)}}
+@media(max-width:1200px){.auth-page{padding:0;background:#f8f4e9}.auth-page::before{content:'';display:block;width:100%;aspect-ratio:1448/1086;background:url('/images/auth-background.png') center/contain no-repeat}.auth-side{position:relative;top:auto;right:auto;bottom:auto;width:100%;min-height:0;padding:0 18px 32px;background:transparent}.auth-card{max-width:480px;padding:29px 24px;background:rgba(255,252,246,.86)}}
 
 /* Premium glass authentication card */
 .auth-card{position:relative;isolation:isolate;overflow:hidden;border:1px solid transparent;background:linear-gradient(rgba(255,253,247,.74),rgba(255,251,241,.66)) padding-box,linear-gradient(135deg,rgba(56,151,112,.88),rgba(255,226,163,.86),rgba(43,122,92,.76)) border-box;box-shadow:0 34px 68px rgba(29,61,43,.24),0 12px 25px rgba(91,75,36,.13),inset 0 1px 0 rgba(255,255,255,.85),inset 0 -1px 0 rgba(38,113,80,.12);backdrop-filter:blur(20px) saturate(135%)}
@@ -236,3 +236,6 @@ main:has(.menu-page){max-width:none;padding-right:38px;padding-left:38px}.menu-p
 
 
 
+.nutrition-detail-toggle{display:block;width:100%;padding:11px 0 0;border:0;border-top:1px solid #dcebe0;background:transparent;color:#24815e;font:inherit;font-size:11px;font-weight:800;text-align:center;cursor:pointer}.nutrition-detail-toggle:hover{text-decoration:underline}.nutrition-detail-toggle:focus-visible{outline:2px solid #24815e;outline-offset:3px}.nutrition-breakdown{margin-top:14px;padding-top:14px;border-top:1px solid #dcebe0}.nutrition-breakdown h4{margin:0 0 10px;color:#234e3e;font-size:14px}.nutrition-breakdown p{margin:0;color:#597767;font-size:12px;line-height:1.5}.nutrition-breakdown-list{display:grid;gap:8px}.nutrition-breakdown-list>div{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:9px 10px;border-radius:9px;background:#f0f8f2;color:#526f5e;font-size:12px}.nutrition-breakdown-list strong{color:#245b43}.nutrition-breakdown-list small{grid-column:1/-1;color:#648875}.menu-columns>main{margin:0;padding:0;align-self:start}
+.auth-responsive-banner{display:none}
+.sidebar-scrim{display:none}

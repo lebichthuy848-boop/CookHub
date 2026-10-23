@@ -26,7 +26,7 @@ export default function Auth({ mode = 'login' }) {
     catch (err) { setError(err.message); } finally { setBusy(false); }
   }
   async function social(provider) { setBusy(true); setError(''); setMessage(''); try { const result = await api(`/auth/${provider}/start`); if (result?.authorization_url) window.location.assign(result.authorization_url); } catch (err) { setError(err.message); } finally { setBusy(false); } }
-  return <main className="auth-page"><aside className="auth-scene"/>
+  return <main className="auth-page"><aside className="auth-scene"/><div className="auth-responsive-banner"><div className="auth-banner-copy"><div className="auth-banner-brand"><span aria-hidden="true">✿</span><strong>Cook<span>Hub</span><small>Nấu ngon mỗi ngày</small></strong></div><h2><span>Nấu ngon mỗi ngày</span><br/>Sống khỏe mỗi ngày</h2><p>Khám phá món ngon và tạo thực đơn phù hợp cho mỗi ngày.</p></div></div>
     <section className="auth-side"><div className="auth-card">
       <p className="auth-eyebrow">NẤU NGON MỖI NGÀY</p><nav className="auth-tabs" aria-label="Xác thực">{modes.map(([key,label,path]) => <Link key={key} to={path} className={mode === key ? 'active' : ''}>{label}</Link>)}</nav>
       <h1>{titles[mode]}</h1><p className="auth-intro">{mode === 'forgot' ? 'Nhập email để nhận hướng dẫn khôi phục.' : 'Cùng tạo nên những bữa ăn bạn yêu thích.'}</p><Notice error={error} message={message}/>

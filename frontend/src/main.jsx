@@ -8,6 +8,8 @@ import './styles.css';
 import './settings-page.css';
 import './theme.css';
 import './list-view.css?v=20261009-list-card';
+import './tablet/index.css';
+import './mobile/index.css';
 
 class AppErrorBoundary extends React.Component {
   state = { error: null };
