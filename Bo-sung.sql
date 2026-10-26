@@ -1361,3 +1361,602 @@ BEGIN
     WHERE td.NgayTao IS NULL;
 END;
 GO
+
+-- ============================================================
+-- DỮ LIỆU SEED BỔ SUNG: khôi phục đủ catalog bản 24/10/2026
+-- Chạy sau QuanLyThucDon.sql; có thể chạy lại an toàn.
+-- Kết quả mong đợi: 9 tài khoản, 65 món, 64 công thức,
+-- 100 nguyên liệu, 90 dòng dinh dưỡng và 3 video mẫu.
+-- ============================================================
+USE QuanLyThucDon;
+GO
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+-- Tài khoản mẫu ND006-ND009 dùng chung mật khẩu: CookHub123!
+IF NOT EXISTS (SELECT 1 FROM dbo.NguoiDung WHERE MaNguoiDung=N'ND006')
+    INSERT dbo.NguoiDung(MaNguoiDung,HoTen,ThuDienTu,MatKhauBam,VaiTro,TrangThai)
+    VALUES (N'ND006',N'Tài khoản mẫu 06',N'demo06@example.com',N'$2b$12$IyW.UgA0MhIQNnQRAFqciOUjjDNLTf./IId7iXsmQxQSZJxt1gIoG',N'Người dùng',N'Đang hoạt động');
+
+IF NOT EXISTS (SELECT 1 FROM dbo.NguoiDung WHERE MaNguoiDung=N'ND007')
+    INSERT dbo.NguoiDung(MaNguoiDung,HoTen,ThuDienTu,MatKhauBam,VaiTro,TrangThai)
+    VALUES (N'ND007',N'Tài khoản mẫu 07',N'demo07@example.com',N'$2b$12$IyW.UgA0MhIQNnQRAFqciOUjjDNLTf./IId7iXsmQxQSZJxt1gIoG',N'Người dùng',N'Đang hoạt động');
+
+IF NOT EXISTS (SELECT 1 FROM dbo.NguoiDung WHERE MaNguoiDung=N'ND008')
+    INSERT dbo.NguoiDung(MaNguoiDung,HoTen,ThuDienTu,MatKhauBam,VaiTro,TrangThai)
+    VALUES (N'ND008',N'Tài khoản mẫu 08',N'demo08@example.com',N'$2b$12$IyW.UgA0MhIQNnQRAFqciOUjjDNLTf./IId7iXsmQxQSZJxt1gIoG',N'Người dùng',N'Đang hoạt động');
+
+IF NOT EXISTS (SELECT 1 FROM dbo.NguoiDung WHERE MaNguoiDung=N'ND009')
+    INSERT dbo.NguoiDung(MaNguoiDung,HoTen,ThuDienTu,MatKhauBam,VaiTro,TrangThai)
+    VALUES (N'ND009',N'Tài khoản mẫu 09',N'demo09@example.com',N'$2b$12$IyW.UgA0MhIQNnQRAFqciOUjjDNLTf./IId7iXsmQxQSZJxt1gIoG',N'Người dùng',N'Đang hoạt động');
+
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[DanhMucMonAn] WHERE [MaDanhMuc] = N'DM010')
+BEGIN
+    INSERT dbo.[DanhMucMonAn] ([MaDanhMuc], [TenDanhMuc], [MoTa], [TrangThaiSuDung], [NgayCapNhat])
+    VALUES (N'DM010', N'Món mặn', N'Các món ăn đậm đà, thường dùng làm món chính trong bữa cơm hằng ngày, được chế biến từ thịt, cá, trứng, hải sản và nhiều nguyên liệu khác.', N'Đang sử dụng', CONVERT(datetime2(3),N'2026-10-07T18:21:16.000',126));
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[DanhMucMonAn] WHERE [MaDanhMuc] = N'DM011')
+BEGIN
+    INSERT dbo.[DanhMucMonAn] ([MaDanhMuc], [TenDanhMuc], [MoTa], [TrangThaiSuDung], [NgayCapNhat])
+    VALUES (N'DM011', N'Món xào', N'Các món ăn được chế biến bằng phương pháp xào trên lửa vừa hoặc lớn, kết hợp đa dạng nguyên liệu như thịt, hải sản, rau củ và gia vị, mang đến hương vị đậm đà, thơm ngon và hấp dẫn.', N'Đang sử dụng', CONVERT(datetime2(3),N'2026-10-10T06:40:19.000',126));
+END;
+IF NOT EXISTS (SELECT 1 FROM dbo.[NguyenLieu] WHERE [MaNguyenLieu] = N'NL091')
+BEGIN
+    INSERT dbo.[NguyenLieu] ([MaNguyenLieu], [TenNguyenLieu], [MoTa])
+    VALUES (N'NL091', N'Dầu mè', N'Nguyên liệu do người dùng bổ sung');
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[NguyenLieu] WHERE [MaNguyenLieu] = N'NL092')
+BEGIN
+    INSERT dbo.[NguyenLieu] ([MaNguyenLieu], [TenNguyenLieu], [MoTa])
+    VALUES (N'NL092', N'Bột hành', N'Nguyên liệu do người dùng bổ sung');
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[NguyenLieu] WHERE [MaNguyenLieu] = N'NL093')
+BEGIN
+    INSERT dbo.[NguyenLieu] ([MaNguyenLieu], [TenNguyenLieu], [MoTa])
+    VALUES (N'NL093', N'Bột nở', N'Nguyên liệu do người dùng bổ sung');
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[NguyenLieu] WHERE [MaNguyenLieu] = N'NL094')
+BEGIN
+    INSERT dbo.[NguyenLieu] ([MaNguyenLieu], [TenNguyenLieu], [MoTa])
+    VALUES (N'NL094', N'Xì dầu', N'');
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[NguyenLieu] WHERE [MaNguyenLieu] = N'NL095')
+BEGIN
+    INSERT dbo.[NguyenLieu] ([MaNguyenLieu], [TenNguyenLieu], [MoTa])
+    VALUES (N'NL095', N'Cam vàng', N'Nguyên liệu do người dùng bổ sung');
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[NguyenLieu] WHERE [MaNguyenLieu] = N'NL096')
+BEGIN
+    INSERT dbo.[NguyenLieu] ([MaNguyenLieu], [TenNguyenLieu], [MoTa])
+    VALUES (N'NL096', N'Bột ngọt', N'Nguyên liệu do người dùng bổ sung');
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[NguyenLieu] WHERE [MaNguyenLieu] = N'NL097')
+BEGIN
+    INSERT dbo.[NguyenLieu] ([MaNguyenLieu], [TenNguyenLieu], [MoTa])
+    VALUES (N'NL097', N'Hạt nêm', N'Nguyên liệu do người dùng bổ sung');
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[NguyenLieu] WHERE [MaNguyenLieu] = N'NL098')
+BEGIN
+    INSERT dbo.[NguyenLieu] ([MaNguyenLieu], [TenNguyenLieu], [MoTa])
+    VALUES (N'NL098', N'Lòng trắng trứng gà', N'Nguyên liệu do người dùng bổ sung');
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[NguyenLieu] WHERE [MaNguyenLieu] = N'NL099')
+BEGIN
+    INSERT dbo.[NguyenLieu] ([MaNguyenLieu], [TenNguyenLieu], [MoTa])
+    VALUES (N'NL099', N'Bột tỏi', N'Nguyên liệu do người dùng bổ sung');
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[NguyenLieu] WHERE [MaNguyenLieu] = N'NL100')
+BEGIN
+    INSERT dbo.[NguyenLieu] ([MaNguyenLieu], [TenNguyenLieu], [MoTa])
+    VALUES (N'NL100', N'Rau cải', N'');
+END;
+IF NOT EXISTS (SELECT 1 FROM dbo.[MonAn] WHERE [MaMonAn] = N'MA061')
+BEGIN
+    INSERT dbo.[MonAn] ([MaMonAn], [MaDanhMuc], [TenMonAn], [MoTa], [ThoiGianCheBien], [DoKho], [DuongDanAnh], [TrangThaiHienThi], [NgayCapNhat])
+    VALUES (N'MA061', N'DM004', N'Bò xào nấm', N'Thịt bò xào nhanh với nấm đùi gà, nấm rơm và hành tây.', 30, N'Trung bình', N'images/uploads/dishes/62c66279a2b5432fa45c35e9fd61fcab.webp', N'Hiển thị', CONVERT(datetime2(3),N'2026-10-07T13:53:40.000',126));
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[MonAn] WHERE [MaMonAn] = N'MA062')
+BEGIN
+    INSERT dbo.[MonAn] ([MaMonAn], [MaDanhMuc], [TenMonAn], [MoTa], [ThoiGianCheBien], [DoKho], [DuongDanAnh], [TrangThaiHienThi], [NgayCapNhat])
+    VALUES (N'MA062', N'DM005', N'Cá hồi sốt mật ong chanh', N'Cá hồi áp chảo phủ sốt mật ong chanh chua ngọt, thơm tỏi.', 30, N'Trung bình', N'images/uploads/dishes/49009d1b468f4417864a87d07e885d89.webp', N'Hiển thị', CONVERT(datetime2(3),N'2026-10-07T13:53:40.000',126));
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[MonAn] WHERE [MaMonAn] = N'MA063')
+BEGIN
+    INSERT dbo.[MonAn] ([MaMonAn], [MaDanhMuc], [TenMonAn], [MoTa], [ThoiGianCheBien], [DoKho], [DuongDanAnh], [TrangThaiHienThi], [NgayCapNhat])
+    VALUES (N'MA063', N'DM005', N'Tôm rang me', N'Tôm rang với sốt me chua ngọt, nước mắm, tỏi và ớt.', 30, N'Trung bình', N'images/uploads/dishes/88fdb902dd70495e87be57d65ac7a553.webp', N'Hiển thị', CONVERT(datetime2(3),N'2026-10-07T13:53:41.000',126));
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[MonAn] WHERE [MaMonAn] = N'MA064')
+BEGIN
+    INSERT dbo.[MonAn] ([MaMonAn], [MaDanhMuc], [TenMonAn], [MoTa], [ThoiGianCheBien], [DoKho], [DuongDanAnh], [TrangThaiHienThi], [NgayCapNhat])
+    VALUES (N'MA064', N'DM004', N'Gà sốt cam', N'Thịt gà chiên vàng kết hợp với sốt cam chua ngọt, thơm nhẹ và đậm vị.', 35, N'Trung bình', N'images/uploads/dishes/8e870e57b99342c5b21ac9ae8ed27124.webp', N'Hiển thị', CONVERT(datetime2(3),N'2026-10-07T07:57:34.000',126));
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[MonAn] WHERE [MaMonAn] = N'MA065')
+BEGIN
+    INSERT dbo.[MonAn] ([MaMonAn], [MaDanhMuc], [TenMonAn], [MoTa], [ThoiGianCheBien], [DoKho], [DuongDanAnh], [TrangThaiHienThi], [NgayCapNhat])
+    VALUES (N'MA065', N'DM004', N'Gà sốt chanh dây kiểu nhiệt đới', N'Thịt gà áp chảo vàng giòn, phủ sốt chanh dây thơm dịu, chua ngọt hài hòa. Ăn kèm cơm trắng hoặc rau củ hấp.', 40, N'Trung bình', N'images/uploads/dishes/8121727afb7e46bc8964c92fda4daba1.webp', N'Hiển thị', CONVERT(datetime2(3),N'2026-10-08T13:06:49.000',126));
+END;
+IF NOT EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc=N'CT061')
+BEGIN
+    INSERT dbo.CongThuc ([MaCongThuc], [MaMonAn], [MoTa], [SoKhauPhanChuan], [DaCongBo], [NgayCapNhat])
+    VALUES (N'CT061', N'MA062', N'Công thức Cá hồi sốt mật ong chanh cho 2 khẩu phần.', 2, 0, CONVERT(datetime2(3),N'2026-10-07T13:53:41.000',126));
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc=N'CT062')
+BEGIN
+    INSERT dbo.CongThuc ([MaCongThuc], [MaMonAn], [MoTa], [SoKhauPhanChuan], [DaCongBo], [NgayCapNhat])
+    VALUES (N'CT062', N'MA063', N'Công thức Tôm rang me cho 2 khẩu phần.', 2, 0, CONVERT(datetime2(3),N'2026-10-07T13:53:41.000',126));
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc=N'CT063')
+BEGIN
+    INSERT dbo.CongThuc ([MaCongThuc], [MaMonAn], [MoTa], [SoKhauPhanChuan], [DaCongBo], [NgayCapNhat])
+    VALUES (N'CT063', N'MA061', N'Công thức Bò xào nấm cho 2 khẩu phần.', 2, 0, CONVERT(datetime2(3),N'2026-10-07T13:53:40.000',126));
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc=N'CT064')
+BEGIN
+    INSERT dbo.CongThuc ([MaCongThuc], [MaMonAn], [MoTa], [SoKhauPhanChuan], [DaCongBo], [NgayCapNhat])
+    VALUES (N'CT064', N'MA064', N'', 4, 0, CONVERT(datetime2(3),N'2026-10-07T13:19:16.000',126));
+END;
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP451')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP451', N'CT064', N'NL096', N'DVT006', 0.500);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP452')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP452', N'CT061', N'NL073', N'DVT001', 2.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP453')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP453', N'CT061', N'NL072', N'DVT001', 12.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP454')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP454', N'CT064', N'NL074', N'DVT006', 1.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP455')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP455', N'CT063', N'NL073', N'DVT001', 2.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP456')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP456', N'CT062', N'NL074', N'DVT001', 18.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP457')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP457', N'CT064', N'NL098', N'DVT005', 1.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP458')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP458', N'CT063', N'NL051', N'DVT001', 12.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP459')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP459', N'CT062', N'NL072', N'DVT001', 18.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP460')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP460', N'CT064', N'NL091', N'DVT006', 0.333);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP461')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP461', N'CT061', N'NL076', N'DVT001', 22.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP462')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP462', N'CT064', N'NL093', N'DVT001', 5.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP463')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP463', N'CT064', N'NL050', N'DVT011', 1.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP464')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP464', N'CT063', N'NL048', N'DVT001', 100.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP465')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP465', N'CT062', N'NL054', N'DVT001', 5.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP466')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP466', N'CT063', N'NL033', N'DVT001', 120.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP467')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP467', N'CT063', N'NL075', N'DVT001', 3.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP468')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP468', N'CT064', N'NL073', N'DVT006', 0.500);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP469')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP469', N'CT064', N'NL071', N'DVT006', 1.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP470')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP470', N'CT064', N'NL072', N'DVT003', 40.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP471')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP471', N'CT064', N'NL097', N'DVT006', 0.500);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP472')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP472', N'CT062', N'NL026', N'DVT001', 350.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP473')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP473', N'CT062', N'NL051', N'DVT001', 12.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP474')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP474', N'CT062', N'NL070', N'DVT001', 15.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP475')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP475', N'CT061', N'NL019', N'DVT001', 320.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP476')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP476', N'CT061', N'NL075', N'DVT001', 2.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP477')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP477', N'CT063', N'NL011', N'DVT001', 320.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP478')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP478', N'CT064', N'NL014', N'DVT001', 500.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP479')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP479', N'CT063', N'NL071', N'DVT001', 18.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP480')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP480', N'CT064', N'NL099', N'DVT006', 0.333);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP481')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP481', N'CT061', N'NL062', N'DVT001', 35.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP482')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP482', N'CT064', N'NL092', N'DVT006', 0.333);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP483')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP483', N'CT063', N'NL072', N'DVT001', 18.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP484')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP484', N'CT061', N'NL051', N'DVT001', 10.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP485')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP485', N'CT062', N'NL077', N'DVT001', 35.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP486')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP486', N'CT061', N'NL071', N'DVT001', 12.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP487')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP487', N'CT062', N'NL050', N'DVT001', 20.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP488')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP488', N'CT063', N'NL032', N'DVT001', 180.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP489')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP489', N'CT064', N'NL095', N'DVT005', 2.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP490')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP490', N'CT064', N'NL052', N'DVT001', 20.000);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[ThanhPhanCongThuc] WHERE [MaThanhPhan] = N'TP491')
+BEGIN
+    INSERT dbo.[ThanhPhanCongThuc] ([MaThanhPhan], [MaCongThuc], [MaNguyenLieu], [MaDonVi], [SoLuong])
+    VALUES (N'TP491', N'CT064', N'NL079', N'DVT001', 60.000);
+END;
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB358')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB358', N'CT064', 6, N'Rim: Rim gà với sốt cam ở lửa nhỏ khoảng 10 phút, đến khi nước giảm và sốt sệt, bám quanh miếng gà. Nguồn có hướng dẫn nêm lại cho vừa ăn ở bước cuối.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB359')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB359', N'CT061', 1, N'Thấm khô cá hồi rồi nêm nhẹ muối và tiêu ở hai mặt.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB360')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB360', N'CT063', 5, N'Xào nấm đến khi vừa chín và lượng nước tiết ra giảm bớt.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB361')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB361', N'CT061', 7, N'Tắt bếp, để cá nghỉ ngắn rồi dùng nóng cùng phần sốt.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB362')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB362', N'CT063', 6, N'Cho thịt bò trở lại chảo, đảo nhanh với nấm và nêm thêm một ít muối nếu cần.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB363')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB363', N'CT061', 3, N'Băm nhỏ tỏi. Làm nóng dầu trong chảo rồi cho cá hồi vào áp chảo đến khi mặt đầu tiên vàng.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB364')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB364', N'CT061', 4, N'Lật cá, cho tỏi vào chảo và đảo nhanh đến khi thơm.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB365')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB365', N'CT062', 7, N'Thêm ớt và hành lá, đảo nhanh rồi tắt bếp.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB366')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB366', N'CT061', 6, N'Nấu đến khi cá vừa chín và sốt giảm còn độ sánh nhẹ.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB367')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB367', N'CT062', 6, N'Tiếp tục rang đến khi nước sốt me sánh lại và bám đều quanh tôm.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB368')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB368', N'CT064', 1, N'Sơ chế và ướp gà: Xát muối lên thịt gà khoảng 10 phút rồi rửa sạch.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB369')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB369', N'CT061', 5, N'Rót hỗn hợp mật ong chanh vào chảo, hạ lửa vừa và liên tục rưới sốt lên mặt cá.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB370')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB370', N'CT064', 4, N'Chiên gà: Làm nóng 40 ml dầu ăn, cho gà vào chiên ở lửa nhỏ, lật đều hai mặt. Chiên khoảng 10–15 phút đến khi gà vàng giòn rồi lấy ra.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB371')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB371', N'CT063', 3, N'Làm nóng một nửa lượng dầu, cho thịt bò vào xào nhanh trên lửa lớn đến khi vừa săn rồi lấy ra.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB372')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB372', N'CT061', 2, N'Vắt chanh lấy nước, trộn với mật ong và nước tương để tạo hỗn hợp sốt.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB373')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB373', N'CT064', 7, N'Hoàn thiện: Rắc hành lá thái nhỏ rồi tắt bếp. Thành phẩm được mô tả có lớp ngoài vàng, vị chua ngọt nhẹ của cam và sốt sệt bao quanh thịt gà.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB374')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB374', N'CT063', 7, N'Khi thịt bò vừa chín tới, rắc thêm tiêu rồi tắt bếp.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB375')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB375', N'CT064', 5, N'Làm sốt cam: Dùng lại chảo, phi gừng khoảng 1 phút. Cho gà đã chiên vào đảo khoảng 1 phút, sau đó thêm 120 ml nước cam + 1/2 muỗng canh bột ngọt + 1/2 muỗng canh hạt nêm + 1 muỗng canh nước tương + 1 muỗng canh đường.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB376')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB376', N'CT062', 4, N'Làm nóng dầu, cho tỏi vào phi thơm rồi thêm tôm và rang trên lửa vừa đến khi tôm đổi màu.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB377')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB377', N'CT063', 4, N'Cho phần dầu còn lại vào chảo, phi tỏi thơm rồi thêm hành tây và các loại nấm.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB378')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB378', N'CT063', 1, N'Thái thịt bò thành lát mỏng ngang thớ rồi ướp với nước tương và tiêu trong khoảng 10 phút.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB379')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB379', N'CT064', 2, N'Cắt 500 g gà thành miếng vừa ăn. Ướp với 1/2 muỗng canh muối + 1/3 muỗng canh bột tỏi + 1/3 muỗng canh bột hành + 1/3 muỗng canh dầu mè + 60 g bột bắp + 5 g bột nở + 1 lòng trắng trứng. Trộn đều rồi để trong ngăn mát 30–60 phút.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB380')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB380', N'CT062', 1, N'Làm sạch tôm, cắt bớt râu và để thật ráo.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB381')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB381', N'CT063', 2, N'Làm sạch nấm đùi gà và nấm rơm, cắt thành miếng vừa ăn. Thái hành tây và băm nhỏ tỏi.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB382')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB382', N'CT064', 3, N'Chuẩn bị cam: Rửa 2 quả cam vàng, cắt đôi rồi vắt lấy khoảng 120 ml nước cam. Gừng gọt vỏ, băm nhỏ; hành lá rửa sạch và thái nhỏ.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB383')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB383', N'CT062', 2, N'Ngâm me với một ít nước nóng, dằm kỹ rồi lọc lấy phần nước me.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB384')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB384', N'CT062', 3, N'Băm nhỏ tỏi và ớt, cắt nhỏ hành lá.', NULL);
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[BuocCheBien] WHERE [MaBuoc] = N'BCB385')
+BEGIN
+    INSERT dbo.[BuocCheBien] ([MaBuoc], [MaCongThuc], [ThuTu], [NoiDung], [ThoiGianThucHien])
+    VALUES (N'BCB385', N'CT062', 5, N'Cho nước me, nước mắm và đường vào chảo, đảo đều để gia vị hòa tan.', NULL);
+END;
+UPDATE dbo.CongThuc SET DaCongBo=1 WHERE MaCongThuc IN (N'CT061',N'CT062',N'CT063',N'CT064') AND DaCongBo=0;
+IF NOT EXISTS (SELECT 1 FROM dbo.[DoanPhimHuongDan] WHERE [MaDoanPhim] = N'DP001')
+BEGIN
+    INSERT dbo.[DoanPhimHuongDan] ([MaDoanPhim], [MaCongThuc], [TieuDe], [DuongDan], [MoTa], [ThoiLuong], [TrangThaiSuDung], [NgayCapNhat])
+    VALUES (N'DP001', N'CT001', N'Video hướng dẫn món Phở bò viên.', N'https://youtu.be/A4pluPQW8s4?si=pdlo-6N9GoY3Sx0A', N'Video hướng dẫn chi tiết cách làm món Phở bò viên.', NULL, N'Đang sử dụng', CONVERT(datetime2(3),N'2026-10-07T14:10:14.000',126));
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[DoanPhimHuongDan] WHERE [MaDoanPhim] = N'DP002')
+BEGIN
+    INSERT dbo.[DoanPhimHuongDan] ([MaDoanPhim], [MaCongThuc], [TieuDe], [DuongDan], [MoTa], [ThoiLuong], [TrangThaiSuDung], [NgayCapNhat])
+    VALUES (N'DP002', N'CT001', N'abc', N'https://www.youtube.com/watch?v=EWHm7YA8Tio', N'abc', NULL, N'Đang sử dụng', CONVERT(datetime2(3),N'2026-10-09T15:42:59.000',126));
+END;
+
+IF NOT EXISTS (SELECT 1 FROM dbo.[DoanPhimHuongDan] WHERE [MaDoanPhim] = N'DP003')
+BEGIN
+    INSERT dbo.[DoanPhimHuongDan] ([MaDoanPhim], [MaCongThuc], [TieuDe], [DuongDan], [MoTa], [ThoiLuong], [TrangThaiSuDung], [NgayCapNhat])
+    VALUES (N'DP003', N'CT001', N'abc', N'https://youtu.be/WAC2UgTTifo?si=mBgZW2dtFOCOPkx5', N'abc', NULL, N'Đang sử dụng', CONVERT(datetime2(3),N'2026-10-09T16:10:30.000',126));
+END;
+
+IF (SELECT COUNT(*) FROM dbo.NguoiDung) <> 9 THROW 55001,N'Seed dữ liệu: số tài khoản không bằng 9.',1;
+IF (SELECT COUNT(*) FROM dbo.MonAn) <> 65 THROW 55002,N'Seed dữ liệu: số món không bằng 65.',1;
+IF (SELECT COUNT(*) FROM dbo.CongThuc) <> 64 THROW 55003,N'Seed dữ liệu: số công thức không bằng 64.',1;
+IF (SELECT COUNT(*) FROM dbo.NguyenLieu) <> 100 THROW 55004,N'Seed dữ liệu: số nguyên liệu không bằng 100.',1;
+IF (SELECT COUNT(*) FROM dbo.ThongTinDinhDuong) <> 90 THROW 55005,N'Seed dữ liệu: số bản ghi dinh dưỡng không bằng 90.',1;
+IF (SELECT COUNT(*) FROM dbo.DoanPhimHuongDan) <> 3 THROW 55006,N'Seed dữ liệu: số video không bằng 3.',1;
+    COMMIT TRANSACTION;
+    PRINT N'Đã nạp đủ dữ liệu CookHub cũ: 9 tài khoản, 65 món, 64 công thức, 100 nguyên liệu, 90 dinh dưỡng, 3 video.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0 ROLLBACK TRANSACTION;
+    THROW;
+END CATCH;
+GO
