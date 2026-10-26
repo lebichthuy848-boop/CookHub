@@ -17103,7 +17103,7 @@ GO
 
 -- ============================================================
 -- DỮ LIỆU SEED BỔ SUNG: khôi phục đủ catalog bản 24/10/2026
--- Chạy sau QuanLyThucDon.sql; có thể chạy lại an toàn.
+-- Phần seed này đã được gộp trong file; có thể chạy lại an toàn.
 -- Kết quả mong đợi: 9 tài khoản, 65 món, 64 công thức,
 -- 100 nguyên liệu, 90 dòng dinh dưỡng và 3 video mẫu.
 -- ============================================================
