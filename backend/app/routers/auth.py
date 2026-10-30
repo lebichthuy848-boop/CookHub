@@ -14,15 +14,6 @@ logger = logging.getLogger(__name__)
 def by_email(db, email):
     return db.scalar(select(m.NguoiDung).where(func.lower(m.NguoiDung.thuDienTu) == email.lower()))
 
-@router.get('/{provider}/start')
-def social_start(provider: str):
-    # OAuth is intentionally blocked until callback/state verification and a
-    # persistent provider-link table are available. Never start a flow that
-    # cannot safely complete account linking.
-    if provider.lower() not in {'google', 'facebook'}:
-        raise HTTPException(404, 'Nhà cung cấp đăng nhập không hợp lệ.')
-    raise HTTPException(501, 'Đăng nhập mạng xã hội chưa thể bật: cần cấu hình callback OAuth và nơi lưu liên kết tài khoản.')
-
 @router.post('/login')
 def login(data: s.Login, response: Response, db: Session = Depends(get_db)):
     user = by_email(db, data.email)
@@ -77,6 +68,8 @@ def register(data: s.Register, response: Response, db: Session = Depends(get_db)
             number, getattr(exc.orig, 'procedure', None),
             getattr(exc.orig, 'line', None), message,
         )
+        if number == 2627 and 'PRIMARY KEY' in message.upper() and 'NguoiDung' in message:
+            raise HTTPException(500, 'Bộ cấp mã tài khoản chưa đồng bộ với dữ liệu mẫu.')
         if number in {2601, 2627, 51032} or 'duplicate' in message.lower() or 'đã được sử dụng' in message.lower():
             raise HTTPException(409, 'Email đã tồn tại.')
         if number in {201, 8144, 8145, 8146}:

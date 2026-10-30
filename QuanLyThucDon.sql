@@ -17131,6 +17131,19 @@ IF NOT EXISTS (SELECT 1 FROM dbo.NguoiDung WHERE MaNguoiDung=N'ND009')
     INSERT dbo.NguoiDung(MaNguoiDung,HoTen,ThuDienTu,MatKhauBam,VaiTro,TrangThai)
     VALUES (N'ND009',N'Tài khoản mẫu 09',N'demo09@example.com',N'$2b$12$IyW.UgA0MhIQNnQRAFqciOUjjDNLTf./IId7iXsmQxQSZJxt1gIoG',N'Người dùng',N'Đang hoạt động');
 
+-- Đồng bộ bộ cấp mã sau khi thêm tài khoản mẫu, tránh cấp lại ND006.
+UPDATE q
+SET SoHienTai = seed.MaxMa
+FROM dbo.QuyUocMaHeThong AS q
+CROSS APPLY (
+    SELECT MAX(TRY_CONVERT(BIGINT, SUBSTRING(MaNguoiDung, 3, 18))) AS MaxMa
+    FROM dbo.NguoiDung
+    WHERE MaNguoiDung LIKE N'ND[0-9]%'
+) AS seed
+WHERE q.LoaiMa = N'NguoiDung'
+  AND seed.MaxMa IS NOT NULL
+  AND q.SoHienTai < seed.MaxMa;
+
 
 IF NOT EXISTS (SELECT 1 FROM dbo.[DanhMucMonAn] WHERE [MaDanhMuc] = N'DM010')
 BEGIN

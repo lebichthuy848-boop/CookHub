@@ -1,4 +1,4 @@
-﻿import { fireEvent, render, screen, waitFor, cleanup } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, cleanup } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { OnboardingSurvey, PreferencesSettings } from './Personalization';
 const mocks=vi.hoisted(()=>({api:vi.fn(),setUser:vi.fn(),favorites:[],user:{id:'new',survey_pending:true},saved:null}));
@@ -24,7 +24,8 @@ it('collects ten questions, previews without saving, persists favorites, and ret
   fireEvent.click(screen.getByRole('button',{name:'Xem nhận định & món gợi ý ✦'}));
   await screen.findByText('Phong cách ăn uống của bạn');
   expect(screen.getByText('Gu đậm vị, thích nấu gọn')).toBeInTheDocument();
-  await screen.findByText('70% Hợp vị');
+  expect(screen.getByText('Cơm gà')).toBeInTheDocument();
+  expect(screen.queryByText('70% Hợp vị')).not.toBeInTheDocument();
   expect(mocks.api).not.toHaveBeenCalledWith('/v1/user/preferences',expect.anything());
   mocks.api.mockResolvedValueOnce(null);
   fireEvent.click(screen.getByRole('button',{name:'Yêu thích Cơm gà'}));

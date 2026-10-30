@@ -7,6 +7,7 @@ export function useApi(path) {
   const [revision, setRevision] = useState(0);
   const reload = useCallback(() => setRevision(n => n + 1), []);
   useEffect(() => {
+    if (!path) { setData(null); setError(''); setLoading(false); return; }
     const controller = new AbortController();
     // Keep existing content visible during a mutation-triggered refresh.
     setLoading(previous => previous && data == null); setError('');

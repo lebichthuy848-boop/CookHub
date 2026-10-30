@@ -6,13 +6,13 @@ from .database import Base
 class NguoiDung(Base):
     __tablename__ = "NguoiDung"
     maNguoiDung = Column(String(50), primary_key=True)
-    hoTen = Column(String(150), nullable=True)
+    hoTen = Column(Unicode(150), nullable=True)
     # Giữ tên thuộc tính cũ để các service/API không đổi giao diện,
     # nhưng ánh xạ đúng tên cột SQL Server V2.
     thuDienTu = Column("ThuDienTu", String(150), nullable=False, unique=True)
     matKhauBam = Column("MatKhauBam", String(255), nullable=False)
-    vaiTro = Column(String(50), nullable=True)
-    trangThai = Column(String(50), nullable=True)
+    vaiTro = Column(Unicode(50), nullable=True)
+    trangThai = Column(Unicode(50), nullable=True)
     ngayTao = Column('NgayTao', DateTime, nullable=True)
 
 

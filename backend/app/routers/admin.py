@@ -1,5 +1,7 @@
 from datetime import datetime, date, timedelta
 import logging
+from urllib.parse import urlparse
+from urllib.request import Request, urlopen
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy import text, cast
@@ -11,6 +13,7 @@ from ..database import get_db
 from ..security import content_user, system_user, dish_editor, review_moderator, roles, public_user, passwords
 from ..services import (require, rows, new_id, allocate_code, dish_data, recipe_data, save_recipe,
                         delete_recipe, delete_dish, validate_media)
+from ..cloudinary_media import image_map
 from .auth import by_email
 
 router = APIRouter(prefix='/admin', tags=['Administration'])
@@ -18,12 +21,25 @@ logger = logging.getLogger(__name__)
 
 @router.get('/system-health')
 def system_health(user=Depends(system_user), db: Session = Depends(get_db)):
-    checked_at = datetime.now().isoformat(timespec='seconds')
+    checked_at = datetime.now().astimezone().isoformat(timespec='seconds')
+    image_urls = list(image_map().values())
+    image_delivery = 'Chưa cấu hình ảnh Cloudinary'
+    if image_urls:
+        sample = image_urls[0]
+        parsed = urlparse(sample)
+        if parsed.scheme == 'https' and parsed.netloc == 'res.cloudinary.com':
+            try:
+                with urlopen(Request(sample, method='HEAD'), timeout=3) as response:
+                    image_delivery = 'Ảnh mẫu truy cập được' if response.status == 200 else 'Ảnh mẫu không truy cập được'
+            except Exception:
+                image_delivery = 'Không kiểm tra được ảnh mẫu'
     try:
         db.execute(text('SELECT 1'))
-        return {'backend': 'Hoạt động', 'database': 'Kết nối thành công', 'checked_at': checked_at}
+        database = 'Kết nối thành công'
     except SQLAlchemyError:
-        return {'backend': 'Hoạt động', 'database': 'Kết nối thất bại', 'checked_at': checked_at}
+        database = 'Kết nối thất bại'
+    return {'backend': 'Hoạt động', 'database': database, 'image_delivery': image_delivery,
+            'checked_at': checked_at}
 
 @router.get('/dishes')
 def admin_dishes(user=Depends(roles('Quản trị nội dung', 'Quản trị hệ thống')), db: Session = Depends(get_db)):
@@ -61,17 +77,26 @@ def stats(user=Depends(roles('Quản trị nội dung', 'Quản trị hệ thố
 @router.get('/system-overview')
 def system_overview(user=Depends(system_user), db: Session = Depends(get_db)):
     users = list(db.scalars(select(m.NguoiDung)))
-    role_names = ['Người dùng', 'Quản trị nội dung', 'Quản trị hệ thống']
+    role_names = sorted({row.vaiTro for row in users if row.vaiTro})
     roles_data = [{'name': role, 'count': sum(1 for row in users if row.vaiTro == role)} for role in role_names]
     status_data = [{'name': 'Đang hoạt động', 'count': sum(1 for row in users if row.trangThai == 'Đang hoạt động')},
                    {'name': 'Tạm khóa', 'count': sum(1 for row in users if row.trangThai == 'Tạm khóa')}]
     locked = [{'id': row.maNguoiDung, 'name': row.hoTen, 'email': row.thuDienTu, 'role': row.vaiTro, 'status': row.trangThai}
               for row in users if row.trangThai == 'Tạm khóa'][:5]
+    end = date.today()
+    start = end - timedelta(days=29)
+    new_users = db.scalar(select(func.count()).select_from(m.NguoiDung).where(
+        m.NguoiDung.ngayTao >= start, m.NguoiDung.ngayTao < end + timedelta(days=1)))
+    new_menus = db.scalar(select(func.count()).select_from(m.ThucDon).where(
+        m.ThucDon.ngayTao >= start, m.ThucDon.ngayTao < end + timedelta(days=1)))
     return {'users': {'total': len(users), 'active': status_data[0]['count'], 'locked': status_data[1]['count']},
             'roles': roles_data, 'content': {'dishes': db.scalar(select(func.count()).select_from(m.MonAn)) or 0},
             'meal_plans': db.scalar(select(func.count()).select_from(m.ThucDon)) or 0,
             'planned_items': db.scalar(select(func.count()).select_from(m.ChiTietThucDon)) or 0,
-            'locked_users': locked}
+            'locked_users': locked, 'updated_at': datetime.now().astimezone().isoformat(timespec='seconds'),
+            'recent_period': {'from': start.isoformat(), 'to': end.isoformat()},
+            'recent_activity': {'new_users': new_users, 'new_menus': new_menus, 'new_recipes': None},
+            'audit_supported': False}
 
 @router.get('/system-reports')
 def system_reports(from_date: date | None = Query(None), to_date: date | None = Query(None),
@@ -94,7 +119,28 @@ def system_reports(from_date: date | None = Query(None), to_date: date | None = 
         m.NguoiDung.ngayTao >= start, m.NguoiDung.ngayTao < end + timedelta(days=1))) or 0
     new_menus = db.scalar(select(func.count()).select_from(m.ThucDon).where(
         m.ThucDon.ngayTao >= start, m.ThucDon.ngayTao < end + timedelta(days=1))) or 0
+    previous_users = db.scalar(select(func.count()).select_from(m.NguoiDung).where(
+        m.NguoiDung.ngayTao >= previous_start,
+        m.NguoiDung.ngayTao < start)) or 0
+    previous_menus = db.scalar(select(func.count()).select_from(m.ThucDon).where(
+        m.ThucDon.ngayTao >= previous_start,
+        m.ThucDon.ngayTao < start)) or 0
+    previous_favorites = db.scalar(select(func.count()).select_from(m.MonYeuThich).where(
+        m.MonYeuThich.ngayThem >= previous_start,
+        m.MonYeuThich.ngayThem < start)) or 0
+    def comparison(current, previous):
+        return {'current': current, 'previous': previous,
+                'change': None if previous == 0 else round((current - previous) / previous * 100, 1)}
     def daily_counts(model, column):
+        if db.bind.dialect.name == 'sqlite':
+            dates = db.scalars(select(column).where(
+                column >= start, column < end + timedelta(days=1))).all()
+            counts = {}
+            for value in dates:
+                if value:
+                    key = value.date().isoformat()
+                    counts[key] = counts.get(key, 0) + 1
+            return counts
         result = db.execute(select(cast(column, SQLDate), func.count()).where(
             column >= start, column < end + timedelta(days=1)).group_by(
                 cast(column, SQLDate))).all()
@@ -145,6 +191,12 @@ def system_reports(from_date: date | None = Query(None), to_date: date | None = 
                 'favorite_saves': [{'date': day, 'value': favorite_trend.get(day, 0)} for day in calendar],
             },
             'comparison': {'current': len(rows_items), 'previous': previous_count, 'change': change},
+            'comparison_by_metric': {
+                'new_users': comparison(new_users, previous_users),
+                'new_menus': comparison(new_menus, previous_menus),
+                'favorite_saves': comparison(favorite_count, previous_favorites),
+                'planned_items': comparison(len(rows_items), previous_count),
+            },
             'active_days': len(trend),
             'trend': [{'date': (start + timedelta(days=offset)).isoformat(),
                        'selections': trend.get((start + timedelta(days=offset)).isoformat(), 0)}
@@ -408,7 +460,8 @@ def remove_review(key: str, user=Depends(review_moderator), db: Session = Depend
 
 @router.get('/users')
 def users(user=Depends(system_user), db: Session = Depends(get_db)):
-    return [public_user(x) for x in rows(db, m.NguoiDung)]
+    return [{**public_user(x), 'created_at': x.ngayTao.isoformat() if x.ngayTao else None}
+            for x in rows(db, m.NguoiDung)]
 
 @router.put('/users/{key}')
 def update_user(key: str, data: s.UserUpdate, user=Depends(system_user), db: Session = Depends(get_db)):

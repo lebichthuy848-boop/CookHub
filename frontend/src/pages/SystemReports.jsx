@@ -1,22 +1,140 @@
 import { useMemo, useState } from 'react';
 import { useApi } from '../hooks';
 import '../system-reports.css';
+import '../system-admin-review.css';
 
-const iso = value => value.toISOString().slice(0, 10);
-const escapeCsv = value => `"${String(value ?? '').replaceAll('"', '""')}"`;
-function periodFor(range, custom) { const end = new Date(); end.setHours(0, 0, 0, 0); const start = new Date(end); if (range === '7') start.setDate(end.getDate() - 6); else if (range === '90') start.setDate(end.getDate() - 89); else if (range === 'month') start.setDate(1); else if (range === 'previous') { start.setMonth(end.getMonth() - 1, 1); end.setDate(0); } else if (range === 'custom') return custom.from && custom.to ? { from: custom.from, to: custom.to } : null; else start.setDate(end.getDate() - 29); return { from: iso(start), to: iso(end) }; }
-function Trend({ data, metric }) { const values = data?.trends?.[metric] || []; const max = Math.max(...values.map(item => item.value), 1); const unit = metric === 'new_users' ? 'tài khoản mới' : metric === 'new_menus' ? 'thực đơn mới' : 'lượt lưu yêu thích'; return <div className="report-bars" aria-label={`Biểu đồ ${unit} theo ngày`}>{values.map(item => <div className="report-bar" key={item.date} title={`${item.date}: ${item.value} ${unit}`}><i style={{ height: `${Math.max(item.value ? 4 : 1, item.value / max * 100)}%` }} /><small>{item.date.slice(5)}</small></div>)}</div>; }
+const localDate = value => [
+  value.getFullYear(),String(value.getMonth()+1).padStart(2,'0'),String(value.getDate()).padStart(2,'0')
+].join('-');
+const metricNames = {new_users:'Tài khoản được tạo',new_menus:'Thực đơn được tạo',favorite_saves:'Lượt lưu yêu thích'};
+const csvCell = value => {
+  const text = String(value ?? '');
+  const safe = /^[\s]*[=+\-@\t\r]/.test(text) ? `'${text}` : text;
+  return `"${safe.replaceAll('"','""')}"`;
+};
+function periodFor(range,custom) {
+  const end = new Date(); end.setHours(0,0,0,0);
+  const start = new Date(end);
+  if (range === '7') start.setDate(end.getDate()-6);
+  else if (range === '90') start.setDate(end.getDate()-89);
+  else if (range === 'month') start.setDate(1);
+  else if (range === 'previous') {start.setMonth(end.getMonth()-1,1);end.setDate(0);}
+  else if (range === 'custom') return custom.from && custom.to && custom.from <= custom.to ? {from:custom.from,to:custom.to} : null;
+  else start.setDate(end.getDate()-29);
+  return {from:localDate(start),to:localDate(end)};
+}
+function Trend({data,metric}) {
+  const values = data?.trends?.[metric] || [];
+  if (!values.length || values.every(item => item.value === 0))
+    return <p className="reports-empty">Không có {metricNames[metric].toLocaleLowerCase('vi-VN')} trong kỳ này.</p>;
+  const max = Math.max(...values.map(item => item.value));
+  return <div className="reports-chart-wrap">
+    <span className="reports-axis-y">Số lượt / ngày</span>
+    <div className="report-bars" role="img" aria-label={`Biểu đồ ${metricNames[metric]} theo ngày`}>
+      {values.map(item => <div className="report-bar" key={item.date} title={`${item.date}: ${item.value} ${metricNames[metric].toLocaleLowerCase('vi-VN')}`}>
+        <i style={{height:`${item.value ? Math.max(4,item.value/max*100) : 0}%`}}/>
+        <small>{item.date.slice(5)}</small>
+      </div>)}
+    </div>
+    <span className="reports-axis-x">Ngày trong kỳ · {metricNames[metric]}</span>
+  </div>;
+}
+function Compare({item}) {
+  if (!item) return null;
+  return <small className="reports-compare">Kỳ trước: {item.previous} · {item.change == null ? 'Không tính được % khi kỳ trước bằng 0' : `${item.change > 0 ? '+' : ''}${item.change}%`}</small>;
+}
 
 export default function SystemReports() {
-  const [range, setRange] = useState('30'); const [custom, setCustom] = useState({ from: '', to: '' }); const [feature, setFeature] = useState('new_users'); const [notice, setNotice] = useState('');
-  const period = useMemo(() => periodFor(range, custom), [range, custom]); const query = period ? `?from_date=${period.from}&to_date=${period.to}` : ''; const resource = useApi(`/admin/system-reports${query}`); const health = useApi('/admin/system-health'); const access = useApi('/admin/system-overview'); const data = resource.data; const invalid = range === 'custom' && (!period || period.from > period.to);
-  const exportCsv = () => { if (!data) return; const rows = [['Báo cáo CookHub', `${data.period.from} - ${data.period.to}`], [], ['Ngày', 'Lượt món lên kế hoạch'], ...(data.trend || []).map(x => [x.date, x.selections]), [], ['Chỉ số', 'Kỳ hiện tại', 'Kỳ trước'], ['Lượt món lên kế hoạch', data.comparison?.current ?? data.kpis.planned_items, data.comparison?.previous ?? '—']]; const blob = new Blob(['\ufeff' + rows.map(row => row.map(escapeCsv).join(',')).join('\n')], { type: 'text/csv;charset=utf-8' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `CookHub_BaoCaoHeThong_${data.period.to}.csv`; link.click(); URL.revokeObjectURL(url); };
-  const refresh = () => { setNotice(''); resource.reload(); health.reload(); access.reload(); setNotice('Đã làm mới dữ liệu báo cáo.'); };
-  return <div className="system-reports"><section className="reports-hero"><div><small>QUẢN TRỊ HỆ THỐNG / PHÂN TÍCH</small><h1>Báo cáo &amp; Thống kê hệ thống</h1><p>Phân tích xu hướng phát triển, mức độ sử dụng và tình hình vận hành CookHub.</p></div><div className="reports-actions"><button onClick={refresh} disabled={resource.loading}>↻ {resource.loading ? 'Đang tải…' : 'Làm mới'}</button><button onClick={exportCsv} disabled={!data}>⇩ Xuất CSV</button></div></section>
-    <section className="reports-filter"><b>Kỳ báo cáo</b><select value={range} onChange={event => setRange(event.target.value)}><option value="7">7 ngày gần nhất</option><option value="30">30 ngày gần nhất</option><option value="90">90 ngày gần nhất</option><option value="month">Tháng này</option><option value="previous">Tháng trước</option><option value="custom">Khoảng tùy chọn</option></select>{range === 'custom' && <><label>Từ <input type="date" value={custom.from} onChange={event => setCustom({ ...custom, from: event.target.value })} /></label><label>Đến <input type="date" value={custom.to} onChange={event => setCustom({ ...custom, to: event.target.value })} /></label></>}<span>{data?.period ? `${data.period.from} → ${data.period.to}` : 'Chọn khoảng thời gian để xem dữ liệu'}</span></section>
-    {invalid && <div className="reports-error">Ngày bắt đầu không được lớn hơn ngày kết thúc.</div>}{resource.error && <div className="reports-error">{resource.error} <button onClick={resource.reload}>Thử lại</button></div>}{notice && <div className="reports-success">✓ {notice}</div>}{resource.loading && !data && <div className="reports-kpis reports-kpis-loading"><article/><article/><article/></div>}
-    {data && !invalid && <><section className="reports-kpis"><article className="is-clickable" role="button" tabIndex="0" onClick={() => setFeature('new_users')} onKeyDown={event => (event.key === 'Enter' || event.key === ' ') && setFeature('new_users')} title="Xem biểu đồ Tài khoản mới. Đếm số bản ghi NguoiDung có NgayTao trong khoảng lọc."><i className="reports-kpi-icon">♙</i><small>Tài khoản mới</small><strong>{data.kpis.new_users == null ? '—' : data.kpis.new_users}</strong><span>{data.kpi_sources?.new_users || 'Số tài khoản được tạo trong kỳ'}</span></article><article className="is-clickable" role="button" tabIndex="0" onClick={() => setFeature('new_menus')} onKeyDown={event => (event.key === 'Enter' || event.key === ' ') && setFeature('new_menus')} title="Xem biểu đồ Thực đơn mới. Đếm số bản ghi ThucDon có NgayTao trong khoảng lọc."><i className="reports-kpi-icon">▤</i><small>Thực đơn mới</small><strong>{data.kpis.new_menus == null ? '—' : data.kpis.new_menus}</strong><span>{data.kpi_sources?.new_menus || 'Số thực đơn được tạo trong kỳ'}</span></article><article className="is-clickable" role="button" tabIndex="0" onClick={() => setFeature('favorite_saves')} onKeyDown={event => (event.key === 'Enter' || event.key === ' ') && setFeature('favorite_saves')} title="Xem biểu đồ Lượt lưu yêu thích. Đếm số dòng MonYeuThich có NgayThem trong khoảng lọc."><i className="reports-kpi-icon">♥</i><small>Lượt lưu yêu thích</small><strong>{data.kpis.favorite_saves}</strong><span>{data.kpi_sources?.favorite_saves || 'Phát sinh trong kỳ đang chọn'}</span></article></section>
-      <section className="reports-card reports-wide"><header><div><h2>Xu hướng sử dụng CookHub</h2><p>{feature === 'new_users' ? 'Theo dõi số tài khoản mới được đăng ký theo thời gian.' : feature === 'new_menus' ? 'Theo dõi số thực đơn mới được tạo theo thời gian.' : 'Theo dõi số lượt lưu món ăn yêu thích theo thời gian.'}</p></div><div className="report-tabs"><button className={feature === 'new_users' ? 'active' : ''} onClick={() => setFeature('new_users')}>♙ Tài khoản mới</button><button className={feature === 'new_menus' ? 'active' : ''} onClick={() => setFeature('new_menus')}>▤ Thực đơn mới</button><button className={feature === 'favorite_saves' ? 'active' : ''} onClick={() => setFeature('favorite_saves')}>♥ Lượt lưu yêu thích</button></div></header><Trend data={data} metric={feature} /></section>
-      <div className="reports-grid"><section className="reports-card monitoring-card"><header><div><h2>🌐 Tình trạng dịch vụ CookHub</h2><p>Theo dõi các thành phần kỹ thuật đang phục vụ website.</p></div><button className="health-button" onClick={health.reload} disabled={health.loading}>↻ Kiểm tra lại</button></header><div className="monitor-row"><span>Backend API</span><b className="status-good">{health.data?.backend || 'Chưa xác định'}</b></div><div className="monitor-row"><span>SQL Server</span><b className={health.data?.database === 'Kết nối thành công' ? 'status-good' : ''}>{health.data?.database || 'Chưa xác định'}</b></div><div className="monitor-row"><span>Kho media ảnh/video</span><b className="status-neutral">Được phục vụ cùng backend</b></div><div className="health-status"><strong>Kiểm tra hiện tại</strong><small>{health.data?.checked_at ? `Lúc ${health.data.checked_at}` : 'Chưa kiểm tra'}</small></div></section><section className="reports-card monitoring-card"><header><div><h2>🔐 Kiểm soát truy cập hệ thống</h2><p>Tổng hợp phạm vi tài khoản và trạng thái truy cập hiện tại.</p></div></header><div className="monitor-row"><span>Quản trị hệ thống</span><b>{access.data?.roles?.find(item => item.name === 'Quản trị hệ thống')?.count ?? '—'} tài khoản</b></div><div className="monitor-row"><span>Quản trị nội dung</span><b>{access.data?.roles?.find(item => item.name === 'Quản trị nội dung')?.count ?? '—'} tài khoản</b></div><div className="monitor-row"><span>Đang hoạt động</span><b className="status-good">{access.data?.users?.active ?? '—'} tài khoản</b></div><div className="monitor-row"><span>Tạm khóa</span><b className={access.data?.users?.locked ? 'status-warning' : 'status-good'}>{access.data?.users?.locked ?? '—'} tài khoản</b></div><small className="monitor-note">Dữ liệu hiện tại; quản lý chi tiết tại Người dùng &amp; Phân quyền.</small></section></div></>}
+  const [range,setRange] = useState('30');
+  const [custom,setCustom] = useState({from:'',to:''});
+  const [feature,setFeature] = useState('new_users');
+  const [notice,setNotice] = useState('');
+  const period = useMemo(() => periodFor(range,custom),[range,custom]);
+  const invalid = range === 'custom' && !period;
+  const resource = useApi(period ? `/admin/system-reports?from_date=${period.from}&to_date=${period.to}` : null);
+  const health = useApi('/admin/system-health');
+  const access = useApi('/admin/system-overview');
+  const data = invalid || resource.error ? null : resource.data;
+
+  function exportCsv() {
+    if (!data) return;
+    try {
+      const comparison = data.comparison_by_metric || {};
+      const rows = [
+        ['Báo cáo CookHub',`${data.period.from} – ${data.period.to}`],
+        ['Chỉ số','Kỳ hiện tại','Kỳ trước','Thay đổi (%)'],
+        ...Object.entries(metricNames).map(([key,label]) => [
+          label,data.kpis[key],comparison[key]?.previous ?? '',
+          comparison[key]?.change ?? '',
+        ]),
+        ['Lượt món lên kế hoạch',data.kpis.planned_items,comparison.planned_items?.previous ?? '',comparison.planned_items?.change ?? ''],
+        [],
+        ['Ngày',...Object.values(metricNames)],
+        ...(data.trends?.new_users || []).map((row,index) => [
+          row.date,row.value,data.trends.new_menus[index]?.value ?? '',data.trends.favorite_saves[index]?.value ?? '',
+        ]),
+      ];
+      const blob = new Blob(['\ufeff'+rows.map(row => row.map(csvCell).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');link.href=url;link.download=`CookHub_BaoCaoHeThong_${data.period.to}.csv`;link.click();
+      window.setTimeout(() => URL.revokeObjectURL(url),1000);
+      setNotice('Đã xuất báo cáo CSV cho kỳ đang chọn.');
+    } catch {setNotice('Không thể xuất CSV. Vui lòng thử lại.');}
+  }
+  const refresh = () => {setNotice('');resource.reload();health.reload();access.reload();};
+  return <div className="system-reports">
+    <section className="reports-hero"><div><small>QUẢN TRỊ HỆ THỐNG / PHÂN TÍCH</small><h1>Báo cáo &amp; Thống kê hệ thống</h1>
+      <p>Phân tích dữ liệu được ghi nhận trong database CookHub.</p></div>
+      <div className="reports-actions"><button onClick={refresh}>↻ Làm mới</button><button onClick={exportCsv} disabled={!data}>⇩ Xuất CSV</button></div>
+    </section>
+    <section className="reports-filter"><b>Kỳ báo cáo</b>
+      <select value={range} onChange={event => setRange(event.target.value)} aria-label="Chọn kỳ báo cáo">
+        <option value="7">7 ngày gần nhất</option><option value="30">30 ngày gần nhất</option><option value="90">90 ngày gần nhất</option>
+        <option value="month">Tháng hiện tại</option><option value="previous">Tháng trước</option><option value="custom">Khoảng ngày tùy chỉnh</option>
+      </select>
+      {range === 'custom' && <><label>Từ <input type="date" value={custom.from} onChange={event => setCustom({...custom,from:event.target.value})}/></label>
+        <label>Đến <input type="date" value={custom.to} onChange={event => setCustom({...custom,to:event.target.value})}/></label></>}
+      <span>{period ? `${period.from} → ${period.to} (bao gồm cả hai ngày)` : 'Chọn khoảng ngày hợp lệ'}</span>
+    </section>
+    {invalid && <p className="reports-error" role="alert">Chọn cả hai ngày; ngày bắt đầu không được lớn hơn ngày kết thúc.</p>}
+    {resource.error && <p className="reports-error" role="alert">{resource.error} <button onClick={resource.reload}>Thử lại</button></p>}
+    {notice && <p className={notice.startsWith('Không thể') ? 'reports-error' : 'reports-success'} role="status">{notice}</p>}
+    {resource.loading && !data && !invalid && <p className="empty" role="status">Đang tải báo cáo…</p>}
+    {data && <>
+      <section className="reports-kpis">
+        {Object.entries(metricNames).map(([key,label]) => <article className="is-clickable" role="button" tabIndex={0} key={key}
+          onClick={() => setFeature(key)} onKeyDown={event => (event.key === 'Enter' || event.key === ' ') && setFeature(key)}>
+          <i className="reports-kpi-icon">{key === 'new_users' ? '♙' : key === 'new_menus' ? '▤' : '♥'}</i>
+          <small>{label}</small><strong>{data.kpis[key] ?? '—'}</strong>
+          <span>{data.kpi_sources?.[key] || 'Nguồn dữ liệu chưa xác định'}</span>
+          <Compare item={data.comparison_by_metric?.[key]}/>
+        </article>)}
+      </section>
+      <section className="reports-card reports-wide"><header><div><h2>{metricNames[feature]} theo ngày</h2>
+        <p>Đếm bản ghi có ngày tạo hoặc ngày lưu trong kỳ, gồm cả dữ liệu mẫu đã nạp.</p></div>
+        <div className="report-tabs">{Object.entries(metricNames).map(([key,label]) =>
+          <button key={key} className={feature === key ? 'active' : ''} onClick={() => setFeature(key)}>{label}</button>)}</div>
+      </header><Trend data={data} metric={feature}/></section>
+      <section className="reports-card"><header><div><h2>Lượt món lên kế hoạch</h2><p>ChiTietThucDon.NgayDung trong kỳ, không phải số thực đơn được tạo.</p></div></header>
+        <strong>{data.kpis.planned_items}</strong><Compare item={data.comparison_by_metric?.planned_items}/></section>
+      <div className="reports-grid">
+        <section className="reports-card monitoring-card"><header><div><h2>Tình trạng dịch vụ</h2><p>Kiểm tra tại thời điểm yêu cầu.</p></div>
+          <button className="health-button" onClick={health.reload}>↻ Kiểm tra lại</button></header>
+          {health.error ? <p className="reports-error" role="alert">{health.error}</p> : health.loading && !health.data ? <p>Đang kiểm tra…</p> :
+            <><div className="monitor-row"><span>Backend API</span><b>{health.data?.backend || 'Chưa kiểm tra'}</b></div>
+              <div className="monitor-row"><span>SQL Server</span><b>{health.data?.database || 'Chưa kiểm tra'}</b></div>
+              <div className="monitor-row"><span>Phân phối ảnh Cloudinary</span><b>{health.data?.image_delivery || 'Chưa kiểm tra'}</b></div>
+              <div className="health-status"><strong>Kiểm tra hiện tại</strong><small>{health.data?.checked_at ? `Lúc ${health.data.checked_at}` : 'Chưa kiểm tra'}</small></div></>}
+        </section>
+        <section className="reports-card monitoring-card"><header><div><h2>Kiểm soát truy cập</h2><p>Số tài khoản hiện tại, ngoài kỳ báo cáo.</p></div></header>
+          {access.error ? <p className="reports-error" role="alert">{access.error}</p> : access.loading && !access.data ? <p>Đang tải…</p> :
+            <><div className="monitor-row"><span>Quản trị hệ thống</span><b>{access.data?.roles?.find(item => item.name === 'Quản trị hệ thống')?.count ?? 0} tài khoản</b></div>
+              <div className="monitor-row"><span>Quản trị nội dung</span><b>{access.data?.roles?.find(item => item.name === 'Quản trị nội dung')?.count ?? 0} tài khoản</b></div>
+              <div className="monitor-row"><span>Đang hoạt động</span><b>{access.data?.users?.active ?? '—'} tài khoản</b></div>
+              <div className="monitor-row"><span>Tạm khóa</span><b>{access.data?.users?.locked ?? '—'} tài khoản</b></div></>}
+        </section>
+      </div>
+      <p className="reports-limitation">Món ăn và công thức chỉ có ngày cập nhật, chưa có ngày tạo; không thống kê “mới” theo kỳ. Ngày tạo của dữ liệu mẫu là thời điểm nạp vào database.</p>
+    </>}
   </div>;
 }

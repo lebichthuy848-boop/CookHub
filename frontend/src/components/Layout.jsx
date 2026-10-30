@@ -3,6 +3,8 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import { useAuth, landing } from '../auth';
 import { api, media } from '../api';
+import { useSettings } from '../settings-context';
+import '../settings-page-review.css';
 
 const userNav = [['home', 'home', 'Trang chủ'], ['suggest', 'sparkle', 'Đề xuất'], ['search', 'search', 'Tìm kiếm'], ['menu', 'calendar', 'Thực đơn'], ['foods', 'utensils', 'Khám phá món ăn'], ['pantry', 'leaf', 'Nguyên liệu'], ['favorites', 'heart', 'Yêu thích'], ['profile', 'user', 'Hồ sơ'], ['settings', 'settings', 'Cài đặt']];
 const adminNav = [['system', 'grid', 'Tổng quan'], ['categories', 'grid', 'Danh mục'], ['recipes', 'book', 'Món ăn & Công thức'], ['videos', 'chart', 'Video hướng dẫn'], ['reviews', 'check', 'Đánh giá & Kiểm duyệt']];
@@ -36,6 +38,7 @@ function useTypingPlaceholder(words) {
 
 export default function Layout() {
   const { user, logout } = useAuth();
+  const {settings,update} = useSettings();
   const [open, setOpen] = useState(false); const [error, setError] = useState(''); const [searching, setSearching] = useState(false); const [pendingReviews,setPendingReviews]=useState(0); const [logoutOpen,setLogoutOpen]=useState(false); const [logoutBusy,setLogoutBusy]=useState(false);
   const navigate = useNavigate(); const systemAdmin = user.role === 'Quản trị viên'; const admin = systemAdmin || user.role === 'Quản trị nội dung'; const nav = systemAdmin ? systemNav : admin ? adminNav : userNav;
   useEffect(()=>{if(user.role!=='Quản trị nội dung')return;let active=true;const load=()=>api('/admin/reviews').then(items=>{if(active)setPendingReviews(items.filter(x=>x.status==='Chờ duyệt').length)}).catch(()=>{});load();window.addEventListener('reviews-updated',load);return()=>{active=false;window.removeEventListener('reviews-updated',load)}},[user.role]);
@@ -49,6 +52,7 @@ export default function Layout() {
   }
   return <div className="shell"><aside id="app-navigation" className={'sidebar premium-sidebar ' + (admin ? 'admin-sidebar ' : '') + (open ? 'open' : '')}>
     <Link to={landing(user.role)} className="sidebar-brand"><span className="brand-flower">✿</span><span>Cook<span>Hub</span><small>Nấu ngon mỗi ngày</small></span></Link>
+    {!admin&&<button type="button" className="sidebar-collapse-button" aria-label={settings.sidebarCollapsed?'Mở rộng sidebar':'Thu gọn sidebar'} title={settings.sidebarCollapsed?'Mở rộng sidebar':'Thu gọn sidebar'} onClick={()=>update('sidebarCollapsed',!settings.sidebarCollapsed)}>{settings.sidebarCollapsed?'›':'‹'}</button>}
     {admin && <p className="admin-badge">✦ Admin Dashboard</p>}
     <nav className={'side-nav '+(admin?'admin-side-nav':'')}>{nav.map(([path, icon, label],index) => <React.Fragment key={path}>{admin && index===0 && <small className="admin-nav-group">{systemAdmin?'HỆ THỐNG':'TỔNG QUAN'}</small>}{admin && index===1 && <small className="admin-nav-group">{systemAdmin?'QUẢN TRỊ':'NỘI DUNG'}</small>}<NavLink title={label} to={'/' + path} onClick={() => setOpen(false)}><Icon name={icon}/><span>{label}</span>{admin&&path==='reviews'&&pendingReviews>0&&<b className="admin-nav-count">{pendingReviews}</b>}</NavLink></React.Fragment>)}</nav>
     <div className="sidebar-bottom">{admin ? <><div className="admin-profile"><div className="admin-avatar">{(user.name || 'A').slice(0, 1)}</div><div><strong>{user.name}</strong><small>{user.role}</small></div></div><NavLink className="admin-account-link" to="/settings" onClick={()=>setOpen(false)}><Icon name="settings"/><span>Tài khoản & bảo mật</span></NavLink></> : <div className="sidebar-note"><p>Nấu ăn mỗi ngày</p><strong>Thêm niềm vui mới!</strong><div className="veggie-row" aria-label="Rau củ tươi ngon"><span>🥬</span><span>🍅</span><span>🥕</span></div></div>}<button className="logout" onClick={() => setLogoutOpen(true)}><Icon name="check"/><span>Đăng xuất</span></button></div>
