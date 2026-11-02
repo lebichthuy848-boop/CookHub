@@ -19,8 +19,9 @@ function FavoriteManagerPopover({ dishId, onClose }) {
   const [creating, setCreating] = useState(false);
   const [name, setName] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
   async function add(id) {
-    try { await api('/favorite-collections/' + id + '/dishes', {method:'POST', body:{dish_id:dishId}}); onClose(); }
+    try { await api('/favorite-collections/' + id + '/dishes', {method:'POST', body:{dish_id:dishId}}); setSuccess(true); window.setTimeout(onClose, 1800); }
     catch (err) { setError(err.message); }
   }
   async function create(event) {
@@ -29,6 +30,7 @@ function FavoriteManagerPopover({ dishId, onClose }) {
     catch (err) { setError(err.message); }
   }
   return <div className="favorite-manager-popover" role="dialog" aria-label="Quản lý bộ sưu tập">
+    {success && <div className="favorite-toast" role="status">✓ <b>Đã thêm món vào bộ sưu tập</b></div>}
     {!creating ? <><button type="button" className="manager-create" onClick={()=>setCreating(true)}>⊕ Tạo bộ sưu tập mới</button><State resource={collections}>{items => items.length ? items.map(item => <button type="button" key={item.MaBoSuuTap} onClick={()=>add(item.MaBoSuuTap)}>{item.DaChuaMon ? '✓ ' : '＋ '}{item.TenBoSuuTap}<small>{item.SoLuongMon || 0} món</small></button>) : <p>Chưa có bộ sưu tập.</p>}</State></> : <form onSubmit={create}><b>Tạo bộ sưu tập mới</b><input autoFocus required value={name} onChange={event=>setName(event.target.value)} placeholder="Tên bộ sưu tập"/><div><button type="button" onClick={()=>setCreating(false)}>Hủy</button><button type="submit">Tạo mới</button></div></form>}
     {error && <p className="manager-error">{error}</p>}<button type="button" className="manager-close" onClick={onClose}>×</button>
   </div>;
@@ -124,6 +126,24 @@ function ExploreCatalog({ dishes, categories, params, setParams, favorites, onFa
     setCalorieValue(Number(params.get('calories') || 500));
     setDifficultyValue(params.get('difficulty') || '');
   }, [params.toString()]);
+  useEffect(() => {
+    const fields = [
+      ['max_time', 5, 120, timeValue, setTimeValue, 'phút'],
+      ['calories', 100, 10000, calorieValue, setCalorieValue, 'kcal']
+    ];
+    const cleanups = fields.map(([name, min, max, value, setValue, unit]) => {
+      const range = document.querySelector(`.range-filter input[name="${name}"]`);
+      if (!range || range.parentElement.querySelector('.smart-number-input')) return () => {};
+      range.max = max;
+      const input = document.createElement('input'); input.type = 'number'; input.className = 'smart-number-input'; input.min = min; input.max = max; input.step = name === 'max_time' ? 5 : 25; input.value = value; input.setAttribute('aria-label', `${name === 'max_time' ? 'Thời gian' : 'Calo tối đa'} bằng số`);
+      const warning = document.createElement('small'); warning.className = 'smart-input-warning';
+      const update = raw => { const parsed = Number(raw); if (!Number.isFinite(parsed) || parsed < 0) { warning.textContent = `Nhập số ${unit} hợp lệ`; return; } const next = parsed; input.value = next; warning.textContent = parsed < min ? `Nên nhập từ ${min} ${unit} trở lên` : ''; setValue(next); range.max = Math.max(Number(range.max) || max, next); range.value = next; };
+      input.addEventListener('change', event => update(event.target.value)); input.addEventListener('blur', event => update(event.target.value)); range.addEventListener('input', event => { input.value = event.target.value; warning.textContent = ''; });
+      range.parentElement.append(input, warning);
+      return () => { input.remove(); warning.remove(); };
+    });
+    return () => cleanups.forEach(cleanup => cleanup());
+  }, [timeValue, calorieValue]);
   function startVoiceSearch(){const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;if(!Recognition){setVoiceError('Trình duyệt chưa hỗ trợ giọng nói. Hãy dùng Chrome hoặc Edge.');setVoiceOpen(true);return}const recognition=new Recognition();voiceRef.current=recognition;recognition.lang='vi-VN';recognition.interimResults=true;recognition.onstart=()=>{setVoiceError('');setVoiceOpen(true)};recognition.onresult=event=>{const text=Array.from(event.results).map(r=>r[0].transcript).join('');const input=document.querySelector('.smart-search input');if(input)input.value=text;if(event.results[0].isFinal){const next=new URLSearchParams(params);next.set('q',text);setParams(next);setVoiceOpen(false)}};recognition.onerror=event=>{setVoiceError(event.error==='not-allowed'?'Hãy cấp quyền microphone cho trang này.':'Không nghe rõ, vui lòng thử lại.');setVoiceOpen(true)};recognition.onend=()=>{voiceRef.current=null};recognition.start()}
 
 
@@ -135,7 +155,7 @@ function ExploreCatalog({ dishes, categories, params, setParams, favorites, onFa
 
     <section className="ingredient-hub panel"><div><small>TỦ LẠNH NHÀ BẠN</small><h2>Tìm món theo nguyên liệu</h2><p>Món tìm được có đủ các nguyên liệu bạn chọn. Bấm Tìm món để áp dụng.</p></div><div className="ingredient-chips">{['Thịt gà','Nấm','Cà chua','Rau xanh','Trứng'].map(item => <button type="button" className={ingredients.includes(item) ? 'picked' : ''} key={item} onClick={() => setIngredients(value => value.includes(item) ? value.filter(x => x !== item) : [...value, item])}>{ingredients.includes(item) ? '✓ ' : '+ '}{item}</button>)}</div></section>
 
-    <div className="category-pills" aria-label="Danh mục nhanh">{categories.slice(0, 7).map((category, index) => <button key={category.id} className={String(params.get('category')) === String(category.id) ? 'active' : ''} onClick={() => { const next = new URLSearchParams(params); if (String(params.get('category')) === String(category.id)) next.delete('category'); else next.set('category', category.id); setParams(next); }}><i>{labelForCategory('', index).split(' ')[0]}</i><span>{category.name}</span></button>)}</div>
+    <div className="category-pills" aria-label="Danh mục nhanh">{categories.filter(category => dishes.some(dish => String(dish.category_id) === String(category.id))).map((category, index) => <button key={category.id} className={String(params.get('category')) === String(category.id) ? 'active' : ''} onClick={() => { const next = new URLSearchParams(params); if (String(params.get('category')) === String(category.id)) next.delete('category'); else next.set('category', category.id); setParams(next); }}><i>{labelForCategory('', index).split(' ')[0]}</i><span>{category.name}</span></button>)}</div>
 
     <form className="filters premium-filters explore-filters visual-filters" onSubmit={event => { event.preventDefault(); const values = new FormData(event.currentTarget); if (ingredients.length) values.set('ingredient', ingredients.join(',')); if (params.get('q')) values.set('q', params.get('q')); if (params.get('category')) values.set('category', params.get('category')); if (difficultyValue) values.set('difficulty', difficultyValue); setParams(Object.fromEntries([...values].filter(([, value]) => value !== ''))); }}><label className="range-filter">Thời gian <output key={timeValue}>{timeValue} phút</output><span className="range-track"><input type="range" name="max_time" min="5" max="120" step="5" value={timeValue} onChange={event => { const value = Number(event.target.value); setTimeValue(value); }}/><em>{timeValue} phút</em></span></label><label className="range-filter">Calo tối đa / khẩu phần <output key={calorieValue}>{calorieValue} kcal</output><span className="range-track"><input type="range" name="calories" min="100" max="1500" step="25" value={calorieValue} onChange={event => { const value = Number(event.target.value); setCalorieValue(value); }}/><em>{calorieValue} kcal</em></span></label><div className="difficulty-filter"><span>Độ khó</span>{['Dễ','Trung bình','Khó'].map(item => <button type="button" className={difficultyValue === item ? 'active' : ''} key={item} onClick={() => setDifficultyValue(value => value === item ? '' : item)}>{item}</button>)}</div><button className="primary filter-submit" type="submit"><span>Tìm món</span><b>⌕</b></button><button className="filter-clear" type="button" onClick={() => { setIngredients([]); setTimeValue(60); setCalorieValue(500); setDifficultyValue(''); setParams({}); }}><span>↻</span> Xóa lọc</button></form>
 
@@ -152,7 +172,26 @@ function ExploreCatalog({ dishes, categories, params, setParams, favorites, onFa
 
 
 function DiscoverCatalog({ dishes, categories: dbCategories, favorites, onFavorite, onHide, error }) {
+<<<<<<< Updated upstream
   const [view, setView] = useState('grid');
+=======
+  const {settings,update} = useSettings();
+  const view = settings.dishView === 'list' ? 'list' : 'grid';
+  const [randomDish,setRandomDish] = useState(null), [previewImage,setPreviewImage] = useState(null), [category,setCategory] = useState('all'), [showAll,setShowAll] = useState(false), [onlyWithVideo,setOnlyWithVideo] = useState(false), [sortOrder,setSortOrder] = useState('az');
+  const counts = useMemo(()=>dishes.reduce((out,dish)=>{const key=String(dish.category_id);out[key]=(out[key]||0)+1;return out},{}),[dishes]);
+  const populatedCategories = (dbCategories || []).filter(item=>counts[String(item.id)]>0).map(item=>({id:item.id,name:item.name}));
+  const categories = [{id:'all',name:'Tất cả món'}, ...(showAll ? (dbCategories || []).map(item=>({id:item.id,name:item.name})) : populatedCategories)];
+  const filtered = dishes.filter(dish=>(category==='all'||String(dish.category_id)===String(category))&&(!onlyWithVideo||(dish.recipe?.videos||[]).length>0));
+  const shown = categories;
+  const sorted = [...filtered].sort((a,b)=>{const result=String(a.name||'').localeCompare(String(b.name||''),'vi');return sortOrder==='za'?-result:result});
+  useEffect(()=>{const actions=document.querySelector('.discover-toolbar .discover-actions');if(!actions)return;let select=actions.querySelector('.name-sort-select');if(!select){select=document.createElement('select');select.className='name-sort-select';select.setAttribute('aria-label','Sắp xếp theo tên');select.innerHTML='<option value="az">Tên A–Z</option><option value="za">Tên Z–A</option>';select.onchange=event=>setSortOrder(event.target.value);actions.prepend(select)}select.value=sortOrder},[sortOrder]);
+  return <div className="discover-page"><Notice error={error}/><section className="discover-hero"><div><span>✨ COOKHUB · THƯ VIỆN MÓN ĂN</span><h1>Khám phá món ngon Việt và thế giới</h1><p>Chọn danh mục để tìm công thức phù hợp cho bữa ăn của bạn.</p></div><button className="random-recipe" onClick={()=>{if(sorted.length)setRandomDish(sorted[Math.floor(Math.random()*sorted.length)])}}>🎲 Gợi ý món ngẫu nhiên</button></section>{randomDish&&<div className="random-result"><b>Hôm nay thử {randomDish.name} nhé!</b><button onClick={()=>setRandomDish(null)}>×</button></div>}<section className="discover-category-panel"><div className="discover-category-heading"><div><small>CHỌN THEO NHÓM MÓN</small><h2>Khám phá danh mục</h2></div><span>{showAll ? (dbCategories || []).length : populatedCategories.length} danh mục</span></div><nav className="discover-categories">{shown.map(item=><button type="button" className={category===item.id?'active':''} key={item.id} onClick={()=>setCategory(item.id)}><span className="category-icon">{item.id==='all'?'🍽️':'🍲'}</span><span className="category-label">{item.name}</span><small>{item.id==='all'?dishes.length:counts[String(item.id)]||0} món</small></button>)}</nav>{(dbCategories || []).length > populatedCategories.length && <button type="button" className="discover-category-more" onClick={()=>setShowAll(value=>!value)}>{showAll?'Thu gọn danh mục':'Hiển thị tất cả danh mục'}</button>}</section><label className="discover-video-filter"><input type="checkbox" checked={onlyWithVideo} onChange={event=>setOnlyWithVideo(event.target.checked)}/><span>Chỉ hiện món có video</span><small>{filtered.length} món</small></label><div className="discover-toolbar"><span>Hiển thị <b>{sorted.length}</b> món ăn</span><div className="discover-actions"><button type="button" onClick={()=>update('dishView',view==='grid'?'list':'grid')}>{view==='grid'?'☷':'▦'}</button></div></div><div className={'dish-grid discover-grid '+(view==='list'?'list-view':'')}>{sorted.map(dish=><DishCard key={dish.id} dish={dish} favorite={favorites.includes(dish.id)} onFavorite={onFavorite} onHide={onHide}/>)}</div></div>;
+}
+
+function DiscoverCatalogLegacy({ dishes, categories: dbCategories, favorites, onFavorite, onHide, error }) {
+  const {settings,update} = useSettings();
+  const view = settings.dishView === 'list' ? 'list' : 'grid';
+>>>>>>> Stashed changes
   const [sortBy, setSortBy] = useState('rating');
   const [order, setOrder] = useState('desc');
   const [randomDish, setRandomDish] = useState(null);
@@ -189,6 +228,7 @@ function FavoritesCatalog({ categories, onFavorite }) {
   const [category, setCategory] = useState('all');
   const [collection, setCollection] = useState('all');
   const [message, setMessage] = useState('');
+  const [collectionToast, setCollectionToast] = useState('');
   const [busyId, setBusyId] = useState('');
   const [view, setView] = useState('all');
   const [collectionModal, setCollectionModal] = useState(false);
@@ -227,7 +267,7 @@ function FavoritesCatalog({ categories, onFavorite }) {
     } catch (err) { setMessage(err.message); }
   }
   async function addToCollection(collectionId, dishId) {
-    try { await api(`/favorite-collections/${collectionId}/dishes`, {method:'POST', body:{dish_id:dishId}}); setMessage('Đã thêm món vào bộ sưu tập.'); collectionResource.reload(); }
+    try { await api(`/favorite-collections/${collectionId}/dishes`, {method:'POST', body:{dish_id:dishId}}); setMessage('Đã thêm món vào bộ sưu tập.'); setCollectionToast('Đã thêm món vào bộ sưu tập.'); collectionResource.reload(); window.setTimeout(() => { setMessage(''); setCollectionToast(''); }, 3000); }
     catch (err) { setMessage(err.message); }
   }
   async function addPreviewDish(dish) {
@@ -277,9 +317,9 @@ export default function Catalog({ page = 'home' }) {
 
   const { favoriteCounts, updateFavoriteCount } = useAuth();
 
-  async function favorite(id, desiredAdding) { if (busy) return false; const adding = desiredAdding === undefined ? !favoriteIds.includes(id) : desiredAdding; setBusy(true); setError(''); updateFavoriteCount(id, adding ? 1 : -1); try { await api('/favorites/' + id, { method: adding ? 'PUT' : 'DELETE' }); favorites.reload(); if (adding) { setFavoriteToast(true); setCollectionManager(id); api('/favorite-collections/for-dish/'+id).then(setManagerCollections).catch(()=>setManagerCollections([])); } return true; } catch (err) { updateFavoriteCount(id, adding ? -1 : 1); setError(err.message); return false; } finally { setBusy(false); } }
+  async function favorite(id, desiredAdding) { if (busy) return false; const adding = desiredAdding === undefined ? !favoriteIds.includes(id) : desiredAdding; setBusy(true); setError(''); updateFavoriteCount(id, adding ? 1 : -1); try { await api('/favorites/' + id, { method: adding ? 'PUT' : 'DELETE' }); favorites.reload(); setFavoriteToast(adding); if (adding) { setCollectionManager(id); api('/favorite-collections/for-dish/'+id).then(setManagerCollections).catch(()=>setManagerCollections([])); window.setTimeout(() => setFavoriteToast(false), 3000); } else { setCollectionManager(''); } return true; } catch (err) { updateFavoriteCount(id, adding ? -1 : 1); setError(err.message); return false; } finally { setBusy(false); } }
 
-  async function addToManagerCollection(collectionId) { try { await api('/favorite-collections/' + collectionId + '/dishes', {method:'POST', body:{dish_id:collectionManager}}); setCollectionManager(''); setFavoriteToast(false); } catch (err) { setError(err.message); } }
+  async function addToManagerCollection(collectionId) { try { await api('/favorite-collections/' + collectionId + '/dishes', {method:'POST', body:{dish_id:collectionManager}}); setManagerOpen(false); setFavoriteToast(true); } catch (err) { setError(err.message); } }
 
   async function hide(id) { try { setError(''); await api('/hidden/' + id, { method: 'PUT' }); hiddenDishes.reload(); favorites.reload(); resource.reload(); } catch (err) { setError(err.message); } }
 

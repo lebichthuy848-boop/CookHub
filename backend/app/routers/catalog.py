@@ -58,16 +58,23 @@ def dishes(q: str = '', category: list[str] = Query(default=[]),
     def contains_words(haystack, needle):
         return bool(needle) and f' {needle} ' in f' {haystack} '
 
-    def matches_query(item):
+    def query_score(item):
         if not normalized_q:
-            return True
+            return 0
         text = normalize_ingredient_text(item['name'] + ' ' + item['description'])
         query_words = normalized_q.split()
         recipe_names = [normalize_ingredient_text(part['name'])
                         for part in (item['recipe'] or {}).get('ingredients', [])]
-        return (contains_words(text, normalized_q)
-                or all(word in text.split() for word in query_words)
-                or any(contains_words(name, normalized_q) for name in recipe_names))
+        searchable = [text, *recipe_names]
+        if contains_words(text, normalized_q):
+            return 1.0
+        scores = []
+        for word in query_words:
+            scores.append(max(ingredient_similarity(word, candidate)
+                              for candidate in searchable for _ in [0]))
+        whole_name = max((ingredient_similarity(normalized_q, candidate)
+                          for candidate in searchable), default=0)
+        return max(whole_name, sum(scores) / max(1, len(scores)))
 
     def has_ingredients(item):
         names = [normalize_ingredient_text(part['name'])
@@ -79,12 +86,14 @@ def dishes(q: str = '', category: list[str] = Query(default=[]),
         return all(any(matches_ingredient(name, term) for name in names)
                    for term in ingredient_terms)
 
-    result = [x for x in result if matches_query(x)
+    result = [x for x in result if (not normalized_q or query_score(x) >= .45)
               and (not category or x['category_id'] in category)
               and (max_time is None or x['time'] <= max_time)
               and (not difficulty or x['difficulty'] == difficulty)
               and (not ingredient_terms or has_ingredients(x))
               and (display == 'all' or x[display + '_display'])]
+    if normalized_q:
+        result.sort(key=query_score, reverse=True)
     if calories is not None:
         filtered = []
         for item in result:
@@ -114,14 +123,18 @@ def nutrition(dish_id: str, servings: int = Query(default=1, ge=1, le=1000), db:
     return dish_nutrition(db, dish_id, servings, date.today())
 
 @router.get('/dishes/{dish_id}/reviews')
-def reviews(dish_id: str, db: Session = Depends(get_db)):
+def reviews(dish_id: str, user=Depends(current_user), db: Session = Depends(get_db)):
     require(db, m.MonAn, dish_id)
     people = {x.maNguoiDung: x.hoTen for x in rows(db, m.NguoiDung)}
     return [dict(id=x.maDanhGia, name=people[x.maNguoiDung], rating=x.soSao,
-                 comment=x.noiDung, date=x.ngayDanhGia)
+                 comment=x.noiDung, date=x.ngayDanhGia,
+                 status=x.trangThaiKiemDuyet,
+                 editable=x.maNguoiDung == user.maNguoiDung)
             for x in db.scalars(select(m.DanhGiaMonAn).where(
                                 m.DanhGiaMonAn.maMonAn == dish_id,
-                                m.DanhGiaMonAn.trangThaiKiemDuyet == 'Đã duyệt')
+                                ((m.DanhGiaMonAn.trangThaiKiemDuyet == 'Đã duyệt') |
+                                 ((m.DanhGiaMonAn.maNguoiDung == user.maNguoiDung) &
+                                  (m.DanhGiaMonAn.trangThaiKiemDuyet != 'Đã duyệt'))))
                                 .order_by(m.DanhGiaMonAn.ngayDanhGia.desc()))]
 
 @router.get('/recommendations')

@@ -36,11 +36,18 @@ function useTypingPlaceholder(words) {
 
 export default function Layout() {
   const { user, logout } = useAuth();
+<<<<<<< Updated upstream
   const [open, setOpen] = useState(false); const [error, setError] = useState(''); const [searching, setSearching] = useState(false); const [pendingReviews,setPendingReviews]=useState(0); const [logoutOpen,setLogoutOpen]=useState(false); const [logoutBusy,setLogoutBusy]=useState(false);
+=======
+  const {settings,update} = useSettings();
+  const [open, setOpen] = useState(false); const [error, setError] = useState(''); const [searching, setSearching] = useState(false); const [pendingReviews,setPendingReviews]=useState(0); const [logoutOpen,setLogoutOpen]=useState(false); const [logoutBusy,setLogoutBusy]=useState(false); const [toast,setToast]=useState('');
+>>>>>>> Stashed changes
   const navigate = useNavigate(); const systemAdmin = user.role === 'Quản trị viên'; const admin = systemAdmin || user.role === 'Quản trị nội dung'; const nav = systemAdmin ? systemNav : admin ? adminNav : userNav;
   useEffect(()=>{if(user.role!=='Quản trị nội dung')return;let active=true;const load=()=>api('/admin/reviews').then(items=>{if(active)setPendingReviews(items.filter(x=>x.status==='Chờ duyệt').length)}).catch(()=>{});load();window.addEventListener('reviews-updated',load);return()=>{active=false;window.removeEventListener('reviews-updated',load)}},[user.role]);
   useEffect(()=>{const request=()=>setLogoutOpen(true);window.addEventListener('request-logout',request);return()=>window.removeEventListener('request-logout',request)},[]);
   useEffect(()=>{if(!open)return;const close=event=>{if(event.key==='Escape')setOpen(false)};window.addEventListener('keydown',close);return()=>window.removeEventListener('keydown',close)},[open]);
+  useEffect(()=>{if(!user || admin)return;let active=true;api('/profile').then(profile=>{const image=document.querySelector('.account img');if(active&&image&&profile.avatar)image.src=profile.avatar}).catch(()=>{});return()=>{active=false}},[user?.id,admin]);
+  useEffect(()=>{let node;const show=event=>{window.setTimeout(()=>{if(document.querySelector('.favorite-toast'))return;if(node)node.remove();node=document.createElement('div');node.className='favorite-toast';node.setAttribute('role','status');node.textContent='✓  ' + (event.detail?.message || 'Đã cập nhật thành công');document.body.appendChild(node);const current=node;window.setTimeout(()=>{current.remove();if(node===current)node=null},3000)},80)};window.addEventListener('cookhub-toast',show);return()=>{node?.remove();window.removeEventListener('cookhub-toast',show)}},[]);
   const searchHint = useTypingPlaceholder(searchSuggestions);
   function submitSearch(event) {
     event.preventDefault(); setSearching(true);

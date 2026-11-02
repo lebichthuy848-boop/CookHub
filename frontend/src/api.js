@@ -7,7 +7,11 @@ export async function api(path, { method = 'GET', body, signal } = {}) {
     method, credentials: 'include', headers, signal,
     body: body instanceof FormData ? body : body ? JSON.stringify(body) : undefined,
   });
-  if (response.status === 204) return null;
+  if (response.status === 204) {
+    if (path.startsWith('/favorites/')) window.dispatchEvent(new CustomEvent('cookhub-toast', { detail: { message: method === 'DELETE' ? 'Đã hủy yêu thích' : 'Đã thêm vào mục Yêu thích' } }));
+    if (path.includes('/favorite-collections/') && path.endsWith('/dishes')) window.dispatchEvent(new CustomEvent('cookhub-toast', { detail: { message: 'Đã thêm món vào bộ sưu tập' } }));
+    return null;
+  }
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
     const detail = Array.isArray(data.detail) ? data.detail.map(x => x.msg).join('; ') : data.detail;
@@ -16,6 +20,7 @@ export async function api(path, { method = 'GET', body, signal } = {}) {
     if (response.status === 401 && !path.startsWith('/auth/')) window.dispatchEvent(new Event('session-expired'));
     throw error;
   }
+  if (path.includes('/favorite-collections/') && path.endsWith('/dishes') && method === 'POST') window.dispatchEvent(new CustomEvent('cookhub-toast', { detail: { message: 'Đã thêm món vào bộ sưu tập' } }));
   return data;
 }
 export const money = amount => Number(amount || 0).toLocaleString('vi-VN') + ' đ';

@@ -21,7 +21,9 @@ def allocate_code(db, kind, fallback_prefix=None):
     test-only fallback. Production SQL Server writes always use this path.
     """
     if db.bind is not None and db.bind.dialect.name == 'mssql':
-        result = db.execute(text('EXEC dbo.SpCapMaMoi @LoaiMa=:kind'),
+        result = db.execute(text('''DECLARE @MaMoi NVARCHAR(20);
+            EXEC dbo.SpCapMaMoi @LoaiMa=:kind, @MaMoi=@MaMoi OUTPUT;
+            SELECT @MaMoi AS MaMoi;'''),
                             {'kind': kind}).mappings().first()
         value = result.get('MaMoi') if result else None
         if not value:
@@ -146,17 +148,21 @@ def recipe_data(db):
     units = {x.maDonVi: x for x in rows(db, m.DonViTinh)}
     components, steps, videos = {}, {}, {}
     for x in rows(db, m.ThanhPhanCongThuc):
-        components.setdefault(x.maCongThuc, []).append(dict(
+        recipe_key = (x.maCongThuc or '').strip().upper()
+        components.setdefault(recipe_key, []).append(dict(
             name=ingredients[x.maNguyenLieu].tenNguyenLieu, ingredient_id=x.maNguyenLieu,
             quantity=float(x.soLuong or 0), unit_id=x.maDonVi, unit=units[x.maDonVi].kyHieu))
     for x in sorted(rows(db, m.BuocCheBien), key=lambda x: x.thuTu or 0):
-        steps.setdefault(x.maCongThuc, []).append(x.noiDung)
+        recipe_key = (x.maCongThuc or '').strip().upper()
+        steps.setdefault(recipe_key, []).append(x.noiDung)
     for x in rows(db, m.DoanPhimHuongDan):
-        videos.setdefault(x.maCongThuc, []).append(dict(id=x.maDoanPhim, recipe_id=x.maCongThuc,
+        recipe_key = (x.maCongThuc or '').strip().upper()
+        videos.setdefault(recipe_key, []).append(dict(id=x.maDoanPhim, recipe_id=recipe_key,
             title=x.tieuDe, path=x.duongDan, description=x.moTa or ''))
-    return [dict(id=x.maCongThuc, dish_id=x.maMonAn, description=x.moTa or '',
-                 servings=x.soKhauPhanChuan or 1, ingredients=components.get(x.maCongThuc, []),
-                 steps=steps.get(x.maCongThuc, []), videos=videos.get(x.maCongThuc, []))
+    return [dict(id=(x.maCongThuc or '').strip().upper(), dish_id=x.maMonAn, description=x.moTa or '',
+                 image=local_image(x.duongDanAnh, x.maCongThuc) if x.duongDanAnh else None,
+                 servings=x.soKhauPhanChuan or 1, ingredients=components.get((x.maCongThuc or '').strip().upper(), []),
+                 steps=steps.get((x.maCongThuc or '').strip().upper(), []), videos=videos.get((x.maCongThuc or '').strip().upper(), []))
             for x in rows(db, m.CongThuc)]
 
 def dish_data(db):

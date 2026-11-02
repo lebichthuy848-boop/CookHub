@@ -1,4 +1,5 @@
 from datetime import date, datetime, timedelta
+import json
 from fastapi import APIRouter, Depends, HTTPException, Body
 from sqlalchemy import select, delete, func, text, bindparam, Unicode
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
@@ -32,9 +33,17 @@ def _collection_sql_error(exc):
 @router.get('/favorite-collections')
 def favorite_collections(user=Depends(current_user), db: Session = Depends(get_db)):
     try:
-        result = db.execute(text('EXEC dbo.SpLayDanhSachBoSuuTapYeuThich @MaNguoiDung=:user_id'),
-                            {'user_id': user.maNguoiDung}).mappings().all()
-        return [dict(row) for row in result]
+        result = [dict(row) for row in db.execute(text('EXEC dbo.SpLayDanhSachBoSuuTapYeuThich @MaNguoiDung=:user_id'),
+                            {'user_id': user.maNguoiDung}).mappings().all()]
+        for item in result:
+            if not item.get('DuongDanAnhBia') and not item.get('AnhMonAn') and not item.get('HinhAnh'):
+                item['image'] = db.scalar(text('''SELECT TOP 1 m.DuongDanAnh
+                    FROM dbo.ChiTietBoSuuTapYeuThich c
+                    JOIN dbo.MonAn m ON m.MaMonAn=c.MaMonAn
+                    WHERE c.MaBoSuuTap=:collection_id AND c.MaNguoiDung=:user_id
+                    ORDER BY c.NgayThem ASC'''),
+                    {'collection_id': item.get('MaBoSuuTap'), 'user_id': user.maNguoiDung})
+        return result
     except SQLAlchemyError as exc:
         raise _collection_sql_error(exc)
 
@@ -107,12 +116,14 @@ def delete_favorite_collection(collection_id: str, user=Depends(current_user), d
 
 @router.get('/profile')
 def profile(user=Depends(current_user), db: Session = Depends(get_db)):
+    preferences = db.get(m.UserPreferences, user.maNguoiDung)
+    preference_data = json.loads(preferences.answers) if preferences and preferences.answers else {}
     budget = db.scalar(select(m.NganSachAnUong).where(m.NganSachAnUong.maNguoiDung == user.maNguoiDung)
                        .order_by(m.NganSachAnUong.ngayBatDau.desc()).limit(1))
     diets = db.scalars(select(m.CheDoAn.tenCheDoAn).join(m.CheDoAnNguoiDung,
         m.CheDoAn.maCheDoAn == m.CheDoAnNguoiDung.maCheDoAn)
         .where(m.CheDoAnNguoiDung.maNguoiDung == user.maNguoiDung)).all()
-    return {**public_user(user), 'budget': float(budget.mucNganSach or 0) if budget else 0, 'diets': diets}
+    return {**public_user(user), 'avatar': preference_data.get('avatar', ''), 'budget': float(budget.mucNganSach or 0) if budget else 0, 'diets': diets}
 
 @router.put('/profile')
 def update_profile(data: s.Profile, user=Depends(current_user), db: Session = Depends(get_db)):
@@ -120,8 +131,16 @@ def update_profile(data: s.Profile, user=Depends(current_user), db: Session = De
     if other and other.maNguoiDung != user.maNguoiDung:
         raise HTTPException(409, 'Email đã được sử dụng.')
     user.hoTen, user.thuDienTu = data.name, data.email
+    preferences = db.get(m.UserPreferences, user.maNguoiDung)
+    if preferences is None:
+        preferences = m.UserPreferences(user_id=user.maNguoiDung, answers='{}')
+        db.add(preferences)
+    preference_data = json.loads(preferences.answers) if preferences.answers else {}
+    if data.avatar:
+        preference_data['avatar'] = data.avatar
+        preferences.answers = json.dumps(preference_data, ensure_ascii=False)
     db.commit()
-    return public_user(user)
+    return {**public_user(user), 'avatar': preference_data.get('avatar', '')}
 
 @router.get('/favorites')
 def favorites(user=Depends(current_user), db: Session = Depends(get_db)):
@@ -151,25 +170,47 @@ def favorite_details(user=Depends(current_user), db: Session = Depends(get_db)):
 def add_favorite(dish_id: str, user=Depends(current_user), db: Session = Depends(get_db)):
     require(db, m.MonAn, dish_id)
     if not db.scalar(select(m.MonYeuThich).where(m.MonYeuThich.maNguoiDung == user.maNguoiDung, m.MonYeuThich.maMonAn == dish_id)):
-        # SQL Server's schema uses MYT followed by digits for this key.  UUID
-        # fragments can violate that CHECK constraint, so allocate the next
-        # numeric key from existing rows (and keep the operation transactional).
         key = allocate_code(db, 'MonYeuThich', 'MYT')
-        db.add(m.MonYeuThich(maMonYeuThich=key, maNguoiDung=user.maNguoiDung,
-                             maMonAn=dish_id, ngayThem=date.today()))
         try:
+            if db.bind is None or db.bind.dialect.name != 'mssql':
+                db.add(m.MonYeuThich(maMonYeuThich=key,
+                                     maNguoiDung=user.maNguoiDung,
+                                     maMonAn=dish_id,
+                                     ngayThem=date.today()))
+                db.commit()
+                return
+            db.execute(text('''EXEC dbo.SpThemMonYeuThich
+                @MaMonYeuThich=:favorite_id,
+                @MaNguoiDung=:user_id,
+                @MaMonAn=:dish_id'''), {
+                'favorite_id': key,
+                'user_id': user.maNguoiDung,
+                'dish_id': dish_id,
+            })
             db.commit()
-        except IntegrityError as error:
+        except SQLAlchemyError as error:
             db.rollback()
             logger.exception("SQL favorite insert failed: number=%s message=%s orig=%s",
                              getattr(error.orig, 'number', None), str(error), repr(error.orig))
-            # A concurrent request may have inserted the same favorite. Treat
-            # that idempotently; surface other constraint violations clearly.
+            orig = getattr(error, 'orig', error)
+            args = getattr(orig, 'args', ()) or ()
+            number = args[0] if args and isinstance(args[0], int) else getattr(orig, 'number', None)
+            if number in {201, 8144, 8145, 8146}:
+                # Compatibility with databases that still contain an older
+                # SpThemMonYeuThich signature.
+                if not db.scalar(select(m.MonYeuThich).where(
+                        m.MonYeuThich.maNguoiDung == user.maNguoiDung,
+                        m.MonYeuThich.maMonAn == dish_id)):
+                    db.add(m.MonYeuThich(maMonYeuThich=allocate_code(db, 'MonYeuThich', 'MYT'),
+                                         maNguoiDung=user.maNguoiDung,
+                                         maMonAn=dish_id, ngayThem=date.today()))
+                    db.commit()
+                return
             if db.scalar(select(m.MonYeuThich).where(
                     m.MonYeuThich.maNguoiDung == user.maNguoiDung,
                     m.MonYeuThich.maMonAn == dish_id)):
                 return
-            raise HTTPException(409, 'Không thể lưu món yêu thích do dữ liệu không hợp lệ.')
+            raise HTTPException(500, 'Không thể lưu món yêu thích. Kiểm tra cấu hình Stored Procedure SpThemMonYeuThich.')
 
 @router.delete('/favorites/{dish_id}', status_code=204)
 def remove_favorite(dish_id: str, user=Depends(current_user), db: Session = Depends(get_db)):
@@ -207,6 +248,21 @@ def add_review(dish_id: str, data: s.Review, user=Depends(current_user), db: Ses
         trangThaiKiemDuyet='Chờ duyệt'))
     db.commit()
     return {'id': key}
+
+@router.put('/dishes/{dish_id}/reviews/{review_id}')
+def update_review(dish_id: str, review_id: str, data: s.Review, user=Depends(current_user), db: Session = Depends(get_db)):
+    review = db.scalar(select(m.DanhGiaMonAn).where(
+        m.DanhGiaMonAn.maDanhGia == review_id,
+        m.DanhGiaMonAn.maMonAn == dish_id,
+        m.DanhGiaMonAn.maNguoiDung == user.maNguoiDung))
+    if review is None:
+        raise HTTPException(404, 'Không tìm thấy đánh giá của bạn.')
+    review.soSao = data.rating
+    review.noiDung = data.comment
+    review.ngayDanhGia = date.today()
+    review.trangThaiKiemDuyet = 'Chờ duyệt'
+    db.commit()
+    return {'id': review_id}
 
 @router.get('/pantry')
 def pantry(user=Depends(current_user), db: Session = Depends(get_db)):
@@ -400,7 +456,9 @@ def _next_code(db, kind):
         """), {'start': len(prefix) + 1, 'prefix': prefix + '%'}).scalar()
         return f'{prefix}{(current or 0) + 1:03d}'
 
-    result = db.execute(text('EXEC dbo.SpCapMaMoi @LoaiMa=:kind'),
+    result = db.execute(text('''DECLARE @MaMoi NVARCHAR(20);
+        EXEC dbo.SpCapMaMoi @LoaiMa=:kind, @MaMoi=@MaMoi OUTPUT;
+        SELECT @MaMoi AS MaMoi;'''),
                         {'kind': kind}).mappings().first()
     value = result.get('MaMoi') if result else None
     if not value:

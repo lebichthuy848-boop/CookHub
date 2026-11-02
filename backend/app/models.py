@@ -140,6 +140,7 @@ class CongThuc(Base):
     maMonAn = Column(String(50), ForeignKey("MonAn.maMonAn"), nullable=False, unique=True)
     moTa = Column(Text, nullable=True)
     soKhauPhanChuan = Column(Integer, nullable=False)
+    duongDanAnh = Column("DuongDanAnh", String(500), nullable=True)
     daCongBo = Column("DaCongBo", Integer, nullable=False, default=0)
 
 
