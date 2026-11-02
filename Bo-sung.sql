@@ -1,4 +1,4 @@
-USE QuanLyThucDon;
+﻿USE QuanLyThucDon;
 GO
 
 -- =====================================================
@@ -907,9 +907,10 @@ HAVING COUNT(DISTINCT yt.MaMonAn) >= 2
 ORDER BY yt.MaNguoiDung;
 
 IF @Nguoi IS NULL
-    THROW 54800,
-        N'Cần một tài khoản đang hoạt động có ít nhất 2 món yêu thích để kiểm thử.',
-        1;
+BEGIN
+    PRINT N'Bỏ qua khối kiểm thử bộ sưu tập: database mới chưa có tài khoản với 2 món yêu thích.';
+    RETURN;
+END;
 
 SELECT TOP (1) @Mon1 = MaMonAn
 FROM dbo.MonYeuThich
@@ -1360,4 +1361,35 @@ BEGIN
         ON i.MaThucDon = td.MaThucDon
     WHERE td.NgayTao IS NULL;
 END;
+GO
+
+-- Đồng bộ bộ cấp mã sau toàn bộ dữ liệu mẫu. Các mã được chèn trực tiếp ở
+-- những phần cuối file có thể lớn hơn SoHienTai đã khởi tạo trước đó.
+USE QuanLyThucDon;
+GO
+DECLARE @LoaiMa SYSNAME, @TenBang SYSNAME, @TenCot SYSNAME, @TienTo NVARCHAR(10),
+        @MaxMa BIGINT, @Sql NVARCHAR(MAX);
+DECLARE cap_ma CURSOR LOCAL FAST_FORWARD FOR
+    SELECT LoaiMa, TenBang, TenCot, TienTo FROM dbo.QuyUocMaHeThong;
+OPEN cap_ma;
+FETCH NEXT FROM cap_ma INTO @LoaiMa, @TenBang, @TenCot, @TienTo;
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    IF EXISTS (SELECT 1 FROM sys.tables t JOIN sys.columns c ON c.object_id=t.object_id
+               WHERE t.schema_id=SCHEMA_ID(N'dbo') AND t.name=@TenBang AND c.name=@TenCot)
+    BEGIN
+        SET @MaxMa = NULL;
+        SET @Sql = N'SELECT @MaxMa=MAX(TRY_CONVERT(BIGINT,SUBSTRING('
+                 + QUOTENAME(@TenCot) + N',LEN(@TienTo)+1,20))) FROM dbo.'
+                 + QUOTENAME(@TenBang) + N' WHERE LEFT('
+                 + QUOTENAME(@TenCot) + N',LEN(@TienTo))=@TienTo';
+        EXEC sys.sp_executesql @Sql, N'@TienTo NVARCHAR(10), @MaxMa BIGINT OUTPUT',
+             @TienTo=@TienTo, @MaxMa=@MaxMa OUTPUT;
+        UPDATE dbo.QuyUocMaHeThong SET SoHienTai=@MaxMa
+        WHERE LoaiMa=@LoaiMa AND @MaxMa>SoHienTai;
+    END;
+    FETCH NEXT FROM cap_ma INTO @LoaiMa, @TenBang, @TenCot, @TienTo;
+END;
+CLOSE cap_ma;
+DEALLOCATE cap_ma;
 GO

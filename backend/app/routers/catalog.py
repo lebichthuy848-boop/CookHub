@@ -49,6 +49,7 @@ def dishes(q: str = '', category: list[str] = Query(default=[]),
            max_time: int | None = Query(default=None, ge=1), difficulty: str = '',
            ingredient: str = '', calories: int | None = Query(default=None, ge=1),
            display: Literal['all', 'home', 'foods'] = 'all', include_drafts: bool = False,
+           topic: str = '',
            db: Session = Depends(get_db)):
     result = dish_data(db)
     if not include_drafts:
@@ -68,6 +69,8 @@ def dishes(q: str = '', category: list[str] = Query(default=[]),
         searchable = [text, *recipe_names]
         if contains_words(text, normalized_q):
             return 1.0
+        if len(query_words) > 1 and not (set(query_words) & set(' '.join(searchable).split())):
+            return 0
         scores = []
         for word in query_words:
             scores.append(max(ingredient_similarity(word, candidate)
@@ -88,6 +91,7 @@ def dishes(q: str = '', category: list[str] = Query(default=[]),
 
     result = [x for x in result if (not normalized_q or query_score(x) >= .45)
               and (not category or x['category_id'] in category)
+              and (topic != 'warm_soup' or x['category_id'] in {'DM003', 'DM013'})
               and (max_time is None or x['time'] <= max_time)
               and (not difficulty or x['difficulty'] == difficulty)
               and (not ingredient_terms or has_ingredients(x))

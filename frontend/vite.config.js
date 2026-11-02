@@ -3,10 +3,6 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-<<<<<<< Updated upstream
-  server: { proxy: Object.fromEntries(['/api','/images','/media'].map(path => [path, 'http://127.0.0.1:8001'])) },
-  test: { environment: 'jsdom', setupFiles: './src/test-setup.js' }
-=======
   server: {
     allowedHosts: true,
     proxy: {
@@ -19,5 +15,4 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/test-setup.js'
   }
->>>>>>> Stashed changes
 });

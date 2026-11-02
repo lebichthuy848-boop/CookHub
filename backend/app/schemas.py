@@ -95,7 +95,7 @@ class UserUpdate(Profile):
 
 
 class Preferences(Input):
-    ingredients: list[Literal['chicken', 'pork', 'seafood', 'beef', 'vegetables', 'eggs_tofu']] = Field(min_length=1, max_length=6)
+    ingredients: list[Literal['chicken', 'pork', 'seafood', 'beef', 'vegetables', 'eggs', 'tofu', 'eggs_tofu']] = Field(min_length=1, max_length=7)
     occasions: list[Literal['solo', 'family', 'healthy', 'low_carb', 'children', 'friends']] = Field(min_length=1, max_length=6)
     tastes: list[Literal['savory', 'spicy', 'sweet_sour', 'light', 'rich']] = Field(min_length=1, max_length=5)
     time: Literal['quick', 'medium', 'relaxed']

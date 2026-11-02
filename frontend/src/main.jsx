@@ -11,6 +11,7 @@ import './list-view.css?v=20261009-list-card';
 import './tablet/index.css';
 import './mobile/index.css';
 import './restore-catalog-layout.css';
+import './avatar-default.css';
 
 class AppErrorBoundary extends React.Component {
   state = { error: null };

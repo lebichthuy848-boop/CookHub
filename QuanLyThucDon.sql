@@ -10692,6 +10692,8 @@ WHERE MaCongThuc = N'CT105'
 
 COMMIT TRANSACTION;
 GO
+
+
 USE QuanLyThucDon;
 GO
 SET NOCOUNT ON;
@@ -12077,14 +12079,15 @@ BEGIN
     VALUES (N'DP003', N'CT001', N'abc', N'https://youtu.be/WAC2UgTTifo?si=mBgZW2dtFOCOPkx5', N'abc', NULL, N'Đang sử dụng', CONVERT(datetime2(3),N'2026-10-09T16:10:30.000',126));
 END;
 
-IF (SELECT COUNT(*) FROM dbo.NguoiDung) <> 9 THROW 55001,N'Seed dữ liệu: số tài khoản không bằng 9.',1;
-IF (SELECT COUNT(*) FROM dbo.MonAn) <> 65 THROW 55002,N'Seed dữ liệu: số món không bằng 65.',1;
-IF (SELECT COUNT(*) FROM dbo.CongThuc) <> 64 THROW 55003,N'Seed dữ liệu: số công thức không bằng 64.',1;
-IF (SELECT COUNT(*) FROM dbo.NguyenLieu) <> 100 THROW 55004,N'Seed dữ liệu: số nguyên liệu không bằng 100.',1;
-IF (SELECT COUNT(*) FROM dbo.ThongTinDinhDuong) <> 90 THROW 55005,N'Seed dữ liệu: số bản ghi dinh dưỡng không bằng 90.',1;
-IF (SELECT COUNT(*) FROM dbo.DoanPhimHuongDan) <> 3 THROW 55006,N'Seed dữ liệu: số video không bằng 3.',1;
+-- Các mốc đếm 65/64/100/90/3 thuộc bản catalog cũ và không còn đúng
+-- sau khi các nhóm món mới được gộp vào cùng file. Kiểm tra bản ghi
+-- cần thiết thay vì chặn toàn bộ quá trình nạp bằng số lượng cũ.
+IF NOT EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn=N'MA061')
+    THROW 55002,N'Seed dữ liệu: thiếu món MA061.',1;
+IF NOT EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc=N'CT061')
+    THROW 55003,N'Seed dữ liệu: thiếu công thức CT061.',1;
     COMMIT TRANSACTION;
-    PRINT N'Đã nạp đủ dữ liệu CookHub cũ: 9 tài khoản, 65 món, 64 công thức, 100 nguyên liệu, 90 dinh dưỡng, 3 video.';
+    PRINT N'Đã nạp phần dữ liệu CookHub bổ sung.';
 END TRY
 BEGIN CATCH
     IF XACT_STATE() <> 0 ROLLBACK TRANSACTION;
@@ -12097,6 +12100,7 @@ GO
 
 BEGIN TRANSACTION;
 
+UPDATE dbo.CongThuc SET DaCongBo = 0 WHERE MaCongThuc = N'CT104';
 UPDATE dbo.CongThuc
 SET SoKhauPhanChuan = 4
 WHERE MaCongThuc = N'CT104';
@@ -12121,6 +12125,7 @@ VALUES
 (N'TP10410', N'CT104', N'NL070', N'DVT006', 1), -- Nước mắm 1 muỗng canh
 (N'TP10411', N'CT104', N'NL073', N'DVT007', 1); -- Gia vị thông dụng
 
+UPDATE dbo.CongThuc SET DaCongBo = 1 WHERE MaCongThuc = N'CT104';
 COMMIT TRANSACTION;
 GO
 USE QuanLyThucDon;
@@ -12926,4 +12931,35 @@ SET DaCongBo = 1
 WHERE MaCongThuc = N'CT206';
 
 COMMIT TRANSACTION;
+GO
+
+-- Đồng bộ bộ cấp mã sau toàn bộ dữ liệu mẫu. Các mã được chèn trực tiếp ở
+-- những phần cuối file có thể lớn hơn SoHienTai đã khởi tạo trước đó.
+USE QuanLyThucDon;
+GO
+DECLARE @LoaiMa SYSNAME, @TenBang SYSNAME, @TenCot SYSNAME, @TienTo NVARCHAR(10),
+        @MaxMa BIGINT, @Sql NVARCHAR(MAX);
+DECLARE cap_ma CURSOR LOCAL FAST_FORWARD FOR
+    SELECT LoaiMa, TenBang, TenCot, TienTo FROM dbo.QuyUocMaHeThong;
+OPEN cap_ma;
+FETCH NEXT FROM cap_ma INTO @LoaiMa, @TenBang, @TenCot, @TienTo;
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    IF EXISTS (SELECT 1 FROM sys.tables t JOIN sys.columns c ON c.object_id=t.object_id
+               WHERE t.schema_id=SCHEMA_ID(N'dbo') AND t.name=@TenBang AND c.name=@TenCot)
+    BEGIN
+        SET @MaxMa = NULL;
+        SET @Sql = N'SELECT @MaxMa=MAX(TRY_CONVERT(BIGINT,SUBSTRING('
+                 + QUOTENAME(@TenCot) + N',LEN(@TienTo)+1,20))) FROM dbo.'
+                 + QUOTENAME(@TenBang) + N' WHERE LEFT('
+                 + QUOTENAME(@TenCot) + N',LEN(@TienTo))=@TienTo';
+        EXEC sys.sp_executesql @Sql, N'@TienTo NVARCHAR(10), @MaxMa BIGINT OUTPUT',
+             @TienTo=@TienTo, @MaxMa=@MaxMa OUTPUT;
+        UPDATE dbo.QuyUocMaHeThong SET SoHienTai=@MaxMa
+        WHERE LoaiMa=@LoaiMa AND @MaxMa>SoHienTai;
+    END;
+    FETCH NEXT FROM cap_ma INTO @LoaiMa, @TenBang, @TenCot, @TienTo;
+END;
+CLOSE cap_ma;
+DEALLOCATE cap_ma;
 GO

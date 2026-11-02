@@ -13,3 +13,14 @@
 /* Compact category icons. */
 .discover-category-panel .discover-categories button{grid-template-columns:28px minmax(0,1fr) auto}
 .discover-category-panel .category-icon{width:28px;height:28px;display:grid;place-items:center;font-size:17px;border-radius:9px;overflow:hidden}
+
+/* This layout file loads after theme.css, so its light surfaces need dark counterparts. */
+html[data-theme="dark"] .search-hub .ingredient-hub{background:linear-gradient(105deg,#19392d,#283928)!important;box-shadow:0 12px 24px #0003}
+html[data-theme="dark"] .discover-category-panel{border-color:var(--color-border);background:linear-gradient(135deg,#1b352b,#1a3027);box-shadow:0 8px 20px #0003}
+html[data-theme="dark"] .discover-category-heading h2{color:var(--color-text-primary)}
+html[data-theme="dark"] .discover-category-heading small{color:#86dfb0}
+html[data-theme="dark"] .discover-category-heading>span{color:var(--color-text-secondary)}
+html[data-theme="dark"] .discover-category-panel button:not(.active)>small{background:#315143;color:#d1e8db}
+html[data-theme="dark"] .discover-category-more{border-color:var(--color-border);background:var(--color-bg-elevated);color:var(--color-text-primary)}
+html[data-theme="dark"] .discover-video-filter{color:var(--color-text-primary)}
+html[data-theme="dark"] .discover-video-filter small{background:var(--color-bg-muted);color:var(--color-text-secondary)}

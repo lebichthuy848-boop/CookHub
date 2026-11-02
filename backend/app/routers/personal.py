@@ -332,6 +332,20 @@ def menu(start: date, end: date, user=Depends(current_user), db: Session = Depen
 def menu_nutrition_for_day(on: date, user=Depends(current_user), db: Session = Depends(get_db)):
     return menu_nutrition(db, user.maNguoiDung, on)
 
+@router.get('/menu/nutrition/week')
+def menu_nutrition_for_week(start: date, user=Depends(current_user), db: Session = Depends(get_db)):
+    items = menu(start, start + timedelta(days=6), user, db)
+    days = []
+    for offset in range(7):
+        current = start + timedelta(days=offset)
+        meals = {item['meal'] for item in items if item['date'] == current}
+        days.append({
+            'date': current,
+            'main_meals': len(meals & {'Sáng', 'Trưa', 'Tối'}),
+            'nutrition': menu_nutrition(db, user.maNguoiDung, current),
+        })
+    return {'start': start, 'days': days}
+
 @router.post('/menu', status_code=201)
 def add_menu(data: s.MenuItem, user=Depends(current_user), db: Session = Depends(get_db)):
     require(db, m.MonAn, data.dish_id)
