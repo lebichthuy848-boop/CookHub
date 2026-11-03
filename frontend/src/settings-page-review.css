@@ -1,0 +1,12 @@
+.sp-hero .sp-help{border:1px solid #c8f5dd;border-radius:12px;background:#ffffff20;color:white;padding:10px 16px;font-weight:700;cursor:pointer}
+.settings-page-new .sp-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible;padding:16px 0;gap:10px;margin-right:0}
+.sp-tabs button{white-space:normal;min-width:0;text-align:center;font-weight:700}
+.sp-card p{color:var(--color-text-secondary);line-height:1.55}
+.sp-row .sp-toggle{flex:none}
+.sp-help:focus-visible,.sp-tabs button:focus-visible,.sp-choice button:focus-visible,.sp-toggle:focus-visible,.sp-secondary:focus-visible,.sp-primary:focus-visible,.sp-danger:focus-visible{outline:3px solid #49c99c;outline-offset:3px}
+.sidebar-collapse-button{display:block;width:36px;height:32px;margin:4px 16px 8px auto;border:1px solid var(--color-border);border-radius:9px;background:var(--color-bg-card);color:var(--color-primary);font-size:22px;line-height:1;cursor:pointer}
+.settings-sidebar-collapsed .sidebar-collapse-button{margin:4px auto 8px}
+.cooking-tools{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.cooking-tools button{border:1px solid var(--color-border);border-radius:10px;padding:8px 12px;background:var(--color-bg-card);color:var(--color-primary);cursor:pointer}.cooking-tools button:disabled{opacity:.5;cursor:not-allowed}.cooking-tools small{width:100%;color:var(--color-text-secondary)}
+@media(max-width:800px){.settings-page-new .sp-hero{gap:12px}.settings-page-new .sp-hero h1{font-size:25px}.sidebar-collapse-button{display:none}}
+@media(max-width:1199px){.settings-sidebar-collapsed .shell .premium-sidebar{width:min(320px,85vw)}.settings-sidebar-collapsed .shell .main-wrap{margin-left:0;width:100%}.settings-sidebar-collapsed .premium-sidebar .side-nav a>span,.settings-sidebar-collapsed .premium-sidebar .sidebar-brand span:not(.brand-flower),.settings-sidebar-collapsed .premium-sidebar .sidebar-note,.settings-sidebar-collapsed .premium-sidebar .logout span{display:initial!important}}
+@media(max-width:520px){.settings-page-new .sp-hero{padding:20px;align-items:flex-start}.sp-hero .sp-help{white-space:nowrap;padding:8px}.settings-page-new .sp-tabs{gap:5px}.sp-tabs button{padding:9px 5px;font-size:12px}.sp-card{padding:17px}.sp-row{gap:12px}}

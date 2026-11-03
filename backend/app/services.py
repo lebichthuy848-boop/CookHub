@@ -167,6 +167,9 @@ def recipe_data(db):
 
 def dish_data(db):
     categories = {x.maDanhMuc: x.tenDanhMuc for x in rows(db, m.DanhMucMonAn)}
+    dish_categories = {}
+    for link in rows(db, m.MonAnDanhMuc):
+        dish_categories.setdefault(link.maMonAn, []).append(link.maDanhMuc)
     recipes = {x['dish_id']: x for x in recipe_data(db)}
     reviews, favorites, diets = {}, {}, {}
     diet_names = {x.maCheDoAn: x.tenCheDoAn for x in rows(db, m.CheDoAn)}
@@ -213,6 +216,10 @@ def dish_data(db):
         return round(total)
     result = []
     for x in rows(db, m.MonAn):
+        category_ids = list(dict.fromkeys([
+            x.maDanhMuc,
+            *dish_categories.get(x.maMonAn, []),
+        ]))
         recipe = recipes.get(x.maMonAn)
         ratings = reviews.get(x.maMonAn, [])
         cost = recipe_cost(recipe)
@@ -220,6 +227,9 @@ def dish_data(db):
         cooking_time = x.thoiGianCheBien or 0
         auto_difficulty = 'Dễ' if cooking_time < 30 and step_count <= 5 else 'Khó' if cooking_time > 60 or step_count > 10 else 'Trung bình'
         result.append(dict(id=x.maMonAn, name=x.tenMonAn, category_id=x.maDanhMuc,
+            category_ids=category_ids,
+            categories=[dict(id=category_id, name=categories[category_id])
+                        for category_id in category_ids if category_id in categories],
             category=categories[x.maDanhMuc], description=x.moTa or '', time=cooking_time,
             difficulty=auto_difficulty, step_count=step_count, image=local_image(x.duongDanAnh, x.tenMonAn), images=local_images(x.duongDanAnh, x.tenMonAn), rating=round(sum(ratings)/len(ratings), 1) if ratings else 0,
             review_count=len(ratings), favorite_count=favorites.get(x.maMonAn, 0), cost=cost,

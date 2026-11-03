@@ -15,7 +15,9 @@ def normalize(text):
 
 WORDS = {
     'chicken': ['gà'], 'pork': ['heo', 'lợn', 'sườn'], 'seafood': ['cá', 'tôm', 'cua', 'mực', 'hải sản'],
-    'beef': ['bò'], 'vegetables': ['rau', 'chay', 'nấm'], 'eggs_tofu': ['trứng', 'đậu hũ', 'đậu phụ'],
+    'beef': ['bò'], 'vegetables': ['rau', 'chay', 'nấm'],
+    'eggs': ['trứng'], 'tofu': ['đậu hũ', 'đậu phụ', 'tàu hũ'],
+    'eggs_tofu': ['trứng', 'đậu hũ', 'đậu phụ', 'tàu hũ'],
     'savory': ['mặn', 'đậm đà', 'kho', 'muối'], 'spicy': ['cay', 'ớt'],
     'sweet_sour': ['chua', 'ngọt'], 'light': ['thanh', 'hấp', 'luộc'], 'rich': ['béo', 'cốt dừa', 'kem'],
     'children': ['trẻ', 'cháo', 'súp'], 'friends': ['nhậu', 'lẩu', 'nướng'],
@@ -58,7 +60,10 @@ def within_budget(dish, budget):
         return True
     cost = dish.get('cost')
     if cost is None:
-        return False
+        # Missing ingredient prices do not prove a dish exceeds the budget.
+        # Keep it eligible; the API leaves cost as null instead of presenting
+        # an unverified estimate.
+        return True
     servings = (dish.get('recipe') or {}).get('servings') or 1
     per_serving = cost / servings
     return per_serving < limit if budget == 'saving' else per_serving <= limit
@@ -120,7 +125,7 @@ def rank_dishes(db, user_id, answers):
         minutes = dish['time']
         hits += [bool(answers['time']) and minutes > 0 and (minutes < 15 if answers['time'] == 'quick' else 15 <= minutes <= 30 if answers['time'] == 'medium' else minutes > 45)]
         hits += [any(matches(text, tag) for tag in answers['tools'])]
-        labels = ['Nguyên liệu ưa thích', 'Bối cảnh / chế độ ăn', 'Khẩu vị', 'Thời gian nấu', 'Dụng cụ (suy luận từ công thức)']
+        labels = ['Món bạn thích ăn', 'Bối cảnh / chế độ ăn', 'Khẩu vị', 'Thời gian nấu', 'Dụng cụ (suy luận từ công thức)']
         weights = [30, 20, 20, 20, 10]
         active = [bool(answers[k]) for k in ['ingredients', 'occasions', 'tastes', 'time', 'tools']]
         total = sum(w for w, used in zip(weights, active) if used)

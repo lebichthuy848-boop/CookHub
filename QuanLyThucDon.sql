@@ -5850,7 +5850,7 @@
 	/* ------------------------------------------------------------
 	   4. Đổi DEFAULT:
 		  dữ liệu cũ = Đã duyệt
-		  đánh giá tạo MỚI = Chờ duyệt
+		  đánh giá tạo MỚI = Đã duyệt
 	   ------------------------------------------------------------ */
 
 	IF EXISTS
@@ -5867,7 +5867,7 @@
 	GO
 	ALTER TABLE dbo.DanhGiaMonAn
 	ADD CONSTRAINT DF_DanhGiaMonAn_TrangThaiKiemDuyet
-	DEFAULT N'Chờ duyệt'
+	DEFAULT N'Đã duyệt'
 	FOR TrangThaiKiemDuyet;
 	GO
 	/* ------------------------------------------------------------
@@ -7561,8 +7561,8 @@
 					NoiDung = @NoiDung,
 					NgayDanhGia = CAST(GETDATE() AS DATE),
 
-					/* Sửa đánh giá -> phải duyệt lại */
-					TrangThaiKiemDuyet = N'Chờ duyệt',
+					/* Đánh giá được hiển thị ngay sau khi sửa */
+					TrangThaiKiemDuyet = N'Đã duyệt',
 					MaNguoiKiemDuyet = NULL,
 					NgayKiemDuyet = NULL,
 					GhiChuKiemDuyet = NULL
@@ -7597,7 +7597,7 @@
 					@NoiDung,
 					CAST(GETDATE() AS DATE),
 
-					N'Chờ duyệt',
+					N'Đã duyệt',
 					NULL,
 					NULL,
 					NULL
@@ -10692,6 +10692,8 @@ WHERE MaCongThuc = N'CT105'
 
 COMMIT TRANSACTION;
 GO
+
+
 USE QuanLyThucDon;
 GO
 SET NOCOUNT ON;
@@ -12077,14 +12079,15 @@ BEGIN
     VALUES (N'DP003', N'CT001', N'abc', N'https://youtu.be/WAC2UgTTifo?si=mBgZW2dtFOCOPkx5', N'abc', NULL, N'Đang sử dụng', CONVERT(datetime2(3),N'2026-10-09T16:10:30.000',126));
 END;
 
-IF (SELECT COUNT(*) FROM dbo.NguoiDung) <> 9 THROW 55001,N'Seed dữ liệu: số tài khoản không bằng 9.',1;
-IF (SELECT COUNT(*) FROM dbo.MonAn) <> 65 THROW 55002,N'Seed dữ liệu: số món không bằng 65.',1;
-IF (SELECT COUNT(*) FROM dbo.CongThuc) <> 64 THROW 55003,N'Seed dữ liệu: số công thức không bằng 64.',1;
-IF (SELECT COUNT(*) FROM dbo.NguyenLieu) <> 100 THROW 55004,N'Seed dữ liệu: số nguyên liệu không bằng 100.',1;
-IF (SELECT COUNT(*) FROM dbo.ThongTinDinhDuong) <> 90 THROW 55005,N'Seed dữ liệu: số bản ghi dinh dưỡng không bằng 90.',1;
-IF (SELECT COUNT(*) FROM dbo.DoanPhimHuongDan) <> 3 THROW 55006,N'Seed dữ liệu: số video không bằng 3.',1;
+-- Các mốc đếm 65/64/100/90/3 thuộc bản catalog cũ và không còn đúng
+-- sau khi các nhóm món mới được gộp vào cùng file. Kiểm tra bản ghi
+-- cần thiết thay vì chặn toàn bộ quá trình nạp bằng số lượng cũ.
+IF NOT EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn=N'MA061')
+    THROW 55002,N'Seed dữ liệu: thiếu món MA061.',1;
+IF NOT EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc=N'CT061')
+    THROW 55003,N'Seed dữ liệu: thiếu công thức CT061.',1;
     COMMIT TRANSACTION;
-    PRINT N'Đã nạp đủ dữ liệu CookHub cũ: 9 tài khoản, 65 món, 64 công thức, 100 nguyên liệu, 90 dinh dưỡng, 3 video.';
+    PRINT N'Đã nạp phần dữ liệu CookHub bổ sung.';
 END TRY
 BEGIN CATCH
     IF XACT_STATE() <> 0 ROLLBACK TRANSACTION;
@@ -12097,6 +12100,7 @@ GO
 
 BEGIN TRANSACTION;
 
+UPDATE dbo.CongThuc SET DaCongBo = 0 WHERE MaCongThuc = N'CT104';
 UPDATE dbo.CongThuc
 SET SoKhauPhanChuan = 4
 WHERE MaCongThuc = N'CT104';
@@ -12121,6 +12125,7 @@ VALUES
 (N'TP10410', N'CT104', N'NL070', N'DVT006', 1), -- Nước mắm 1 muỗng canh
 (N'TP10411', N'CT104', N'NL073', N'DVT007', 1); -- Gia vị thông dụng
 
+UPDATE dbo.CongThuc SET DaCongBo = 1 WHERE MaCongThuc = N'CT104';
 COMMIT TRANSACTION;
 GO
 USE QuanLyThucDon;
@@ -12926,4 +12931,10070 @@ SET DaCongBo = 1
 WHERE MaCongThuc = N'CT206';
 
 COMMIT TRANSACTION;
+GO
+
+-- Đồng bộ bộ cấp mã sau toàn bộ dữ liệu mẫu. Các mã được chèn trực tiếp ở
+-- những phần cuối file có thể lớn hơn SoHienTai đã khởi tạo trước đó.
+USE QuanLyThucDon;
+GO
+DECLARE @LoaiMa SYSNAME, @TenBang SYSNAME, @TenCot SYSNAME, @TienTo NVARCHAR(10),
+        @MaxMa BIGINT, @Sql NVARCHAR(MAX);
+DECLARE cap_ma CURSOR LOCAL FAST_FORWARD FOR
+    SELECT LoaiMa, TenBang, TenCot, TienTo FROM dbo.QuyUocMaHeThong;
+OPEN cap_ma;
+FETCH NEXT FROM cap_ma INTO @LoaiMa, @TenBang, @TenCot, @TienTo;
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    IF EXISTS (SELECT 1 FROM sys.tables t JOIN sys.columns c ON c.object_id=t.object_id
+               WHERE t.schema_id=SCHEMA_ID(N'dbo') AND t.name=@TenBang AND c.name=@TenCot)
+    BEGIN
+        SET @MaxMa = NULL;
+        SET @Sql = N'SELECT @MaxMa=MAX(TRY_CONVERT(BIGINT,SUBSTRING('
+                 + QUOTENAME(@TenCot) + N',LEN(@TienTo)+1,20))) FROM dbo.'
+                 + QUOTENAME(@TenBang) + N' WHERE LEFT('
+                 + QUOTENAME(@TenCot) + N',LEN(@TienTo))=@TienTo';
+        EXEC sys.sp_executesql @Sql, N'@TienTo NVARCHAR(10), @MaxMa BIGINT OUTPUT',
+             @TienTo=@TienTo, @MaxMa=@MaxMa OUTPUT;
+        UPDATE dbo.QuyUocMaHeThong SET SoHienTai=@MaxMa
+        WHERE LoaiMa=@LoaiMa AND @MaxMa>SoHienTai;
+    END;
+    FETCH NEXT FROM cap_ma INTO @LoaiMa, @TenBang, @TenCot, @TienTo;
+END;
+CLOSE cap_ma;
+DEALLOCATE cap_ma;
+GO
+
+-- Public Cloudinary delivery URLs for the 26 supplied dish images.
+-- Only fill empty image fields; keep any image chosen by an administrator.
+UPDATE dish
+SET DuongDanAnh = supplied.Url
+FROM dbo.MonAn AS dish
+JOIN (VALUES
+    (N'MA102', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672866/cookhub/mon-an/MA102.png'),
+    (N'MA103', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672868/cookhub/mon-an/MA103.png'),
+    (N'MA105', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672870/cookhub/mon-an/MA105.png'),
+    (N'MA106', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672872/cookhub/mon-an/MA106.png'),
+    (N'MA107', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672874/cookhub/mon-an/MA107.png'),
+    (N'MA108', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672876/cookhub/mon-an/MA108.png'),
+    (N'MA110', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672878/cookhub/mon-an/MA110.png'),
+    (N'MA201', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672880/cookhub/mon-an/MA201.png'),
+    (N'MA202', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672882/cookhub/mon-an/MA202.png'),
+    (N'MA203', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672884/cookhub/mon-an/MA203.png'),
+    (N'MA204', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672886/cookhub/mon-an/MA204.png'),
+    (N'MA205', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672888/cookhub/mon-an/MA205.png'),
+    (N'MA206', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672818/cookhub/mon-an/MA206.png'),
+    (N'MA207', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672891/cookhub/mon-an/MA207.png'),
+    (N'MA208', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672893/cookhub/mon-an/MA208.png'),
+    (N'MA209', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672895/cookhub/mon-an/MA209.png'),
+    (N'MA210', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672897/cookhub/mon-an/MA210.png'),
+    (N'MA211', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672899/cookhub/mon-an/MA211.png'),
+    (N'MA212', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672901/cookhub/mon-an/MA212.png'),
+    (N'MA213', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672903/cookhub/mon-an/MA213.png'),
+    (N'MA214', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672904/cookhub/mon-an/MA214.png'),
+    (N'MA215', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672906/cookhub/mon-an/MA215.png'),
+    (N'MA216', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672908/cookhub/mon-an/MA216.png'),
+    (N'MA217', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672910/cookhub/mon-an/MA217.png'),
+    (N'MA218', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672912/cookhub/mon-an/MA218.png'),
+    (N'MA219', N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793672914/cookhub/mon-an/MA219.png')
+) AS supplied(MaMonAn, Url) ON supplied.MaMonAn = dish.MaMonAn
+WHERE dish.DuongDanAnh IS NULL OR LTRIM(RTRIM(dish.DuongDanAnh)) = N'';
+GO
+
+-- Reuse the existing Cloudinary image for Canh chua ca loc.
+UPDATE dbo.MonAn SET DuongDanAnh=N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1792714190/cookhub/mon-an/canh-chua-ca-loc.jpg'
+WHERE MaMonAn=N'MA104' AND (DuongDanAnh IS NULL OR LTRIM(RTRIM(DuongDanAnh))=N'');
+GO
+
+-- Images supplied after the initial Cloudinary import.
+UPDATE dbo.MonAn SET DuongDanAnh=N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793673454/cookhub/mon-an/MA101.png'
+WHERE MaMonAn=N'MA101' AND (DuongDanAnh IS NULL OR LTRIM(RTRIM(DuongDanAnh))=N'');
+UPDATE dbo.MonAn SET DuongDanAnh=N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793673456/cookhub/mon-an/MA109.png'
+WHERE MaMonAn=N'MA109' AND (DuongDanAnh IS NULL OR LTRIM(RTRIM(DuongDanAnh))=N'');
+UPDATE dbo.MonAn SET DuongDanAnh=N'https://res.cloudinary.com/ncpoysfj/image/upload/f_auto,q_auto/v1793673459/cookhub/mon-an/MA230.png'
+WHERE MaMonAn=N'MA230' AND (DuongDanAnh IS NULL OR DuongDanAnh=N'images/pho-bo-card-stretched.jpg');
+GO
+
+USE QuanLyThucDon;
+GO
+SET XACT_ABORT ON;
+BEGIN TRANSACTION;
+
+IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn=N'MA001' AND TenMonAn=N'Phở bò viên')
+   AND EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn=N'MA230' AND TenMonAn=N'Phở bò')
+BEGIN
+    IF EXISTS (SELECT 1 FROM dbo.ChiTietThucDon WHERE MaMonAn=N'MA001')
+       OR EXISTS (SELECT 1 FROM dbo.DanhGiaMonAn WHERE MaMonAn=N'MA001')
+       OR EXISTS (SELECT 1 FROM dbo.MonYeuThich WHERE MaMonAn=N'MA001')
+       OR EXISTS (SELECT 1 FROM dbo.MonKhongThich WHERE MaMonAn=N'MA001')
+       OR EXISTS (SELECT 1 FROM dbo.PhanHoiCheBien WHERE MaCongThuc IN (SELECT MaCongThuc FROM dbo.CongThuc WHERE MaMonAn=N'MA001'))
+    BEGIN
+        ROLLBACK TRANSACTION;
+        THROW 51003, N'Phở bò viên đang có dữ liệu người dùng; chưa thể xóa tự động.', 1;
+    END;
+
+    UPDATE dbo.CongThuc SET DaCongBo=0 WHERE MaMonAn=N'MA001';
+    DELETE FROM dbo.BuocCheBien WHERE MaCongThuc IN (SELECT MaCongThuc FROM dbo.CongThuc WHERE MaMonAn=N'MA001');
+    DELETE FROM dbo.ThanhPhanCongThuc WHERE MaCongThuc IN (SELECT MaCongThuc FROM dbo.CongThuc WHERE MaMonAn=N'MA001');
+    DELETE FROM dbo.DoanPhimHuongDan WHERE MaCongThuc IN (SELECT MaCongThuc FROM dbo.CongThuc WHERE MaMonAn=N'MA001');
+    DELETE FROM dbo.CongThuc WHERE MaMonAn=N'MA001';
+    DELETE FROM dbo.CheDoAnMonAn WHERE MaMonAn=N'MA001';
+    DELETE FROM dbo.KhauViMonAn WHERE MaMonAn=N'MA001';
+    DELETE FROM dbo.MonAnNhan WHERE MaMonAn=N'MA001';
+    DELETE FROM dbo.ThongTinDinhDuongMonAn WHERE MaMonAn=N'MA001';
+    DELETE FROM dbo.MonAn WHERE MaMonAn=N'MA001';
+END;
+
+COMMIT TRANSACTION;
+GO
+
+USE QuanLyThucDon;
+GO
+
+-- Chạy một lần khi nâng cấp database cũ sang cơ chế đăng đánh giá ngay.
+UPDATE dbo.DanhGiaMonAn
+SET TrangThaiKiemDuyet = N'Đã duyệt',
+    MaNguoiKiemDuyet = NULL,
+    NgayKiemDuyet = NULL,
+    GhiChuKiemDuyet = NULL
+WHERE TrangThaiKiemDuyet = N'Chờ duyệt';
+GO
+
+DECLARE @constraint_name sysname;
+DECLARE @drop_sql nvarchar(max);
+SELECT @constraint_name = dc.name
+FROM sys.default_constraints AS dc
+JOIN sys.columns AS c ON c.object_id = dc.parent_object_id AND c.column_id = dc.parent_column_id
+WHERE dc.parent_object_id = OBJECT_ID(N'dbo.DanhGiaMonAn') AND c.name = N'TrangThaiKiemDuyet';
+IF @constraint_name IS NOT NULL
+BEGIN
+    SET @drop_sql = N'ALTER TABLE dbo.DanhGiaMonAn DROP CONSTRAINT ' + QUOTENAME(@constraint_name);
+    EXEC sp_executesql @drop_sql;
+END;
+ALTER TABLE dbo.DanhGiaMonAn
+ADD CONSTRAINT DF_DanhGiaMonAn_TrangThaiKiemDuyet DEFAULT N'Đã duyệt' FOR TrangThaiKiemDuyet;
+GO
+
+BEGIN TRANSACTION;
+
+DECLARE @DanhMucGiữLại TABLE (
+    TenDanhMuc NVARCHAR(100) PRIMARY KEY
+);
+
+INSERT INTO @DanhMucGiữLại (TenDanhMuc)
+VALUES
+(N'Món canh'),
+(N'Món bánh'),
+(N'Món chè'),
+(N'Món nước'),
+(N'Món kem'),
+(N'Món nướng'),
+(N'Món cháo'),
+(N'Món xào'),
+(N'Món kho'),
+(N'Món chiên'),
+(N'Món hấp'),
+(N'Món lẩu'),
+(N'Món gỏi - salad'),
+(N'Món từ gà'),
+(N'Món từ bò'),
+(N'Món chay'),
+(N'Ăn vặt'),
+(N'Ngày lễ - Tết'),
+(N'Thức uống'),
+(N'Sinh tố'),
+(N'Trà sữa'),
+(N'Nước ép'),
+(N'Món tráng miệng'),
+(N'Món khô - mắm'),
+(N'Món cuốn - trộn'),
+(N'Mẹo vào bếp');
+
+-- Kiểm tra các danh mục sẽ bị xóa
+SELECT dm.MaDanhMuc, dm.TenDanhMuc
+FROM dbo.DanhMucMonAn dm
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM @DanhMucGiữLại keep
+    WHERE keep.TenDanhMuc = dm.TenDanhMuc
+);
+
+-- Xóa các danh mục dư nhưng chỉ khi chưa có món ăn tham chiếu
+DELETE dm
+FROM dbo.DanhMucMonAn dm
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM @DanhMucGiữLại keep
+    WHERE keep.TenDanhMuc = dm.TenDanhMuc
+)
+AND NOT EXISTS (
+    SELECT 1
+    FROM dbo.MonAn ma
+    WHERE ma.MaDanhMuc = dm.MaDanhMuc
+);
+
+COMMIT TRANSACTION;
+-- Nếu còn transaction cũ đang mở thì hủy trước
+IF XACT_STATE() <> 0
+    ROLLBACK TRANSACTION;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    IF OBJECT_ID('tempdb..#MonCanXoa') IS NOT NULL
+        DROP TABLE #MonCanXoa;
+
+    IF OBJECT_ID('tempdb..#CongThucCanXoa') IS NOT NULL
+        DROP TABLE #CongThucCanXoa;
+
+    -- Lấy các món thuộc 2 danh mục cần xóa
+    SELECT ma.MaMonAn
+    INTO #MonCanXoa
+    FROM dbo.MonAn ma
+    INNER JOIN dbo.DanhMucMonAn dm
+        ON dm.MaDanhMuc = ma.MaDanhMuc
+    WHERE dm.TenDanhMuc IN
+    (
+        N'Thịt và gia cầm',
+        N'Cá và hải sản'
+    );
+
+    -- Kiểm tra danh sách món trước khi xóa
+    SELECT
+        ma.MaMonAn,
+        ma.TenMonAn,
+        dm.TenDanhMuc
+    FROM dbo.MonAn ma
+    INNER JOIN dbo.DanhMucMonAn dm
+        ON dm.MaDanhMuc = ma.MaDanhMuc
+    WHERE ma.MaMonAn IN (
+        SELECT MaMonAn FROM #MonCanXoa
+    );
+
+    -- Lấy công thức thuộc các món cần xóa
+    SELECT c.MaCongThuc
+    INTO #CongThucCanXoa
+    FROM dbo.CongThuc c
+    WHERE c.MaMonAn IN (
+        SELECT MaMonAn FROM #MonCanXoa
+    );
+
+    -- Xóa món khỏi thực đơn
+    DELETE FROM dbo.ChiTietThucDon
+    WHERE MaMonAn IN (
+        SELECT MaMonAn FROM #MonCanXoa
+    );
+
+    -- Hủy trạng thái công bố công thức
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 0
+    WHERE MaCongThuc IN (
+        SELECT MaCongThuc FROM #CongThucCanXoa
+    );
+
+    -- Xóa phản hồi liên quan đến công thức
+    DELETE FROM dbo.PhanHoiCheBien
+    WHERE MaCongThuc IN (
+        SELECT MaCongThuc FROM #CongThucCanXoa
+    );
+
+    -- Xóa thành phần công thức
+    DELETE FROM dbo.ThanhPhanCongThuc
+    WHERE MaCongThuc IN (
+        SELECT MaCongThuc FROM #CongThucCanXoa
+    );
+
+    -- Xóa các bước chế biến
+    DELETE FROM dbo.BuocCheBien
+    WHERE MaCongThuc IN (
+        SELECT MaCongThuc FROM #CongThucCanXoa
+    );
+
+    -- Xóa video hướng dẫn
+    DELETE FROM dbo.DoanPhimHuongDan
+    WHERE MaCongThuc IN (
+        SELECT MaCongThuc FROM #CongThucCanXoa
+    );
+
+    -- Xóa các liên kết trực tiếp với món ăn
+    DELETE FROM dbo.KhauViMonAn
+    WHERE MaMonAn IN (
+        SELECT MaMonAn FROM #MonCanXoa
+    );
+
+    DELETE FROM dbo.CheDoAnMonAn
+    WHERE MaMonAn IN (
+        SELECT MaMonAn FROM #MonCanXoa
+    );
+
+    DELETE FROM dbo.MonYeuThich
+    WHERE MaMonAn IN (
+        SELECT MaMonAn FROM #MonCanXoa
+    );
+
+    DELETE FROM dbo.MonKhongThich
+    WHERE MaMonAn IN (
+        SELECT MaMonAn FROM #MonCanXoa
+    );
+
+    DELETE FROM dbo.DanhGiaMonAn
+    WHERE MaMonAn IN (
+        SELECT MaMonAn FROM #MonCanXoa
+    );
+
+    -- Xóa công thức
+    DELETE FROM dbo.CongThuc
+    WHERE MaCongThuc IN (
+        SELECT MaCongThuc FROM #CongThucCanXoa
+    );
+
+    -- Xóa món ăn
+    DELETE FROM dbo.MonAn
+    WHERE MaMonAn IN (
+        SELECT MaMonAn FROM #MonCanXoa
+    );
+
+    -- Xóa 2 danh mục
+    DELETE FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc IN
+    (
+        N'Thịt và gia cầm',
+        N'Cá và hải sản'
+    );
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã xóa thành công 2 danh mục và các món liên quan.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20) = N'MA901';
+    DECLARE @MaCongThuc NVARCHAR(20) = N'CT901';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+    DECLARE @MaNL NVARCHAR(20);
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = @MaMonAn)
+        THROW 51001, N'Mã món MA901 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc = @MaCongThuc)
+        THROW 51002, N'Mã công thức CT901 đã tồn tại.', 1;
+
+    SELECT @MaDanhMuc = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món nướng';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51003, N'Chưa có danh mục Món nướng trong database.', 1;
+
+    /*
+      Thêm các nguyên liệu còn thiếu.
+      Nếu nguyên liệu đã tồn tại thì dùng lại nguyên liệu cũ.
+    */
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Thịt heo xay')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL901', N'Thịt heo xay', N'Thịt heo xay.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Giò sống')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL902', N'Giò sống', N'Giò sống.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Mỡ heo')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL903', N'Mỡ heo', N'Mỡ heo.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Pate gan heo')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL904', N'Pate gan heo', N'Pate gan heo.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Bánh tráng')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL905', N'Bánh tráng', N'Loại bánh tráng tròn.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Bột nở')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL906', N'Bột nở', N'Bột nở.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Tỏi băm')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL907', N'Tỏi băm', N'Tỏi băm.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Dầu ăn')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL908', N'Dầu ăn', N'Dầu ăn.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Dầu màu điều')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL909', N'Dầu màu điều', N'Dầu màu điều.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Bơ đậu phộng')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL910', N'Bơ đậu phộng', N'Bơ đậu phộng.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Bột nếp')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL911', N'Bột nếp', N'Bột nếp.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Nước mắm')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL912', N'Nước mắm', N'Nước mắm.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Gia vị thông dụng')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL913', N'Gia vị thông dụng', N'Muối/đường/hạt nêm/bột ngọt/tiêu.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Bún ăn kèm')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL914', N'Bún ăn kèm', N'Bún ăn kèm.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Rau ăn kèm tùy sở thích')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL915', N'Rau ăn kèm tùy sở thích', N'Xà lách/tía tô/chuối chát/dưa leo...');
+
+    /*
+      Thêm món ăn.
+      Chuẩn bị: 3 giờ = 180 phút.
+      Chế biến: 1 giờ = 60 phút.
+    */
+    INSERT dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        ThoiGianChuanBi,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Nem nướng Ninh Hòa',
+        N'Nem nướng Ninh Hòa thơm lừng hấp dẫn với phần thịt dai ngon, beo béo và nước chấm đậm đà là món ăn đặc sản yêu thích của nhiều người.',
+        60,
+        180,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DaCongBo
+    )
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Nem nướng Ninh Hòa thơm lừng hấp dẫn với phần thịt dai ngon, beo béo và nước chấm đậm đà là món ăn đặc sản yêu thích của nhiều người.',
+        3,
+        0
+    );
+
+    /*
+      Nguyên liệu:
+      Tỏi băm được gộp thành 5 muỗng canh.
+    */
+    INSERT dbo.ThanhPhanCongThuc
+    (
+        MaThanhPhan, MaCongThuc, MaNguyenLieu, MaDonVi, SoLuong
+    )
+    SELECT N'TP901', @MaCongThuc, MaNguyenLieu, N'DVT001', 550
+    FROM dbo.NguyenLieu
+    WHERE TenNguyenLieu = N'Thịt heo xay';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP902', @MaCongThuc, MaNguyenLieu, N'DVT001', 200
+    FROM dbo.NguyenLieu
+    WHERE TenNguyenLieu = N'Giò sống';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP903', @MaCongThuc, MaNguyenLieu, N'DVT001', 50
+    FROM dbo.NguyenLieu
+    WHERE TenNguyenLieu = N'Mỡ heo';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP904', @MaCongThuc, MaNguyenLieu, N'DVT001', 100
+    FROM dbo.NguyenLieu
+    WHERE TenNguyenLieu = N'Pate gan heo';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP905', @MaCongThuc, MaNguyenLieu, N'DVT001', 200
+    FROM dbo.NguyenLieu
+    WHERE TenNguyenLieu = N'Bánh tráng';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP906', @MaCongThuc, MaNguyenLieu, N'DVT007', 0.125
+    FROM dbo.NguyenLieu
+    WHERE TenNguyenLieu = N'Bột nở';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP907', @MaCongThuc, MaNguyenLieu, N'DVT006', 5
+    FROM dbo.NguyenLieu
+    WHERE TenNguyenLieu = N'Tỏi băm';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP908', @MaCongThuc, MaNguyenLieu, N'DVT003', 210
+    FROM dbo.NguyenLieu
+    WHERE TenNguyenLieu = N'Dầu ăn';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP909', @MaCongThuc, MaNguyenLieu, N'DVT006', 2
+    FROM dbo.NguyenLieu
+    WHERE TenNguyenLieu = N'Dầu màu điều';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP910', @MaCongThuc, MaNguyenLieu, N'DVT006', 3
+    FROM dbo.NguyenLieu
+    WHERE TenNguyenLieu = N'Bơ đậu phộng';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP911', @MaCongThuc, MaNguyenLieu, N'DVT001', 50
+    FROM dbo.NguyenLieu
+    WHERE TenNguyenLieu = N'Bột nếp';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP912', @MaCongThuc, MaNguyenLieu, N'DVT006', 2
+    FROM dbo.NguyenLieu
+    WHERE TenNguyenLieu = N'Nước mắm';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP913', @MaCongThuc, MaNguyenLieu, N'DVT014', 1
+    FROM dbo.NguyenLieu
+    WHERE TenNguyenLieu = N'Gia vị thông dụng';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP914', @MaCongThuc, MaNguyenLieu, N'DVT001', 200
+    FROM dbo.NguyenLieu
+    WHERE TenNguyenLieu = N'Bún ăn kèm';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP915', @MaCongThuc, MaNguyenLieu, N'DVT014', 1
+    FROM dbo.NguyenLieu
+    WHERE TenNguyenLieu = N'Rau ăn kèm tùy sở thích';
+
+    /*
+      Các bước chế biến.
+      Mỗi tiêu đề được thêm dấu ~ theo yêu cầu.
+    */
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90101', @MaCongThuc, 1,
+        N'~ Sơ chế nguyên liệu ~
+
+Mỡ heo mua về rửa sạch với nước muối loãng để khử mùi hôi, sau đó rửa lại với nước sạch rồi dùng dao cắt hình quân cờ với kích thước khoảng 1cm.
+
+Sau đó cho mỡ vào trụng với nước sôi khoảng 2 phút rồi vớt ra đem đi ướp với đường trong 30 phút để mỡ heo săn lại.',
+        35
+    ),
+    (
+        N'BCB90102', @MaCongThuc, 2,
+        N'~ Trộn nhân nem ~
+
+Cho vào tô phần giò sống, thịt heo xay và phần mỡ heo đã sơ chế. Nêm vào hỗn hợp thịt: 1/2 muỗng cà phê muối, 2 muỗng cà phê đường, 1 ít bột ngọt, 1/8 muỗng cà phê bột nở, 1 muỗng canh tỏi băm và 1 ít tiêu.
+
+Dùng tay có đeo găng tay ni lông, trộn đều phần nhân cho các nguyên liệu trộn lẫn và thấm gia vị.
+
+Để phần nhân nem được dẻo quánh và kết dính hơn bạn có thể dùng chày để giã hoặc dùng tay ném phần nhân thẳng từ trên xuống tô để quết nhân nem.
+
+Sau khi trộn nêm, dùng màng bọc thực phẩm bọc kín miệng tô rồi cho phần nhân vào ngăn mát tủ lạnh từ 2 - 3 tiếng để nhân nem thấm gia vị và kết dính với nhau.',
+        180
+    ),
+    (
+        N'BCB90103', @MaCongThuc, 3,
+        N'~ Làm bánh tráng giòn ~
+
+Dùng kéo cắt đôi miếng bánh tráng tròn ra, sau đó dùng cọ quết 1 lớp nước mỏng lên bề mặt bánh tráng để bánh tráng mềm dễ cuốn hơn.
+
+Sau khi quết nước, dùng tay cuốn tròn phần bánh tráng lại theo chiều ngang. Làm lần lượt cho đến khi hết bánh tráng.
+
+Bắc chảo với 200ml dầu ăn lên bếp, đợi dầu sôi thì lần lượt thả từng miếng bánh tráng đã cuốn vào chiên cho đến khi lớp vỏ bánh tráng giòn cả 2 mặt thì gắp ra cho vào dĩa có giấy thấm dầu.
+
+Lưu ý
+
+Không quết quá nhiều nước lên bánh tráng sẽ khiến bánh tráng bị mềm nhũn không thể cuốn lại được.
+Cuốn hơi chặt tay và cố gắng cuốn phần vòng càng nhỏ càng tốt sẽ khiến bánh tráng không bị bung ra khi chiên.
+Khi cuốn bánh tráng tới vòng cuối thì quết thêm 1 lớp nước mỏng lên phần rìa cuối để tạo độ kết dính.
+Nên chiên bánh tráng trong chảo hoặc nồi ngập dầu để bánh tráng giòn cả 2 mặt mà không bị khét.',
+        20
+    ),
+    (
+        N'BCB90104', @MaCongThuc, 4,
+        N'~ Pha nước chấm nem nướng ~
+
+Bắc nồi lên bếp cho vào 2 muỗng canh dầu màu điều. Khi dầu điều nóng lên thì cho 2 muỗng canh hành tím băm, 2 muỗng canh tỏi băm đảo đều cho các nguyên liệu dậy mùi thơm.
+
+Tiếp tục cho vào 250gr thịt heo xay vào xào cho đến khi thịt săn lại và tơi ra thì cho 100gr pate gan heo, 3 muỗng canh bơ đậu phộng, 50gr bột nếp pha với 100ml nước.
+
+Dùng vá khuấy đều cho hỗn hợp hòa quyện với nhau. Cho thêm 100ml nước lọc nếu thấy hỗn hợp sốt quá đặc, hoặc không tùy theo sở thích ăn đặc hoặc loãng của bạn nhé!
+
+Nêm vào nồi nước chấm: 2 muỗng canh nước mắm, 1 ít muối, 2 muỗng canh đường, 1 ít bột ngọt và 1 ít hạt nêm. Khuấy đều cho gia vị hòa tan rồi tắt bếp là xong phần nước chấm.
+
+Bạn có thể điều chỉnh lại cho vừa khẩu vị bản thân, nên nêm sao cho nước chấm hơi ngọt một chút sẽ chuẩn vị hơn.
+
+Lưu ý
+
+Nếu không có bơ đậu phộng, bạn có thể sử dụng đậu phộng rang rồi đem xay nhuyễn hoặc giã nhuyễn để cho vào đều được.
+Nếu thích ăn cay bạn có thể cho thêm ớt băm hoặc ớt cắt lát vào để tăng hương vị hấp dẫn hơn.',
+        25
+    ),
+    (
+        N'BCB90105', @MaCongThuc, 5,
+        N'~ Bắt nem vào que tre ~
+
+Lấy phần nhân nem trong tủ lạnh ra, dùng tay có đeo bao tay ni lông thoa 1 lớp dầu ăn mỏng lên rồi lấy một phần vừa đủ nhân nem cho vào tay.
+
+Dùng 1 que tre đặt vào giữa phần nhân nem trong lòng bàn tay kia rồi dùng các ngón tay nắm chặt lại để phần nhân nem bao bọc đều bên ngoài phần que tre là được.
+
+Làm lần lượt cho đến khi hết phần nhân nem.
+
+Lưu ý
+
+Que tre nên đem ngâm nước ấm khoảng 10 phút để khi bắt nem vào que phần nhân nem sẽ dính chặt không bị bung ra, cũng như khi nướng que tre sẽ không bị cháy.
+Bắt nem sao cho lớp nhân bao phủ đều quanh que tre, không để chỗ thì nhân quá dày, chỗ lại quá ít khi nướng nem sẽ không chín đều và dễ khét ở phía ít nhân hơn.
+Khi bắt nem nên bóp nhẹ nhàng để tránh làm phần thịt bị nát và vỡ.',
+        15
+    ),
+    (
+        N'BCB90106', @MaCongThuc, 6,
+        N'~ Nướng nem ~
+
+Sau khi bắt nem vào que tre, cho nem lên bếp nướng điện nướng chín vàng đều cả 2 mặt thì gắp nem ra là hoàn thành.
+
+Lưu ý: Nếu không có bếp nướng điện, bạn có thể nướng nem bằng bếp than hoa, lò nướng hoặc áp chảo đều được. Khi nướng nem bằng bếp than hoa sẽ có thành phẩm nem nướng có hương thơm và mùi vị chuẩn nhất nhé!
+
+Nướng nem bằng bếp than hoa: Làm đỏ lửa than hoa, sau đó cho vỉ nướng lên rồi đặt nem lên vỉ, nướng chín đều cả 2 mặt. Lật trở thường xuyên để nem không bị cháy, đồng thời nên quết 1 lớp dầu ăn mỏng lên bề mặt nem để nem không bị khô.
+Nướng nem bằng lò nướng: Làm nóng lò nướng với mức nhiệt 250 độ C trong 10 phút, sau đó xếp nem vào khay nướng và cho vào ngăn giữa lò rồi nướng khoảng 20 - 25 phút.
+Nướng nem bằng chảo: Để chảo thật nóng, rồi dùng cọ quét một lớp dầu ăn thật mỏng và đều lên bề mặt chảo, sau đó để từng que nem lên, áp chảo cho chín đều 2 mặt là được.',
+        60
+    ),
+    (
+        N'BCB90107', @MaCongThuc, 7,
+        N'~ Thành phẩm ~
+
+Món nem nướng thơm lừng, phần nhân thịt béo bùi mềm ngọt không quá khô kết hợp với nước chấm tương đậu phộng beo béo vô cùng hấp dẫn.
+
+Nem nướng bạn có thể sử dụng bánh tráng để cuốn nem, bún, các loại rau ăn kèm và bánh tráng giòn chấm cùng sốt tương đậu thơm béo thì vô cùng tuyệt vời đấy nhé!',
+        NULL
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = @MaCongThuc;
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm món Nem nướng Ninh Hòa thành công.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM dbo.CongThuc
+        WHERE MaCongThuc = N'CT901'
+    )
+        THROW 51010, N'Không tìm thấy công thức CT901.', 1;
+
+    IF EXISTS (
+        SELECT 1
+        FROM dbo.DoanPhimHuongDan
+        WHERE DuongDan = N'https://www.youtube.com/watch?v=v0bhAehGBM4'
+    )
+        THROW 51011, N'Video này đã tồn tại trong database.', 1;
+
+    INSERT dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim,
+        MaCongThuc,
+        TieuDe,
+        DuongDan,
+        MoTa
+    )
+    VALUES
+    (
+        N'DP901',
+        N'CT901',
+        N'Cách làm nem nướng Ninh Hòa',
+        N'https://www.youtube.com/watch?v=v0bhAehGBM4',
+        N'Video hướng dẫn cách làm nem nướng Ninh Hòa.'
+    );
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm video thành công.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    -- Tạo nguyên liệu có chú thích nếu chưa tồn tại
+    IF NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu
+        WHERE TenNguyenLieu = N'Bánh tráng (loại bánh tráng tròn)'
+    )
+    INSERT dbo.NguyenLieu
+    (MaNguyenLieu, TenNguyenLieu, MoTa)
+    VALUES
+    (
+        N'NL927',
+        N'Bánh tráng (loại bánh tráng tròn)',
+        N'Loại bánh tráng tròn.'
+    );
+
+    IF NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu
+        WHERE TenNguyenLieu = N'Gia vị thông dụng (muối/đường/hạt nêm/bột ngọt/tiêu)'
+    )
+    INSERT dbo.NguyenLieu
+    (MaNguyenLieu, TenNguyenLieu, MoTa)
+    VALUES
+    (
+        N'NL928',
+        N'Gia vị thông dụng (muối/đường/hạt nêm/bột ngọt/tiêu)',
+        N'Muối/đường/hạt nêm/bột ngọt/tiêu.'
+    );
+
+    IF NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu
+        WHERE TenNguyenLieu = N'Rau ăn kèm tùy sở thích (xà lách/tía tô/chuối chát/dưa leo...)'
+    )
+    INSERT dbo.NguyenLieu
+    (MaNguyenLieu, TenNguyenLieu, MoTa)
+    VALUES
+    (
+        N'NL929',
+        N'Rau ăn kèm tùy sở thích (xà lách/tía tô/chuối chát/dưa leo...)',
+        N'Xà lách/tía tô/chuối chát/dưa leo...'
+    );
+
+    -- Cập nhật nguyên liệu trong công thức CT901
+    UPDATE tp
+    SET tp.MaNguyenLieu = nlMoi.MaNguyenLieu
+    FROM dbo.ThanhPhanCongThuc tp
+    INNER JOIN dbo.NguyenLieu nlCu
+        ON nlCu.MaNguyenLieu = tp.MaNguyenLieu
+    INNER JOIN dbo.NguyenLieu nlMoi
+        ON nlMoi.TenNguyenLieu =
+            CASE nlCu.TenNguyenLieu
+                WHEN N'Bánh tráng'
+                    THEN N'Bánh tráng (loại bánh tráng tròn)'
+                WHEN N'Gia vị thông dụng'
+                    THEN N'Gia vị thông dụng (muối/đường/hạt nêm/bột ngọt/tiêu)'
+                WHEN N'Rau ăn kèm tùy sở thích'
+                    THEN N'Rau ăn kèm tùy sở thích (xà lách/tía tô/chuối chát/dưa leo...)'
+            END
+    WHERE tp.MaCongThuc = N'CT901'
+      AND nlCu.TenNguyenLieu IN
+      (
+          N'Bánh tráng',
+          N'Gia vị thông dụng',
+          N'Rau ăn kèm tùy sở thích'
+      );
+
+    -- Kiểm tra kết quả
+    SELECT
+        tp.MaCongThuc,
+        nl.TenNguyenLieu,
+        tp.SoLuong,
+        dv.TenDonVi
+    FROM dbo.ThanhPhanCongThuc tp
+    JOIN dbo.NguyenLieu nl
+        ON nl.MaNguyenLieu = tp.MaNguyenLieu
+    JOIN dbo.DonViTinh dv
+        ON dv.MaDonVi = tp.MaDonVi
+    WHERE tp.MaCongThuc = N'CT901';
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+IF XACT_STATE() <> 0
+    ROLLBACK TRANSACTION;
+
+	USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20) = N'MA902';
+    DECLARE @MaCongThuc NVARCHAR(20) = N'CT902';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = @MaMonAn)
+        THROW 51020, N'Mã món MA902 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc = @MaCongThuc)
+        THROW 51021, N'Mã công thức CT902 đã tồn tại.', 1;
+
+    SELECT @MaDanhMuc = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món nướng';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51022, N'Không tìm thấy danh mục Món nướng.', 1;
+
+    -- Thêm nguyên liệu nếu chưa có
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Gà')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL916', N'Gà', N'Gà nguyên con.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Tỏi băm')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL917', N'Tỏi băm', N'Tỏi băm.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Sả băm')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL918', N'Sả băm', N'Sả băm.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Ớt băm')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL919', N'Ớt băm', N'Ớt băm.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Lá giang')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL920', N'Lá giang', N'Lá giang.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Muối')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL921', N'Muối', N'Muối.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Đường')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL922', N'Đường', N'Đường.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Bột ngọt')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL923', N'Bột ngọt', N'Bột ngọt.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Hành lá')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL924', N'Hành lá', N'Hành lá.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Dầu mè')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL925', N'Dầu mè', N'Dầu mè.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Dầu ăn')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL926', N'Dầu ăn', N'Dầu ăn.');
+
+    -- Thêm món ăn
+    INSERT dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        ThoiGianChuanBi,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Gà nướng muối sả',
+        N'Các món gà nướng với lớp da giòn rụm, phần thịt mềm được nêm nếm vừa phải là một món ăn mà cả gia đình ai ai cũng thích mê',
+        60,
+        15,
+        N'Dễ',
+        NULL
+    );
+
+    -- Thêm công thức
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DaCongBo
+    )
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Các món gà nướng với lớp da giòn rụm, phần thịt mềm được nêm nếm vừa phải là một món ăn mà cả gia đình ai ai cũng thích mê',
+        2,
+        0
+    );
+
+    -- Thêm nguyên liệu
+    DECLARE
+    @G NVARCHAR(20),
+    @Toi NVARCHAR(20),
+    @Sa NVARCHAR(20),
+    @Ot NVARCHAR(20),
+    @LaGiang NVARCHAR(20),
+    @Muoi NVARCHAR(20),
+    @Duong NVARCHAR(20),
+    @BotNgot NVARCHAR(20),
+    @HanhLa NVARCHAR(20),
+    @DauMe NVARCHAR(20),
+    @DauAn NVARCHAR(20);
+
+SELECT @G = MaNguyenLieu
+FROM dbo.NguyenLieu
+WHERE TenNguyenLieu = N'Gà';
+
+SELECT @Toi = MaNguyenLieu
+FROM dbo.NguyenLieu
+WHERE TenNguyenLieu = N'Tỏi băm';
+
+SELECT @Sa = MaNguyenLieu
+FROM dbo.NguyenLieu
+WHERE TenNguyenLieu = N'Sả băm';
+
+SELECT @Ot = MaNguyenLieu
+FROM dbo.NguyenLieu
+WHERE TenNguyenLieu = N'Ớt băm';
+
+SELECT @LaGiang = MaNguyenLieu
+FROM dbo.NguyenLieu
+WHERE TenNguyenLieu = N'Lá giang';
+
+SELECT @Muoi = MaNguyenLieu
+FROM dbo.NguyenLieu
+WHERE TenNguyenLieu = N'Muối';
+
+SELECT @Duong = MaNguyenLieu
+FROM dbo.NguyenLieu
+WHERE TenNguyenLieu = N'Đường';
+
+SELECT @BotNgot = MaNguyenLieu
+FROM dbo.NguyenLieu
+WHERE TenNguyenLieu = N'Bột ngọt';
+
+SELECT @HanhLa = MaNguyenLieu
+FROM dbo.NguyenLieu
+WHERE TenNguyenLieu = N'Hành lá';
+
+SELECT @DauMe = MaNguyenLieu
+FROM dbo.NguyenLieu
+WHERE TenNguyenLieu = N'Dầu mè';
+
+SELECT @DauAn = MaNguyenLieu
+FROM dbo.NguyenLieu
+WHERE TenNguyenLieu = N'Dầu ăn';
+
+IF @G IS NULL OR @Toi IS NULL OR @Sa IS NULL OR @Ot IS NULL
+   OR @LaGiang IS NULL OR @Muoi IS NULL OR @Duong IS NULL
+   OR @BotNgot IS NULL OR @HanhLa IS NULL
+   OR @DauMe IS NULL OR @DauAn IS NULL
+    THROW 51030, N'Có nguyên liệu chưa tồn tại trong database.', 1;
+
+INSERT dbo.ThanhPhanCongThuc
+(MaThanhPhan, MaCongThuc, MaNguyenLieu, MaDonVi, SoLuong)
+VALUES
+(N'TP916', @MaCongThuc, @G,      N'DVT005', 1),
+(N'TP917', @MaCongThuc, @Toi,    N'DVT001', 50),
+(N'TP918', @MaCongThuc, @Sa,     N'DVT001', 50),
+(N'TP919', @MaCongThuc, @Ot,     N'DVT006', 4),
+(N'TP920', @MaCongThuc, @LaGiang,N'DVT001', 20),
+(N'TP921', @MaCongThuc, @Muoi,   N'DVT007', 3),
+(N'TP922', @MaCongThuc, @Duong,  N'DVT006', 4),
+(N'TP923', @MaCongThuc, @BotNgot,N'DVT007', 1),
+(N'TP924', @MaCongThuc, @HanhLa, N'DVT011', 4),
+(N'TP925', @MaCongThuc, @DauMe,  N'DVT006', 1),
+(N'TP926', @MaCongThuc, @DauAn,  N'DVT006', 4);
+
+    -- Bước 1
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90201',
+        @MaCongThuc,
+        1,
+        N'~ Sơ chế gà nguyên con ~
+
+Gà làm sạch, nhổ bỏ lông măng (lông tơ, nhỏ, đen còn ghim trên da gà), xát một ít muối hoặc chanh lên da gà cho gà sạch, bớt hôi rồi rửa lại với nước cho sạch, để ráo nước.
+
+Dùng dao nhỏ, bén lọc bỏ cẩn thận phần xương sụn ngay phần phao câu, giữ lại phần xương của cánh và đùi.
+
+Lưu ý: Cách sơ chế gà sạch, không hôi
+
+- Để gà không hôi, bạn cần làm sạch hết lông, kể cả lông măng (lông tơ) để gà trắng, sạch và bớt hôi.
+- Hòa hỗn hợp giấm và muối theo tỉ lệ 2 muối : 1 giấm rồi thoa khắp mình gà vịt, chà xát nhiều lần sau đó rửa lại thật kỹ bằng nước sạch.
+- Chà xát vài lát chanh với ít muối lên thịt gà.Đập dập 1 củ gừng và một ít rượu trắng, xoa bóp lên thịt gà và để nguyên trong vòng 30 phút trước khi nấu.',
+        35
+    );
+
+    -- Bước 2
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90202',
+        @MaCongThuc,
+        2,
+        N'~ Ướp gà ~
+
+Hỗn hợp ướp gà: 50gr tỏi băm, 3 muỗng canh ớt băm, 1 muỗng canh dầu mè, 3 muỗng canh đường, 2 muỗng cà phê muối, 1 muỗng cà phê bột ngọt, 4 muỗng canh dầu ăn. Trộn đều hỗn hợp và dùng tay thoa đều vào phía trong và phía ngoài thịt gà. Ướp thịt gà trong khoảng 20 - 30 phút cho thịt thấm gia vị.',
+        30
+    );
+
+    -- Bước 3
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90203',
+        @MaCongThuc,
+        3,
+        N'~ Nướng gà ~
+
+Nhóm lửa bếp than trước, than đỏ đều hết thì cho vỉ nướng lên bắt đầu nướng.
+
+Dùng cây xiên dọc theo thân gà. Rồi cho gà lên vỉ nướng, trong quá trình nướng thường xuyên lật trở gà và thỉnh thoảng quét dầu ăn để thịt gà không bị cháy khét.
+
+Nướng đến khi gà chuyển màu vàng rám nâu là được.',
+        60
+    );
+
+    -- Bước 4
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90204',
+        @MaCongThuc,
+        4,
+        N'~ Làm nước chấm ~
+
+Cho lần lượt 50gr sả băm, 20gr lá giang vào máy xay sinh tố, xay nhuyễn hỗn hợp. Sau đó cho hỗn hợp ra tô đựng.
+
+Thêm vào tô 1 muỗng canh ớt băm, 1 muỗng cà phê muối, 1 muỗng canh đường, trộn đều các gia vị lại với nhau.',
+        10
+    );
+
+    -- Bước 5
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90205',
+        @MaCongThuc,
+        5,
+        N'~ Làm cơm cháy mỡ hành ~
+
+Cho cơm nguội vào túi nilon, sau đó dùng cây cán cho cơm dẹt và dính lại. Lót giấy nến và cho phần cơm vừa cán vào khuôn. Sau đó cho vào nồi chiên không dầu, chiên trong 20 phút.
+
+Cắt nhỏ hành lá cho ra chén, thêm 1/2 muỗng cà phê muối, rồi đổ dầu nóng vào chén, trộn đều.',
+        20
+    );
+
+    -- Bước 6
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90206',
+        @MaCongThuc,
+        6,
+        N'~ Thành phẩm ~
+
+Thịt gà với là da ngoài giòn, thịt gà được nêm nếm vừa phải. Chấm thịt gà với muối sả, bạn sẽ cảm nhận được vị cay nồng của sả cùng vị chua nhẹ của lá giang làm cho món ăn thêm lạ miệng, hấp dẫn.
+
+Món gà nướng còn được ăn kèm với cơm cháy mỡ hành giòn rụm thì còn gì bằng đúng không nào?',
+        NULL
+    );
+
+    -- Thêm video YouTube
+    INSERT dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim,
+        MaCongThuc,
+        TieuDe,
+        DuongDan,
+        MoTa
+    )
+    VALUES
+    (
+        N'DP902',
+        @MaCongThuc,
+        N'Cách làm gà nướng muối sả thơm lừng, hấp dẫn khó cưỡng',
+        N'https://www.youtube.com/watch?v=IiQP2aACSVg',
+        N'Video hướng dẫn cách làm gà nướng muối sả.'
+    );
+
+    -- Công bố công thức
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = @MaCongThuc;
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm món Gà nướng muối sả thành công.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20) = N'MA903';
+    DECLARE @MaCongThuc NVARCHAR(20) = N'CT903';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = @MaMonAn)
+        THROW 51040, N'Mã món MA903 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc = @MaCongThuc)
+        THROW 51041, N'Mã công thức CT903 đã tồn tại.', 1;
+
+    SELECT @MaDanhMuc = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món nướng';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51042, N'Không tìm thấy danh mục Món nướng.', 1;
+
+    -- Thêm nguyên liệu nếu chưa tồn tại
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Cá saba')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL930', N'Cá saba', N'Cá saba.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Hành lá')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL931', N'Hành lá', N'Hành lá.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Tỏi')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL932', N'Tỏi', N'Tỏi.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Hành tím')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL933', N'Hành tím', N'Hành tím.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Ớt')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL934', N'Ớt', N'Ớt.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Chanh')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL935', N'Chanh', N'Chanh.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Đậu phộng rang')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL936', N'Đậu phộng rang', N'Đậu phộng rang.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Bột tỏi')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL937', N'Bột tỏi', N'Bột tỏi.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Nước mắm')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL938', N'Nước mắm', N'Nước mắm.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Dầu ăn')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES(N'NL939', N'Dầu ăn', N'Dầu ăn.');
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Gia vị thông dụng (muối/đường/hạt nêm/tiêu)')
+        INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES
+        (
+            N'NL940',
+            N'Gia vị thông dụng (muối/đường/hạt nêm/tiêu)',
+            N'Muối/đường/hạt nêm/tiêu.'
+        );
+
+    -- Thêm món ăn
+    INSERT dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        ThoiGianChuanBi,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Cá saba nướng mỡ hành',
+        N'Cá saba nướng mỡ hành thơm phức quyện lẫn trong vị beo béo của mỡ hành và thịt cá tươi ngọt là một món nướng vô cùng hấp dẫn.',
+        30,
+        15,
+        N'Dễ',
+        NULL
+    );
+
+    -- Thêm công thức
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DaCongBo
+    )
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Cá saba nướng mỡ hành thơm phức quyện lẫn trong vị beo béo của mỡ hành và thịt cá tươi ngọt là một món nướng vô cùng hấp dẫn.',
+        4,
+        0
+    );
+
+    -- Lấy mã nguyên liệu trực tiếp theo tên
+    DECLARE
+        @Ca NVARCHAR(20),
+        @HanhLa NVARCHAR(20),
+        @Toi NVARCHAR(20),
+        @HanhTim NVARCHAR(20),
+        @Ot NVARCHAR(20),
+        @Chanh NVARCHAR(20),
+        @DauPhong NVARCHAR(20),
+        @BotToi NVARCHAR(20),
+        @NuocMam NVARCHAR(20),
+        @DauAn NVARCHAR(20),
+        @GiaVi NVARCHAR(20);
+
+    SELECT @Ca = MaNguyenLieu FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Cá saba';
+    SELECT @HanhLa = MaNguyenLieu FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Hành lá';
+    SELECT @Toi = MaNguyenLieu FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Tỏi';
+    SELECT @HanhTim = MaNguyenLieu FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Hành tím';
+    SELECT @Ot = MaNguyenLieu FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Ớt';
+    SELECT @Chanh = MaNguyenLieu FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Chanh';
+    SELECT @DauPhong = MaNguyenLieu FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Đậu phộng rang';
+    SELECT @BotToi = MaNguyenLieu FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Bột tỏi';
+    SELECT @NuocMam = MaNguyenLieu FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Nước mắm';
+    SELECT @DauAn = MaNguyenLieu FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Dầu ăn';
+    SELECT @GiaVi = MaNguyenLieu
+    FROM dbo.NguyenLieu
+    WHERE TenNguyenLieu = N'Gia vị thông dụng (muối/đường/hạt nêm/tiêu)';
+
+    IF @Ca IS NULL OR @HanhLa IS NULL OR @Toi IS NULL
+       OR @HanhTim IS NULL OR @Ot IS NULL OR @Chanh IS NULL
+       OR @DauPhong IS NULL OR @BotToi IS NULL OR @NuocMam IS NULL
+       OR @DauAn IS NULL OR @GiaVi IS NULL
+        THROW 51043, N'Có nguyên liệu chưa tồn tại trong database.', 1;
+
+    -- Thêm nguyên liệu công thức
+    INSERT dbo.ThanhPhanCongThuc
+    (MaThanhPhan, MaCongThuc, MaNguyenLieu, MaDonVi, SoLuong)
+    VALUES
+    (N'TP930', @MaCongThuc, @Ca,      N'DVT005', 2),
+    (N'TP931', @MaCongThuc, @HanhLa,  N'DVT011', 5),
+    (N'TP932', @MaCongThuc, @Toi,     N'DVT012', 5),
+    (N'TP933', @MaCongThuc, @HanhTim, N'DVT010', 2),
+    (N'TP934', @MaCongThuc, @Ot,      N'DVT005', 2),
+    (N'TP935', @MaCongThuc, @Chanh,   N'DVT005', 1),
+    (N'TP936', @MaCongThuc, @DauPhong,N'DVT001', 20),
+    (N'TP937', @MaCongThuc, @BotToi,  N'DVT007', 1),
+    (N'TP938', @MaCongThuc, @NuocMam, N'DVT006', 4),
+    (N'TP939', @MaCongThuc, @DauAn,   N'DVT006', 3),
+    (N'TP940', @MaCongThuc, @GiaVi,   N'DVT014', 1);
+
+    -- Bước 1
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90301',
+        @MaCongThuc,
+        1,
+        N'~ Sơ chế nguyên liệu ~
+
+Cá basa sau khi mua về bạn làm sạch vẩy, bỏ nội tạng, rửa sạch và để ráo nước, khứa vài đường lên mình cá để khi ướp cho thấm gia vị.
+
+Lưu ý: Mẹo khử mùi hôi của cá thu Nhật - cá saba:
+
+- Để khửi mùi hôi của cá thu Nhật bạn nên làm sạch vẩy, bỏ hết nội tạng và rửa thật sạch máu cá.
+- Sau đó có thể mang cá đi rửa với nước cốt chanh trong 2 - 3 phút rồi xả lại nước sạch.
+- Thay thế nước cốt chanh bằng rượu hoặc giấm ăn cũng có tác dụng khử mùi hôi của cá.
+
+Hành lá nhặt sạch lá sâu úa, rửa sạch rồi cắt nhỏ. Hành tím, tỏi bạn bóc bỏ vỏ, ớt rửa sạch, rồi băm nhỏ tỏi và ớt, hành tím bạn cắt lát.
+
+Chanh bạn vắt lấy nước cốt. Đậu phộng rang bạn giã nhỏ.',
+        20
+    );
+
+    -- Bước 2
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90302',
+        @MaCongThuc,
+        2,
+        N'~ Ướp cá ~
+
+Cho vào chén 1 muỗng cà phê muối, 1 muỗng cà phê bột tỏi, 1 muỗng cà phê hạt nêm, 1 muỗng cà phê tiêu rồi trộn cho thật đều.
+
+Dùng tay rắc đều hỗn hợp gia vị lên trên bề mặt cá, xoa bóp toàn thân cá cho gia vị thấm đều, ướp trong khoảng 15 - 30 phút.',
+        30
+    );
+
+    -- Bước 3
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90303',
+        @MaCongThuc,
+        3,
+        N'~ Làm mỡ hành ~
+
+Nấu sôi 3 muỗng canh dầu ăn rồi cho vào chén hành cắt nhỏ, thêm vào 1 ít muối, giúp hành giữ được màu xanh đẹp mắt.',
+        10
+    );
+
+    -- Bước 4
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90304',
+        @MaCongThuc,
+        4,
+        N'~ Làm nước mắm ~
+
+Cho vào tô 4 muỗng canh nước mắm, 4 muỗng canh đường, cốt 1 quả chanh, 4 muỗng canh nước, dùng muỗng khuấy đều hỗn hợp.
+
+Bạn nêm nếm cho vừa ăn rồi cho tỏi, ớt băm nhỏ vào là hoàn thành.',
+        10
+    );
+
+    -- Bước 5
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90305',
+        @MaCongThuc,
+        5,
+        N'~ Nướng cá ~
+
+Dùng giấy bạc lót phía dưới, đặt cá lên trên, xếp hành tím quanh cá và bắt đầu cuốn giấy lại cho thật kín. Bật lò nướng trước 5 phút ở nhiệt độ 170 độ C.
+
+Tiếp đó cho cá vào nướng mỗi mặt khoảng 15 phút ở nhiệt độ 170 độ C.
+
+Lưu ý
+
+- Bạn có thể nướng cá trên bếp than hồng thay vì lò nướng vẫn được nhé.
+- Tuỳ vào kích thước cá khác nhau mà bạn có thể tự điều chỉnh thời gian nướng cho phù hợp.',
+        30
+    );
+
+    -- Bước 6
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90306',
+        @MaCongThuc,
+        6,
+        N'~ Thành phẩm ~
+
+Khi đủ thời gian, bạn gỡ giấy bạc, rưới mỡ hành và đậu phộng lên mình cá, thưởng thức thôi!
+
+Cá basa nướng mỡ hành với thịt cá thanh ngọt tự nhiên được ướp thấm đều gia vị, khi nướng thêm hương vị của mỡ hành và vị bùi bùi của đậu phộng rất ngon miệng.
+
+Ăn kèm với rau sống, bún tươi, chấm cùng nước chấm chua ngọt thì ngon ngất ngây nhé!',
+        NULL
+    );
+
+    -- Thêm video YouTube
+    INSERT dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim,
+        MaCongThuc,
+        TieuDe,
+        DuongDan,
+        MoTa
+    )
+    VALUES
+    (
+        N'DP903',
+        @MaCongThuc,
+        N'Cách làm cá saba nướng mỡ hành thơm lừng mềm ngon đơn giản tại nhà',
+        N'https://www.youtube.com/watch?v=9_d7q9lBNBE',
+        N'Video hướng dẫn cách làm cá saba nướng mỡ hành.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = @MaCongThuc;
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm món Cá saba nướng mỡ hành thành công.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20) = N'MA904';
+    DECLARE @MaCongThuc NVARCHAR(20) = N'CT904';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = @MaMonAn)
+        THROW 51050, N'Mã món MA904 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc = @MaCongThuc)
+        THROW 51051, N'Mã công thức CT904 đã tồn tại.', 1;
+
+    SELECT @MaDanhMuc = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món nướng';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51052, N'Không tìm thấy danh mục Món nướng.', 1;
+
+    -- Thêm nguyên liệu nếu chưa tồn tại
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL941', N'Sườn heo', N'Sườn heo.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Sườn heo'
+    );
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL942', N'Ớt chuông xanh', N'Ớt chuông xanh.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Ớt chuông xanh'
+    );
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL943', N'Ớt bột', N'Ớt bột.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Ớt bột'
+    );
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL944', N'Dầu ăn', N'Dầu ăn.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Dầu ăn'
+    );
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL945', N'Xì dầu', N'Xì dầu.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Xì dầu'
+    );
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL946', N'Dầu hào', N'Dầu hào.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Dầu hào'
+    );
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL947', N'Bột gừng', N'Bột gừng.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Bột gừng'
+    );
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL948', N'Hạt nêm', N'Hạt nêm.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Hạt nêm'
+    );
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL949', N'Đường', N'Đường.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Đường'
+    );
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL950', N'Mật ong', N'Mật ong.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Mật ong'
+    );
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL951', N'Hành tỏi xay', N'Hành tỏi xay.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Hành tỏi xay'
+    );
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL952', N'Giấm', N'Giấm.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Giấm'
+    );
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL953', N'Tương cà', N'Tương cà.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Tương cà'
+    );
+
+    -- Thêm món ăn
+    INSERT dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        ThoiGianChuanBi,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Sườn đút lò',
+        N'Có phải bạn đang băn khoăn nên làm món ngon gì cho tối cuối tuần? Chỉ với vài nguyên liệu cơ bản và khâu chuẩn bị đơn giản, bạn đã có thể thực hiện món sườn đút lò hảo hạng rồi.',
+        60,
+        240,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DaCongBo
+    )
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Có phải bạn đang băn khoăn nên làm món ngon gì cho tối cuối tuần? Chỉ với vài nguyên liệu cơ bản và khâu chuẩn bị đơn giản, bạn đã có thể thực hiện món sườn đút lò hảo hạng rồi.',
+        4,
+        0
+    );
+
+    -- Thêm thành phần, lấy mã nguyên liệu theo tên
+    INSERT dbo.ThanhPhanCongThuc
+    (MaThanhPhan, MaCongThuc, MaNguyenLieu, MaDonVi, SoLuong)
+    SELECT N'TP941', @MaCongThuc, MaNguyenLieu, N'DVT001', 500
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Sườn heo';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP942', @MaCongThuc, MaNguyenLieu, N'DVT005', 1
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Ớt chuông xanh';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP943', @MaCongThuc, MaNguyenLieu, N'DVT006', 1
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Ớt bột';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP944', @MaCongThuc, MaNguyenLieu, N'DVT006', 2
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Dầu ăn';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP945', @MaCongThuc, MaNguyenLieu, N'DVT006', 3
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Xì dầu';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP946', @MaCongThuc, MaNguyenLieu, N'DVT006', 2
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Dầu hào';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP947', @MaCongThuc, MaNguyenLieu, N'DVT007', 1
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Bột gừng';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP948', @MaCongThuc, MaNguyenLieu, N'DVT007', 2
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Hạt nêm';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP949', @MaCongThuc, MaNguyenLieu, N'DVT006', 3
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Đường';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP950', @MaCongThuc, MaNguyenLieu, N'DVT006', 2
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Mật ong';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP951', @MaCongThuc, MaNguyenLieu, N'DVT006', 1
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Hành tỏi xay';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP952', @MaCongThuc, MaNguyenLieu, N'DVT007', 1
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Giấm';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP953', @MaCongThuc, MaNguyenLieu, N'DVT006', 1
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Tương cà';
+
+    -- Bước 1
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90401',
+        @MaCongThuc,
+        1,
+        N'~ Sơ chế và ướp sườn ~
+
+Đầu tiên, ta sẽ ướp sườn. Cho sườn vào tô, lần lượt múc 1 muỗng canh ớt bột, 2 muỗng canh dầu ăn, 3 muỗng canh xì dầu, 2 muỗng canh dầu hào vào tô.
+
+Tiếp tục thêm vào tô 1 muỗng cà phê bột gừng, 2 muỗng cà phê hạt nêm, 3 muỗng canh đường, 2 muỗng canh mật ong, 1 muỗng canh hành tỏi xay, 1 muỗng cà phê dấm, 1 muỗng canh tương cà. Trộn đều đến khi sườn ướp đều gia vị. Bọc sườn lại và ướp trong tối thiểu 4 tiếng đồng hồ để sườn ngấm gia vị.',
+        240
+    );
+
+    -- Bước 2
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90402',
+        @MaCongThuc,
+        2,
+        N'~ Gói thịt trên giấy bạc ~
+
+Sau khi thịt đã thấm gia vị, bạn trải giấy bạc ra tô rồi gắp thịt bỏ vào. Bạn có thể cho thêm hành tây, ớt chuông cắt khối vuông vào tô thịt để thêm hương vị khi nướng. Sau đó gói thịt lại cẩn thận.',
+        5
+    );
+
+    -- Bước 3
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90403',
+        @MaCongThuc,
+        3,
+        N'~ Nướng thịt ~
+
+Làm nóng lò nướng ở 150 độ C khoảng 10 phút trước khi nấu.
+
+Gắp sườn cho vào lò nướng.
+
+Bạn chỉnh thời gian nướng lên 40 phút.
+
+Sau khi sườn đã chín, bạn cẩn thận tháo giấy bạc ra, gắp sườn cho vào đĩa. Trang trí với dưa leo, cà chua xắt lát. Món sườn nướng thơm ngon đã hoàn thành rồi!',
+        60
+    );
+
+    -- Bước 4
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90404',
+        @MaCongThuc,
+        4,
+        N'~ Thành phẩm ~
+
+Những miếng sườn nướng nóng hổi cùng mùi thơm vô cùng quyến rũ chắc hẳn sẽ đánh gục vị giác của mọi thành viên trong gia đình bạn đấy! Cùng trổ tài thực hiện ngay thôi nào!',
+        NULL
+    );
+
+    -- Thêm video
+    INSERT dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim,
+        MaCongThuc,
+        TieuDe,
+        DuongDan,
+        MoTa
+    )
+    VALUES
+    (
+        N'DP904',
+        @MaCongThuc,
+        N'Hướng dẫn chi tiết cách làm sườn đút lò ngon bá cháy',
+        N'https://www.youtube.com/watch?v=ecBOfXv3VTg',
+        N'Video hướng dẫn cách làm sườn đút lò.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = @MaCongThuc;
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm món Sườn đút lò thành công.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20) = N'MA905';
+    DECLARE @MaCongThuc NVARCHAR(20) = N'CT905';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = @MaMonAn)
+        THROW 51060, N'Mã món MA905 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc = @MaCongThuc)
+        THROW 51061, N'Mã công thức CT905 đã tồn tại.', 1;
+
+    SELECT @MaDanhMuc = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món cháo';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51062, N'Không tìm thấy danh mục Món cháo.', 1;
+
+    -- Thêm nguyên liệu nếu chưa có
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL954', N'Gạo tẻ', N'Gạo tẻ.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Gạo tẻ');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL955', N'Gạo nếp', N'Gạo nếp.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Gạo nếp');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL956', N'Thịt xay', N'Thịt xay.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Thịt xay');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL957', N'Cà rốt', N'Cà rốt.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Cà rốt');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL958', N'Khoai tây', N'Khoai tây.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Khoai tây');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL959', N'Gừng', N'Gừng.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Gừng');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL960', N'Tía tô', N'Tía tô.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Tía tô');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL961', N'Hành lá', N'Hành lá.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Hành lá');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL962', N'Nước mắm', N'Nước mắm.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Nước mắm');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL963', N'Gia vị thông dụng (muối/hạt nêm/tiêu xay)', N'Muối/hạt nêm/tiêu xay.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu
+        WHERE TenNguyenLieu = N'Gia vị thông dụng (muối/hạt nêm/tiêu xay)'
+    );
+
+    -- Món ăn
+    INSERT dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        ThoiGianChuanBi,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Cháo thịt bằm tía tô',
+        N'Món cháo thơm ngon hấp dẫn lại có tác dụng trị dứt ngay bệnh cảm cúm của bạn, dễ ăn với cách làm nhanh chóng. Đặc biệt thích hợp cho những ngày gió lạnh hay giao mùa.',
+        10,
+        45,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DaCongBo
+    )
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Món cháo thơm ngon hấp dẫn lại có tác dụng trị dứt ngay bệnh cảm cúm của bạn, dễ ăn với cách làm nhanh chóng. Đặc biệt thích hợp cho những ngày gió lạnh hay giao mùa.',
+        4,
+        0
+    );
+
+    -- Thành phần công thức, lấy MaNguyenLieu theo tên
+    INSERT dbo.ThanhPhanCongThuc
+    (MaThanhPhan, MaCongThuc, MaNguyenLieu, MaDonVi, SoLuong)
+    SELECT N'TP954', @MaCongThuc, MaNguyenLieu, N'DVT001', 100
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Gạo tẻ';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP955', @MaCongThuc, MaNguyenLieu, N'DVT001', 20
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Gạo nếp';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP956', @MaCongThuc, MaNguyenLieu, N'DVT001', 200
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Thịt xay';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP957', @MaCongThuc, MaNguyenLieu, N'DVT010', 1
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Cà rốt';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP958', @MaCongThuc, MaNguyenLieu, N'DVT010', 1
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Khoai tây';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP959', @MaCongThuc, MaNguyenLieu, N'DVT010', 0.5
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Gừng';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP960', @MaCongThuc, MaNguyenLieu, N'DVT001', 50
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Tía tô';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP961', @MaCongThuc, MaNguyenLieu, N'DVT011', 4
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Hành lá';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP962', @MaCongThuc, MaNguyenLieu, N'DVT006', 1
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Nước mắm';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP963', @MaCongThuc, MaNguyenLieu, N'DVT014', 1
+    FROM dbo.NguyenLieu
+    WHERE TenNguyenLieu = N'Gia vị thông dụng (muối/hạt nêm/tiêu xay)';
+
+    -- Bước 1
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90501',
+        @MaCongThuc,
+        1,
+        N'~ Rang gạo và nấu cháo ~
+
+Gạo nếp và gạo tẻ bạn vo với nước khoảng 1 - 2 lần rồi để ráo.
+
+Sau đó, bạn bắc 1 cái nồi lên bếp, đợi nồi nóng thì cho gạo và nếp vào rang với lửa nhỏ trong khoảng 7 phút cho gạo chuyển sang màu trắng ngà là được.
+
+Tiếp đó, bạn cho vào nồi 1.5 lít nước lọc đã đun sôi rồi ninh cháo từ 25 - 30 phút với lửa vừa.',
+        30
+    );
+
+    -- Bước 2
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90502',
+        @MaCongThuc,
+        2,
+        N'~ Ướp thịt ~
+
+Bạn cho 200gr thịt xay vào 1 cái tô, ướp thịt với 1/2 muỗng canh hạt nêm, 1/4 muỗng canh muối và 1/4 muỗng canh tiêu xay, dùng muỗng trộn đều cho thịt và để ướp trong 15 phút cho thịt thấm gia vị.',
+        15
+    );
+
+    -- Bước 3
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90503',
+        @MaCongThuc,
+        3,
+        N'~ Sơ chế các loại rau củ ~
+
+Cà rốt và khoai tây mua về bạn dùng dao gọt sạch vỏ rồi cắt thành hạt lựu nhỏ vừa ăn.
+
+Lá tía tô bạn rửa sạch rồi cắt nhỏ. Hành lá bạn cắt nhuyễn.
+
+Gừng bạn cạo sạch vỏ rồi dùng dao cắt thành sợi nhuyễn nhé.',
+        10
+    );
+
+    -- Bước 4
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90504',
+        @MaCongThuc,
+        4,
+        N'~ Nấu cháo thịt bằm tía tô ~
+
+Sau khi cháo đã nở và mềm, bạn cho 1 củ cà rốt và 1 củ khoai tây đã cắt hạt lựu vào nấu thêm 10 phút với lửa vừa cho rau củ chín.
+
+Tiếp đó bạn cho thịt xay đã ướp gia vị vào nồi rồi dùng vá khuấy đều cho thịt tơi ra không bị vón cục. Kế tiếp bạn nêm cháo thêm 1/3 muỗng canh muối, 1/2 muỗng canh hạt nêm và 1 muỗng canh nước mắm, dùng vá khuấy đều lên.
+
+Tiếp theo, bạn cho 50gr lá tía tô đã cắt nhỏ vào nồi, khuấy đều tay rồi tắt bếp.',
+        10
+    );
+
+    -- Bước 5
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90505',
+        @MaCongThuc,
+        5,
+        N'~ Hoàn thành ~
+
+Bạn múc cháo ra tô, cho thêm 1 ít hành lá và tiêu xay lên mặt tô, cho tiếp vài lát gừng cắt sợi lên là có thể thưởng thức rồi.',
+        5
+    );
+
+    -- Bước 6
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90506',
+        @MaCongThuc,
+        6,
+        N'~ Thành phẩm ~
+
+Món cháo thịt bầm tía tô đúng thật là hấp dẫn các bạn nhỉ? Đây quả là món ăn không thể lý tưởng hơn vào những ngày mà cơ thể cảm thấy không được khỏe, đặc biệt là khi bị cảm cúm đấy!
+
+Cháo mềm mịn, đậm đà gia vị, quyện với lá tía tô cay nhẹ có hương thơm thoang thoảng, thịt mềm ngon ngọt cùng với rau củ bùi bùi ngọt tự nhiên quá là tuyệt vời. Chần chừ gì nữa mà không trổ tài ngay nào!',
+        NULL
+    );
+
+    -- Video
+    INSERT dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim,
+        MaCongThuc,
+        TieuDe,
+        DuongDan,
+        MoTa
+    )
+    VALUES
+    (
+        N'DP905',
+        @MaCongThuc,
+        N'Cách nấu cháo thịt bằm tía tô bổ dưỡng ăn nóng giải cảm mùa mưa',
+        N'https://www.youtube.com/watch?v=0C1lSHrm9t8',
+        N'Video hướng dẫn cách nấu cháo thịt bằm tía tô.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = @MaCongThuc;
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm món Cháo thịt bằm tía tô thành công.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20) = N'MA906';
+    DECLARE @MaCongThuc NVARCHAR(20) = N'CT906';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = @MaMonAn)
+        THROW 51070, N'Mã món MA906 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc = @MaCongThuc)
+        THROW 51071, N'Mã công thức CT906 đã tồn tại.', 1;
+
+    SELECT @MaDanhMuc = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món cháo';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51072, N'Không tìm thấy danh mục Món cháo.', 1;
+
+    -- Nguyên liệu
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL964', N'Gạo tẻ (1 cốc)', N'Gạo tẻ, 1 cốc.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu
+        WHERE TenNguyenLieu = N'Gạo tẻ (1 cốc)'
+    );
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL965', N'Gạo nếp (1 cốc)', N'Gạo nếp, 1 cốc.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu
+        WHERE TenNguyenLieu = N'Gạo nếp (1 cốc)'
+    );
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL966', N'Tôm tươi', N'Tôm tươi.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu
+        WHERE TenNguyenLieu = N'Tôm tươi'
+    );
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL967', N'Bí đỏ', N'Bí đỏ.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu
+        WHERE TenNguyenLieu = N'Bí đỏ'
+    );
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL968', N'Cà rốt', N'Cà rốt.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu
+        WHERE TenNguyenLieu = N'Cà rốt'
+    );
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL969', N'Hạt sen tươi', N'Hạt sen tươi.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu
+        WHERE TenNguyenLieu = N'Hạt sen tươi'
+    );
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL970', N'Muối', N'Muối.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.NguyenLieu
+        WHERE TenNguyenLieu = N'Muối'
+    );
+
+    -- Món ăn
+    INSERT dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        ThoiGianChuanBi,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Cháo tôm bí đỏ bằng máy xay nấu đa năng',
+        N'Cháo là món đơn giản nhưng đem lại nhiều lợi ích cho cơ thể, cung cấp nhiều dinh dưỡng nhất là với người già và trẻ nhỏ.',
+        35,
+        10,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DaCongBo
+    )
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Cháo là món đơn giản nhưng đem lại nhiều lợi ích cho cơ thể, cung cấp nhiều dinh dưỡng nhất là với người già và trẻ nhỏ.',
+        3,
+        0
+    );
+
+    -- Thành phần công thức
+    INSERT dbo.ThanhPhanCongThuc
+    (MaThanhPhan, MaCongThuc, MaNguyenLieu, MaDonVi, SoLuong)
+    SELECT N'TP964', @MaCongThuc, MaNguyenLieu, N'DVT001', 150
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Gạo tẻ (1 cốc)';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP965', @MaCongThuc, MaNguyenLieu, N'DVT001', 150
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Gạo nếp (1 cốc)';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP966', @MaCongThuc, MaNguyenLieu, N'DVT001', 100
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Tôm tươi';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP967', @MaCongThuc, MaNguyenLieu, N'DVT001', 100
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Bí đỏ';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP968', @MaCongThuc, MaNguyenLieu, N'DVT010', 0.5
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Cà rốt';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP969', @MaCongThuc, MaNguyenLieu, N'DVT001', 50
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Hạt sen tươi';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP970', @MaCongThuc, MaNguyenLieu, N'DVT007', 0.125
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Muối';
+
+    -- Bước 1
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90601',
+        @MaCongThuc,
+        1,
+        N'~ Sơ chế tôm ~
+
+Tôm bạn làm sạch, lột vỏ, lấy chỉ đen, tiếp đến bạn rửa sạch rồi để ráo.
+
+Lưu ý: Cách rút chỉ lưng tôm nhanh:
+
+- Cách 1: Bóc vỏ đầu và vỏ thân tôm từ phần chân, đến phần đuôi dùng hai ngón tay giữ chặt phần đốt cuối rồi rút ra. Tiếp theo dùng dao khía lưng tôm để lộ chỉ đen rồi lấy tăm khều ra.
+- Cách 2: Tôm sau khi đã rửa sạch bạn lách tăm vào giữa cổ tôm rồi lôi phần chỉ đen ra, loại bỏ.
+- Cách 3: Rửa sạch tôm dùng kéo cắt dọc vỏ tôm lộ chỉ đen sau đó rửa dưới vòi nước cho sạch.',
+        10
+    );
+
+    -- Bước 2
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90602',
+        @MaCongThuc,
+        2,
+        N'~ Sơ chế nguyên liệu khác ~
+
+Bí đỏ, cà rốt rửa sạch, gọt vỏ rồi cắt miếng vừa ăn.
+
+Hạt sen, bạn lựa hạt hư bỏ đi, sau đó loại bỏ tâm sen trong hạt, rửa sạch, để ráo.
+
+Lưu ý
+
+- Nếu lựa chọn mua hạt sen còn vỏ, bạn đem luộc hạt sen với một ít muối khoảng 10 - 15 phút, như vậy bạn sẽ bóc vỏ dễ dàng.
+- Tách đôi hạt và loại bỏ tâm sen vì tâm sen có vị đắng, không loại bỏ kĩ sẽ ảnh hưởng đến hương vị món ăn.',
+        15
+    );
+
+    -- Bước 3
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90603',
+        @MaCongThuc,
+        3,
+        N'~ Vo gạo ~
+
+Bạn dùng cốc đi kèm nồi cơm điện đong gạo, đong 1 cốc gạo tẻ và 1 cốc gạo nếp vào tô, dùng tay nhẹ nhàng vo gạo rồi khuấy đều để cát bụi, vỏ trấu, sạn còn bám trên hạt gạo, chắt nước ra rồi tiếp tục chế nước sạch vào.',
+        5
+    );
+
+    -- Bước 4
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90604',
+        @MaCongThuc,
+        4,
+        N'~ Nấu cháo ~
+
+Bạn cho gạo vào máy xay nấu, thêm bí đỏ, cà rốt, gạt sen, tôm, 1/8 muỗng cà phê muối, 1 lít nước.
+
+Bạn chọn chế độ nấu cháo dinh dưỡng chọn thời gian 22 phút, bấm nút nấu, máy sẽ hoạt động xay nấu trong khoảng 25 phút là hoàn thành.',
+        35
+    );
+
+    -- Bước 5
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90605',
+        @MaCongThuc,
+        5,
+        N'~ Thành phẩm ~
+
+Cháo bí đỏ sau khi hoàn thành có màu vàng cam bắt mắt cùng vị ngọt thanh của bí đỏ và tôm giúp tô cháo thêm hấp dẫn hơn. Bạn có thể thêm ít hành ngò để cháo thơm hơn nếu thích nhé, mời gia đình thưởng thức thôi.',
+        NULL
+    );
+
+    -- Video
+    INSERT dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim,
+        MaCongThuc,
+        TieuDe,
+        DuongDan,
+        MoTa
+    )
+    VALUES
+    (
+        N'DP906',
+        @MaCongThuc,
+        N'Cách nấu cháo tôm bí đỏ bằng máy xay nấu đa năng thơm ngon, dễ làm tại nhà',
+        N'https://www.youtube.com/watch?v=-Ytc-mI93vI',
+        N'Video hướng dẫn cách nấu cháo tôm bí đỏ bằng máy xay nấu đa năng.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = @MaCongThuc;
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm món Cháo tôm bí đỏ thành công.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20) = N'MA907';
+    DECLARE @MaCongThuc NVARCHAR(20) = N'CT907';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = @MaMonAn)
+        THROW 51080, N'Mã món MA907 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc = @MaCongThuc)
+        THROW 51081, N'Mã công thức CT907 đã tồn tại.', 1;
+
+    SELECT @MaDanhMuc = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món xào';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51082, N'Không tìm thấy danh mục Món xào.', 1;
+
+    -- Thêm nguyên liệu nếu chưa tồn tại
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL971', N'Ức gà', N'Ức gà.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Ức gà');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL972', N'Bột mì đa dụng', N'Bột mì đa dụng.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Bột mì đa dụng');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL973', N'Trứng gà', N'Trứng gà.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Trứng gà');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL974', N'Sốt cà cô đặc', N'Sốt cà cô đặc.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Sốt cà cô đặc');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL975', N'Dầu oliu', N'Dầu oliu.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Dầu oliu');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL976', N'Whipping Cream', N'Whipping Cream.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Whipping Cream');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL977', N'Sữa tươi', N'Sữa tươi.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Sữa tươi');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL978', N'Bột phô mai', N'Bột phô mai.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Bột phô mai');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL979', N'Bột năng', N'Bột năng.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Bột năng');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL980', N'Nước lọc', N'Nước lọc.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Nước lọc');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL981', N'Dầu ăn', N'Dầu ăn.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Dầu ăn');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL982', N'Mè rang', N'Mè rang.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Mè rang');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL983', N'Gia vị (muối/tiêu)', N'Muối/tiêu.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Gia vị (muối/tiêu)');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL984', N'Đường', N'Đường.'
+    WHERE NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Đường');
+
+    -- Món ăn
+    INSERT dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        ThoiGianChuanBi,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Mì Ý gà giòn sốt kem',
+        N'Mì Ý gà giòn sốt kem là món ăn thơm ngon, hấp dẫn mà cách làm lại vô cùng đơn giản, chuẩn vị nhà hàng.',
+        60,
+        60,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DaCongBo
+    )
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Mì Ý gà giòn sốt kem là món ăn thơm ngon, hấp dẫn mà cách làm lại vô cùng đơn giản, chuẩn vị nhà hàng.',
+        2,
+        0
+    );
+
+    -- Thành phần công thức
+    INSERT dbo.ThanhPhanCongThuc
+    (MaThanhPhan, MaCongThuc, MaNguyenLieu, MaDonVi, SoLuong)
+    SELECT N'TP971', @MaCongThuc, MaNguyenLieu, N'DVT001', 300
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Ức gà';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP972', @MaCongThuc, MaNguyenLieu, N'DVT001', 600
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Bột mì đa dụng';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP973', @MaCongThuc, MaNguyenLieu, N'DVT005', 3
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Trứng gà';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP974', @MaCongThuc, MaNguyenLieu, N'DVT001', 100
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Sốt cà cô đặc';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP975', @MaCongThuc, MaNguyenLieu, N'DVT003', 10
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Dầu oliu';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP976', @MaCongThuc, MaNguyenLieu, N'DVT003', 50
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Whipping Cream';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP977', @MaCongThuc, MaNguyenLieu, N'DVT003', 30
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Sữa tươi';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP978', @MaCongThuc, MaNguyenLieu, N'DVT001', 50
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Bột phô mai';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP979', @MaCongThuc, MaNguyenLieu, N'DVT006', 6
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Bột năng';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP980', @MaCongThuc, MaNguyenLieu, N'DVT003', 50
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Nước lọc';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP981', @MaCongThuc, MaNguyenLieu, N'DVT003', 100
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Dầu ăn';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP982', @MaCongThuc, MaNguyenLieu, N'DVT001', 5
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Mè rang';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP983', @MaCongThuc, MaNguyenLieu, N'DVT014', 1
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Gia vị (muối/tiêu)';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP984', @MaCongThuc, MaNguyenLieu, N'DVT007', 2
+    FROM dbo.NguyenLieu WHERE TenNguyenLieu = N'Đường';
+
+    -- Bước 1
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90701',
+        @MaCongThuc,
+        1,
+        N'~ Sơ chế thịt gà ~
+
+Ức gà rửa sạch với nước sau đó dùng muối chà xát đều lên miếng ức rồi rửa lại bằng nước sạch để khử mùi tanh, để ráo nước hoặc dùng khăn sạch thấm khô, sau đó cắt gà thành các miếng vừa ăn.
+
+Lưu ý sơ chế ức gà không còn mùi hôi:
+
+- Sau khi đã chà xát với muối, bạn có thể dùng hỗn hợp rượu và gừng cắt lát, đập dập vừa chà vừa bóp toàn miếng ức một lần nữa, giúp khử sạch mùi hôi và chất bẩn. Rửa sạch, chờ ráo nước là được.
+- Ngoài ra, bạn cũng có thể cho chanh vào trong nước, cho ức gà vào ngâm trong 15 - 20 phút. Sau đó vớt ra, xả lại nước lạnh và để ráo.',
+        15
+    );
+
+    -- Bước 2
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90702',
+        @MaCongThuc,
+        2,
+        N'~ Trộn bột và nhồi bột ~
+
+Cho 400gr bột mì ra 1 tấm thớt sạch, dùng tay tạo một lỗ ở giữa phần bột, sau đó đập 2 quả trứng gà và cho 10ml dầu oliu vào giữa.
+
+Dùng muỗng đánh trứng và dầu cho tan, vừa đánh vừa đẩy phần bộ vào trong cho đến khi bột bao hết phần trứng gà, kế đến dùng tay nhào bột cho tới khi dẻo mịn. Sau khi nhồi xong, để bột nghỉ khoảng 30 phút.
+
+Lưu ý:
+
+- Bạn nên nhồi bột bằng tay để cảm nhân được độ đạt của bột.
+- Nếu bột nhão có thể thêm ít bột còn nếu bột quá khô có thể thêm trứng hoặc nước để nhồi tiếp.',
+        35
+    );
+
+    -- Bước 3
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90703',
+        @MaCongThuc,
+        3,
+        N'~ Ướp gà ~
+
+Trong thời gian đợi bột nghỉ, tiến hành ướp thịt gà với 1.5 muỗng cà phê muối, 1 muỗng cà phê tiêu. Trộn đều và ướp khoảng 15 phút cho gà ngấm gia vị.',
+        15
+    );
+
+    -- Bước 4
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90704',
+        @MaCongThuc,
+        4,
+        N'~ Làm sốt cà ~
+
+Bắc chảo lên bếp, cho 1 muỗng canh dầu ăn vào và đợi nóng, cho tiếp 100gr sốt cà cô đặc và 50ml nước lọc vào chảo và đun sôi. Khi sốt cà sôi, các bạn thêm vào chảo 2 muỗng cà phê đường và tiếp tục khuấy cho đến khi sốt cà đạt độ sánh mong muốn thì tắt bếp, cho ra chén.',
+        10
+    );
+
+    -- Bước 5
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90705',
+        @MaCongThuc,
+        5,
+        N'~ Cán bột ~
+
+Rắc một ít bột mì khô lên trên khối bột và cây lăn.
+
+Dùng cây lăn cán mỏng bột. Sau khi bột đã mỏng, các bạn cho bột mì khô vào giữa sau đó gập miếng bột lại rồi tiếp tục cán mỏng cho bột dày khoảng 1mm. Lặp lại bước này từ 1 – 2 lần để sợi mì sau khi hoàn thành đạt được độ dài mong muốn.
+
+Lưu ý: Nếu bạn cán bột càng mỏng thì sợi mì làm ra sẽ ngon hơn.',
+        15
+    );
+
+    -- Bước 6
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90706',
+        @MaCongThuc,
+        6,
+        N'~ Cắt và trụng mì ~
+
+Gấp bột làm đôi thêm một lần nữa, sau đó dùng dao cắt bột thành các sợi mỏng, dày khoảng 1 – 2 mm.
+
+Sau khi cắt xong, bạn gỡ cho sợi mì dài ra, mang mì đi áo qua một lớp bột mì, rồi quấn mì thành từng vắt.
+
+Bắc một nồi nước lên bếp và đun sôi. Nước sôi, các bạn cho mì vào trụng khoảng 2 – 3 phút cho sợi mì chín thì vớt ra
+
+Lưu ý:
+
+- Sau khi cắt, các bạn nên áo mì qua một lớp bột giúp sợi mì không bị khô và không dính vào nhau.
+- Mì trụng khi chín thường có màu trong. Khi dùng tay ngắt thử thì sợi mì đứt ngay, không còn dẻo và dính tay là được.',
+        15
+    );
+
+    -- Bước 7
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90707',
+        @MaCongThuc,
+        7,
+        N'~ Trộn bột chiên gà ~
+
+Chuẩn bị phần bột ướp: Cho 3 muỗng canh bột mì, 3 muỗng canh bột năng, 1 muỗng cà phê muối, 1 muỗng cà phê tiêu vào tô và trộn đều.
+
+Chuẩn bị phần bột nước: Cho 3 muỗng canh bột mì, 3 muỗng canh bột năng, 1 lòng đỏ trứng gà, 100ml nước lọc vào tô, đánh đều cho bột tan hoàn toàn.
+
+Lưu ý: Trong quá trình tẩm bột, nên vẩy bớt bột để lớp bột chiên gà không quá dày khiến món ăn bị ngán.',
+        15
+    );
+
+    -- Bước 8
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90708',
+        @MaCongThuc,
+        8,
+        N'~ Chiên gà ~
+
+Áo gà qua một lớp bột khô, sau đó nhúng gà qua bột ướt, rồi lại lăn gà qua lớp bột khô 1 lần nữa.
+
+Bắc chảo lên bếp, cho phần dầu ăn còn lại vào và đợi nóng, cho các miếng gà vừa tẩm bột vào chảo, chiên ngập dầu ở lửa lớn cho gà chín vàng.
+
+Vớt gà ra dĩa, để cho gà nguội và ráo dầu thì cho gà trở lại vào chảo, chiên thêm 1 lần nữa cho gà thật vàng thì vớt ra, để ráo dầu.
+
+Lưu ý:
+
+- Để gà nguội mới đem chiên để gà được giòn ngon hơn.
+- Chiên 2 lần sẽ giúp miếng gà chiên được giòn hơn.',
+        30
+    );
+
+    -- Bước 9
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90709',
+        @MaCongThuc,
+        9,
+        N'~ Làm sốt kem ~
+
+Bắc chảo lên bếp, cho vào 50ml whipping cream, 30ml sữa tươi, để lửa nhỏ và nấu đến khi hỗn hợp sữa vừa ấm lên thì cho 50gr bột phô mai vào, nêm nếm lại cho vừa ăn sau đó cho mì Ý vào đảo đều khoảng 1 - 2 phút rồi tắt bếp, cho ra dĩa.',
+        10
+    );
+
+    -- Bước 10
+    INSERT dbo.BuocCheBien
+    (MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90710',
+        @MaCongThuc,
+        10,
+        N'~ Thành phẩm ~
+
+Cho mì Ý ra dĩa, nhúng gà chiên qua sốt cà chua rồi đặt lên trên, có thể rắc thêm chút mè rang, trang trí thêm 1 ít bông cải luộc và cà chua cắt lát cho đẹp mắt là hoàn thành.
+
+Vậy chúng ta đã có những sợi mì vàng óng kết hợp cùng sốt kem béo ngậy, thịt gà ngon rụm, đậm đà không thua kém nhà hàng. Bạn hãy rắc thêm một xíu mè rang và có thể ăn kèm với tương ớt nếu thích nhé!',
+        NULL
+    );
+
+    -- Video
+    INSERT dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim,
+        MaCongThuc,
+        TieuDe,
+        DuongDan,
+        MoTa
+    )
+    VALUES
+    (
+        N'DP907',
+        @MaCongThuc,
+        N'Cách làm mì Ý gà giòn sốt kem thơm béo hấp dẫn',
+        N'https://www.youtube.com/watch?v=YJG14Q_Chvc',
+        N'Video hướng dẫn cách làm mì Ý gà giòn sốt kem.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = @MaCongThuc;
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm món Mì Ý gà giòn sốt kem thành công.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20) = N'MA908';
+    DECLARE @MaCongThuc NVARCHAR(20) = N'CT908';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = @MaMonAn)
+        THROW 51090, N'Mã món MA908 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc = @MaCongThuc)
+        THROW 51091, N'Mã công thức CT908 đã tồn tại.', 1;
+
+    SELECT @MaDanhMuc = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món xào';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51092, N'Không tìm thấy danh mục Món xào.', 1;
+
+    DECLARE @NL TABLE
+    (
+        MaNguyenLieu NVARCHAR(20),
+        TenNguyenLieu NVARCHAR(150),
+        MoTa NVARCHAR(500)
+    );
+
+    INSERT @NL VALUES
+    (N'NL985',N'Nấm linh chi nâu',N'Nấm linh chi nâu.'),
+    (N'NL986',N'Nấm linh chi trắng',N'Nấm linh chi trắng.'),
+    (N'NL987',N'Nấm đông cô tươi',N'Nấm đông cô tươi.'),
+    (N'NL988',N'Nấm rơm',N'Nấm rơm.'),
+    (N'NL989',N'Nấm bào ngư',N'Nấm bào ngư.'),
+    (N'NL990',N'Nấm mèo',N'Nấm mèo.'),
+    (N'NL991',N'Thơm',N'Thơm.'),
+    (N'NL992',N'Ớt chuông xanh',N'Ớt chuông xanh.'),
+    (N'NL993',N'Ớt chuông vàng',N'Ớt chuông vàng.'),
+    (N'NL994',N'Ớt chuông đỏ',N'Ớt chuông đỏ.'),
+    (N'NL995',N'Hành tây',N'Hành tây.'),
+    (N'NL996',N'Giấm gạo',N'Giấm gạo.'),
+    (N'NL997',N'Tương ớt',N'Tương ớt.'),
+    (N'NL998',N'Tương cà',N'Tương cà.'),
+    (N'NL999',N'Tương xí muội',N'Tương xí muội.'),
+    (N'NL1000',N'Gia vị thông dụng (muối/đường/hạt nêm chay/bột ngọt)',N'Muối/đường/hạt nêm chay/bột ngọt.'),
+    (N'NL1001',N'Hành boa rô',N'Hành boa rô.'),
+    (N'NL1002',N'Dầu ăn',N'Dầu ăn.');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu,TenNguyenLieu,MoTa)
+    SELECT n.MaNguyenLieu,n.TenNguyenLieu,n.MoTa
+    FROM @NL n
+    WHERE NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.NguyenLieu x
+        WHERE x.TenNguyenLieu=n.TenNguyenLieu
+    );
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn,MaDanhMuc,TenMonAn,MoTa,
+        ThoiGianCheBien,ThoiGianChuanBi,DoKho,DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Nấm xào chua ngọt chay',
+        N'Nấm xào chua ngọt chay là món xào thơm ngon, bắt vị, chỉ với nguyên liệu cơ bản bạn đã có ngay món ăn hấp dẫn này để chiêu đãi cả nhà rồi, chắc hẳn bạn sẽ bất ngờ bởi độ thơm ngon của nó đó.',
+        20,
+        10,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT dbo.CongThuc
+    (MaCongThuc,MaMonAn,MoTa,SoKhauPhanChuan,DaCongBo)
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Nấm xào chua ngọt chay là món xào thơm ngon, bắt vị, chỉ với nguyên liệu cơ bản bạn đã có ngay món ăn hấp dẫn này để chiêu đãi cả nhà rồi, chắc hẳn bạn sẽ bất ngờ bởi độ thơm ngon của nó đó.',
+        4,
+        0
+    );
+
+    DECLARE @TP TABLE
+    (
+        MaThanhPhan NVARCHAR(20),
+        TenNguyenLieu NVARCHAR(150),
+        MaDonVi NVARCHAR(20),
+        SoLuong DECIMAL(12,3)
+    );
+
+    INSERT @TP VALUES
+    (N'TP985',N'Nấm linh chi nâu',N'DVT001',50),
+    (N'TP986',N'Nấm linh chi trắng',N'DVT001',50),
+    (N'TP987',N'Nấm đông cô tươi',N'DVT001',50),
+    (N'TP988',N'Nấm rơm',N'DVT001',50),
+    (N'TP989',N'Nấm bào ngư',N'DVT001',50),
+    (N'TP990',N'Nấm mèo',N'DVT001',10),
+    (N'TP991',N'Thơm',N'DVT005',0.5),
+    (N'TP992',N'Ớt chuông xanh',N'DVT005',0.5),
+    (N'TP993',N'Ớt chuông vàng',N'DVT005',0.5),
+    (N'TP994',N'Ớt chuông đỏ',N'DVT005',0.5),
+    (N'TP995',N'Hành tây',N'DVT005',0.5),
+    (N'TP996',N'Giấm gạo',N'DVT006',1),
+    (N'TP997',N'Tương ớt',N'DVT006',2),
+    (N'TP998',N'Tương cà',N'DVT006',2),
+    (N'TP999',N'Tương xí muội',N'DVT006',2),
+    (N'TP1000',N'Gia vị thông dụng (muối/đường/hạt nêm chay/bột ngọt)',N'DVT014',1),
+    (N'TP1001',N'Hành boa rô',N'DVT006',1),
+    (N'TP1002',N'Dầu ăn',N'DVT006',2);
+
+    INSERT dbo.ThanhPhanCongThuc
+    (MaThanhPhan,MaCongThuc,MaNguyenLieu,MaDonVi,SoLuong)
+    SELECT
+        tp.MaThanhPhan,
+        @MaCongThuc,
+        nl.MaNguyenLieu,
+        tp.MaDonVi,
+        tp.SoLuong
+    FROM @TP tp
+    JOIN dbo.NguyenLieu nl
+        ON nl.TenNguyenLieu=tp.TenNguyenLieu;
+
+    INSERT dbo.BuocCheBien
+    (MaBuoc,MaCongThuc,ThuTu,NoiDung,ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90801',@MaCongThuc,1,
+        N'~ Sơ chế nguyên liệu ~
+
+Ớt chuông xanh, ớt chuông vàng, ớt chuông đỏ mua về bạn rửa sạch, bỏ hạt rồi cắt khúc vừa ăn khoảng 1/2 lóng tay.
+
+Hành tây bạn lột bỏ vỏ, cắt múi cau. Nấm mèo bạn ngâm nước lạnh khoảng 30 phút rồi rửa sạch, cắt miếng vừa ăn.
+
+Nấm linh chi trắng, nấm linh chi nâu, nấm đông cô tươi, nấm rơm, nấm bào ngư bạn cắt bỏ chân nấm rồi rửa sạch.
+
+Thơm bạn nhờ người bán cắt bỏ mắt, mua về rửa sạch rồi cắt lát vừa ăn.',
+        30
+    ),
+    (
+        N'BCB90802',@MaCongThuc,2,
+        N'~ Pha nước sốt ~
+
+Bạn cho vào chén 4 muỗng canh đường, 1/2 muỗng canh hạt nêm chay, 1 muỗng cà phê bột ngọt, 1 muỗng cà phê muối, 2 muỗng canh tương ớt, 2 muỗng canh tương cà, 2 muỗng canh tương xí muội, 1 muỗng canh giấm gạo rồi đảo đều.',
+        5
+    ),
+    (
+        N'BCB90803',@MaCongThuc,3,
+        N'~ Xào nấm ~
+
+Bắc chảo lên bếp mở lửa vừa, cho vào chảo 2 muỗng canh dầu ăn, đợi dầu nóng bạn cho 1 muỗng canh hành boa rô vào phi thơm.
+
+Khi hành thơm, bạn thêm nấm mèo, nấm rơm, nấm đông cô tươi, nấm linh chi nâu, nấm linh chi trắng, nấm bào ngư vào xào đều khoảng 1 phút thì cho thơm, ớt chuông và phần nước sốt vào xào lửa nhỏ 5 phút.
+
+Sau 5 phút, bạn thêm phần hành tây vào đảo đều, nêm nếm lại cho vừa ăn và tắt bếp.',
+        20
+    ),
+    (
+        N'BCB90804',@MaCongThuc,4,
+        N'~ Thành phẩm ~
+
+Vậy là bạn đã hoàn thành xong món nấm xào chua ngọt chay rất thơm ngon, bắt mắt rồi.
+
+Nấm tươi ngọt thấm đều vị sốt ăn rất ngon miệng, món này ăn với cơm nóng thì còn gì bằng, trổ tài vào bếp thực hiện chiêu đãi cả nhà nha!',
+        NULL
+    );
+
+    INSERT dbo.DoanPhimHuongDan
+    (MaDoanPhim,MaCongThuc,TieuDe,DuongDan,MoTa)
+    VALUES
+    (
+        N'DP908',
+        @MaCongThuc,
+        N'Nấm xào chua ngọt chay',
+        N'https://www.youtube.com/watch?v=bFH8xHVqoSk',
+        N'Video hướng dẫn cách làm nấm xào chua ngọt chay.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo=1
+    WHERE MaCongThuc=@MaCongThuc;
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm món Nấm xào chua ngọt chay thành công.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE()<>0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20) = N'MA909';
+    DECLARE @MaCongThuc NVARCHAR(20) = N'CT909';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn=@MaMonAn)
+        THROW 51100, N'Mã món MA909 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc=@MaCongThuc)
+        THROW 51101, N'Mã công thức CT909 đã tồn tại.', 1;
+
+    SELECT @MaDanhMuc=MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc=N'Món xào';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51102, N'Không tìm thấy danh mục Món xào.', 1;
+
+    DECLARE @NL TABLE
+    (
+        MaNguyenLieu NVARCHAR(20),
+        TenNguyenLieu NVARCHAR(150),
+        MoTa NVARCHAR(500)
+    );
+
+    INSERT @NL VALUES
+    (N'NL1003',N'Răng mực',N'Răng mực.'),
+    (N'NL1004',N'Muối',N'Muối.'),
+    (N'NL1005',N'Đường',N'Đường.'),
+    (N'NL1006',N'Hạt nêm',N'Hạt nêm.'),
+    (N'NL1007',N'Tiêu',N'Tiêu.'),
+    (N'NL1008',N'Tỏi băm',N'Tỏi băm.'),
+    (N'NL1009',N'Tóp mỡ',N'Tóp mỡ.'),
+    (N'NL1010',N'Bơ',N'Bơ.'),
+    (N'NL1011',N'Ớt băm',N'Ớt băm.');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu,TenNguyenLieu,MoTa)
+    SELECT n.MaNguyenLieu,n.TenNguyenLieu,n.MoTa
+    FROM @NL n
+    WHERE NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.NguyenLieu x
+        WHERE x.TenNguyenLieu=n.TenNguyenLieu
+    );
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn,MaDanhMuc,TenMonAn,MoTa,
+        ThoiGianCheBien,ThoiGianChuanBi,DoKho,DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Răng mực xào bơ tỏi',
+        N'Răng mực xào bơ tỏi là món ăn vặt nhâm nhi hấp dẫn, đồng thời khi ăn kèm với bánh mì cũng có thể trở thành một món ăn no nê.',
+        20,
+        30,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT dbo.CongThuc
+    (MaCongThuc,MaMonAn,MoTa,SoKhauPhanChuan,DaCongBo)
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Răng mực xào bơ tỏi là món ăn vặt nhâm nhi hấp dẫn, đồng thời khi ăn kèm với bánh mì cũng có thể trở thành một món ăn no nê.',
+        3,
+        0
+    );
+
+    DECLARE @TP TABLE
+    (
+        MaThanhPhan NVARCHAR(20),
+        TenNguyenLieu NVARCHAR(150),
+        MaDonVi NVARCHAR(20),
+        SoLuong DECIMAL(12,3)
+    );
+
+    INSERT @TP VALUES
+    (N'TP1003',N'Răng mực',N'DVT001',300),
+    (N'TP1004',N'Muối',N'DVT007',0.5),
+    (N'TP1005',N'Đường',N'DVT006',1),
+    (N'TP1006',N'Hạt nêm',N'DVT007',1),
+    (N'TP1007',N'Tiêu',N'DVT007',1),
+    (N'TP1008',N'Tỏi băm',N'DVT006',3),
+    (N'TP1009',N'Tóp mỡ',N'DVT014',1),
+    (N'TP1010',N'Bơ',N'DVT001',300),
+    (N'TP1011',N'Ớt băm',N'DVT006',1);
+
+    INSERT dbo.ThanhPhanCongThuc
+    (MaThanhPhan,MaCongThuc,MaNguyenLieu,MaDonVi,SoLuong)
+    SELECT
+        tp.MaThanhPhan,
+        @MaCongThuc,
+        nl.MaNguyenLieu,
+        tp.MaDonVi,
+        tp.SoLuong
+    FROM @TP tp
+    JOIN dbo.NguyenLieu nl
+        ON nl.TenNguyenLieu=tp.TenNguyenLieu;
+
+    INSERT dbo.BuocCheBien
+    (MaBuoc,MaCongThuc,ThuTu,NoiDung,ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB90901',
+        @MaCongThuc,
+        1,
+        N'~ Ướp răng mực ~
+
+Răng mực rửa sạch để ráo sau đó bạn cho vào tô.
+
+Thêm vào tô 1/2 muỗng cà phê muối, 1 muỗng cà phê hạt nêm, 1 muỗng cà phê tiêu, 1 muỗng canh đường, 1 muỗng canh ớt băm, 1 muỗng canh tỏi băm, bạn đảo đều.
+
+Để ướp 30 phút.',
+        30
+    ),
+    (
+        N'BCB90902',
+        @MaCongThuc,
+        2,
+        N'~ Xào răng mực ~
+
+Bạn bắc chảo lên bếp, cho 300 gr bơ vào đợi nóng cho bơ tan hết.
+
+Bạn cho 2 muỗng canh tỏi băm vào phi thơm vàng, sau đó cho răng mực vào xào chín vàng đều rồi thêm 1 chén tóp mỡ, đảo đều, xào thêm tầm 1 phút rồi tắt bếp.',
+        20
+    ),
+    (
+        N'BCB90903',
+        @MaCongThuc,
+        3,
+        N'~ Thành phẩm ~
+
+Răng mực xào bơ tỏi thơm lừng, răng mực giòn dai sần sật kết hợp với bơ tỏi thơm béo cực kỳ hấp dẫn, kích thích vị giác.',
+        NULL
+    );
+
+    INSERT dbo.DoanPhimHuongDan
+    (MaDoanPhim,MaCongThuc,TieuDe,DuongDan,MoTa)
+    VALUES
+    (
+        N'DP909',
+        @MaCongThuc,
+        N'Cách làm răng mực xào bơ tỏi thơm béo giòn dai ngon khó cưỡng',
+        N'https://www.youtube.com/watch?v=BNUjZe9mtgY',
+        N'Video hướng dẫn cách làm răng mực xào bơ tỏi.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo=1
+    WHERE MaCongThuc=@MaCongThuc;
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm món Răng mực xào bơ tỏi thành công.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE()<>0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20)=N'MA910';
+    DECLARE @MaCongThuc NVARCHAR(20)=N'CT910';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn=@MaMonAn)
+        THROW 51110,N'Mã món MA910 đã tồn tại.',1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc=@MaCongThuc)
+        THROW 51111,N'Mã công thức CT910 đã tồn tại.',1;
+
+    SELECT @MaDanhMuc=MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc=N'Ăn vặt';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51112,N'Không tìm thấy danh mục Ăn vặt.',1;
+
+    DECLARE @NL TABLE
+    (
+        MaNguyenLieu NVARCHAR(20),
+        TenNguyenLieu NVARCHAR(150),
+        MoTa NVARCHAR(500)
+    );
+
+    INSERT @NL VALUES
+    (N'NL1012',N'Tôm',N'Tôm.'),
+    (N'NL1013',N'Phô mai mozzarella',N'Phô mai mozzarella.'),
+    (N'NL1014',N'Bắp ngọt',N'Bắp ngọt.'),
+    (N'NL1015',N'Rong biển',N'Rong biển.'),
+    (N'NL1016',N'Mùi tây khô',N'Mùi tây khô.'),
+    (N'NL1017',N'Bơ lạt',N'Bơ lạt.'),
+    (N'NL1018',N'Tỏi băm',N'Tỏi băm.'),
+    (N'NL1019',N'Ớt bột',N'Ớt bột.'),
+    (N'NL1020',N'Muối/Tiêu xay',N'Muối/tiêu xay.');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu,TenNguyenLieu,MoTa)
+    SELECT n.MaNguyenLieu,n.TenNguyenLieu,n.MoTa
+    FROM @NL n
+    WHERE NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.NguyenLieu x
+        WHERE x.TenNguyenLieu=n.TenNguyenLieu
+    );
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn,MaDanhMuc,TenMonAn,MoTa,
+        ThoiGianCheBien,ThoiGianChuanBi,DoKho,DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Tôm sốt phô mai',
+        N'Các món ăn vặt từ phô mai luôn thu hút sự chú ý của giới trẻ và được nhiều bạn yêu thích.',
+        15,
+        10,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT dbo.CongThuc
+    (MaCongThuc,MaMonAn,MoTa,SoKhauPhanChuan,DaCongBo)
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Các món ăn vặt từ phô mai luôn thu hút sự chú ý của giới trẻ và được nhiều bạn yêu thích.',
+        3,
+        0
+    );
+
+    DECLARE @TP TABLE
+    (
+        MaThanhPhan NVARCHAR(20),
+        TenNguyenLieu NVARCHAR(150),
+        MaDonVi NVARCHAR(20),
+        SoLuong DECIMAL(12,3)
+    );
+
+    INSERT @TP VALUES
+    (N'TP1012',N'Tôm',N'DVT001',500),
+    (N'TP1013',N'Phô mai mozzarella',N'DVT001',500),
+    (N'TP1014',N'Bắp ngọt',N'DVT001',200),
+    (N'TP1015',N'Rong biển',N'DVT001',5),
+    (N'TP1016',N'Mùi tây khô',N'DVT014',1),
+    (N'TP1017',N'Bơ lạt',N'DVT001',40),
+    (N'TP1018',N'Tỏi băm',N'DVT006',1),
+    (N'TP1019',N'Ớt bột',N'DVT007',0.5),
+    (N'TP1020',N'Muối/Tiêu xay',N'DVT014',1);
+
+    INSERT dbo.ThanhPhanCongThuc
+    (MaThanhPhan,MaCongThuc,MaNguyenLieu,MaDonVi,SoLuong)
+    SELECT
+        tp.MaThanhPhan,
+        @MaCongThuc,
+        nl.MaNguyenLieu,
+        tp.MaDonVi,
+        tp.SoLuong
+    FROM @TP tp
+    JOIN dbo.NguyenLieu nl
+        ON nl.TenNguyenLieu=tp.TenNguyenLieu;
+
+    INSERT dbo.BuocCheBien
+    (MaBuoc,MaCongThuc,ThuTu,NoiDung,ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB91001',
+        @MaCongThuc,
+        1,
+        N'~ Sơ chế tôm ~
+
+Tôm mua về bạn dùng kéo cắt đầu tôm, lột sạch vỏ rồi từ từ rút phần chỉ màu đen và nặn hết chất thải bên trong đầu tôm ra ngoài.
+
+Sau đó, rửa với nước muối loãng rồi rửa lại với nước sạch, vớt ra và để ráo.',
+        10
+    ),
+    (
+        N'BCB91002',
+        @MaCongThuc,
+        2,
+        N'~ Làm tôm sốt phô mai ~
+
+Bắc chảo lên bếp, vặn lửa vừa, sau đó cho bơ lạt vào đảo đều đến khi bơ tan chảy thì cho 1 muỗng canh tỏi băm vào phi thơm.
+
+Sau khi tỏi vàng thơm thì bạn cho phần tôm đã sơ chế vào chảo, cho thêm 1 muỗng cà phê muối cùng 1/2 muỗng cà phê ớt bột.
+
+Xào khoảng 2 - 3 phút cho đến khi tôm có màu cam thì cho tiếp 200gr bắp ngọt vào đảo đều thêm khoảng 1 - 2 phút nữa.
+
+Kế tiếp, rắc đều phô mai vào chảo, đậy nắp lại và nấu từ 3 - 5 phút đến khi phô mai tan hết ra thì tắt bếp.',
+        15
+    ),
+    (
+        N'BCB91003',
+        @MaCongThuc,
+        3,
+        N'~ Hoàn thành ~
+
+Bạn rắc vào chảo thêm 1 ít mùi tây khô, 1 ít tiêu xay cùng 5gr rong biển là món ăn hoàn thành rồi.',
+        5
+    ),
+    (
+        N'BCB91004',
+        @MaCongThuc,
+        4,
+        N'~ Thành phẩm ~
+
+Tôm sốt phô mai thơm ngon, hấp dẫn với vị ngọt tươi và mềm thơm của tôm quyện cùng vị béo bùi của phô mai, xen lẫn 1 chút vị ngọt của bắp và mùi thơm của tỏi phi.
+
+Đây sẽ là một món ăn vặt cực kì thích hợp cho một buổi chiều tán gẫu cùng bạn bè, thử trổ tài ngay nhé!',
+        NULL
+    );
+
+    INSERT dbo.DoanPhimHuongDan
+    (MaDoanPhim,MaCongThuc,TieuDe,DuongDan,MoTa)
+    VALUES
+    (
+        N'DP910',
+        @MaCongThuc,
+        N'Tôm sốt phô mai kéo sợi',
+        N'https://www.youtube.com/watch?v=NthHSYjo7Og',
+        N'Video hướng dẫn cách làm tôm sốt phô mai.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo=1
+    WHERE MaCongThuc=@MaCongThuc;
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm món Tôm sốt phô mai thành công.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE()<>0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    SELECT @MaDanhMuc = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món xào';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51120, N'Không tìm thấy danh mục Món xào.', 1;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM dbo.MonAn
+        WHERE MaMonAn = N'MA910'
+    )
+        THROW 51121, N'Không tìm thấy món ăn MA910.', 1;
+
+    UPDATE dbo.MonAn
+    SET
+        MaDanhMuc = @MaDanhMuc,
+        MoTa = N'Các món xào từ phô mai luôn thu hút sự chú ý của giới trẻ và được nhiều bạn yêu thích.  '
+    WHERE MaMonAn = N'MA910';
+
+    UPDATE dbo.CongThuc
+    SET MoTa = N'Các món xào từ phô mai luôn thu hút sự chú ý của giới trẻ và được nhiều bạn yêu thích.  '
+    WHERE MaCongThuc = N'CT910';
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã cập nhật danh mục và mô tả món Tôm sốt phô mai thành công.';
+
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20)=N'MA911';
+    DECLARE @MaCongThuc NVARCHAR(20)=N'CT911';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn=@MaMonAn)
+        THROW 51120,N'Mã món MA911 đã tồn tại.',1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc=@MaCongThuc)
+        THROW 51121,N'Mã công thức CT911 đã tồn tại.',1;
+
+    SELECT @MaDanhMuc=MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc=N'Món xào';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51122,N'Không tìm thấy danh mục Món xào.',1;
+
+    DECLARE @NL TABLE
+    (
+        MaNguyenLieu NVARCHAR(20),
+        TenNguyenLieu NVARCHAR(150),
+        MoTa NVARCHAR(500)
+    );
+
+    INSERT @NL VALUES
+    (N'NL1021',N'Cà tím',N'Cà tím.'),
+    (N'NL1022',N'Ớt',N'Ớt.'),
+    (N'NL1023',N'Tỏi',N'Tỏi.'),
+    (N'NL1024',N'Hành lá',N'Hành lá.'),
+    (N'NL1025',N'Dầu hào',N'Dầu hào.'),
+    (N'NL1026',N'Dầu ăn',N'Dầu ăn.'),
+    (N'NL1027',N'Gia vị thông dụng (muối/đường/hạt nêm/tiêu xay)',N'Muối/đường/hạt nêm/tiêu xay.');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu,TenNguyenLieu,MoTa)
+    SELECT n.MaNguyenLieu,n.TenNguyenLieu,n.MoTa
+    FROM @NL n
+    WHERE NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.NguyenLieu x
+        WHERE x.TenNguyenLieu=n.TenNguyenLieu
+    );
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn,MaDanhMuc,TenMonAn,MoTa,
+        ThoiGianCheBien,ThoiGianChuanBi,DoKho,DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Cà tím xào tỏi ớt',
+        N'Cà tím là nguyên liệu được sử dụng để làm thành nhiều món ăn ngon, vừa thanh đạm vừa nhiều khoáng chất tốt cho sức khỏe.',
+        20,
+        10,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT dbo.CongThuc
+    (MaCongThuc,MaMonAn,MoTa,SoKhauPhanChuan,DaCongBo)
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Cà tím là nguyên liệu được sử dụng để làm thành nhiều món ăn ngon, vừa thanh đạm vừa nhiều khoáng chất tốt cho sức khỏe.',
+        4,
+        0
+    );
+
+    DECLARE @TP TABLE
+    (
+        MaThanhPhan NVARCHAR(20),
+        TenNguyenLieu NVARCHAR(150),
+        MaDonVi NVARCHAR(20),
+        SoLuong DECIMAL(12,3)
+    );
+
+    INSERT @TP VALUES
+    (N'TP1021',N'Cà tím',N'DVT005',2),
+    (N'TP1022',N'Ớt',N'DVT005',2),
+    (N'TP1023',N'Tỏi',N'DVT012',4),
+    (N'TP1024',N'Hành lá',N'DVT011',4),
+    (N'TP1025',N'Dầu hào',N'DVT006',2),
+    (N'TP1026',N'Dầu ăn',N'DVT006',2),
+    (N'TP1027',N'Gia vị thông dụng (muối/đường/hạt nêm/tiêu xay)',N'DVT014',1);
+
+    INSERT dbo.ThanhPhanCongThuc
+    (MaThanhPhan,MaCongThuc,MaNguyenLieu,MaDonVi,SoLuong)
+    SELECT
+        tp.MaThanhPhan,
+        @MaCongThuc,
+        nl.MaNguyenLieu,
+        tp.MaDonVi,
+        tp.SoLuong
+    FROM @TP tp
+    JOIN dbo.NguyenLieu nl
+        ON nl.TenNguyenLieu=tp.TenNguyenLieu;
+
+    INSERT dbo.BuocCheBien
+    (MaBuoc,MaCongThuc,ThuTu,NoiDung,ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB91101',
+        @MaCongThuc,
+        1,
+        N'~ Sơ chế nguyên liệu ~
+
+Cà tím bạn rửa sạch, cắt thành từng miếng vừa ăn có độ dày khoảng 1/2 lóng tay.
+
+Để cà không bị thâm đen thì sau khi cắt xong, bạn đem cà ngâm vào nước muối pha loãng khoảng 15 phút rồi vớt ra để ráo.
+
+Hành lá bạn bỏ rễ và lá héo, rửa sạch, để ráo rồi cắt nhỏ. Tỏi bạn bóc bỏ vỏ, băm nhỏ.
+
+Ớt bạn cắt bỏ cuống, rửa sạch, băm nhỏ.',
+        15
+    ),
+    (
+        N'BCB91102',
+        @MaCongThuc,
+        2,
+        N'~ Trụng cà tím ~
+
+Bắc nồi lên bếp mở lửa vừa, thêm 500ml nước cùng 1 muỗng canh muối nấu sôi.
+
+Khi nước sôi bạn cho cà tím vào trụng khoảng 2 phút rồi vớt ra để ráo.',
+        5
+    ),
+    (
+        N'BCB91103',
+        @MaCongThuc,
+        3,
+        N'~ Xào cà tím ~
+
+Bắc chảo lên bếp mở lửa vừa, cho vào chảo 2 muỗng canh dầu ăn. Dầu nóng thì bạn cho tỏi băm, ớt băm vào phi vàng thơm.
+
+Khi tỏi đã thơm, bạn thêm 2 muỗng canh dầu hào, 1 muỗng canh đường, 1 muỗng canh hạt nêm, 2 muỗng canh nước lọc vào, bạn đảo đều rồi cho cà tím vào đảo thêm 2 phút.
+
+Cuối cùng bạn nêm nếm lại gia vị cho vừa ăn, thêm hành lá vào và tắt bếp. Bày món ăn ra dĩa, rắc thêm tiêu xay cho dậy mùi thơm là có thể thưởng thức ngay.',
+        15
+    ),
+    (
+        N'BCB91104',
+        @MaCongThuc,
+        4,
+        N'~ Thành phẩm ~
+
+Cà tím xào tỏi ớt sau khi hoàn thành có màu sắc bắt mắt và dậy mùi thơm hấp dẫn.
+
+Cà tím mềm, ngọt quyện cùng tỏi ớt thơm thơm, cay cay sẽ làm siêu lòng bất cứ ai ngay từ lần đầu thưởng thức.
+
+Món ăn dân dã này chính là sự lựa chọn tuyệt vời giúp bạn đổi mới cho bữa cơm đấy!',
+        NULL
+    );
+
+    INSERT dbo.DoanPhimHuongDan
+    (MaDoanPhim,MaCongThuc,TieuDe,DuongDan,MoTa)
+    VALUES
+    (
+        N'DP911',
+        @MaCongThuc,
+        N'Cách làm cà tím xào tỏi ớt thơm ngon cực đưa cơm đơn giản tại nhà',
+        N'https://www.youtube.com/watch?v=7R5Wvo5uDJ4',
+        N'Video hướng dẫn cách làm cà tím xào tỏi ớt.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo=1
+    WHERE MaCongThuc=@MaCongThuc;
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm món Cà tím xào tỏi ớt thành công.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE()<>0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20)=N'MA912';
+    DECLARE @MaCongThuc NVARCHAR(20)=N'CT912';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn=@MaMonAn)
+        THROW 51130,N'Mã món MA912 đã tồn tại.',1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc=@MaCongThuc)
+        THROW 51131,N'Mã công thức CT912 đã tồn tại.',1;
+
+    SELECT @MaDanhMuc=MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc=N'Món xào';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51132,N'Không tìm thấy danh mục Món xào.',1;
+
+    DECLARE @NL TABLE
+    (
+        MaNguyenLieu NVARCHAR(20),
+        TenNguyenLieu NVARCHAR(150),
+        MoTa NVARCHAR(500)
+    );
+
+    INSERT @NL VALUES
+    (N'NL1028',N'Ốc móng tay',N'Ốc móng tay.'),
+    (N'NL1029',N'Tỏi',N'Tỏi.'),
+    (N'NL1030',N'Ớt',N'Ớt.'),
+    (N'NL1031',N'Gừng',N'Gừng.'),
+    (N'NL1032',N'Bơ lạt',N'Bơ lạt.'),
+    (N'NL1033',N'Dầu hào',N'Dầu hào.'),
+    (N'NL1034',N'Tương ớt',N'Tương ớt.'),
+    (N'NL1035',N'Dầu ăn',N'Dầu ăn.'),
+    (N'NL1036',N'Gia vị thông dụng (muối/đường/hạt nêm)',N'Muối/đường/hạt nêm.');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu,TenNguyenLieu,MoTa)
+    SELECT n.MaNguyenLieu,n.TenNguyenLieu,n.MoTa
+    FROM @NL n
+    WHERE NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.NguyenLieu x
+        WHERE x.TenNguyenLieu=n.TenNguyenLieu
+    );
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn,MaDanhMuc,TenMonAn,MoTa,
+        ThoiGianCheBien,ThoiGianChuanBi,DoKho,DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Ốc móng tay xào bơ tỏi',
+        N'Ốc móng tay là loại hải sản rất được ưa chuộng bởi độ ngọt thịt, thơm ngon, bổ dưỡng và có thể chế biến thành nhiều món ăn khác nhau.',
+        15,
+        15,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT dbo.CongThuc
+    (MaCongThuc,MaMonAn,MoTa,SoKhauPhanChuan,DaCongBo)
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Ốc móng tay là loại hải sản rất được ưa chuộng bởi độ ngọt thịt, thơm ngon, bổ dưỡng và có thể chế biến thành nhiều món ăn khác nhau.',
+        4,
+        0
+    );
+
+    DECLARE @TP TABLE
+    (
+        MaThanhPhan NVARCHAR(20),
+        TenNguyenLieu NVARCHAR(150),
+        MaDonVi NVARCHAR(20),
+        SoLuong DECIMAL(12,3)
+    );
+
+    INSERT @TP VALUES
+    (N'TP1028',N'Ốc móng tay',N'DVT001',400),
+    (N'TP1029',N'Tỏi',N'DVT010',1),
+    (N'TP1030',N'Ớt',N'DVT005',3),
+    (N'TP1031',N'Gừng',N'DVT010',0.5),
+    (N'TP1032',N'Bơ lạt',N'DVT006',3),
+    (N'TP1033',N'Dầu hào',N'DVT006',2),
+    (N'TP1034',N'Tương ớt',N'DVT006',2),
+    (N'TP1035',N'Dầu ăn',N'DVT006',2),
+    (N'TP1036',N'Gia vị thông dụng (muối/đường/hạt nêm)',N'DVT014',1);
+
+    INSERT dbo.ThanhPhanCongThuc
+    (MaThanhPhan,MaCongThuc,MaNguyenLieu,MaDonVi,SoLuong)
+    SELECT
+        tp.MaThanhPhan,
+        @MaCongThuc,
+        nl.MaNguyenLieu,
+        tp.MaDonVi,
+        tp.SoLuong
+    FROM @TP tp
+    JOIN dbo.NguyenLieu nl
+        ON nl.TenNguyenLieu=tp.TenNguyenLieu;
+
+    INSERT dbo.BuocCheBien
+    (MaBuoc,MaCongThuc,ThuTu,NoiDung,ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB91201',
+        @MaCongThuc,
+        1,
+        N'~ Sơ chế ốc móng tay và các nguyên liệu khác ~
+
+Để làm sạch cát và khử đi mùi tanh của ốc móng tay, bạn ngâm ốc trong nước muối pha loãng với 2 quả ớt cắt khúc từ 1 - 2 tiếng.
+
+Sau đó dùng dao cắt một đường thẳng ở thân ốc, lấy phần ruột ốc ra rồi rửa lại 2 - 3 lần với nước sạch.
+
+Tỏi bạn bóc bỏ vỏ, băm nhỏ. 1 quả ớt còn lại băm nhỏ. Gừng rửa sạch, cạo bớt vỏ, cắt lát.
+
+Lưu ý: Cách sơ chế ốc móng tay sạch cát
+
+- Cách 1: Ngâm ốc móng tay trong nước sạch 7 tiếng, cách 2 tiếng thay nước 1 lần.
+- Cách 2: Ngâm ốc với nước vo gạo, cho thêm 2 trái ớt cắt lát hoặc đập dập vào, ngâm khoảng 1 - 2 tiếng thì vớt ra. Cắt thân ốc và lấy ruột ốc đi, rửa 2 lần với nước rồi để ráo.',
+        15
+    ),
+    (
+        N'BCB91202',
+        @MaCongThuc,
+        2,
+        N'~ Luộc ốc móng tay ~
+
+Bắc nồi lên bếp mở lửa vừa, thêm 1 lít nước, gừng cắt lát vào đun sôi.
+
+Khi nước bắt đầu sôi, bạn cho ốc móng tay vào luộc sơ khoảng 3 phút rồi vớt ốc ra, để ráo nước.',
+        5
+    ),
+    (
+        N'BCB91203',
+        @MaCongThuc,
+        3,
+        N'~ Xào ốc móng tay ~
+
+Bắc chảo lên bếp mở lửa vừa, cho 2 muỗng canh dầu ăn vào đun nóng, sau đó cho tỏi băm, ớt băm vào phi thơm.
+
+Khi tỏi đã vàng đều và dậy mùi, bạn thêm 3 muỗng canh bơ lạt, đun chảy.
+
+Nêm gia vị với 2 muỗng cà phê đường, 1 muỗng cà phê hạt nêm, 2 muỗng canh dầu hào, 2 muỗng canh tương ớt.
+
+Khuấy đều tay cho gia vị tan hoàn toàn và phần nước sốt sánh lại.
+
+Trút toàn bộ phần ốc móng tay vào chảo, xào ở lửa vừa khoảng 2 phút nữa cho ốc ngấm gia vị, nêm nếm cho vừa ăn rồi tắt bếp.
+
+Lưu ý: Không nên xào ốc móng tay quá lâu sẽ khiến ốc bị ra nước, teo lại và không còn ngon nữa.',
+        15
+    ),
+    (
+        N'BCB91204',
+        @MaCongThuc,
+        4,
+        N'~ Thành phẩm ~
+
+Món ốc móng tay xào bơ tỏi ớt sau khi hoàn thành có mùi thơm cực cuốn hút.
+
+Ốc dai giòn, ngọt thịt quyệt cùng với sốt bơ tỏi thơm nức, đậm đà, cay cay đầy cuốn hút.
+
+Món này ăn cùng với cơm nóng, mì xào hoặc bánh mì và một ít muối tiêu chanh sẽ vô cùng tuyệt vời đấy.',
+        NULL
+    );
+
+    INSERT dbo.DoanPhimHuongDan
+    (MaDoanPhim,MaCongThuc,TieuDe,DuongDan,MoTa)
+    VALUES
+    (
+        N'DP912',
+        @MaCongThuc,
+        N'Cách làm ốc móng tay xào bơ tỏi ngon miệng thơm lừng cực hấp dẫn',
+        N'https://www.youtube.com/watch?v=wYbyPXzmxp8',
+        N'Video hướng dẫn cách làm ốc móng tay xào bơ tỏi.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo=1
+    WHERE MaCongThuc=@MaCongThuc;
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm món Ốc móng tay xào bơ tỏi thành công.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE()<>0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20) = N'MA920';
+    DECLARE @MaCongThuc NVARCHAR(20) = N'CT920';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    SELECT @MaDanhMuc = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món hấp';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51001, N'Không tìm thấy danh mục Món hấp.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = @MaMonAn)
+        THROW 51002, N'Mã món MA920 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc = @MaCongThuc)
+        THROW 51003, N'Mã công thức CT920 đã tồn tại.', 1;
+
+    IF COL_LENGTH(N'dbo.MonAn', N'ThoiGianChuanBi') IS NULL
+        ALTER TABLE dbo.MonAn ADD ThoiGianChuanBi INT NULL;
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi = N'DVT014')
+        INSERT dbo.DonViTinh (MaDonVi, TenDonVi, KyHieu, HeSoGramChuan)
+        VALUES (N'DVT014', N'Ít', N'ít', NULL);
+
+    DECLARE @NguyenLieuMoi TABLE
+    (
+        MaNguyenLieu NVARCHAR(20) PRIMARY KEY,
+        TenNguyenLieu NVARCHAR(150) NOT NULL,
+        MoTa NVARCHAR(500) NULL
+    );
+
+    INSERT INTO @NguyenLieuMoi (MaNguyenLieu, TenNguyenLieu, MoTa)
+    VALUES
+    (N'NL1101', N'Gà', N'Gà nguyên con đã làm sạch, lấy nội tạng.'),
+    (N'NL1102', N'Gừng', N'Gừng tươi.'),
+    (N'NL1103', N'Ớt', N'Ớt tươi.'),
+    (N'NL1104', N'Sả', N'Sả tươi.'),
+    (N'NL1105', N'Hành tím', N'Hành tím.'),
+    (N'NL1106', N'Tỏi', N'Tỏi.'),
+    (N'NL1107', N'Lá chanh', N'Lá chanh tươi.'),
+    (N'NL1108', N'Chanh', N'Chanh tươi.'),
+    (N'NL1109', N'Bột nghệ', N'Bột nghệ.'),
+    (N'NL1110', N'Bột tỏi', N'Bột tỏi.'),
+    (N'NL1111', N'Nước mắm', N'Nước mắm.'),
+    (N'NL1112', N'Muối hột', N'Muối hột.'),
+    (N'NL1113', N'Gia vị thông dụng (Muối/ đường/ hạt nêm/ tiêu xay)', N'Muối, đường, hạt nêm và tiêu xay.'),
+    (N'NL1114', N'Sữa đặc', N'Sữa đặc dùng pha nước chấm.');
+
+    IF EXISTS
+    (
+        SELECT 1
+        FROM @NguyenLieuMoi m
+        INNER JOIN dbo.NguyenLieu nl ON nl.MaNguyenLieu = m.MaNguyenLieu
+        WHERE nl.TenNguyenLieu <> m.TenNguyenLieu
+    )
+        THROW 51004, N'Một mã nguyên liệu mới đã được dùng cho nguyên liệu khác.', 1;
+
+    INSERT INTO dbo.NguyenLieu (MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT m.MaNguyenLieu, m.TenNguyenLieu, m.MoTa
+    FROM @NguyenLieuMoi m
+    WHERE NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.NguyenLieu nl
+        WHERE nl.TenNguyenLieu = m.TenNguyenLieu
+    );
+
+    INSERT INTO dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        ThoiGianChuanBi,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Gà hấp muối sả',
+        N'Thịt gà thường được sử dụng để chế biến nhiều món ăn ngon.',
+        30,
+        10,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT INTO dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DaCongBo
+    )
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Gà hấp muối sả thơm mềm, dùng kèm nước chấm chua cay.',
+        4,
+        0
+    );
+
+    DECLARE @ThanhPhan TABLE
+    (
+        MaThanhPhan NVARCHAR(20) PRIMARY KEY,
+        TenNguyenLieu NVARCHAR(150) NOT NULL,
+        MaDonVi NVARCHAR(20) NOT NULL,
+        SoLuong DECIMAL(12,3) NOT NULL
+    );
+
+    INSERT INTO @ThanhPhan
+    VALUES
+    (N'TP1101', N'Gà', N'DVT005', 1),
+    (N'TP1102', N'Gừng', N'DVT011', 1),
+    (N'TP1103', N'Ớt', N'DVT005', 1),
+    (N'TP1104', N'Sả', N'DVT011', 8),
+    (N'TP1105', N'Hành tím', N'DVT010', 2),
+    (N'TP1106', N'Tỏi', N'DVT012', 3),
+    (N'TP1107', N'Lá chanh', N'DVT013', 10),
+    (N'TP1108', N'Chanh', N'DVT005', 0.5),
+    (N'TP1109', N'Bột nghệ', N'DVT007', 1),
+    (N'TP1110', N'Bột tỏi', N'DVT006', 1),
+    (N'TP1111', N'Nước mắm', N'DVT006', 1),
+    (N'TP1112', N'Muối hột', N'DVT001', 500),
+    (N'TP1113', N'Gia vị thông dụng (Muối/ đường/ hạt nêm/ tiêu xay)', N'DVT014', 1),
+    (N'TP1114', N'Sữa đặc', N'DVT006', 1);
+
+    IF EXISTS
+    (
+        SELECT 1
+        FROM @ThanhPhan tp
+        LEFT JOIN dbo.NguyenLieu nl ON nl.TenNguyenLieu = tp.TenNguyenLieu
+        LEFT JOIN dbo.DonViTinh dv ON dv.MaDonVi = tp.MaDonVi
+        WHERE nl.MaNguyenLieu IS NULL OR dv.MaDonVi IS NULL
+    )
+        THROW 51005, N'Không tìm thấy nguyên liệu hoặc đơn vị tính cho công thức.', 1;
+
+    INSERT INTO dbo.ThanhPhanCongThuc
+    (
+        MaThanhPhan,
+        MaCongThuc,
+        MaNguyenLieu,
+        MaDonVi,
+        SoLuong
+    )
+    SELECT
+        tp.MaThanhPhan,
+        @MaCongThuc,
+        nl.MaNguyenLieu,
+        tp.MaDonVi,
+        tp.SoLuong
+    FROM @ThanhPhan tp
+    INNER JOIN dbo.NguyenLieu nl
+        ON nl.TenNguyenLieu = tp.TenNguyenLieu;
+
+    INSERT INTO dbo.BuocCheBien
+    (
+        MaBuoc,
+        MaCongThuc,
+        ThuTu,
+        NoiDung,
+        ThoiGianThucHien
+    )
+    VALUES
+    (
+        N'BCB92001',
+        @MaCongThuc,
+        1,
+        N'~ Sơ chế nguyên liệu ~
+
+Gà nguyên con đã được làm sạch và lấy nội tạng ra, bạn rửa qua nước muối pha loãng, sau đó rửa sạch lại với nước, rồi để ráo.
+
+Lưu ý: Cách khử mùi hôi thịt gà hiệu quả:
+- Cách 1: Chà xát thịt gà với hỗn hợp muối và giấm theo tỉ lệ 2:1 khoảng 5 phút, sau đó rửa lại với vài lần nước sạch.
+- Cách 2: Bạn cũng có thể thay thế giấm bằng chanh, bạn chỉ cần chà xát vài lát chanh với 1 ít muối lên thịt gà, sau đó rửa lại với nước sạch là được.
+- Cách 3: Đập dập 1 củ gừng và hòa với 1 ít rượu trắng, chà xát hỗn hợp rượu gừng này lên thịt gà rồi để yên khoảng 30 phút trước khi chế biến nhé.
+
+Bạn mang sả đi rửa sạch, đập dập rồi cắt khúc. Gừng bạn cạo bỏ vỏ, rồi cắt lát.
+
+Lá chanh bạn rửa sạch, lấy 1 lá cắt nhỏ. Ớt bạn rửa sạch, bỏ cuống. Hành tím, tỏi bạn lột bỏ vỏ.',
+        10
+    ),
+    (
+        N'BCB92002',
+        @MaCongThuc,
+        2,
+        N'~ Ướp gà ~
+
+Bạn trộn đều hỗn hợp gồm: 1 muỗng cà phê bột nghệ, 1 muỗng canh bột tỏi, 1 muỗng canh đường, 1 muỗng canh hạt nêm, 1 muỗng canh nước mắm, 1 muỗng canh muối rồi xoa khắp con gà.
+
+Bạn nhét 1/2 phần gừng, hành tím, tỏi, 3 nhánh sả đập dập vào trong bụng gà.',
+        5
+    ),
+    (
+        N'BCB92003',
+        @MaCongThuc,
+        3,
+        N'~ Hấp gà ~
+
+Bạn chuẩn bị 1 cái nồi to, lót giấy bạc, trải 500gr muối hột, 10 lá chanh, 5 nhánh sả, phần gừng còn lại vào, đặt con gà lên trên rồi cuộn giấy bạc lại.
+
+Đặt nồi lên bếp hấp trên lửa nhỏ khoảng 45 phút cho gà chín đều.
+
+Bạn pha nước chấm với công thức: cho vào chén 1 trái ớt, 1 muỗng canh muối, 1 muỗng canh đường, bạn giã nhuyễn rồi thêm 1 muỗng canh sữa đặc, 1 muỗng cà phê tiêu, vắt lấy cốt 1/2 quả chanh, trộn đều hỗn hợp.
+
+Sau đó cho vào 1 lá chanh cắt nhỏ, nêm nếm cho vừa ăn là hoàn thành rồi!',
+        45
+    ),
+    (
+        N'BCB92004',
+        @MaCongThuc,
+        4,
+        N'~ Thành phẩm ~
+
+Gà hấp muối sả khi hoàn thành màu rất hấp dẫn, mùi thơm nức của sả và lá chanh cực mê mẩn. Thịt gà mềm thơm, thấm gia vị, chấm kèm nước chấm chua cay vô cùng ngon.
+
+Món ăn sẽ ngon hơn khi ăn nóng, chắc chắn sẽ làm cả nhà bạn tấm tắc khen ngon bạn nha!',
+        5
+    );
+
+    INSERT INTO dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim,
+        MaCongThuc,
+        TieuDe,
+        DuongDan,
+        MoTa
+    )
+    VALUES
+    (
+        N'DP920',
+        @MaCongThuc,
+        N'Gà hấp muối sả',
+        N'https://www.youtube.com/watch?v=Qx9WNVPmjt0',
+        N'Video hướng dẫn làm gà hấp muối sả.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = @MaCongThuc;
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20)=N'MA913';
+    DECLARE @MaCongThuc NVARCHAR(20)=N'CT913';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn=@MaMonAn)
+        THROW 51140,N'Mã món MA913 đã tồn tại.',1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc=@MaCongThuc)
+        THROW 51141,N'Mã công thức CT913 đã tồn tại.',1;
+
+    SELECT @MaDanhMuc=MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc=N'Món kho';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51142,N'Không tìm thấy danh mục Món kho.',1;
+
+    DECLARE @NL TABLE
+    (
+        MaNguyenLieu NVARCHAR(20),
+        TenNguyenLieu NVARCHAR(150),
+        MoTa NVARCHAR(500)
+    );
+
+    INSERT @NL VALUES
+    (N'NL1037',N'Cá lóc (khoảng 500gr)',N'Cá lóc khoảng 500gr.'),
+    (N'NL1038',N'Thịt heo xay',N'Thịt heo xay.'),
+    (N'NL1039',N'Nước dừa',N'Nước dừa tươi.');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu,TenNguyenLieu,MoTa)
+    SELECT n.MaNguyenLieu,n.TenNguyenLieu,n.MoTa
+    FROM @NL n
+    WHERE NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.NguyenLieu x
+        WHERE x.TenNguyenLieu=n.TenNguyenLieu
+    );
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn,MaDanhMuc,TenMonAn,MoTa,
+        ThoiGianCheBien,ThoiGianChuanBi,DoKho,DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Cá lóc kho tộ',
+        N'Trời bắt đầu se lạnh, bữa ăn gia đình với chén cơm nóng hổi, miếng cá kho thơm nồng thì không còn gì sánh nổi.',
+        20,
+        20,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT dbo.CongThuc
+    (MaCongThuc,MaMonAn,MoTa,SoKhauPhanChuan,DaCongBo)
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Trời bắt đầu se lạnh, bữa ăn gia đình với chén cơm nóng hổi, miếng cá kho thơm nồng thì không còn gì sánh nổi.',
+        2,
+        0
+    );
+
+    INSERT dbo.ThanhPhanCongThuc
+    (MaThanhPhan,MaCongThuc,MaNguyenLieu,MaDonVi,SoLuong)
+    SELECT N'TP1037',@MaCongThuc,MaNguyenLieu,N'DVT005',1
+    FROM dbo.NguyenLieu
+    WHERE TenNguyenLieu=N'Cá lóc (khoảng 500gr)';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP1038',@MaCongThuc,MaNguyenLieu,N'DVT001',50
+    FROM dbo.NguyenLieu
+    WHERE TenNguyenLieu=N'Thịt heo xay';
+
+    INSERT dbo.ThanhPhanCongThuc
+    SELECT N'TP1039',@MaCongThuc,MaNguyenLieu,N'DVT005',1
+    FROM dbo.NguyenLieu
+    WHERE TenNguyenLieu=N'Nước dừa';
+
+    INSERT dbo.BuocCheBien
+    (MaBuoc,MaCongThuc,ThuTu,NoiDung,ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB91301',
+        @MaCongThuc,
+        1,
+        N'~ Sơ chế cá lóc ~
+
+Cá lóc đem rửa sạch, làm thịt, bỏ mang, cắt khúc vừa ăn, để ráo nước.',
+        10
+    ),
+    (
+        N'BCB91302',
+        @MaCongThuc,
+        2,
+        N'~ Ướp cá ~
+
+Phần đầu hành lá băm nhuyễn, trộn đều với 2 thìa nước mắm, 1 thìa nước màu, 1 thìa nhỏ tiêu xay, 1 thìa nhỏ hạt nêm sau đó ướp đều hỗn hợp lên cá trong 30 phút.',
+        30
+    ),
+    (
+        N'BCB91303',
+        @MaCongThuc,
+        3,
+        N'~ Kho cá ~
+
+Bắc nồi đất lên bếp cho nóng, phi một ít tỏi băm, hành phi với dầu ăn cho vàng, thơm.
+
+Cho thịt heo xay vào đảo đều, đến khi vàng đều thì cho cá đã ướp + phần nước ướp cá + nước dừa tươi vào đun lửa vừa.
+
+Đến khi nước cạn còn 1/2 thì giảm lửa nhỏ nhất, nêm nếm lại gia vị cho vừa ăn, đun liu riu đến khi nước trong nồi sệt lại, thịt cá săn chắc là được.',
+        20
+    ),
+    (
+        N'BCB91304',
+        @MaCongThuc,
+        4,
+        N'~ Thành phẩm ~
+
+Thịt cá chín đều có màu vàng sậm, săn chắc, dậy mùi thơm nồng. Bạn có thể dùng thêm ớt hiểm, hành lá để trang trí cho bắt mắt hoặc để ăn kèm.
+
+Món cá lóc kho tộ ăn nóng với cơm rất ngon, chắc chắn sẽ mang lại cho bạn bữa cơm đầm ấm bên gia đình. Chúc bạn thành công!',
+        NULL
+    );
+
+    INSERT dbo.DoanPhimHuongDan
+    (MaDoanPhim,MaCongThuc,TieuDe,DuongDan,MoTa)
+    VALUES
+    (
+        N'DP913',
+        @MaCongThuc,
+        N'Cách làm món cá lóc kho tộ cực dễ, thơm ngon đậm đà đưa cơm',
+        N'https://www.youtube.com/watch?v=A5IZaiJJs_Q',
+        N'Video hướng dẫn cách làm cá lóc kho tộ.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo=1
+    WHERE MaCongThuc=@MaCongThuc;
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm món Cá lóc kho tộ thành công.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE()<>0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+SET XACT_ABORT ON;
+
+BEGIN TRY
+BEGIN TRANSACTION;
+
+DECLARE @Mon NVARCHAR(20)=N'MA914', @CT NVARCHAR(20)=N'CT914';
+DECLARE @DM NVARCHAR(20);
+
+SELECT @DM=MaDanhMuc
+FROM dbo.DanhMucMonAn
+WHERE TenDanhMuc=N'Món kho';
+
+IF @DM IS NULL THROW 51150,N'Không tìm thấy danh mục Món kho.',1;
+IF EXISTS(SELECT 1 FROM dbo.MonAn WHERE MaMonAn=@Mon)
+    THROW 51151,N'Mã MA914 đã tồn tại.',1;
+
+DECLARE @NL TABLE(Ma NVARCHAR(20),Ten NVARCHAR(150),MoTa NVARCHAR(300));
+INSERT @NL VALUES
+(N'NL1040',N'Sườn heo',N'Sườn heo.'),
+(N'NL1041',N'Thơm (dứa)',N'Thơm (dứa).'),
+(N'NL1042',N'Hành tím',N'Hành tím.'),
+(N'NL1043',N'Tỏi',N'Tỏi.'),
+(N'NL1044',N'Ớt',N'Ớt.'),
+(N'NL1045',N'Hành lá',N'Hành lá.'),
+(N'NL1046',N'Nước mắm',N'Nước mắm.'),
+(N'NL1047',N'Dầu ăn',N'Dầu ăn.'),
+(N'NL1048',N'Gia vị thông dụng (muối/đường/hạt nêm/tiêu)',N'Muối/đường/hạt nêm/tiêu.');
+
+INSERT dbo.NguyenLieu(MaNguyenLieu,TenNguyenLieu,MoTa)
+SELECT Ma,Ten,MoTa FROM @NL n
+WHERE NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu x WHERE x.TenNguyenLieu=n.Ten);
+
+INSERT dbo.MonAn
+(MaMonAn,MaDanhMuc,TenMonAn,MoTa,ThoiGianCheBien,ThoiGianChuanBi,DoKho,DuongDanAnh)
+VALUES
+(@Mon,@DM,N'Sườn kho thơm (dứa)',
+ N'Sự kết hợp độc đáo từ vị chua ngọt của thơm (dứa) và vị béo của sườn non sẽ tạo nên một món kho thơm ngon, kích thích vị giác.',
+ 35,10,N'Dễ',NULL);
+
+INSERT dbo.CongThuc(MaCongThuc,MaMonAn,MoTa,SoKhauPhanChuan,DaCongBo)
+VALUES(@CT,@Mon,N'Sườn kho thơm (dứa).',4,0);
+
+DECLARE @TP TABLE(Ma NVARCHAR(20),Ten NVARCHAR(150),DVT NVARCHAR(20),SL DECIMAL(12,3));
+INSERT @TP VALUES
+(N'TP1040',N'Sườn heo',N'DVT001',500),
+(N'TP1041',N'Thơm (dứa)',N'DVT005',0.5),
+(N'TP1042',N'Hành tím',N'DVT010',5),
+(N'TP1043',N'Tỏi',N'DVT012',5),
+(N'TP1044',N'Ớt',N'DVT005',6),
+(N'TP1045',N'Hành lá',N'DVT011',2),
+(N'TP1046',N'Nước mắm',N'DVT006',4),
+(N'TP1047',N'Dầu ăn',N'DVT006',3),
+(N'TP1048',N'Gia vị thông dụng (muối/đường/hạt nêm/tiêu)',N'DVT014',1);
+
+INSERT dbo.ThanhPhanCongThuc
+(MaThanhPhan,MaCongThuc,MaNguyenLieu,MaDonVi,SoLuong)
+SELECT tp.Ma,@CT,nl.MaNguyenLieu,tp.DVT,tp.SL
+FROM @TP tp JOIN dbo.NguyenLieu nl ON nl.TenNguyenLieu=tp.Ten;
+
+INSERT dbo.BuocCheBien
+(MaBuoc,MaCongThuc,ThuTu,NoiDung,ThoiGianThucHien)
+VALUES
+(N'BCB91401',@CT,1,N'~ Sơ chế sườn heo ~
+
+Để làm sạch bụi bẩn và khử mùi hôi của sườn heo, sau khi mua về, bạn chặt miếng vừa ăn khoảng 2 lóng tay, mang ngâm với nước muối pha loãng khoảng 5 phút.
+
+Tiếp đó trụng sơ với nước sôi 2 phút, rồi xả sạch lại với nước, để ráo.',10),
+(N'BCB91402',@CT,2,N'~ Sơ chế nguyên liệu khác ~
+
+Hành tím, tỏi bóc bỏ vỏ, đập dập rồi băm nhỏ 1 củ hành tím, 1 tép tỏi.
+
+Tiếp đó cho vào cối giã phần hành tím, tỏi còn lại, thêm 2 quả ớt, 1 muỗng canh hạt nêm, 2 muỗng canh đường, 1/2 muỗng canh muối, giã nhuyễn làm sốt ướp.
+
+Bạn có thể mua thơm đã được gọt sẵn để tiết kiệm thời gian hoặc mua thơm nguyên quả về gọt vỏ, cắt mắt, cắt bỏ cùi và cắt miếng vừa ăn.
+
+Mách nhỏ: gọt thơm (dứa) nhanh không cần cắt mắt
+
+- Đầu tiên bạn cắt quả thơm theo chiều dọc từ trên xuống thành 4 phần bằng nhau.
+- Tiếp tục cắt xuôi theo chiều dài của miếng thơm, rồi dừng lại ở phần cuối của quả và cắt mạnh để lấy phần thịt và bỏ phần vỏ.
+- Không nên cắt quá gần phần vỏ để tránh còn lẫn mắt thơm nhé. Cuối cùng là cắt lại thành từng miếng nhỏ theo nhu cầu sử dụng là được.',15),
+(N'BCB91403',@CT,3,N'~ Ướp sườn ~
+
+Cho phần sốt ướp vào tô sườn. Trộn đều và ướp sườn khoảng 30 - 40 phút cho thấm gia vị.',40),
+(N'BCB91404',@CT,4,N'~ Xào thơm ~
+
+Bắc chảo lên bếp mở lửa vừa, thêm 3 muỗng canh dầu ăn, dầu nóng bạn phi thơm hành tím, tỏi băm nhỏ.
+
+Tiếp đó cho thơm, 1 muỗng canh đường và xào sơ ở lửa nhỏ khoảng 3 phút cho thơm vừa chín tới là được.
+
+Mách nhỏ: Nên xào thơm trước trên chảo giúp rút ngắn thời gian nấu, thơm thấm gia vị và dậy mùi thơm hơn.',5),
+(N'BCB91405',@CT,5,N'~ Kho sườn với dứa (thơm) ~
+
+Khi thơm đã chín tới, bạn vớt thơm ra tô, cho phần thịt sườn vào chảo, đảo đều ở lửa lớn khoảng 5 phút cho sườn săn và chín đều.
+
+Cho 300ml nước lọc vào tô ướp sườn khi này, tráng đều để hòa tan hết phần gia vị còn dư, sau đó đổ vào chảo.
+
+Nấu cho nước sôi trở lại, sau đó hạ nhỏ lửa, đậy nắp và rim thịt khoảng 20 phút cho thịt mềm và ngấm đều gia vị.
+
+Mách nhỏ: Trong quá trình rim, cứ 10 phút bạn nên mở nắp chảo ra và trở mặt thịt một lần để thịt được đều màu và ngấm gia vị.
+
+Sau 20 phút, cho phần thơm và 4 quả ớt vào, đảo đều và kho thêm 2 phút nữa, nêm nếm gia vị cho vừa ăn.
+
+Sau đó cho phần hành lá cắt khúc và ít tiêu lên trên rồi tắt bếp, bày ra dĩa, trang trí lại cho đẹp mắt là hoàn thành.',35),
+(N'BCB91406',@CT,6,N'~ Thành phẩm ~
+
+Sườn kho thơm với màu sắc hấp dẫn, đẹp mắt, thịt sườn đậm đà, vừa mềm vừa dai, kết hợp với vị chua chua, ngọt ngọt của thơm rất phù hợp để ăn cùng với cơm nóng.
+
+Trổ tài vào bếp thực hiện ngay thôi.',NULL);
+
+INSERT dbo.DoanPhimHuongDan
+(MaDoanPhim,MaCongThuc,TieuDe,DuongDan,MoTa)
+VALUES
+(N'DP914',@CT,N'Sườn kho thơm (dứa)',
+ N'https://www.youtube.com/watch?v=6dG85WHnJJo',
+ N'Video hướng dẫn cách làm sườn kho thơm.');
+
+UPDATE dbo.CongThuc SET DaCongBo=1 WHERE MaCongThuc=@CT;
+
+COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+IF XACT_STATE()<>0 ROLLBACK TRANSACTION;
+THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+SET XACT_ABORT ON;
+
+BEGIN TRY
+BEGIN TRANSACTION;
+
+DECLARE @Mon NVARCHAR(20)=N'MA916', @CT NVARCHAR(20)=N'CT916', @DM NVARCHAR(20);
+
+SELECT @DM=MaDanhMuc FROM dbo.DanhMucMonAn WHERE TenDanhMuc=N'Món chiên';
+IF @DM IS NULL THROW 51160,N'Không tìm thấy danh mục Món chiên.',1;
+IF EXISTS(SELECT 1 FROM dbo.MonAn WHERE MaMonAn=@Mon)
+    THROW 51161,N'Mã MA916 đã tồn tại.',1;
+
+DECLARE @NL TABLE(Ma NVARCHAR(20),Ten NVARCHAR(150),MoTa NVARCHAR(300));
+INSERT @NL VALUES
+(N'NL1049',N'Trứng gà',N'Trứng gà.'),
+(N'NL1050',N'Đậu hũ non',N'Đậu hũ non.'),
+(N'NL1051',N'Bột chiên xù',N'Bột chiên xù.'),
+(N'NL1052',N'Bột mì',N'Bột mì.'),
+(N'NL1053',N'Dầu ăn',N'Dầu ăn.');
+
+INSERT dbo.NguyenLieu(MaNguyenLieu,TenNguyenLieu,MoTa)
+SELECT Ma,Ten,MoTa FROM @NL n
+WHERE NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu x WHERE x.TenNguyenLieu=n.Ten);
+
+INSERT dbo.MonAn
+(MaMonAn,MaDanhMuc,TenMonAn,MoTa,ThoiGianCheBien,ThoiGianChuanBi,DoKho,DuongDanAnh)
+VALUES
+(@Mon,@DM,N'Đậu hũ non chiên xù',
+N'Đậu hũ non chiên xù được rất nhiều bạn yêu thích nhờ vẻ ngoài vàng ươm hấp dẫn, giòn rụm và cực kỳ thơm ngon. Món ăn này không chỉ đổi vị cho bữa cơm gia đình mà còn là món ăn vặt lý tưởng.',
+15,5,N'Dễ',NULL);
+
+INSERT dbo.CongThuc(MaCongThuc,MaMonAn,MoTa,SoKhauPhanChuan,DaCongBo)
+VALUES(@CT,@Mon,N'Đậu hũ non chiên xù.',3,0);
+
+DECLARE @TP TABLE(Ma NVARCHAR(20),Ten NVARCHAR(150),DVT NVARCHAR(20),SL DECIMAL(12,3));
+INSERT @TP VALUES
+(N'TP1049',N'Trứng gà',N'DVT005',3),
+(N'TP1050',N'Đậu hũ non',N'DVT001',300),
+(N'TP1051',N'Bột chiên xù',N'DVT001',500),
+(N'TP1052',N'Bột mì',N'DVT001',100),
+(N'TP1053',N'Dầu ăn',N'DVT003',400);
+
+INSERT dbo.ThanhPhanCongThuc(MaThanhPhan,MaCongThuc,MaNguyenLieu,MaDonVi,SoLuong)
+SELECT tp.Ma,@CT,nl.MaNguyenLieu,tp.DVT,tp.SL
+FROM @TP tp JOIN dbo.NguyenLieu nl ON nl.TenNguyenLieu=tp.Ten;
+
+INSERT dbo.BuocCheBien(MaBuoc,MaCongThuc,ThuTu,NoiDung,ThoiGianThucHien)
+VALUES
+(N'BCB91601',@CT,1,N'~ Sơ chế nguyên liệu ~
+
+Đậu hũ non mua về bạn dùng dao cắt thành các miếng nhỏ vừa ăn có độ dày khoảng 1 lóng tay.
+
+Trứng gà đập và cho vào tô sạch, đánh đều cho trứng tan.',5),
+(N'BCB91602',@CT,2,N'~ Lăn đậu hũ non với bột chiên xù ~
+
+Cho đậu hũ đã cắt nhỏ vào lăn đều với bột mì sao cho bột mì áo đều miếng đậu hũ.
+
+Tiếp đến, cho đậu hũ vào tô trứng đã đánh tan trước đó.
+
+Cuối cùng, lăn đều miếng đậu hũ với bột chiên xù để bột phủ đều lên đậu hũ. Làm tương tự như vậy cho đến hết phần đậu hũ non đã cắt.',5),
+(N'BCB91603',@CT,3,N'~ Chiên đậu hũ non ~
+
+Bắc chảo lên bếp, cho 400ml dầu ăn vào chảo. Đợi khi dầu sôi thì cho đậu hũ non đã lăn với bột vào chiên ở lửa nhỏ.
+
+Chiên khoảng 10 - 15 phút cho đến khi đậu hũ non vàng ươm, giòn đều các mặt thì vớt ra, để ráo dầu.',15),
+(N'BCB91604',@CT,4,N'~ Thành phẩm ~
+
+Đậu hũ chiên xù có vẻ ngoài bắt mắt hấp dẫn, lớp vỏ bột giòn rụm, đậu hũ ngọt mềm ăn cực thích.
+
+Bạn có thể ăn kèm đậu hũ với một ít sốt Mayonnaise, chà bông heo và trứng bắc thảo để thêm phần béo ngậy, bùi bùi kích thích vị giác nhé!',NULL);
+
+INSERT dbo.DoanPhimHuongDan(MaDoanPhim,MaCongThuc,TieuDe,DuongDan,MoTa)
+VALUES(N'DP916',@CT,N'Đậu hũ non chiên xù',
+N'https://www.youtube.com/watch?v=eujOCNXY4FA',
+N'Video hướng dẫn cách làm đậu hũ non chiên xù.');
+
+UPDATE dbo.CongThuc SET DaCongBo=1 WHERE MaCongThuc=@CT;
+
+COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+IF XACT_STATE()<>0 ROLLBACK TRANSACTION;
+THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+SET XACT_ABORT ON;
+
+BEGIN TRY
+BEGIN TRANSACTION;
+
+DECLARE @Mon NVARCHAR(20)=N'MA915', @CT NVARCHAR(20)=N'CT915', @DM NVARCHAR(20);
+
+SELECT @DM=MaDanhMuc FROM dbo.DanhMucMonAn WHERE TenDanhMuc=N'Món kho';
+IF @DM IS NULL THROW 51170,N'Không tìm thấy danh mục Món kho.',1;
+IF EXISTS(SELECT 1 FROM dbo.MonAn WHERE MaMonAn=@Mon)
+    THROW 51171,N'Mã MA915 đã tồn tại.',1;
+
+DECLARE @NL TABLE(Ma NVARCHAR(20),Ten NVARCHAR(150),MoTa NVARCHAR(300));
+INSERT @NL VALUES
+(N'NL1054',N'Thịt ba rọi (thịt ba chỉ)',N'Thịt ba rọi/thịt ba chỉ.'),
+(N'NL1055',N'Nước dừa tươi',N'Nước dừa tươi.'),
+(N'NL1056',N'Trứng vịt',N'Trứng vịt.'),
+(N'NL1057',N'Tỏi băm',N'Tỏi băm.'),
+(N'NL1058',N'Hành tím băm',N'Hành tím băm.'),
+(N'NL1059',N'Ớt',N'Ớt.'),
+(N'NL1060',N'Rượu',N'Rượu.'),
+(N'NL1061',N'Nước mắm',N'Nước mắm.'),
+(N'NL1062',N'Gia vị thông dụng (muối/đường/hạt nêm/tiêu)',N'Muối/đường/hạt nêm/tiêu.');
+
+INSERT dbo.NguyenLieu(MaNguyenLieu,TenNguyenLieu,MoTa)
+SELECT Ma,Ten,MoTa FROM @NL n
+WHERE NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu x WHERE x.TenNguyenLieu=n.Ten);
+
+INSERT dbo.MonAn
+(MaMonAn,MaDanhMuc,TenMonAn,MoTa,ThoiGianCheBien,ThoiGianChuanBi,DoKho,DuongDanAnh)
+VALUES
+(@Mon,@DM,N'Thịt kho tàu bằng nồi áp suất',
+N'Thịt kho tàu là món kho vô cùng quen thuộc với các bữa ăn trong gia đình.',
+30,10,N'Dễ',NULL);
+
+INSERT dbo.CongThuc(MaCongThuc,MaMonAn,MoTa,SoKhauPhanChuan,DaCongBo)
+VALUES(@CT,@Mon,N'Thịt kho tàu là món kho vô cùng quen thuộc với các bữa ăn trong gia đình.',4,0);
+
+DECLARE @TP TABLE(Ma NVARCHAR(20),Ten NVARCHAR(150),DVT NVARCHAR(20),SL DECIMAL(12,3));
+INSERT @TP VALUES
+(N'TP1054',N'Thịt ba rọi (thịt ba chỉ)',N'DVT001',500),
+(N'TP1055',N'Nước dừa tươi',N'DVT003',200),
+(N'TP1056',N'Trứng vịt',N'DVT005',6),
+(N'TP1057',N'Tỏi băm',N'DVT006',1),
+(N'TP1058',N'Hành tím băm',N'DVT006',2),
+(N'TP1059',N'Ớt',N'DVT005',3),
+(N'TP1060',N'Rượu',N'DVT006',1),
+(N'TP1061',N'Nước mắm',N'DVT006',2),
+(N'TP1062',N'Gia vị thông dụng (muối/đường/hạt nêm/tiêu)',N'DVT014',1);
+
+INSERT dbo.ThanhPhanCongThuc(MaThanhPhan,MaCongThuc,MaNguyenLieu,MaDonVi,SoLuong)
+SELECT tp.Ma,@CT,nl.MaNguyenLieu,tp.DVT,tp.SL
+FROM @TP tp JOIN dbo.NguyenLieu nl ON nl.TenNguyenLieu=tp.Ten;
+
+INSERT dbo.BuocCheBien(MaBuoc,MaCongThuc,ThuTu,NoiDung,ThoiGianThucHien)
+VALUES
+(N'BCB91501',@CT,1,N'~ Sơ chế nguyên liệu ~
+
+Để làm sạch thịt, khi mua về bạn dùng 1 muỗng canh muối chà xát, sau đó rửa lại với nước sạch, cắt miếng vừa ăn khoảng 1 lóng tay.
+
+Lưu ý: Cách khử mùi hôi thịt heo
+
+- Để thịt heo không bị hôi thì trước khi chế biến bạn hãy chần thịt heo trong nước sôi khoảng 3 phút cùng với 1 củ hành tím đập dập, hành sẽ giúp khử mùi hôi rất tốt.
+- Ngoài ra bạn cũng có thể cho vào nước luộc thịt một ít rượu trắng trước khi vớt thịt ra vì rượu trắng sẽ giúp tẩy sạch mùi hôi có trong thịt hiệu quả nhất.
+- Sau đó, rửa thịt lại với nước lạnh rồi mang đi chế biến tiếp, thịt sẽ không còn mùi hôi nữa và món ăn chế biến từ thịt heo sẽ thơm ngon hơn.',10),
+(N'BCB91502',@CT,2,N'~ Ướp thịt ~
+
+Để thịt ngon và màu đẹp hơn, bạn ướp thịt với 2 muỗng canh đường trong 30 phút.
+
+Tiếp đó bạn ướp thêm 2 muỗng canh hạt nêm, 2 muỗng cà phê tiêu, 1 muỗng canh rượu, 2 muỗng canh nước mắm, 1 muỗng canh tỏi băm, 2 muỗng canh hành tím băm.
+
+Trộn đều và ướp thêm 30 phút cho thịt thấm gia vị.
+
+Lưu ý: Nếu có thời gian, bạn cũng có thể ướp thịt trong ngăn mát tủ lạnh qua đêm để thịt thấm gia vị thơm ngon hơn nhé!',60),
+(N'BCB91503',@CT,3,N'~ Luộc trứng vịt ~
+
+Trứng vịt rửa sạch, cho vào nồi luộc trong 5 - 7 phút trên lửa vừa. Sau đó để nguội, bóc sạch vỏ.
+
+Lưu ý: Cách luộc trứng vịt bóc vỏ nhanh:
+
+- Cho trứng vào nồi, đổ ngập nước và pha thêm vào một chút giấm để khi bóc vỏ sẽ dễ dàng hơn.
+- Sau khi luộc trứng khoảng 7 phút thì vớt trứng ra cho vào một tô nước lạnh và tiến hành lột trứng, cách này sẽ làm cho trứng nhanh nguội và lớp vỏ trứng sẽ dễ dàng bong ra, tiện cho việc lột vỏ.',10),
+(N'BCB91504',@CT,4,N'~ Kho thịt ~
+
+Bạn cắm điện nồi áp suất chỉnh thời gian 5 phút, thêm 2 muỗng canh đường, 2 muỗng canh nước lọc, dùng đũa khuấy đều đến khi nước đường trở màu nâu cánh gián là được.
+
+Tiếp đó cho thịt đã ướp vào nồi xào săn lại, thêm 200ml nước dừa tươi và nước lọc cho ngập sấp mặt thịt, đậy nắp và chỉnh kho 10 phút.
+
+Sau 10 phút, bạn xả hơi áp suất, thêm trứng vịt, 3 quả ớt, nêm nếm lại gia vị cho vừa ăn, tiếp tục chỉnh thời gian thêm 10 phút là hoàn thành.
+
+Lưu ý:
+
+- Khi xả hơi áp suất, bạn lưu ý cẩn thận tránh bị hơi nóng làm phỏng nha.
+- Bạn cũng có thể sử dụng nồi đất kho thịt thay vì dùng nồi áp suất cũng được nha!',30),
+(N'BCB91505',@CT,5,N'~ Thành phẩm ~
+
+Món thịt kho tàu cực ngon đã hoàn thành và có thể dùng nóng. Món ăn mềm ngon, đậm đà, thịt beo béo kết hợp với trứng vịt bùi bùi cực đưa cơm đấy nhé!',NULL);
+
+INSERT dbo.DoanPhimHuongDan(MaDoanPhim,MaCongThuc,TieuDe,DuongDan,MoTa)
+VALUES
+(N'DP915',@CT,N'Thịt kho tàu bằng nồi áp suất',
+N'https://www.youtube.com/watch?v=5sG8rvzWXR4',
+N'Video hướng dẫn cách làm thịt kho tàu bằng nồi áp suất.');
+
+UPDATE dbo.CongThuc SET DaCongBo=1 WHERE MaCongThuc=@CT;
+
+COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+IF XACT_STATE()<>0 ROLLBACK TRANSACTION;
+THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+SET XACT_ABORT ON;
+
+BEGIN TRY
+BEGIN TRANSACTION;
+
+DECLARE @Mon NVARCHAR(20)=N'MA917', @CT NVARCHAR(20)=N'CT917', @DM NVARCHAR(20);
+SELECT @DM=MaDanhMuc FROM dbo.DanhMucMonAn WHERE TenDanhMuc=N'Món chiên';
+
+IF @DM IS NULL THROW 51180,N'Không tìm thấy danh mục Món chiên.',1;
+IF EXISTS(SELECT 1 FROM dbo.MonAn WHERE MaMonAn=@Mon)
+    THROW 51181,N'Mã món MA917 đã tồn tại.',1;
+
+DECLARE @NL TABLE(Ma NVARCHAR(20),Ten NVARCHAR(150),MoTa NVARCHAR(300));
+INSERT @NL VALUES
+(N'NL1063',N'Sụn gà',N'Sụn gà.'),
+(N'NL1064',N'Ớt',N'Ớt.'),
+(N'NL1065',N'Gừng',N'Gừng.'),
+(N'NL1066',N'Bột năng',N'Bột năng.'),
+(N'NL1067',N'Tiêu',N'Tiêu.'),
+(N'NL1068',N'Trứng gà',N'Trứng gà.'),
+(N'NL1069',N'Hành tây',N'Hành tây.'),
+(N'NL1070',N'Tỏi băm',N'Tỏi băm.'),
+(N'NL1071',N'Hành tím băm',N'Hành tím băm.'),
+(N'NL1072',N'Hành lá',N'Hành lá.'),
+(N'NL1073',N'Dầu ăn',N'Dầu ăn.'),
+(N'NL1074',N'Nước mắm',N'Nước mắm.'),
+(N'NL1075',N'Tương ớt',N'Tương ớt.'),
+(N'NL1076',N'Đường',N'Đường.'),
+(N'NL1077',N'Muối',N'Muối.');
+
+INSERT dbo.NguyenLieu(MaNguyenLieu,TenNguyenLieu,MoTa)
+SELECT Ma,Ten,MoTa FROM @NL n
+WHERE NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu x WHERE x.TenNguyenLieu=n.Ten);
+
+INSERT dbo.MonAn
+(MaMonAn,MaDanhMuc,TenMonAn,MoTa,ThoiGianCheBien,ThoiGianChuanBi,DoKho,DuongDanAnh)
+VALUES
+(@Mon,@DM,N'Sụn gà chiên nước mắm',
+N'Sụn gà chiên nước mắm là một món ăn đơn giản dễ làm, chỉ cần chú ý vài chi tiết thôi sẽ có đĩa sụn gà thơm ngon mà bất cứ ai khi nhìn thấy đều khó có thể kiềm lòng.',
+45,10,N'Dễ',NULL);
+
+INSERT dbo.CongThuc(MaCongThuc,MaMonAn,MoTa,SoKhauPhanChuan,DaCongBo)
+VALUES(@CT,@Mon,N'Sụn gà chiên nước mắm.',4,0);
+
+DECLARE @TP TABLE(Ma NVARCHAR(20),Ten NVARCHAR(150),DVT NVARCHAR(20),SL DECIMAL(12,3));
+INSERT @TP VALUES
+(N'TP1063',N'Sụn gà',N'DVT001',300),
+(N'TP1064',N'Ớt',N'DVT005',2),
+(N'TP1065',N'Gừng',N'DVT010',2),
+(N'TP1066',N'Bột năng',N'DVT001',30),
+(N'TP1067',N'Tiêu',N'DVT007',1),
+(N'TP1068',N'Trứng gà',N'DVT005',1),
+(N'TP1069',N'Hành tây',N'DVT010',1),
+(N'TP1070',N'Tỏi băm',N'DVT007',1),
+(N'TP1071',N'Hành tím băm',N'DVT007',1),
+(N'TP1072',N'Hành lá',N'DVT014',1),
+(N'TP1073',N'Dầu ăn',N'DVT014',1),
+(N'TP1074',N'Nước mắm',N'DVT006',2),
+(N'TP1075',N'Tương ớt',N'DVT006',2),
+(N'TP1076',N'Đường',N'DVT006',4),
+(N'TP1077',N'Muối',N'DVT007',3);
+
+INSERT dbo.ThanhPhanCongThuc(MaThanhPhan,MaCongThuc,MaNguyenLieu,MaDonVi,SoLuong)
+SELECT tp.Ma,@CT,nl.MaNguyenLieu,tp.DVT,tp.SL
+FROM @TP tp JOIN dbo.NguyenLieu nl ON nl.TenNguyenLieu=tp.Ten;
+
+INSERT dbo.BuocCheBien(MaBuoc,MaCongThuc,ThuTu,NoiDung,ThoiGianThucHien)
+VALUES
+(N'BCB91701',@CT,1,N'~ Luộc sụn gà ~
+
+Bạn cho nồi nước lên bếp, nấu sôi rồi thêm gừng, 1 muỗng muối và cho sụn gà vào luộc ở lửa nhỏ khoảng 15p cho chín, sau đó vớt ra tô.',15),
+(N'BCB91702',@CT,2,N'~ Nêm gia vị ~
+
+Từ tô sụn gà: Bạn thêm 1 muỗng cà phê muối, 1 muỗng canh đường, bột năng, tiêu, 1 quả trứng gà, đảo đều và ướp 15p.',15),
+(N'BCB91703',@CT,3,N'~ Chiên sụn gà ~
+
+Bạn bắc chảo lên bếp, đợi chảo nóng bạn cho khoảng 1 bát dầu ăn vào, thử đầu đũa thấy sủi tăm là dầu đã nóng, bạn cho sụn gà vào chiên vàng giòn rồi vớt ra dĩa.',15),
+(N'BCB91704',@CT,4,N'~ Sốt nước mắm ~
+
+Bạn bắc chảo lên bếp, đợi chảo nóng bạn cho 1 muỗng canh dầu ăn vào rồi thêm tỏi, hành tím, bạn phi thơm vàng.
+
+Rồi cho thêm 2 trái ớt cắt nhỏ, 2 muỗng canh nước mắm, 2 muỗng canh tương ớt, 3 muỗng canh đường, 1 muỗng cà phê muối, dĩa sụn gà đã chiên vào đảo đều khoảng 2p.
+
+Bạn thêm hành tây, hành lá vào đảo đều rồi tắt bếp.',15),
+(N'BCB91705',@CT,5,N'~ Thành phẩm ~
+
+Sụn gà chiên nước mắm thơm ngon có thể làm món ăn vặt nhâm nhi hoặc dùng với cơm trắng đều rất ngon.',NULL);
+
+INSERT dbo.DoanPhimHuongDan(MaDoanPhim,MaCongThuc,TieuDe,DuongDan,MoTa)
+VALUES(N'DP917',@CT,N'Sụn gà chiên nước mắm',
+N'https://www.youtube.com/watch?v=MHzK2_XPRAQ',
+N'Video hướng dẫn cách làm sụn gà chiên nước mắm.');
+
+UPDATE dbo.CongThuc SET DaCongBo=1 WHERE MaCongThuc=@CT;
+COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+IF XACT_STATE()<>0 ROLLBACK TRANSACTION;
+THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+SET XACT_ABORT ON;
+
+BEGIN TRY
+BEGIN TRANSACTION;
+
+DECLARE @Mon NVARCHAR(20)=N'MA918', @CT NVARCHAR(20)=N'CT918', @DM NVARCHAR(20);
+SELECT @DM=MaDanhMuc FROM dbo.DanhMucMonAn WHERE TenDanhMuc=N'Món chiên';
+
+IF @DM IS NULL THROW 51190,N'Không tìm thấy danh mục Món chiên.',1;
+IF EXISTS(SELECT 1 FROM dbo.MonAn WHERE MaMonAn=@Mon)
+    THROW 51191,N'Mã món MA918 đã tồn tại.',1;
+
+DECLARE @NL TABLE(Ma NVARCHAR(20),Ten NVARCHAR(150),MoTa NVARCHAR(300));
+INSERT @NL VALUES
+(N'NL1078',N'Thịt heo',N'Thịt heo.'),
+(N'NL1079',N'Tôm tươi',N'Tôm tươi.'),
+(N'NL1080',N'Khoai môn',N'Khoai môn cao.'),
+(N'NL1081',N'Cà rốt',N'Cà rốt.'),
+(N'NL1082',N'Nấm mèo (đã ngâm nở)',N'Nấm mèo đã ngâm nở.'),
+(N'NL1083',N'Bún tàu khô',N'Bún tàu khô.'),
+(N'NL1084',N'Hành tím',N'Hành tím.'),
+(N'NL1085',N'Tỏi',N'Tỏi.'),
+(N'NL1086',N'Hành lá',N'Hành lá.'),
+(N'NL1087',N'Bịch bánh cuốn chả giò (loại bánh tráng dẻo)',N'Loại bánh tráng dẻo.'),
+(N'NL1088',N'Bột mì',N'Bột mì.'),
+(N'NL1089',N'Gia vị thông dụng (bột nêm/muối/tiêu/dầu ăn/giấm)',N'Bột nêm/muối/tiêu/dầu ăn/giấm.');
+
+INSERT dbo.NguyenLieu(MaNguyenLieu,TenNguyenLieu,MoTa)
+SELECT Ma,Ten,MoTa FROM @NL n
+WHERE NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu x WHERE x.TenNguyenLieu=n.Ten);
+
+INSERT dbo.MonAn
+(MaMonAn,MaDanhMuc,TenMonAn,MoTa,ThoiGianCheBien,ThoiGianChuanBi,DoKho,DuongDanAnh)
+VALUES
+(@Mon,@DM,N'Chả giò miền Nam',
+N'Cùng vào bếp thực hiện chả giò miền Nam vàng ươm, giòn rụm. Với cách làm chả giò tôm thịt miền nam này, bạn sẽ có món chiên hấp dẫn, đậm đà vị khoai môn cao và mộc nhĩ, hứa hẹn thành công ngay lần đầu.',
+25,60,N'Trung bình',NULL);
+
+INSERT dbo.CongThuc(MaCongThuc,MaMonAn,MoTa,SoKhauPhanChuan,DaCongBo)
+VALUES(@CT,@Mon,N'Chả giò miền Nam nhân tôm thịt.',50,0);
+
+DECLARE @TP TABLE(Ma NVARCHAR(20),Ten NVARCHAR(150),DVT NVARCHAR(20),SL DECIMAL(12,3));
+INSERT @TP VALUES
+(N'TP1078',N'Thịt heo',N'DVT001',500),
+(N'TP1079',N'Tôm tươi',N'DVT001',300),
+(N'TP1080',N'Khoai môn',N'DVT001',350),
+(N'TP1081',N'Cà rốt',N'DVT001',150),
+(N'TP1082',N'Nấm mèo (đã ngâm nở)',N'DVT001',80),
+(N'TP1083',N'Bún tàu khô',N'DVT001',60),
+(N'TP1084',N'Hành tím',N'DVT001',50),
+(N'TP1085',N'Tỏi',N'DVT001',20),
+(N'TP1086',N'Hành lá',N'DVT001',30),
+(N'TP1087',N'Bịch bánh cuốn chả giò (loại bánh tráng dẻo)',N'DVT005',2),
+(N'TP1088',N'Bột mì',N'DVT007',1),
+(N'TP1089',N'Gia vị thông dụng (bột nêm/muối/tiêu/dầu ăn/giấm)',N'DVT014',1);
+
+INSERT dbo.ThanhPhanCongThuc(MaThanhPhan,MaCongThuc,MaNguyenLieu,MaDonVi,SoLuong)
+SELECT tp.Ma,@CT,nl.MaNguyenLieu,tp.DVT,tp.SL
+FROM @TP tp JOIN dbo.NguyenLieu nl ON nl.TenNguyenLieu=tp.Ten;
+
+INSERT dbo.BuocCheBien(MaBuoc,MaCongThuc,ThuTu,NoiDung,ThoiGianThucHien)
+VALUES
+(N'BCB91801',@CT,1,N'~ Sơ chế thịt heo xay và tôm tươi ~
+
+Thịt heo mua về rửa sạch với muối và giấm, thấm khô rồi xay nhuyễn. Tôm bóc vỏ, rửa sạch, thấm thật khô nước trước khi mang đi xay mịn để nhân không bị bở.',15),
+(N'BCB91802',@CT,2,N'~ Chuẩn bị rau củ, mộc nhĩ và miến ~
+
+Băm nhỏ hành tím và tỏi, xắt nhuyễn hành lá. Mộc nhĩ (nấm mèo) ngâm nở, xắt sợi rồi băm nhẹ để giữ độ giòn. Miến (bún tàu) ngâm nước 3 phút cho mềm rồi cắt khúc ngắn.',10),
+(N'BCB91803',@CT,3,N'~ Bào sợi khoai môn cao và phi thơm hành tỏi ~
+
+Bào sợi khoai môn cao và cà rốt dài khoảng 3 - 4cm. Trải đều ra mẹt, hong quạt 30 phút cho ráo nước giúp chả giòn lâu. Sau đó, phi thơm hành tỏi với dầu ăn đến khi se mặt.',30),
+(N'BCB91804',@CT,4,N'~ Trộn nhân và gói chả giò với bánh tráng dẻo ~
+
+Cho thịt và tôm vào tô lớn, thêm 1.5 muỗng canh bột nêm gà, 1.5 muỗng canh đường, 1 muỗng cà phê muối, 1 muỗng cà phê tiêu, hành lá xắt nhuyễn và phần hành tỏi đã phi thơm vào trộn đều.
+
+Sau đó, bạn cho tiếp khoai môn, cà rốt, nấm mèo và bún tàu vào trộn thật đều tay cho nhân hòa quyện.
+
+Bạn trải miếng bánh cuốn ra theo chiều góc nhọn hướng về phía mình, múc một muỗng nhân cho vào và dàn đều. Bạn xếp góc dưới lên nhân, gập hai đầu bánh lại cho đều nhau rồi cuộn tròn.
+
+Cuối cùng, bạn dùng hỗn hợp bột mì pha một ít nước bôi vào mép để dán cuốn chả cho chắc chắn.',20),
+(N'BCB91805',@CT,5,N'~ Chiên ngập dầu cho cuốn chả giòn tan ~
+
+Cho chả đã cuốn vào ngăn mát tủ lạnh ít nhất 30 phút để bề mặt khô ráo. Đun nóng dầu ăn đến khoảng 150 độ C rồi lần lượt cho chả vào chiên ở lửa vừa, xoay trở đều tay.
+
+Khi chả đã vàng đều, bạn tăng lửa lớn để dầu không thấm ngược vào nhân rồi vớt ra, dựng đứng trên giấy thấm dầu.
+
+Mách nhỏ: Việc làm lạnh chả trước khi chiên và tăng lửa phút cuối giúp lớp vỏ đạt độ giòn rụm tối đa và không bị ngấy dầu.',25),
+(N'BCB91806',@CT,6,N'~ Thành phẩm ~
+
+Những cuốn chả giò miền Nam vàng ươm, lớp vỏ giòn tan và không bị vỡ nát trông cực kỳ bắt mắt. Nhân bên trong đậm đà, thơm bùi vị khoai môn và ngọt tự nhiên từ tôm thịt, ăn kèm với nước mắm chua ngọt, đồ chua và rau sống sẽ tạo nên hương vị khó cưỡng.',NULL);
+
+UPDATE dbo.CongThuc SET DaCongBo=1 WHERE MaCongThuc=@CT;
+COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+IF XACT_STATE()<>0 ROLLBACK TRANSACTION;
+THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20) = N'MA919';
+    DECLARE @MaCongThuc NVARCHAR(20) = N'CT919';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    SELECT @MaDanhMuc = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món chiên';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51001, N'Không tìm thấy danh mục Món chiên.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = @MaMonAn)
+        THROW 51002, N'Mã món MA919 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc = @MaCongThuc)
+        THROW 51003, N'Mã công thức CT919 đã tồn tại.', 1;
+
+    IF COL_LENGTH(N'dbo.MonAn', N'ThoiGianChuanBi') IS NULL
+        ALTER TABLE dbo.MonAn ADD ThoiGianChuanBi INT NULL;
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.DonViTinh WHERE TenDonVi = N'Chén')
+    BEGIN
+        IF EXISTS (
+            SELECT 1
+            FROM dbo.DonViTinh
+            WHERE MaDonVi = N'DVT016'
+              AND TenDonVi <> N'Chén'
+        )
+            THROW 51004, N'Mã đơn vị DVT016 đang được dùng cho đơn vị khác.', 1;
+
+        INSERT dbo.DonViTinh (MaDonVi, TenDonVi, KyHieu, HeSoGramChuan)
+        VALUES (N'DVT016', N'Chén', N'chén', NULL);
+    END;
+
+    DECLARE @NguyenLieuMoi TABLE
+    (
+        MaNguyenLieu NVARCHAR(20) PRIMARY KEY,
+        TenNguyenLieu NVARCHAR(150) NOT NULL,
+        MoTa NVARCHAR(500) NULL
+    );
+
+    INSERT INTO @NguyenLieuMoi (MaNguyenLieu, TenNguyenLieu, MoTa)
+    VALUES
+    (N'NL1090', N'Thơm', N'Trái thơm dùng làm phần vỏ đựng cơm chiên.'),
+    (N'NL1091', N'Đậu Hà Lan', N'Đậu Hà Lan.'),
+    (N'NL1092', N'Cà rốt cắt nhỏ', N'Cà rốt đã cắt nhỏ.'),
+    (N'NL1093', N'Bắp hạt', N'Bắp hạt.'),
+    (N'NL1094', N'Tỏi băm', N'Tỏi đã băm nhỏ.'),
+    (N'NL1095', N'Cơm nguội', N'Cơm đã nấu chín để nguội.'),
+    (N'NL1096', N'Trứng gà (đánh tan cùng nước mắm)', N'Trứng gà đánh tan cùng nước mắm.'),
+    (N'NL1097', N'Hạt điều', N'Hạt điều.'),
+    (N'NL1098', N'Thơm cắt hạt lựu', N'Thơm đã cắt hạt lựu.'),
+    (N'NL1099', N'Tôm', N'Tôm dùng để xào cùng rau củ.'),
+    (N'NL1100', N'Nước mắm', N'Nước mắm.');
+
+    IF EXISTS
+    (
+        SELECT 1
+        FROM @NguyenLieuMoi m
+        INNER JOIN dbo.NguyenLieu nl ON nl.MaNguyenLieu = m.MaNguyenLieu
+        WHERE nl.TenNguyenLieu <> m.TenNguyenLieu
+    )
+        THROW 51005, N'Một mã nguyên liệu mới đã được dùng cho nguyên liệu khác.', 1;
+
+    INSERT INTO dbo.NguyenLieu (MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT m.MaNguyenLieu, m.TenNguyenLieu, m.MoTa
+    FROM @NguyenLieuMoi m
+    WHERE NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.NguyenLieu nl
+        WHERE nl.TenNguyenLieu = m.TenNguyenLieu
+    );
+
+    INSERT INTO dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        ThoiGianChuanBi,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Cơm chiên dứa',
+        N'Thái Lan nổi tiếng với nền ẩm thực đa dạng, phong phú với nhiều món ăn ngon. Cơm chiên trái thơm là một trong số đó, món ăn này với vị chua nhè nhẹ của thơm, vị bùi bùi của các loại rau củ hoà quyện với vị ngọt thanh của tôm hứa hẹn mang lại một trải nghiệm thú vị khi thưởng thức. Cùng vào bếp thực hiện ngay nhé!',
+        60,
+        15,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT INTO dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DaCongBo
+    )
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Cơm chiên dứa kiểu Thái.',
+        2,
+        0
+    );
+
+    DECLARE @ThanhPhan TABLE
+    (
+        MaThanhPhan NVARCHAR(20) PRIMARY KEY,
+        TenNguyenLieu NVARCHAR(150) NOT NULL,
+        MaDonVi NVARCHAR(20) NOT NULL,
+        SoLuong DECIMAL(12,3) NOT NULL
+    );
+
+    INSERT INTO @ThanhPhan
+    VALUES
+    (N'TP1090', N'Thơm', N'DVT005', 1),
+    (N'TP1091', N'Đậu Hà Lan', N'DVT016', 1),
+    (N'TP1092', N'Cà rốt cắt nhỏ', N'DVT016', 1),
+    (N'TP1093', N'Bắp hạt', N'DVT016', 1),
+    (N'TP1094', N'Tỏi băm', N'DVT001', 20),
+    (N'TP1095', N'Cơm nguội', N'DVT016', 2),
+    (N'TP1096', N'Trứng gà (đánh tan cùng nước mắm)', N'DVT005', 1),
+    (N'TP1097', N'Hạt điều', N'DVT016', 1),
+    (N'TP1098', N'Thơm cắt hạt lựu', N'DVT016', 1),
+    (N'TP1099', N'Tôm', N'DVT001', 100),
+    (N'TP1100', N'Nước mắm', N'DVT006', 1);
+
+    IF EXISTS
+    (
+        SELECT 1
+        FROM @ThanhPhan tp
+        LEFT JOIN dbo.NguyenLieu nl ON nl.TenNguyenLieu = tp.TenNguyenLieu
+        LEFT JOIN dbo.DonViTinh dv ON dv.MaDonVi = tp.MaDonVi
+        WHERE nl.MaNguyenLieu IS NULL OR dv.MaDonVi IS NULL
+    )
+        THROW 51006, N'Không tìm thấy nguyên liệu hoặc đơn vị tính cho công thức.', 1;
+
+    INSERT INTO dbo.ThanhPhanCongThuc
+    (
+        MaThanhPhan,
+        MaCongThuc,
+        MaNguyenLieu,
+        MaDonVi,
+        SoLuong
+    )
+    SELECT
+        tp.MaThanhPhan,
+        @MaCongThuc,
+        nl.MaNguyenLieu,
+        tp.MaDonVi,
+        tp.SoLuong
+    FROM @ThanhPhan tp
+    INNER JOIN dbo.NguyenLieu nl
+        ON nl.TenNguyenLieu = tp.TenNguyenLieu;
+
+    INSERT INTO dbo.BuocCheBien
+    (
+        MaBuoc,
+        MaCongThuc,
+        ThuTu,
+        NoiDung,
+        ThoiGianThucHien
+    )
+    VALUES
+    (
+        N'BCB91901',
+        @MaCongThuc,
+        1,
+        N'~ Sơ chế thơm ~
+
+Cắt 1/4 trái thơm rồi khoét lấy phần thịt ra thơm ra ngoài, chừa 1 khoảng trống để chứa cơm chiên.',
+        15
+    ),
+    (
+        N'BCB91902',
+        @MaCongThuc,
+        2,
+        N'~ Xào nguyên liệu ~
+
+Phi thơm 1 ít tỏi băm rồi cho tôm vào xào. Khi tôm đã săn bạn cho các loại rau củ vào xào chung, nêm thêm 1/2 muỗng cà phê hạt nêm rồi múc ra tô.',
+        15
+    ),
+    (
+        N'BCB91903',
+        @MaCongThuc,
+        3,
+        N'~ Chiên cơm ~
+
+Phi thơm 1 ít tỏi băm, rồi cho 2 chén cơm nguội vào chiên. Dàn đều để cơm được tơi ra.
+
+Nêm vào cơm 1 muỗng canh nước mắm rồi sau đó cho phần trứng đã đanh tan cùng nước mắm vào đảo đều.
+
+Sau đó cho thơm, hạt điều và các loại rau củ tôm đã xào trước đó vào xào thêm một chút nữa là đạt. Có thể nêm nếm lại cho vừa khẩu vị.',
+        25
+    ),
+    (
+        N'BCB91904',
+        @MaCongThuc,
+        4,
+        N'~ Thành phẩm ~
+
+Cơm chiên sau khi hoàn tất bạn múc ra trái thơm đã được khoét lỗ trước đó, ăn nóng cùng nước tương tỏi ớt.
+
+Món cơm chiên kiểu Thái với những hạt cơm được rang giòn quyện đều với trứng đượm màu vàng, có mùi thơm mùi dứa, chua chua, ngọt ngọt, kết hợp với đậu hà lan, bắp... rất ngon, dễ ăn mà không bị ngán.',
+        5
+    );
+
+    INSERT INTO dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim,
+        MaCongThuc,
+        TieuDe,
+        DuongDan,
+        MoTa
+    )
+    VALUES
+    (
+        N'DP919',
+        @MaCongThuc,
+        N'Cơm chiên dứa',
+        N'https://www.youtube.com/watch?v=EHOIOagnk_4',
+        N'Video hướng dẫn làm cơm chiên dứa.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = @MaCongThuc;
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20)=N'MA921';
+    DECLARE @MaCongThuc NVARCHAR(20)=N'CT921';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn=@MaMonAn)
+        THROW 51110,N'Mã món MA921 đã tồn tại.',1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc=@MaCongThuc)
+        THROW 51111,N'Mã công thức CT921 đã tồn tại.',1;
+
+    SELECT @MaDanhMuc=MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc=N'Món hấp';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51112,N'Không tìm thấy danh mục Món hấp.',1;
+
+    DECLARE @NL TABLE
+    (
+        MaNguyenLieu NVARCHAR(20),
+        TenNguyenLieu NVARCHAR(150),
+        MoTa NVARCHAR(500)
+    );
+
+    INSERT @NL VALUES
+    (N'NL1114',N'Ốc bươu lớn',N'Ốc bươu lớn, tươi ngon.'),
+    (N'NL1115',N'Thịt nạc vai xay',N'Thịt nạc vai băm hoặc xay.'),
+    (N'NL1116',N'Cá thác lác',N'Cá thác lác hoặc giò sống.'),
+    (N'NL1117',N'Sả cây',N'Sả cây tươi.'),
+    (N'NL1118',N'Sả xay',N'Sả băm hoặc xay nhuyễn.'),
+    (N'NL1119',N'Gừng',N'Gừng tươi.'),
+    (N'NL1120',N'Tỏi',N'Tỏi tươi.'),
+    (N'NL1121',N'Ớt',N'Ớt tươi.'),
+    (N'NL1122',N'Lá chanh',N'Lá chanh tươi.'),
+    (N'NL1123',N'Nước cốt chanh',N'Nước cốt chanh tươi.'),
+    (N'NL1124',N'Muối',N'Muối ăn.'),
+    (N'NL1125',N'Đường',N'Đường ăn.'),
+    (N'NL1126',N'Bột nêm',N'Bột nêm gia vị.'),
+    (N'NL1127',N'Bột ngọt',N'Bột ngọt.'),
+    (N'NL1128',N'Tiêu xay',N'Tiêu xay.'),
+    (N'NL1129',N'Dầu ăn',N'Dầu ăn.'),
+    (N'NL1130',N'Nước mắm',N'Nước mắm.');
+
+    INSERT dbo.NguyenLieu(MaNguyenLieu,TenNguyenLieu,MoTa)
+    SELECT n.MaNguyenLieu,n.TenNguyenLieu,n.MoTa
+    FROM @NL n
+    WHERE NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.NguyenLieu x
+        WHERE x.TenNguyenLieu=n.TenNguyenLieu
+    );
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn,MaDanhMuc,TenMonAn,MoTa,
+        ThoiGianCheBien,ThoiGianChuanBi,DoKho,DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Ốc nhồi hấp sả',
+        N'Món ốc nhồi hấp sả là tinh hoa ẩm thực miền Bắc với hương vị giòn sần sật đặc trưng.',
+        30,
+        30,
+        N'Trung bình',
+        NULL
+    );
+
+    INSERT dbo.CongThuc
+    (MaCongThuc,MaMonAn,MoTa,SoKhauPhanChuan,DaCongBo)
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Món ốc nhồi hấp sả là tinh hoa ẩm thực miền Bắc với hương vị giòn sần sật đặc trưng.',
+        4,
+        0
+    );
+
+    DECLARE @TP TABLE
+    (
+        MaThanhPhan NVARCHAR(20),
+        TenNguyenLieu NVARCHAR(150),
+        MaDonVi NVARCHAR(20),
+        SoLuong DECIMAL(12,3)
+    );
+
+    INSERT @TP VALUES
+    (N'TP23011',N'Ốc bươu lớn',N'DVT002',1),
+    (N'TP23012',N'Thịt nạc vai xay',N'DVT001',100),
+    (N'TP23013',N'Cá thác lác',N'DVT001',60),
+    (N'TP23014',N'Sả cây',N'DVT011',10),
+    (N'TP23015',N'Sả xay',N'DVT001',50),
+    (N'TP23016',N'Gừng',N'DVT010',1),
+    (N'TP23017',N'Tỏi',N'DVT010',1),
+    (N'TP23018',N'Ớt',N'DVT005',3),
+    (N'TP23019',N'Lá chanh',N'DVT014',1),
+    (N'TP23020',N'Nước cốt chanh',N'DVT006',1),
+    (N'TP23021',N'Muối',N'DVT007',0.25),
+    (N'TP23022',N'Đường',N'DVT007',1),
+    (N'TP23023',N'Bột nêm',N'DVT007',0.25),
+    (N'TP23024',N'Bột ngọt',N'DVT007',0.25),
+    (N'TP23025',N'Tiêu xay',N'DVT007',0.25),
+    (N'TP23026',N'Dầu ăn',N'DVT006',1),
+    (N'TP23027',N'Nước mắm',N'DVT006',2);
+
+    INSERT dbo.ThanhPhanCongThuc
+    (MaThanhPhan,MaCongThuc,MaNguyenLieu,MaDonVi,SoLuong)
+    SELECT
+        tp.MaThanhPhan,
+        @MaCongThuc,
+        nl.MaNguyenLieu,
+        tp.MaDonVi,
+        tp.SoLuong
+    FROM @TP tp
+    JOIN dbo.NguyenLieu nl
+        ON nl.TenNguyenLieu=tp.TenNguyenLieu;
+
+    INSERT dbo.BuocCheBien
+    (MaBuoc,MaCongThuc,ThuTu,NoiDung,ThoiGianThucHien)
+    VALUES
+    (
+        N'BCB92101',
+        @MaCongThuc,
+        1,
+        N'~ Sơ chế nguyên liệu ~
+
+Ốc bươu sau khi mua về bạn mang ngâm với nước vo gạo cùng một vài lát ớt trong khoảng 4 - 5 tiếng để ốc nhả hết chất nhớt và bùn đất.
+
+Với sả cây, bạn rửa sạch, tách bỏ vỏ già, chia làm hai phần: một phần đập dập, phần còn lại tách lấy các lá sả dài. Gừng và tỏi bạn gọt vỏ rồi băm nhuyễn trên thớt.',
+        30
+    ),
+    (
+        N'BCB92102',
+        @MaCongThuc,
+        2,
+        N'~ Luộc sơ ốc khử mùi ~
+
+Bạn cho ốc vào nồi luộc cùng một ít sả đập dập và gừng đập dập để khử mùi tanh. Bạn luộc trong khoảng 5 - 7 phút, không cần cho quá nhiều nước vì ốc sẽ tự tiết ra nước.
+
+Khi ốc vừa chín tới, bạn vớt ra để nguội.',
+        7
+    ),
+    (
+        N'BCB92103',
+        @MaCongThuc,
+        3,
+        N'~ Trộn hỗn hợp nhân thịt ~
+
+Bạn dùng một cây que nhọn xoắn theo chiều vỏ để lấy thịt ốc ra ngoài. Bạn lưu ý chỉ lấy phần đầu giòn, bỏ phần đuôi. Sau đó, bạn rửa sạch lại thịt ốc rồi dùng dao băm nhỏ. Vỏ ốc bạn đem rửa sạch và để ráo để chuẩn bị nhồi thịt.
+
+Bạn cho thịt ốc đã băm vào tô cùng 100gr thịt nạc vai băm, 50gr cá thác lác (hoặc giò sống), 1 muỗng canh sả băm, 1 muỗng canh tỏi băm và 1 muỗng canh gừng băm.
+
+Tiếp theo, bạn nêm 1/4 muỗng cà phê muối, 1 muỗng cà phê đường, 1/4 muỗng cà phê bột nêm, 1/4 muỗng cà phê bột ngọt, 1/4 muỗng cà phê tiêu và 1 muỗng canh dầu ăn. Bạn dùng muỗng quết thật đều tay cho nhân dẻo dai.',
+        10
+    ),
+    (
+        N'BCB92104',
+        @MaCongThuc,
+        4,
+        N'~ Nhồi nhân ốc ~
+
+Bạn đặt một lá sả (hoặc lá gừng) vào trong vỏ ốc sao cho hai đầu lá thò ra ngoài. Tiếp đến, bạn lấy một lượng nhân vừa đủ nhồi thật chặt vào bên trong vỏ ốc cho đầy miệng. Cách làm này giúp bạn rút thịt ốc ra ăn dễ dàng hơn sau khi hấp.',
+        5
+    ),
+    (
+        N'BCB92105',
+        @MaCongThuc,
+        5,
+        N'~ Cách hấp ốc nhồi thơm nồng ~
+
+Bạn lót một lớp sả cây dưới đáy xửng hấp, sau đó xếp toàn bộ ốc đã nhồi nhân lên trên. Bạn tiến hành hấp ốc trong khoảng 20 phút cho đến khi nhân thịt chín đều và tỏa mùi thơm nồng nàn của sả gừng.',
+        20
+    ),
+    (
+        N'BCB92106',
+        @MaCongThuc,
+        6,
+        N'~ Pha nước chấm ốc ~
+
+Trong lúc chờ hấp ốc, bạn cho 50gr gừng, 1 quả ớt và 2 muỗng canh đường vào cối giã nhuyễn. Sau đó, bạn đổ ra chén, thêm 2 muỗng canh nước mắm và 1 muỗng canh nước cốt chanh vào khuấy đều. Thêm vài lá chanh thái chỉ để nước chấm thêm hấp dẫn.',
+        5
+    ),
+    (
+        N'BCB92107',
+        @MaCongThuc,
+        7,
+        N'~ Thành phẩm ~
+
+Món ăn hoàn thành có mùi thơm đặc trưng của sả gừng hòa quyện. Khi thưởng thức, bạn rút nhẹ lá sả, thịt ốc dai giòn sần sật quyện cùng vị cá dẻo mịn, chấm vào nước mắm gừng chua ngọt cay nồng vô cùng hấp dẫn.',
+        NULL
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo=1
+    WHERE MaCongThuc=@MaCongThuc;
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm món Ốc nhồi hấp sả thành công.';
+
+END TRY
+BEGIN CATCH
+    IF XACT_STATE()<>0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaCongThuc NVARCHAR(20) = N'CT921';
+    DECLARE @DonViCay NVARCHAR(20);
+    DECLARE @MaxNL INT;
+
+    IF NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.CongThuc
+        WHERE MaCongThuc = @MaCongThuc
+    )
+        THROW 51130, N'Không tìm thấy công thức CT921.', 1;
+
+    -- Tạm bỏ công bố để trigger không chặn lúc cập nhật nguyên liệu.
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 0
+    WHERE MaCongThuc = @MaCongThuc;
+
+    -- Tạo đơn vị Cây nếu chưa có.
+    IF NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.DonViTinh
+        WHERE TenDonVi = N'Cây'
+    )
+    BEGIN
+        SELECT @DonViCay =
+            N'DVT' + CONVERT(NVARCHAR(17),
+                ISNULL(MAX(TRY_CONVERT(INT, SUBSTRING(MaDonVi, 4, 17))), 0) + 1)
+        FROM dbo.DonViTinh;
+
+        INSERT dbo.DonViTinh
+        (
+            MaDonVi,
+            TenDonVi,
+            KyHieu,
+            HeSoGramChuan
+        )
+        VALUES
+        (
+            @DonViCay,
+            N'Cây',
+            N'cây',
+            NULL
+        );
+    END;
+
+    SELECT @DonViCay = MaDonVi
+    FROM dbo.DonViTinh
+    WHERE TenDonVi = N'Cây';
+
+    DECLARE @NL TABLE
+    (
+        TenNguyenLieu NVARCHAR(150) PRIMARY KEY,
+        MoTa NVARCHAR(500)
+    );
+
+    INSERT INTO @NL
+    (
+        TenNguyenLieu,
+        MoTa
+    )
+    VALUES
+    (N'Ốc bươu lớn', N'Ốc bươu lớn.'),
+    (N'Thịt xay', N'Thịt xay.'),
+    (N'Cá thác lác (hoặc giò sống)', N'Cá thác lác (hoặc giò sống).'),
+    (N'Sả', N'Sả cây.'),
+    (N'Sả xay', N'Sả xay.'),
+    (N'Gừng', N'Gừng.'),
+    (N'Tỏi', N'Tỏi.'),
+    (N'Ớt', N'Ớt.'),
+    (N'Lá chanh (hoặc lá gừng)', N'Lá chanh (hoặc lá gừng).'),
+    (N'Nước cốt chanh', N'Nước cốt chanh.'),
+    (N'Gia vị thông dụng', N'(muối/đường/bột nêm/bột ngọt/tiêu xay/dầu ăn/nước mắm)');
+
+    SELECT @MaxNL =
+        ISNULL(MAX(TRY_CONVERT(INT, SUBSTRING(MaNguyenLieu, 3, 18))), 0)
+    FROM dbo.NguyenLieu;
+
+    ;WITH NLCanThem AS
+    (
+        SELECT
+            n.TenNguyenLieu,
+            n.MoTa,
+            ROW_NUMBER() OVER (ORDER BY n.TenNguyenLieu) AS STT
+        FROM @NL n
+        WHERE NOT EXISTS
+        (
+            SELECT 1
+            FROM dbo.NguyenLieu nl
+            WHERE nl.TenNguyenLieu = n.TenNguyenLieu
+        )
+    )
+    INSERT INTO dbo.NguyenLieu
+    (
+        MaNguyenLieu,
+        TenNguyenLieu,
+        MoTa
+    )
+    SELECT
+        N'NL' + CONVERT(NVARCHAR(18), @MaxNL + STT),
+        TenNguyenLieu,
+        MoTa
+    FROM NLCanThem;
+
+    IF EXISTS
+    (
+        SELECT 1
+        FROM dbo.ThanhPhanCongThuc
+        WHERE MaThanhPhan IN
+        (
+            N'TP23011', N'TP23012', N'TP23013',
+            N'TP23014', N'TP23015', N'TP23016',
+            N'TP23017', N'TP23018', N'TP23019',
+            N'TP23020', N'TP23021'
+        )
+        AND MaCongThuc <> @MaCongThuc
+    )
+        THROW 51131, N'Mã thành phần đang được công thức khác sử dụng.', 1;
+
+    DELETE FROM dbo.ThanhPhanCongThuc
+    WHERE MaCongThuc = @MaCongThuc;
+
+    DECLARE @TP TABLE
+    (
+        MaThanhPhan NVARCHAR(20) PRIMARY KEY,
+        TenNguyenLieu NVARCHAR(150),
+        MaDonVi NVARCHAR(20),
+        SoLuong DECIMAL(12,3)
+    );
+
+    INSERT INTO @TP
+    (
+        MaThanhPhan,
+        TenNguyenLieu,
+        MaDonVi,
+        SoLuong
+    )
+    VALUES
+    (N'TP23011', N'Ốc bươu lớn', N'DVT002', 1),
+    (N'TP23012', N'Thịt xay', N'DVT001', 100),
+    (N'TP23013', N'Cá thác lác (hoặc giò sống)', N'DVT001', 60),
+    (N'TP23014', N'Sả', @DonViCay, 10),
+    (N'TP23015', N'Sả xay', N'DVT001', 50),
+    (N'TP23016', N'Gừng', N'DVT010', 1),
+    (N'TP23017', N'Tỏi', N'DVT010', 1),
+    (N'TP23018', N'Ớt', N'DVT005', 3),
+    (N'TP23019', N'Lá chanh (hoặc lá gừng)', N'DVT014', 1),
+    (N'TP23020', N'Nước cốt chanh', N'DVT006', 1),
+    (N'TP23021', N'Gia vị thông dụng', N'DVT014', 1);
+
+    IF EXISTS
+    (
+        SELECT 1
+        FROM @TP tp
+        LEFT JOIN dbo.NguyenLieu nl
+            ON nl.TenNguyenLieu = tp.TenNguyenLieu
+        LEFT JOIN dbo.DonViTinh dv
+            ON dv.MaDonVi = tp.MaDonVi
+        WHERE nl.MaNguyenLieu IS NULL
+           OR dv.MaDonVi IS NULL
+    )
+        THROW 51132, N'Không tìm thấy nguyên liệu hoặc đơn vị tính.', 1;
+
+    INSERT INTO dbo.ThanhPhanCongThuc
+    (
+        MaThanhPhan,
+        MaCongThuc,
+        MaNguyenLieu,
+        MaDonVi,
+        SoLuong
+    )
+    SELECT
+        tp.MaThanhPhan,
+        @MaCongThuc,
+        nl.MaNguyenLieu,
+        tp.MaDonVi,
+        tp.SoLuong
+    FROM @TP tp
+    INNER JOIN dbo.NguyenLieu nl
+        ON nl.TenNguyenLieu = tp.TenNguyenLieu;
+
+    -- Chỉ công bố lại khi đã có từ 2 bước trở lên.
+    IF
+    (
+        SELECT COUNT(*)
+        FROM dbo.BuocCheBien
+        WHERE MaCongThuc = @MaCongThuc
+    ) >= 2
+    BEGIN
+        UPDATE dbo.CongThuc
+        SET DaCongBo = 1
+        WHERE MaCongThuc = @MaCongThuc;
+    END;
+
+    COMMIT TRANSACTION;
+
+    IF
+    (
+        SELECT COUNT(*)
+        FROM dbo.BuocCheBien
+        WHERE MaCongThuc = @MaCongThuc
+    ) >= 2
+        PRINT N'Đã cập nhật 11 nguyên liệu và công bố lại CT921.';
+    ELSE
+        PRINT N'Đã cập nhật 11 nguyên liệu cho CT921. Công thức đang ở trạng thái nháp vì chưa có tối thiểu 2 bước chế biến.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20) = N'MA922';
+    DECLARE @MaCongThuc NVARCHAR(20) = N'CT922';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    SELECT @MaDanhMuc = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món hấp';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51201, N'Không tìm thấy danh mục Món hấp.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = @MaMonAn)
+        THROW 51202, N'Mã món MA922 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc = @MaCongThuc)
+        THROW 51203, N'Mã công thức CT922 đã tồn tại.', 1;
+
+    IF COL_LENGTH(N'dbo.MonAn', N'ThoiGianChuanBi') IS NULL
+        ALTER TABLE dbo.MonAn ADD ThoiGianChuanBi INT NULL;
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi = N'DVT014')
+        INSERT dbo.DonViTinh (MaDonVi, TenDonVi, KyHieu, HeSoGramChuan)
+        VALUES (N'DVT014', N'Ít', N'ít', NULL);
+
+    DECLARE @NL TABLE
+    (
+        TenNguyenLieu NVARCHAR(150) PRIMARY KEY,
+        MoTa NVARCHAR(500)
+    );
+
+    INSERT INTO @NL
+    VALUES
+    (N'Nghêu', N'Nghêu tươi.'),
+    (N'Sốt lẩu Thái (khoảng 1/2 chai)', N'Sốt lẩu Thái.'),
+    (N'Dừa (lấy nước)', N'Dừa tươi, lấy nước.'),
+    (N'Sả', N'Sả tươi.'),
+    (N'Ớt hiểm', N'Ớt hiểm tươi.'),
+    (N'Gừng', N'Gừng tươi.'),
+    (N'Hành tím', N'Hành tím.'),
+    (N'Nước mắm', N'Nước mắm.'),
+    (N'Gia vị thông dụng (hạt nêm/ đường/ muối)', N'Hạt nêm, đường và muối.'),
+    (N'Dầu ăn', N'Dầu ăn.');
+
+    DECLARE @MaxNL INT;
+
+    SELECT @MaxNL =
+        ISNULL(MAX(TRY_CONVERT(INT, SUBSTRING(MaNguyenLieu, 3, 18))), 0)
+    FROM dbo.NguyenLieu;
+
+    ;WITH NLCanThem AS
+    (
+        SELECT
+            TenNguyenLieu,
+            MoTa,
+            ROW_NUMBER() OVER (ORDER BY TenNguyenLieu) AS STT
+        FROM @NL nl
+        WHERE NOT EXISTS
+        (
+            SELECT 1
+            FROM dbo.NguyenLieu x
+            WHERE x.TenNguyenLieu = nl.TenNguyenLieu
+        )
+    )
+    INSERT dbo.NguyenLieu
+    (
+        MaNguyenLieu,
+        TenNguyenLieu,
+        MoTa
+    )
+    SELECT
+        N'NL' + CONVERT(NVARCHAR(18), @MaxNL + STT),
+        TenNguyenLieu,
+        MoTa
+    FROM NLCanThem;
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        ThoiGianChuanBi,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Nghêu hấp Thái',
+        N'Nếu bạn yêu thích những món ăn ngon từ nghêu thì đừng bỏ qua bài viết này nhé!',
+        15,
+        20,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DaCongBo
+    )
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Nghêu hấp Thái thơm cay, đậm đà.',
+        4,
+        0
+    );
+
+    DECLARE @TP TABLE
+    (
+        MaThanhPhan NVARCHAR(20) PRIMARY KEY,
+        TenNguyenLieu NVARCHAR(150),
+        MaDonVi NVARCHAR(20),
+        SoLuong DECIMAL(12,3)
+    );
+
+    INSERT INTO @TP
+    VALUES
+    (N'TP1115', N'Nghêu', N'DVT002', 3),
+    (N'TP1116', N'Sốt lẩu Thái (khoảng 1/2 chai)', N'DVT001', 140),
+    (N'TP1117', N'Dừa (lấy nước)', N'DVT005', 1),
+    (N'TP1118', N'Sả', N'DVT011', 3),
+    (N'TP1119', N'Ớt hiểm', N'DVT005', 8),
+    (N'TP1120', N'Gừng', N'DVT010', 1),
+    (N'TP1121', N'Hành tím', N'DVT010', 3),
+    (N'TP1122', N'Nước mắm', N'DVT006', 1),
+    (N'TP1123', N'Gia vị thông dụng (hạt nêm/ đường/ muối)', N'DVT014', 1),
+    (N'TP1124', N'Dầu ăn', N'DVT006', 3);
+
+    IF EXISTS
+    (
+        SELECT 1
+        FROM @TP tp
+        LEFT JOIN dbo.NguyenLieu nl
+            ON nl.TenNguyenLieu = tp.TenNguyenLieu
+        LEFT JOIN dbo.DonViTinh dv
+            ON dv.MaDonVi = tp.MaDonVi
+        WHERE nl.MaNguyenLieu IS NULL
+           OR dv.MaDonVi IS NULL
+    )
+        THROW 51204, N'Không tìm thấy nguyên liệu hoặc đơn vị tính.', 1;
+
+    INSERT dbo.ThanhPhanCongThuc
+    (
+        MaThanhPhan,
+        MaCongThuc,
+        MaNguyenLieu,
+        MaDonVi,
+        SoLuong
+    )
+    SELECT
+        tp.MaThanhPhan,
+        @MaCongThuc,
+        nl.MaNguyenLieu,
+        tp.MaDonVi,
+        tp.SoLuong
+    FROM @TP tp
+    INNER JOIN dbo.NguyenLieu nl
+        ON nl.TenNguyenLieu = tp.TenNguyenLieu;
+
+    INSERT dbo.BuocCheBien
+    (
+        MaBuoc,
+        MaCongThuc,
+        ThuTu,
+        NoiDung,
+        ThoiGianThucHien
+    )
+    VALUES
+    (
+        N'BCB92201',
+        @MaCongThuc,
+        1,
+        N'~ Sơ chế nghêu ~
+
+Nghêu mua về bạn rửa thật sạch rồi cho vào thau nước. Để nghêu nhã sạch bùn đất, bạn ngâm nghêu cùng 1 muỗng cà phê muối, 2 trái ớt hiểm cắt nhỏ trong khoảng 1 - 2 tiếng.
+
+Sau đó, bạn vớt nghêu ra và rửa lại với nước sạch rồi để ráo.',
+        20
+    ),
+    (
+        N'BCB92202',
+        @MaCongThuc,
+        2,
+        N'~ Sơ chế các nguyên liệu khác ~
+
+Bạn rửa sạch sả, để ráo và cắt khúc dài khoảng 3 đốt ngón tay, sau đó dùng dao đập dập sả.
+
+Hành tím lột vỏ, rửa sạch và băm nhỏ. Ớt rửa sạch, bỏ cuống và cắt nhỏ. Gừng mang đi rửa với nước sạch và cắt lát.',
+        5
+    ),
+    (
+        N'BCB92203',
+        @MaCongThuc,
+        3,
+        N'~ Nấu nghêu hấp thái ~
+
+Bạn cho vào nồi 3 muỗng canh dầu ăn rồi nấu trên bếp ở nhiệt độ cao đến khi dầu sôi thì cho các nguyên liệu đã sơ chế ở bước 2 vào, xào khoảng 2 phút đến khi dậy mùi thơm.
+
+Tiếp theo, bạn cho nước dừa vào nấu cùng khoảng 5 - 7 phút đến khi nước dừa sôi thì cho 1/2 chai sốt lẩu thái vào nồi rồi khuấy đều. Đậy nắp lại và nấu thêm 5- 7 phút nữa.
+
+Khi nước sôi trở lại, bạn mở nắp ra và thêm vào 1/2 muỗng canh hạt nêm, 1 muỗng canh nước mắm, 2 muỗng canh đường và khuấy đều.
+
+Cho ngay nghêu đã sơ chế sạch vào nồi và đậy nắp lại nấu trong 10 phút đến khi nghêu mở miệng hết thì tắt bếp.',
+        25
+    ),
+    (
+        N'BCB92204',
+        @MaCongThuc,
+        4,
+        N'~ Thành phẩm ~
+
+Vậy là món nghêu hấp Thái đã hoàn thành xong rồi đấy.
+
+Nồi nghêu nóng hổi, nghi ngút với phần thịt nghêu nấu vừa chín tới nên vẫn giữ được độ dai ngon và vị ngọt tự nhiên vốn có. Thêm vào đó là phần nước dùng đậm đà, mặn mặn ngọt ngọt, thơm lừng hương sả, gừng xen lẫn vị cay nồng của ớt cực kỳ kích thích vị giác, khiến bạn chỉ muốn ăn mãi thôi!',
+        5
+    );
+
+    INSERT dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim,
+        MaCongThuc,
+        TieuDe,
+        DuongDan,
+        MoTa
+    )
+    VALUES
+    (
+        N'DP922',
+        @MaCongThuc,
+        N'Nghêu hấp Thái',
+        N'https://www.youtube.com/watch?v=R1b6DYokGNg',
+        N'Video hướng dẫn làm nghêu hấp Thái.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = @MaCongThuc;
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20) = N'MA923';
+    DECLARE @MaCongThuc NVARCHAR(20) = N'CT923';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    SELECT @MaDanhMuc = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món hấp';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51210, N'Không tìm thấy danh mục Món hấp.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = @MaMonAn)
+        THROW 51211, N'Mã món MA923 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc = @MaCongThuc)
+        THROW 51212, N'Mã công thức CT923 đã tồn tại.', 1;
+
+    IF COL_LENGTH(N'dbo.MonAn', N'ThoiGianChuanBi') IS NULL
+        ALTER TABLE dbo.MonAn ADD ThoiGianChuanBi INT NULL;
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi = N'DVT014')
+        INSERT dbo.DonViTinh (MaDonVi, TenDonVi, KyHieu, HeSoGramChuan)
+        VALUES (N'DVT014', N'Ít', N'ít', NULL);
+
+    DECLARE @NL TABLE
+    (
+        TenNguyenLieu NVARCHAR(150) PRIMARY KEY,
+        MoTa NVARCHAR(500)
+    );
+
+    INSERT INTO @NL
+    VALUES
+    (N'Cá lóc (1 con)', N'Cá lóc tươi.'),
+    (N'Thịt ba chỉ', N'Thịt ba chỉ.'),
+    (N'Tương hột', N'Tương hột.'),
+    (N'Cà rốt (1/2 củ)', N'Cà rốt.'),
+    (N'Hành tây', N'Hành tây.'),
+    (N'Hành lá', N'Hành lá.'),
+    (N'Nấm mèo (1 tai)', N'Nấm mèo.'),
+    (N'Bún tàu', N'Bún tàu.'),
+    (N'Gừng (2 củ)', N'Gừng tươi.'),
+    (N'Hành tím băm', N'Hành tím băm.'),
+    (N'Tỏi băm', N'Tỏi băm.'),
+    (N'Rượu trắng', N'Rượu trắng.'),
+    (N'Gia vị thông dụng (Muối/ Đường/ Tiêu xay)', N'Muối, đường và tiêu xay.'),
+    (N'Nước', N'Nước dùng để hấp cá.');
+
+    DECLARE @MaxNL INT;
+
+    SELECT @MaxNL =
+        ISNULL(MAX(TRY_CONVERT(INT, SUBSTRING(MaNguyenLieu, 3, 18))), 0)
+    FROM dbo.NguyenLieu;
+
+    ;WITH NLCanThem AS
+    (
+        SELECT
+            TenNguyenLieu,
+            MoTa,
+            ROW_NUMBER() OVER (ORDER BY TenNguyenLieu) AS STT
+        FROM @NL nl
+        WHERE NOT EXISTS
+        (
+            SELECT 1
+            FROM dbo.NguyenLieu x
+            WHERE x.TenNguyenLieu = nl.TenNguyenLieu
+        )
+    )
+    INSERT dbo.NguyenLieu
+    (
+        MaNguyenLieu,
+        TenNguyenLieu,
+        MoTa
+    )
+    SELECT
+        N'NL' + CONVERT(NVARCHAR(18), @MaxNL + STT),
+        TenNguyenLieu,
+        MoTa
+    FROM NLCanThem;
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        ThoiGianChuanBi,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Cá lóc hấp tương',
+        N'Mời bạn cùng CookHub làm ngay một món hấp thơm ngon, bổ dưỡng mà thành viên nào trong nhà bạn cũng có thể thưởng thức, đó chính là cá lóc hấp tương. Nào, thực hiện ngay thôi!',
+        30,
+        40,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DaCongBo
+    )
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Cá lóc hấp tương thơm ngon, đậm đà.',
+        4,
+        0
+    );
+
+    DECLARE @TP TABLE
+    (
+        MaThanhPhan NVARCHAR(20) PRIMARY KEY,
+        TenNguyenLieu NVARCHAR(150),
+        MaDonVi NVARCHAR(20),
+        SoLuong DECIMAL(12,3)
+    );
+
+    INSERT INTO @TP
+    VALUES
+    (N'TP1125', N'Cá lóc (1 con)', N'DVT002', 1),
+    (N'TP1126', N'Thịt ba chỉ', N'DVT001', 300),
+    (N'TP1127', N'Tương hột', N'DVT006', 5),
+    (N'TP1128', N'Cà rốt (1/2 củ)', N'DVT001', 100),
+    (N'TP1129', N'Hành tây', N'DVT010', 1),
+    (N'TP1130', N'Hành lá', N'DVT011', 1),
+    (N'TP1131', N'Nấm mèo (1 tai)', N'DVT001', 15),
+    (N'TP1132', N'Bún tàu', N'DVT001', 20),
+    (N'TP1133', N'Gừng (2 củ)', N'DVT001', 100),
+    (N'TP1134', N'Hành tím băm', N'DVT007', 2),
+    (N'TP1135', N'Tỏi băm', N'DVT007', 2),
+    (N'TP1136', N'Rượu trắng', N'DVT006', 1),
+    (N'TP1137', N'Gia vị thông dụng (Muối/ Đường/ Tiêu xay)', N'DVT014', 1),
+    (N'TP1138', N'Nước', N'DVT003', 300);
+
+    IF EXISTS
+    (
+        SELECT 1
+        FROM @TP tp
+        LEFT JOIN dbo.NguyenLieu nl
+            ON nl.TenNguyenLieu = tp.TenNguyenLieu
+        LEFT JOIN dbo.DonViTinh dv
+            ON dv.MaDonVi = tp.MaDonVi
+        WHERE nl.MaNguyenLieu IS NULL
+           OR dv.MaDonVi IS NULL
+    )
+        THROW 51213, N'Không tìm thấy nguyên liệu hoặc đơn vị tính.', 1;
+
+    INSERT dbo.ThanhPhanCongThuc
+    (
+        MaThanhPhan,
+        MaCongThuc,
+        MaNguyenLieu,
+        MaDonVi,
+        SoLuong
+    )
+    SELECT
+        tp.MaThanhPhan,
+        @MaCongThuc,
+        nl.MaNguyenLieu,
+        tp.MaDonVi,
+        tp.SoLuong
+    FROM @TP tp
+    INNER JOIN dbo.NguyenLieu nl
+        ON nl.TenNguyenLieu = tp.TenNguyenLieu;
+
+    INSERT dbo.BuocCheBien
+    (
+        MaBuoc,
+        MaCongThuc,
+        ThuTu,
+        NoiDung,
+        ThoiGianThucHien
+    )
+    VALUES
+    (
+        N'BCB92301',
+        @MaCongThuc,
+        1,
+        N'~ Sơ chế và ướp cá lóc ~
+
+Đầu tiên, cá lóc mua về cắt bỏ đầu, mang và đuôi bỏ đi. Sau đó, bạn cạo sạch vẩy rồi rửa sơ với nước, tiếp đến bạn dùng dao cắt 1 đường ở phần bụng cá để lấy sạch phần ruột và máu dơ còn tích tụ bên trong.
+
+Để cá được sạch hoàn toàn, bạn lấy 1 ít muối chà sát lên bề mặt cá 3 - 5 phút rồi rửa lại với nước sạch 1 - 2 lần thì để ráo.
+
+Kế đến, tiến hành ướp cá cùng 1 muỗng cà phê muối, 2 muỗng cà phê đường, 1 muỗng canh rượu trắng, 50gr (1 củ) gừng đã được lột vỏ giã nhuyễn và 4 muỗng canh tương hột.
+
+Bạn xoa đều gia vị khắp thân cá rồi để yến ướp cho cá thấm gia vị trong vòng 20 phút.
+
+Mách nhỏ: Để cá được thấm đều gia vị hơn bạn có thể khứa trên 2 bề mặt cá 2 - 3 đường hình chữ thập nhé!',
+        25
+    ),
+    (
+        N'BCB92302',
+        @MaCongThuc,
+        2,
+        N'~ Sơ chế các nguyên liệu khác ~
+
+Thịt ba chỉ mua về rửa sơ với nước muối pha loãng, sau đó rửa sạch lại, để ráo, cắt thành khúc vừa ăn.
+
+Đối với cà rốt, gừng bạn bào vỏ, rửa sạch, đem cắt sợi.
+
+Hành tây chỉ cần lột vỏ cắt múi cau. Còn hành lá thì bỏ rễ, rửa sạch, cắt khúc là được.
+
+Kế đến, bạn tiến hành ngâm nấm mèo, bún tàu cùng nước 45 - 60 phút đến khi nở mềm. Tiếp theo, chắt nước rồi đem nấm mèo cắt sợi, bún tàu cắt khúc.
+
+Mách nhỏ: Để không kích thích các chất không tốt của nấm mèo, nên nhớ không ngâm với nước nóng và tuyệt đối chỉ ngâm trong vòng tối đa 3 tiếng.',
+        15
+    ),
+    (
+        N'BCB92303',
+        @MaCongThuc,
+        3,
+        N'~ Làm nhân nhồi cá ~
+
+Chuẩn bị 1 cái tô cho 300gr thịt ba chỉ cắt khúc, 2 muỗng cà phê đường, 1 muỗng cà phê tiêu xay, 1 muỗng cà phê muối, 2 muỗng cà phê hành tím băm, 2 muỗng cà phê tỏi băm, gừng và cà rốt xắt sợi.
+
+Tiếp tục thêm vào 1 tai nấm mèo cắt sợi, 1 muỗng canh tương hột, 1 nhánh hành lá và 20gr bún tàu cắt khúc, trộn đều tất cả nguyên liệu lên với nhau là được.',
+        10
+    ),
+    (
+        N'BCB92304',
+        @MaCongThuc,
+        4,
+        N'~ Nhồi nhân và hấp cá ~
+
+Kế đến, bạn lấy 1/2 số nhân vừa chuẩn bị xong nhồi vào phần bụng cá rồi cho ra dĩa rồi xếp hết 1/2 số nhân còn lại xung quanh rồi đem đi hấp.
+
+Bạn đun sôi 300ml trong nồi hấp trước, sau đó đặt dĩa cá vào xửng và tiến hành hấp cá trong vòng 25 - 30 phút đến khi cá chín thì tắt bếp, lấy cá ra khỏi xửng.
+
+Mách nhỏ:
+- Tránh cá khi hấp xong sẽ không được đẹp mắt bạn không nên nhồi nhân quá nhiều, chỉ nên vừa đủ thôi nhé!
+- Trong quá trình hấp, không để cháy xửng thì lưu ý kiểm tra thường xuyên nước ở hộc dưới.
+- Để tiết kiệm thời gian hấp, bạn có thể dùng nước ấm hoặc sôi cho vào hộc dưới xửng hấp nha!',
+        30
+    ),
+    (
+        N'BCB92305',
+        @MaCongThuc,
+        5,
+        N'~ Thành phẩm ~
+
+Bày biện món cá lóc hấp tương ra rồi chiêu đãi gia đình, bạn bè ngay thôi nào! Điện máy XANH tin rằng cho dù chỉ mới vô tình chạm nhẹ ánh mắt cũng đã khiến mọi người không thể cưỡng lại rồi!
+
+Cá lóc thì tươi ngon ngọt thịt vô cùng, quyện với tương hột mặn mặn ngọt ngọt rất thú vị, đã thế còn là cái dai ngon sần sật của cà rốt, nấm mèo, bún tàu, cùng hương thơm thoang thoảng của gừng. Ôi làm sao mà dừng lại được đây!
+
+Để hương vị món ăn được trọn vẹn hơn, bạn có thể cuốn cùng bánh tráng và rau sống, chấm thêm chén nước mắm chua ngọt nữa nha!',
+        5
+    );
+
+    INSERT dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim,
+        MaCongThuc,
+        TieuDe,
+        DuongDan,
+        MoTa
+    )
+    VALUES
+    (
+        N'DP923',
+        @MaCongThuc,
+        N'Cá lóc hấp tương',
+        N'https://www.youtube.com/watch?v=oJ1dFrjtqMI',
+        N'Video hướng dẫn làm cá lóc hấp tương.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = @MaCongThuc;
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20) = N'MA924';
+    DECLARE @MaCongThuc NVARCHAR(20) = N'CT924';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+    DECLARE @DonViCay NVARCHAR(20);
+
+    SELECT @MaDanhMuc = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món lẩu';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51220, N'Không tìm thấy danh mục Món lẩu.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = @MaMonAn)
+        THROW 51221, N'Mã món MA924 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc = @MaCongThuc)
+        THROW 51222, N'Mã công thức CT924 đã tồn tại.', 1;
+
+    IF COL_LENGTH(N'dbo.MonAn', N'ThoiGianChuanBi') IS NULL
+        ALTER TABLE dbo.MonAn ADD ThoiGianChuanBi INT NULL;
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi = N'DVT014')
+        INSERT dbo.DonViTinh (MaDonVi, TenDonVi, KyHieu, HeSoGramChuan)
+        VALUES (N'DVT014', N'Ít', N'ít', NULL);
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.DonViTinh WHERE TenDonVi = N'Cây')
+    BEGIN
+        DECLARE @MaDonViMoi NVARCHAR(20);
+
+        SELECT @MaDonViMoi =
+            N'DVT' + CONVERT(NVARCHAR(17),
+                ISNULL(MAX(TRY_CONVERT(INT, SUBSTRING(MaDonVi, 4, 17))), 0) + 1)
+        FROM dbo.DonViTinh;
+
+        INSERT dbo.DonViTinh
+        (
+            MaDonVi,
+            TenDonVi,
+            KyHieu,
+            HeSoGramChuan
+        )
+        VALUES
+        (
+            @MaDonViMoi,
+            N'Cây',
+            N'cây',
+            NULL
+        );
+    END;
+
+    SELECT @DonViCay = MaDonVi
+    FROM dbo.DonViTinh
+    WHERE TenDonVi = N'Cây';
+
+    DECLARE @NL TABLE
+    (
+        TenNguyenLieu NVARCHAR(150) PRIMARY KEY,
+        MoTa NVARCHAR(500)
+    );
+
+    INSERT INTO @NL
+    VALUES
+    (N'Bao tử dê', N'Bao tử dê đã sơ chế sạch.'),
+    (N'Thăn bò', N'Thăn bò.'),
+    (N'Gừng', N'Gừng tươi.'),
+    (N'Hành baro', N'Hành baro.'),
+    (N'Quế cây', N'Quế cây.'),
+    (N'Hoa hồi', N'Hoa hồi.'),
+    (N'Táo đỏ', N'Táo đỏ.'),
+    (N'Đông trùng hạ thảo', N'Đông trùng hạ thảo.'),
+    (N'Hành tây', N'Hành tây.'),
+    (N'Hoa hẹ', N'Hoa hẹ.'),
+    (N'Táo', N'Táo tươi.'),
+    (N'Gia vị thông dụng (Đường/ Hạt nêm/ Dầu hào/ Muối hạt/ Đường phèn/ Tiêu xay/ Rượu trắng)', N'Đường, hạt nêm, dầu hào, muối hạt, đường phèn, tiêu xay và rượu trắng.'),
+    (N'Sả', N'Sả đập dập.'),
+    (N'Tỏi', N'Tỏi.'),
+    (N'Ớt', N'Ớt tươi.'),
+    (N'Nước dừa tươi', N'Nước dừa tươi.'),
+    (N'Nấm hương', N'Nấm hương.');
+
+    DECLARE @MaxNL INT;
+
+    SELECT @MaxNL =
+        ISNULL(MAX(TRY_CONVERT(INT, SUBSTRING(MaNguyenLieu, 3, 18))), 0)
+    FROM dbo.NguyenLieu;
+
+    ;WITH NLCanThem AS
+    (
+        SELECT
+            TenNguyenLieu,
+            MoTa,
+            ROW_NUMBER() OVER (ORDER BY TenNguyenLieu) AS STT
+        FROM @NL nl
+        WHERE NOT EXISTS
+        (
+            SELECT 1
+            FROM dbo.NguyenLieu x
+            WHERE x.TenNguyenLieu = nl.TenNguyenLieu
+        )
+    )
+    INSERT dbo.NguyenLieu
+    (
+        MaNguyenLieu,
+        TenNguyenLieu,
+        MoTa
+    )
+    SELECT
+        N'NL' + CONVERT(NVARCHAR(18), @MaxNL + STT),
+        TenNguyenLieu,
+        MoTa
+    FROM NLCanThem;
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        ThoiGianChuanBi,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Lẩu bò Mông Cổ',
+        N'Bạn muốn thưởng thức lẩu bò Mông Cổ chuẩn vị ngay tại nhà? Hãy cùng vào bếp thực hiện ngay món lẩu thơm lừng thảo mộc và bổ dưỡng để chiêu đãi cả gia đình một bữa tiệc vị giác thật bùng nổ nhé.',
+        60,
+        30,
+        N'Trung bình',
+        NULL
+    );
+
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DaCongBo
+    )
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Lẩu bò Mông Cổ thơm lừng thảo mộc và bổ dưỡng.',
+        4,
+        0
+    );
+
+    DECLARE @TP TABLE
+    (
+        MaThanhPhan NVARCHAR(20) PRIMARY KEY,
+        TenNguyenLieu NVARCHAR(150),
+        MaDonVi NVARCHAR(20),
+        SoLuong DECIMAL(12,3)
+    );
+
+    INSERT INTO @TP
+    VALUES
+    (N'TP1139', N'Bao tử dê', N'DVT005', 2),
+    (N'TP1140', N'Thăn bò', N'DVT001', 500),
+    (N'TP1141', N'Gừng', N'DVT001', 20),
+    (N'TP1142', N'Hành baro', N'DVT001', 30),
+    (N'TP1143', N'Quế cây', N'DVT011', 1),
+    (N'TP1144', N'Hoa hồi', N'DVT005', 2),
+    (N'TP1145', N'Táo đỏ', N'DVT005', 10),
+    (N'TP1146', N'Đông trùng hạ thảo', N'DVT001', 50),
+    (N'TP1147', N'Hành tây', N'DVT010', 2),
+    (N'TP1148', N'Hoa hẹ', N'DVT001', 100),
+    (N'TP1149', N'Táo', N'DVT001', 50),
+    (N'TP1150', N'Gia vị thông dụng (Đường/ Hạt nêm/ Dầu hào/ Muối hạt/ Đường phèn/ Tiêu xay/ Rượu trắng)', N'DVT014', 1),
+    (N'TP1151', N'Sả', @DonViCay, 1),
+    (N'TP1152', N'Tỏi', N'DVT014', 1),
+    (N'TP1153', N'Ớt', N'DVT014', 1),
+    (N'TP1154', N'Nước dừa tươi', N'DVT003', 2500),
+    (N'TP1155', N'Nấm hương', @DonViCay, 10);
+
+    IF EXISTS
+    (
+        SELECT 1
+        FROM @TP tp
+        LEFT JOIN dbo.NguyenLieu nl
+            ON nl.TenNguyenLieu = tp.TenNguyenLieu
+        LEFT JOIN dbo.DonViTinh dv
+            ON dv.MaDonVi = tp.MaDonVi
+        WHERE nl.MaNguyenLieu IS NULL
+           OR dv.MaDonVi IS NULL
+    )
+        THROW 51223, N'Không tìm thấy nguyên liệu hoặc đơn vị tính.', 1;
+
+    INSERT dbo.ThanhPhanCongThuc
+    (
+        MaThanhPhan,
+        MaCongThuc,
+        MaNguyenLieu,
+        MaDonVi,
+        SoLuong
+    )
+    SELECT
+        tp.MaThanhPhan,
+        @MaCongThuc,
+        nl.MaNguyenLieu,
+        tp.MaDonVi,
+        tp.SoLuong
+    FROM @TP tp
+    INNER JOIN dbo.NguyenLieu nl
+        ON nl.TenNguyenLieu = tp.TenNguyenLieu;
+
+    INSERT dbo.BuocCheBien
+    (
+        MaBuoc,
+        MaCongThuc,
+        ThuTu,
+        NoiDung,
+        ThoiGianThucHien
+    )
+    VALUES
+    (
+        N'BCB92401',
+        @MaCongThuc,
+        1,
+        N'~ Sơ chế và xay thịt bò làm nhân ~
+
+Đầu tiên, bạn cho 500gr thăn bò, 20gr gừng cắt lát và 30gr hành baro đã cắt khúc vào máy xay thịt. Thêm vào hỗn hợp 1/2 muỗng canh đường, 1/2 muỗng canh hạt nêm, 1 muỗng canh dầu hào và một ít tiêu xay. Sau đó, bạn xay thịt vừa đủ sao cho thịt tơi nhưng không quá nhuyễn, như vậy sẽ tạo độ sần sật cho nhân khi ăn.',
+        10
+    ),
+    (
+        N'BCB92402',
+        @MaCongThuc,
+        2,
+        N'~ Nhồi và tạo hình viên bao tử ~
+
+Bạn lấy bao tử dê đã được sơ chế sạch ra thớt. Dùng muỗng lấy một lượng thịt bò đã xay nhồi vào bên trong bao tử dê, sau đó cuộn tròn và dùng chỉ thực phẩm cột thật chặt phần miệng bao tử để tạo hình thành những viên tròn như quả bóng nhỏ.',
+        10
+    ),
+    (
+        N'BCB92403',
+        @MaCongThuc,
+        3,
+        N'~ Chần sơ bao tử nhồi thịt ~
+
+Bạn đun sôi nước cùng sả đập dập, gừng lát và 50ml rượu trắng để tạo mùi thơm. Khi nước đã sôi mạnh, bạn cho các viên bao tử nhồi thịt vào chần sơ qua để loại bỏ hoàn toàn mùi hôi và giúp lớp vỏ săn lại. Sau khi chần xong, bạn vớt viên bao tử ra và rửa lại ngay với nước lạnh cho sạch.',
+        10
+    ),
+    (
+        N'BCB92404',
+        @MaCongThuc,
+        4,
+        N'~ Làm nước chấm hoa hẹ độc đáo ~
+
+Bạn chuẩn bị hoa hẹ, một ít gừng, tỏi và ớt. Cho tất cả các nguyên liệu này vào máy xay cùng với 50gr táo, một ít muối, đường và một chút nước lọc. Bạn xay cho đến khi hỗn hợp nhuyễn mịn, tạo thành một loại nước sốt có màu xanh bắt mắt và vị cay nồng đặc trưng. Ngoài ra, nếu không thích nước chấm hoa hẹ, bạn có thể chuẩn bị thêm nước chấm chao bằng cách tán nhuyễn 2 miếng chao với sa tế và đường.',
+        10
+    ),
+    (
+        N'BCB92405',
+        @MaCongThuc,
+        5,
+        N'~ Nấu nước lẩu bò Mông Cổ ~
+
+Bạn chuẩn bị các loại gia vị lẩu bò Mông Cổ gồm quế, hồi, táo đỏ, đông trùng hạ thảo, hành baro, hành tây và gừng (đã nướng thơm). Dùng 2.5L nước dừa tươi, nêm nếm cùng 1 muỗng canh muối hạt, 1 muỗng canh đường phèn. Bạn cho các viên bao tử đã chần vào nước lẩu và hầm 60 phút cho chín mềm.',
+        60
+    ),
+    (
+        N'BCB92406',
+        @MaCongThuc,
+        6,
+        N'~ Hoàn thành nước lẩu ~
+
+Sau khi viên bao tử mềm, bạn thêm 10 cây nấm hương cùng 1.5 muỗng canh hạt nêm và nêm nếm lại theo khẩu vị gia đình mình nhé.',
+        5
+    ),
+    (
+        N'BCB92407',
+        @MaCongThuc,
+        7,
+        N'~ Thành phẩm ~
+
+Món lẩu bò Mông Cổ sau khi hoàn tất có nước dùng thanh ngọt, thơm mùi thảo mộc và rất bổ dưỡng cho sức khỏe. Lẩu được ăn kèm với bắp bò thái mỏng và rau nấm tươi giòn. Viên bao tử nhồi thịt có lớp vỏ dai giòn, phần nhân thịt bò bên trong đậm đà, khi chấm cùng sốt hoa hẹ cay nồng sẽ tạo nên hương vị vô cùng bùng nổ. Đây chính là cách nấu lẩu bò Mông Cổ chuẩn vị tại nhà đơn giản nhất mà bạn có thể thực hiện.',
+        5
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = @MaCongThuc;
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20) = N'MA925';
+    DECLARE @MaCongThuc NVARCHAR(20) = N'CT925';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    SELECT @MaDanhMuc = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món lẩu';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51230, N'Không tìm thấy danh mục Món lẩu.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = @MaMonAn)
+        THROW 51231, N'Mã món MA925 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc = @MaCongThuc)
+        THROW 51232, N'Mã công thức CT925 đã tồn tại.', 1;
+
+    IF COL_LENGTH(N'dbo.MonAn', N'ThoiGianChuanBi') IS NULL
+        ALTER TABLE dbo.MonAn ADD ThoiGianChuanBi INT NULL;
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi = N'DVT014')
+        INSERT dbo.DonViTinh (MaDonVi, TenDonVi, KyHieu, HeSoGramChuan)
+        VALUES (N'DVT014', N'Ít', N'ít', NULL);
+
+    DECLARE @NL TABLE
+    (
+        TenNguyenLieu NVARCHAR(150) PRIMARY KEY,
+        MoTa NVARCHAR(500)
+    );
+
+    INSERT INTO @NL
+    VALUES
+    (N'Thịt bò', N'Thịt bò thái lát mỏng.'),
+    (N'Thơm (dứa)', N'Thơm tươi.'),
+    (N'Hành tây', N'Hành tây.'),
+    (N'Tỏi', N'Tỏi.'),
+    (N'Hành tím', N'Hành tím.'),
+    (N'Sả', N'Sả tươi.'),
+    (N'Ớt hiểm', N'Ớt hiểm tươi.'),
+    (N'Nước dừa tươi', N'Nước dừa tươi.'),
+    (N'Giấm (dấm)', N'Giấm.'),
+    (N'Đường phèn', N'Đường phèn.'),
+    (N'Mắm nêm', N'Mắm nêm.'),
+    (N'Dầu ăn', N'Dầu ăn.'),
+    (N'Muối/ đường', N'Muối và đường.');
+
+    DECLARE @MaxNL INT;
+
+    SELECT @MaxNL =
+        ISNULL(MAX(TRY_CONVERT(INT, SUBSTRING(MaNguyenLieu, 3, 18))), 0)
+    FROM dbo.NguyenLieu;
+
+    ;WITH NLCanThem AS
+    (
+        SELECT
+            TenNguyenLieu,
+            MoTa,
+            ROW_NUMBER() OVER (ORDER BY TenNguyenLieu) AS STT
+        FROM @NL nl
+        WHERE NOT EXISTS
+        (
+            SELECT 1
+            FROM dbo.NguyenLieu x
+            WHERE x.TenNguyenLieu = nl.TenNguyenLieu
+        )
+    )
+    INSERT dbo.NguyenLieu
+    (
+        MaNguyenLieu,
+        TenNguyenLieu,
+        MoTa
+    )
+    SELECT
+        N'NL' + CONVERT(NVARCHAR(18), @MaxNL + STT),
+        TenNguyenLieu,
+        MoTa
+    FROM NLCanThem;
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        ThoiGianChuanBi,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Lẩu bò nhúng giấm (dấm)',
+        N'Nếu bạn vẫn đang băn khoăn chưa biết trổ tài làm món gì vào dịp cuối tuần để các thành viên quây quần bên nhau thì CookHub sẽ giới thiệu đến bạn công thức món lẩu siêu hấp dẫn sau đây! Nào cùng bắt tay vào bếp thực hiện ngay một nồi lẩu bò nhúng giấm (dấm) thơm ngon, bổ dưỡng thôi nào!',
+        20,
+        25,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DaCongBo
+    )
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Lẩu bò nhúng giấm (dấm) thơm ngon, bổ dưỡng.',
+        4,
+        0
+    );
+
+    DECLARE @TP TABLE
+    (
+        MaThanhPhan NVARCHAR(20) PRIMARY KEY,
+        TenNguyenLieu NVARCHAR(150),
+        MaDonVi NVARCHAR(20),
+        SoLuong DECIMAL(12,3)
+    );
+
+    INSERT INTO @TP
+    VALUES
+    (N'TP1156', N'Thịt bò', N'DVT002', 1),
+    (N'TP1157', N'Thơm (dứa)', N'DVT005', 0.5),
+    (N'TP1158', N'Hành tây', N'DVT010', 1),
+    (N'TP1159', N'Tỏi', N'DVT012', 4),
+    (N'TP1160', N'Hành tím', N'DVT010', 1),
+    (N'TP1161', N'Sả', N'DVT011', 2),
+    (N'TP1162', N'Ớt hiểm', N'DVT005', 2),
+    (N'TP1163', N'Nước dừa tươi', N'DVT004', 1.5),
+    (N'TP1164', N'Giấm (dấm)', N'DVT003', 100),
+    (N'TP1165', N'Đường phèn', N'DVT001', 30),
+    (N'TP1166', N'Mắm nêm', N'DVT006', 4),
+    (N'TP1167', N'Dầu ăn', N'DVT006', 2),
+    (N'TP1168', N'Muối/ đường', N'DVT014', 1);
+
+    IF EXISTS
+    (
+        SELECT 1
+        FROM @TP tp
+        LEFT JOIN dbo.NguyenLieu nl
+            ON nl.TenNguyenLieu = tp.TenNguyenLieu
+        LEFT JOIN dbo.DonViTinh dv
+            ON dv.MaDonVi = tp.MaDonVi
+        WHERE nl.MaNguyenLieu IS NULL
+           OR dv.MaDonVi IS NULL
+    )
+        THROW 51233, N'Không tìm thấy nguyên liệu hoặc đơn vị tính.', 1;
+
+    INSERT dbo.ThanhPhanCongThuc
+    (
+        MaThanhPhan,
+        MaCongThuc,
+        MaNguyenLieu,
+        MaDonVi,
+        SoLuong
+    )
+    SELECT
+        tp.MaThanhPhan,
+        @MaCongThuc,
+        nl.MaNguyenLieu,
+        tp.MaDonVi,
+        tp.SoLuong
+    FROM @TP tp
+    INNER JOIN dbo.NguyenLieu nl
+        ON nl.TenNguyenLieu = tp.TenNguyenLieu;
+
+    INSERT dbo.BuocCheBien
+    (
+        MaBuoc,
+        MaCongThuc,
+        ThuTu,
+        NoiDung,
+        ThoiGianThucHien
+    )
+    VALUES
+    (
+        N'BCB92501',
+        @MaCongThuc,
+        1,
+        N'~ Sơ chế thịt bò ~
+
+Đầu tiên, thịt bò mua về bạn đem rửa sơ với nước. Kế đến, dùng khăn ẩm sạch lau sơ trên bề mặt để sạch hết các bụi bẩn còn bám lại. Sau đó, dùng dao thái theo thớ ngang thành các lát mỏng vừa ăn.
+
+Lưu ý: Cách sơ chế thịt bò không bị hôi:
+- Bạn có thể sử dụng rượu trắng, gừng, muối, chanh hoặc giấm sau đó chà xát lên thịt để yên trong khoảng 5 - 10 phút rồi rửa sạch lại bằng nước.
+- Ngoài ra, trong lúc ướp thịt, bạn hãy nướng một củ hành tím, bóc vỏ, giã nhuyễn và ướp thêm cùng thịt bò thịt bò sẽ giúp khử mùi hôi vô cùng hiệu quả.',
+        10
+    ),
+    (
+        N'BCB92502',
+        @MaCongThuc,
+        2,
+        N'~ Sơ chế các nguyên liệu khác ~
+
+Thơm mua về bạn gọt vỏ, đồng thời loại khứa bỏ sạch mắt thơm, sau đó rửa sơ với nước cho sạch, để ráo, rồi dùng dao cắt làm 2 phần, 1 phần cắt lát mỏng, 1 phần băm nhuyễn.
+
+Sả thì bạn cắt gốc, rứa sạch rồi đập dập, cắt khúc. Tỏi, hành tím bạn lột vỏ, ớt hiểm bỏ cuống rồi đem băm nhuyễn cả tỏi, hành tím và ớt.
+
+Hành tây bạn lột bỏ vỏ, 1 nửa cắt lát mỏng, 1 nửa cắt múi cau. Phần hành tây cắt mỏng bạn cho vào dĩa thịt bò, trộn đều.',
+        15
+    ),
+    (
+        N'BCB92503',
+        @MaCongThuc,
+        3,
+        N'~ Nấu nước dấm nhúng bò ~
+
+Chuẩn bị nguyên liệu xong, bạn bắc nồi lên bếp cùng 2 muỗng canh dầu ăn với lửa vừa. Dầu sôi lăn tăn sôi bạn cho phần sả đập dập vào phi thơm.
+
+Kế đến, bạn cho phần tỏi, hành tím và ớt hiểm băm nhuyễn vào, tiếp tục dùng đũa xào đều thêm 2 phút.
+
+Sau đó, bạn thêm 1.5 lít nước dừa, 100ml giấm, 30gr đường phèn, hành tây cắt múi cau vào, dùng vá đảo đều rồi nấu khoảng 5 phút.
+
+Tiếp đó bạn nêm nếm gia vị vừa ăn nữa là nhúng thịt bò vào và thưởng thức thôi!',
+        15
+    ),
+    (
+        N'BCB92504',
+        @MaCongThuc,
+        4,
+        N'~ Pha nước chấm ~
+
+Bạn lấy chén rồi cho phần thơm băm nhuyễn, 4 muỗng canh mắm nêm, 2 muỗng canh đường, dùng muỗng trộn đều để tất cả được hòa lẫn với nhau.',
+        5
+    ),
+    (
+        N'BCB92505',
+        @MaCongThuc,
+        5,
+        N'~ Thành phẩm ~
+
+Lẩu bò nhúng giấm quả là món ăn vừa thơm ngon lại bổ dưỡng mà không thể chê vào đâu được các bạn nhỉ?
+
+Chỉ với vài bước đơn giản, thế là bạn đã có thể thưởng thức được từng miếng bò dai mềm nhúng với phần nước mặn mà, chua ngọt dịu nhẹ hấp dẫn vô cùng!
+
+Đặc biệt, lẩu bò nhúng dấm (giấm) còn có thể ăn cùng bún tươi, hoặc cuốn với bánh tráng và rau sống nữa đó nha! Chắc chắn phải chấm kèm với chén mắm nêm để món lẩu thêm tròn vị nữa đấy!',
+        5
+    );
+
+    INSERT dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim,
+        MaCongThuc,
+        TieuDe,
+        DuongDan,
+        MoTa
+    )
+    VALUES
+    (
+        N'DP925',
+        @MaCongThuc,
+        N'Lẩu bò nhúng giấm (dấm)',
+        N'https://www.youtube.com/watch?v=ndMpCvlpGxA',
+        N'Video hướng dẫn làm lẩu bò nhúng giấm (dấm).'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = @MaCongThuc;
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20) = N'MA926';
+    DECLARE @MaCongThuc NVARCHAR(20) = N'CT926';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    SELECT @MaDanhMuc = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món lẩu';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51240, N'Không tìm thấy danh mục Món lẩu.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = @MaMonAn)
+        THROW 51241, N'Mã món MA926 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc = @MaCongThuc)
+        THROW 51242, N'Mã công thức CT926 đã tồn tại.', 1;
+
+    IF COL_LENGTH(N'dbo.MonAn', N'ThoiGianChuanBi') IS NULL
+        ALTER TABLE dbo.MonAn ADD ThoiGianChuanBi INT NULL;
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi = N'DVT014')
+        INSERT dbo.DonViTinh (MaDonVi, TenDonVi, KyHieu, HeSoGramChuan)
+        VALUES (N'DVT014', N'Ít', N'ít', NULL);
+
+    DECLARE @NL TABLE
+    (
+        TenNguyenLieu NVARCHAR(150) PRIMARY KEY,
+        MoTa NVARCHAR(500)
+    );
+
+    INSERT INTO @NL
+    VALUES
+    (N'Cua đồng', N'Cua đồng tươi.'),
+    (N'Xương ống', N'Xương ống.'),
+    (N'Thịt bò', N'Thịt bò.'),
+    (N'Đậu hũ', N'Đậu hũ.'),
+    (N'Bún tươi', N'Bún tươi.'),
+    (N'Rau ăn kèm (Mồng tơi/mướp/rau muống/bắp cải/rau mồng tơi)', N'Rau ăn kèm lẩu cua đồng.'),
+    (N'Sả', N'Sả tươi.'),
+    (N'Hành tím', N'Hành tím.'),
+    (N'Tỏi băm', N'Tỏi băm.'),
+    (N'Cà chua', N'Cà chua.'),
+    (N'Gia vị thông dụng (đường/ muối/ hạt nêm)', N'Đường, muối và hạt nêm.'),
+    (N'Dầu ăn', N'Dầu ăn.');
+
+    DECLARE @MaxNL INT;
+
+    SELECT @MaxNL =
+        ISNULL(MAX(TRY_CONVERT(INT, SUBSTRING(MaNguyenLieu, 3, 18))), 0)
+    FROM dbo.NguyenLieu;
+
+    ;WITH NLCanThem AS
+    (
+        SELECT
+            TenNguyenLieu,
+            MoTa,
+            ROW_NUMBER() OVER (ORDER BY TenNguyenLieu) AS STT
+        FROM @NL nl
+        WHERE NOT EXISTS
+        (
+            SELECT 1
+            FROM dbo.NguyenLieu x
+            WHERE x.TenNguyenLieu = nl.TenNguyenLieu
+        )
+    )
+    INSERT dbo.NguyenLieu
+    (
+        MaNguyenLieu,
+        TenNguyenLieu,
+        MoTa
+    )
+    SELECT
+        N'NL' + CONVERT(NVARCHAR(18), @MaxNL + STT),
+        TenNguyenLieu,
+        MoTa
+    FROM NLCanThem;
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        ThoiGianChuanBi,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Lẩu cua đồng',
+        N'Là một món lẩu có vị ngọt thanh, lẩu cua đồng đậm đà hương vị, ăn hoài không ngán. Rất thích hợp để cả nhà cùng thưởng thức trong những ngày hè nóng bức.',
+        30,
+        15,
+        N'Trung bình',
+        NULL
+    );
+
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DaCongBo
+    )
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Lẩu cua đồng đậm đà, ngọt thanh.',
+        5,
+        0
+    );
+
+    DECLARE @TP TABLE
+    (
+        MaThanhPhan NVARCHAR(20) PRIMARY KEY,
+        TenNguyenLieu NVARCHAR(150),
+        MaDonVi NVARCHAR(20),
+        SoLuong DECIMAL(12,3)
+    );
+
+    INSERT INTO @TP
+    VALUES
+    (N'TP1169', N'Cua đồng', N'DVT002', 1),
+    (N'TP1170', N'Xương ống', N'DVT001', 500),
+    (N'TP1171', N'Thịt bò', N'DVT001', 200),
+    (N'TP1172', N'Đậu hũ', N'DVT009', 3),
+    (N'TP1173', N'Bún tươi', N'DVT002', 1),
+    (N'TP1174', N'Rau ăn kèm (Mồng tơi/mướp/rau muống/bắp cải/rau mồng tơi)', N'DVT001', 200),
+    (N'TP1175', N'Sả', N'DVT011', 2),
+    (N'TP1176', N'Hành tím', N'DVT010', 5),
+    (N'TP1177', N'Tỏi băm', N'DVT006', 1),
+    (N'TP1178', N'Cà chua', N'DVT005', 3),
+    (N'TP1179', N'Gia vị thông dụng (đường/ muối/ hạt nêm)', N'DVT014', 1),
+    (N'TP1180', N'Dầu ăn', N'DVT006', 2);
+
+    IF EXISTS
+    (
+        SELECT 1
+        FROM @TP tp
+        LEFT JOIN dbo.NguyenLieu nl ON nl.TenNguyenLieu = tp.TenNguyenLieu
+        LEFT JOIN dbo.DonViTinh dv ON dv.MaDonVi = tp.MaDonVi
+        WHERE nl.MaNguyenLieu IS NULL OR dv.MaDonVi IS NULL
+    )
+        THROW 51243, N'Không tìm thấy nguyên liệu hoặc đơn vị tính.', 1;
+
+    INSERT dbo.ThanhPhanCongThuc
+    (
+        MaThanhPhan,
+        MaCongThuc,
+        MaNguyenLieu,
+        MaDonVi,
+        SoLuong
+    )
+    SELECT
+        tp.MaThanhPhan,
+        @MaCongThuc,
+        nl.MaNguyenLieu,
+        tp.MaDonVi,
+        tp.SoLuong
+    FROM @TP tp
+    INNER JOIN dbo.NguyenLieu nl
+        ON nl.TenNguyenLieu = tp.TenNguyenLieu;
+
+    INSERT dbo.BuocCheBien
+    (
+        MaBuoc,
+        MaCongThuc,
+        ThuTu,
+        NoiDung,
+        ThoiGianThucHien
+    )
+    VALUES
+    (
+        N'BCB92601',
+        @MaCongThuc,
+        1,
+        N'~ Sơ chế nguyên liệu ~
+
+Rau mồng tơi lặt lá rửa sạch, mướp gọt vỏ, rửa sạch, cắt xéo. Cà chua rửa sạch, cắt múi cau.
+
+Xương ống rửa sạch để ráo, để làm sạch bạn chần sơ xương ống qua nước sôi khoảng 5 phút.
+
+Cua đồng rửa sạch, để ráo. Sau đó bạn gỡ mai lấy gạch bỏ ra chén riêng, phần cua đem xay hoặc giã nhuyễn.',
+        15
+    ),
+    (
+        N'BCB92602',
+        @MaCongThuc,
+        2,
+        N'~ Nấu nước dùng xương ống và làm gạch cua ~
+
+~ Nấu nước dùng xương ống ~
+
+Bạn bắc nồi lên bếp, cho 2 lít nước và xương ống, 2 củ hành tím vào nồi, hầm lửa nhỏ 3 tiếng. Để lấy nước dùng.
+
+~ Làm gạch cua ~
+
+Bạn bắc chảo lên bếp, cho 1 muỗng canh dầu ăn đợi nóng, thêm 1 muỗng canh tỏi băm, 1 muỗng canh hành tím băm, đảo đều phi thơm vàng.
+
+Sau khi hành tỏi đã thơm, bạn thêm phần gạch cua vào xào khoảng 5 phút.
+
+~ Nấu nước dùng thịt cua ~
+
+Phần cua bạn đã xay, thêm 700 ml nước dùng xương ống, rồi ray nước cho vào nồi.
+
+Thêm 1 muỗng cà phê muối đun sôi, khi thấy nước sôi, trên bề mặt có 1 lớp riêu cua, bạn vớt lớp riêu cua để riêng.',
+        180
+    ),
+    (
+        N'BCB92603',
+        @MaCongThuc,
+        3,
+        N'~ Nấu lẩu cua ~
+
+Bắc nồi lên bếp, nếu dùng lẩu điện thì bạn cắm điện, sau đó cho 1 muỗng canh dầu ăn vào, thêm 1 muỗng canh hành tím băm phi thơm vàng.
+
+Thêm cà chua vào xào khoảng 2 phút, sau đó 1 muỗng canh đường, 2 nhánh sả vào xào.
+
+Thêm nước hầm xương và nước riêu cua vào nấu sôi, thêm 2 muỗng canh hạt nêm, 1 muỗng cà phê muối, phần gạch cua, đợi sôi. Nêm nếm lại gia vị sao cho vừa ăn là hoàn tất.',
+        25
+    ),
+    (
+        N'BCB92604',
+        @MaCongThuc,
+        4,
+        N'~ Thành phẩm ~
+
+Đặt bếp lẩu hoặc nồi lẩu điện ra bàn ăn, bày rau, bún tươi hoặc bánh đa ra tô, nấu lẩu sôi nhẹ để nhúng rau, ăn tới đâu nhúng tới đó, ăn đến đâu cho thịt bò, riêu vào đến đó.
+
+Bạn đã có món lẩu cua đồng thơm ngon nứt mũi chẳng khác nào ngoài hàng để chiêu đãi cho cả nhà bữa ngon vào cuối tuần này rồi!',
+        5
+    );
+
+    INSERT dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim,
+        MaCongThuc,
+        TieuDe,
+        DuongDan,
+        MoTa
+    )
+    VALUES
+    (
+        N'DP926',
+        @MaCongThuc,
+        N'Lẩu cua đồng',
+        N'https://www.youtube.com/watch?v=ysrW6iELfD4',
+        N'Video hướng dẫn làm lẩu cua đồng.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = @MaCongThuc;
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20) = N'MA927';
+    DECLARE @MaCongThuc NVARCHAR(20) = N'CT927';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    SELECT @MaDanhMuc = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món lẩu';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51250, N'Không tìm thấy danh mục Món lẩu.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = @MaMonAn)
+        THROW 51251, N'Mã món MA927 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc = @MaCongThuc)
+        THROW 51252, N'Mã công thức CT927 đã tồn tại.', 1;
+
+    IF COL_LENGTH(N'dbo.MonAn', N'ThoiGianChuanBi') IS NULL
+        ALTER TABLE dbo.MonAn ADD ThoiGianChuanBi INT NULL;
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi = N'DVT014')
+        INSERT dbo.DonViTinh (MaDonVi, TenDonVi, KyHieu, HeSoGramChuan)
+        VALUES (N'DVT014', N'Ít', N'ít', NULL);
+
+    DECLARE @NL TABLE
+    (
+        TenNguyenLieu NVARCHAR(150) PRIMARY KEY,
+        MoTa NVARCHAR(500)
+    );
+
+    INSERT INTO @NL
+    VALUES
+    (N'Vịt (khoảng 1.5kg)', N'Vịt nguyên con.'),
+    (N'Khoai môn (2 củ)', N'Khoai môn.'),
+    (N'Chao đỏ (nước chao 90ml)', N'Chao đỏ và nước chao.'),
+    (N'Rau muống', N'Rau muống.'),
+    (N'Cải thìa', N'Cải thìa.'),
+    (N'Hành tím', N'Hành tím.'),
+    (N'Tỏi', N'Tỏi.'),
+    (N'Gừng', N'Gừng tươi.'),
+    (N'Ớt sa tế', N'Ớt sa tế.'),
+    (N'Bún tươi', N'Bún tươi.'),
+    (N'Đường phèn', N'Đường phèn.'),
+    (N'Dầu ăn', N'Dầu ăn.'),
+    (N'Dầu màu điều', N'Dầu màu điều.'),
+    (N'Gia vị thông dụng (Muối/ hạt nêm/ đường/ bột ngọt)', N'Muối, hạt nêm, đường và bột ngọt.'),
+    (N'Sữa tươi không đường', N'Sữa tươi không đường.'),
+    (N'Nấm rơm', N'Nấm rơm.'),
+    (N'Nước', N'Nước dùng để nấu vịt.');
+
+    DECLARE @MaxNL INT;
+
+    SELECT @MaxNL =
+        ISNULL(MAX(TRY_CONVERT(INT, SUBSTRING(MaNguyenLieu, 3, 18))), 0)
+    FROM dbo.NguyenLieu;
+
+    ;WITH NLCanThem AS
+    (
+        SELECT
+            TenNguyenLieu,
+            MoTa,
+            ROW_NUMBER() OVER (ORDER BY TenNguyenLieu) AS STT
+        FROM @NL nl
+        WHERE NOT EXISTS
+        (
+            SELECT 1
+            FROM dbo.NguyenLieu x
+            WHERE x.TenNguyenLieu = nl.TenNguyenLieu
+        )
+    )
+    INSERT dbo.NguyenLieu
+    (
+        MaNguyenLieu,
+        TenNguyenLieu,
+        MoTa
+    )
+    SELECT
+        N'NL' + CONVERT(NVARCHAR(18), @MaxNL + STT),
+        TenNguyenLieu,
+        MoTa
+    FROM NLCanThem;
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        ThoiGianChuanBi,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Vịt nấu chao',
+        N'Vịt nấu chao là món ngon được rất nhiều yêu thích bởi hương vị thơm ngon, với thịt vịt mềm thơm thấm gia vị, vị bùi béo của chao và khoai môn.',
+        30,
+        10,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DaCongBo
+    )
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Vịt nấu chao béo bùi, thơm ngon.',
+        4,
+        0
+    );
+
+    DECLARE @TP TABLE
+    (
+        MaThanhPhan NVARCHAR(20) PRIMARY KEY,
+        TenNguyenLieu NVARCHAR(150),
+        MaDonVi NVARCHAR(20),
+        SoLuong DECIMAL(12,3)
+    );
+
+    INSERT INTO @TP
+    VALUES
+    (N'TP1181', N'Vịt (khoảng 1.5kg)', N'DVT005', 1),
+    (N'TP1182', N'Khoai môn (2 củ)', N'DVT001', 500),
+    (N'TP1183', N'Chao đỏ (nước chao 90ml)', N'DVT001', 350),
+    (N'TP1184', N'Rau muống', N'DVT001', 200),
+    (N'TP1185', N'Cải thìa', N'DVT001', 200),
+    (N'TP1186', N'Hành tím', N'DVT010', 4),
+    (N'TP1187', N'Tỏi', N'DVT012', 5),
+    (N'TP1188', N'Gừng', N'DVT011', 1),
+    (N'TP1189', N'Ớt sa tế', N'DVT007', 0.5),
+    (N'TP1190', N'Bún tươi', N'DVT001', 500),
+    (N'TP1191', N'Đường phèn', N'DVT006', 3),
+    (N'TP1192', N'Dầu ăn', N'DVT006', 7),
+    (N'TP1193', N'Dầu màu điều', N'DVT006', 2),
+    (N'TP1194', N'Gia vị thông dụng (Muối/ hạt nêm/ đường/ bột ngọt)', N'DVT014', 1),
+    (N'TP1195', N'Sữa tươi không đường', N'DVT003', 200),
+    (N'TP1196', N'Nấm rơm', N'DVT014', 1),
+    (N'TP1197', N'Nước', N'DVT004', 2);
+
+    IF EXISTS
+    (
+        SELECT 1
+        FROM @TP tp
+        LEFT JOIN dbo.NguyenLieu nl ON nl.TenNguyenLieu = tp.TenNguyenLieu
+        LEFT JOIN dbo.DonViTinh dv ON dv.MaDonVi = tp.MaDonVi
+        WHERE nl.MaNguyenLieu IS NULL OR dv.MaDonVi IS NULL
+    )
+        THROW 51253, N'Không tìm thấy nguyên liệu hoặc đơn vị tính.', 1;
+
+    INSERT dbo.ThanhPhanCongThuc
+    (
+        MaThanhPhan,
+        MaCongThuc,
+        MaNguyenLieu,
+        MaDonVi,
+        SoLuong
+    )
+    SELECT
+        tp.MaThanhPhan,
+        @MaCongThuc,
+        nl.MaNguyenLieu,
+        tp.MaDonVi,
+        tp.SoLuong
+    FROM @TP tp
+    INNER JOIN dbo.NguyenLieu nl
+        ON nl.TenNguyenLieu = tp.TenNguyenLieu;
+
+    INSERT dbo.BuocCheBien
+    (
+        MaBuoc,
+        MaCongThuc,
+        ThuTu,
+        NoiDung,
+        ThoiGianThucHien
+    )
+    VALUES
+    (
+        N'BCB92701',
+        @MaCongThuc,
+        1,
+        N'~ Sơ chế nguyên liệu ~
+
+Để khử mùi hôi của thịt vịt, bạn chà xát 1 muỗng canh muối lên bề mặt thịt vịt, rồi rửa thật sạch với nước. Sau đó, chặt thành khúc nhỏ vừa ăn, để ra rổ cho ráo nước.
+
+Khoai môn bạn dùng dao gọt bỏ đi lớp vỏ rồi rửa sạch và cắt thành các miếng vừa ăn có chiều dài khoảng 2 lóng tay.
+
+Hành tím và tỏi, gừng bạn bỏ vỏ, rửa sạch rồi băm nhỏ. Rau muống và rau cải thìa bạn nhặt bỏ gốc già, lá úa, rửa sạch rồi cắt khúc vừa ăn khoảng 2 lóng tay.
+
+Bạn lấy 200gr khoai môn đã sơ chế cho vào máy xay sinh tố, thêm 200ml sữa tươi không đường rồi xay nhuyễn mịn.',
+        10
+    ),
+    (
+        N'BCB92702',
+        @MaCongThuc,
+        2,
+        N'~ Ướp vịt ~
+
+Bạn lấy 300gr chao đỏ và 2 muỗng canh nước của chao ra chén, thêm 3 muỗng canh đường, 2 muỗng canh dầu màu điều, 2 muỗng canh bột ngọt, dùng muỗng nghiền nhuyễn.
+
+Bạn ướp vịt với hỗn hợp chao và 1/2 phần hành tím băm, 1/2 phần tỏi băm. Trộn đều và để ướp thịt vịt trong khoảng 2 tiếng cho thấm gia vị.',
+        120
+    ),
+    (
+        N'BCB92703',
+        @MaCongThuc,
+        3,
+        N'~ Chiên khoai môn ~
+
+Bắc chảo lên bếp mở lửa vừa, cho vào chảo 5 muỗng canh dầu ăn, đợi dầu nóng thì bạn cho phần khoai môn còn lại vào chiên.
+
+Bạn chỉnh lửa nhỏ và chiên khoảng 5 phút cho khoai môn vàng đều cả 2 mặt thì bạn gắp ra để ráo dầu.',
+        5
+    ),
+    (
+        N'BCB92704',
+        @MaCongThuc,
+        4,
+        N'~ Làm vịt nấu chao ~
+
+Bắc nồi lên bếp mở lửa vừa, cho vào nồi 2 muỗng canh dầu ăn, đợi dầu nóng thì bạn cho phần hành tím, tỏi còn lại và 1 muỗng canh gừng băm vào, phi thơm lên.
+
+Khi hành tím, tỏi đã thơm, bạn cho thịt vịt vào, xào khoảng 10 phút ở lửa lớn cho thịt vịt săn lại rồi bạn cho hỗn hợp khoai môn xay nhuyễn vào xào thêm 10 phút ở lửa vừa.
+
+Sau đó, bạn cho 2 lít nước, 3 muỗng canh đường phèn, 4 muỗng canh hạt nêm vào, chỉnh lửa nhỏ đậy nắp nấu thêm 30 phút.
+
+Sau cùng, bạn thêm nấm rơm, khoai môn đã chiên vào, đợi sôi lại bạn nêm nếm cho hợp khẩu vị gia đình là hoàn thành rồi nè!',
+        50
+    ),
+    (
+        N'BCB92705',
+        @MaCongThuc,
+        5,
+        N'~ Làm nước chấm ~
+
+Bạn lấy 50gr chao (khoảng 2 viên) và 4 muỗng canh nước của chao ra chén, dùng muỗng nghiền nhuyễn rồi thêm 1/2 muỗng cà phê ớt sa tế vào là hoàn thành nước chấm.',
+        5
+    ),
+    (
+        N'BCB92706',
+        @MaCongThuc,
+        6,
+        N'~ Thành phẩm ~
+
+Vịt nấu chao sau khi hoàn thành có màu sắc đẹp mắt, mùi thơm hấp dẫn lan tỏa cả căn phòng.
+
+Khi ăn bạn cho bún tươi ra chén, ăn tới đâu nhúng kèm rau muống, rau cải thìa tới đó, phần thịt vịt thơm, béo mềm, thấm đẫm gia vị vừa ăn, chấm kèm chén chao, chắc chắn sẽ khiến gia đình bạn thích mê chỉ với miếng đầu tiên.',
+        5
+    );
+
+    INSERT dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim,
+        MaCongThuc,
+        TieuDe,
+        DuongDan,
+        MoTa
+    )
+    VALUES
+    (
+        N'DP927',
+        @MaCongThuc,
+        N'Vịt nấu chao',
+        N'https://www.youtube.com/watch?v=qt6K-3Ozf5Q',
+        N'Video hướng dẫn làm vịt nấu chao.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = @MaCongThuc;
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20) = N'MA928';
+    DECLARE @MaCongThuc NVARCHAR(20) = N'CT928';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    SELECT @MaDanhMuc = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món lẩu';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51260, N'Không tìm thấy danh mục Món lẩu.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = @MaMonAn)
+        THROW 51261, N'Mã món MA928 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc = @MaCongThuc)
+        THROW 51262, N'Mã công thức CT928 đã tồn tại.', 1;
+
+    IF COL_LENGTH(N'dbo.MonAn', N'ThoiGianChuanBi') IS NULL
+        ALTER TABLE dbo.MonAn ADD ThoiGianChuanBi INT NULL;
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi = N'DVT014')
+        INSERT dbo.DonViTinh (MaDonVi, TenDonVi, KyHieu, HeSoGramChuan)
+        VALUES (N'DVT014', N'Ít', N'ít', NULL);
+
+    DECLARE @NL TABLE
+    (
+        TenNguyenLieu NVARCHAR(150) PRIMARY KEY,
+        MoTa NVARCHAR(500)
+    );
+
+    INSERT INTO @NL
+    VALUES
+    (N'Gà (1 con)', N'Gà nguyên con.'),
+    (N'Ớt hiểm', N'Ớt hiểm tươi.'),
+    (N'Kỷ tử', N'Kỷ tử.'),
+    (N'Sả', N'Sả tươi.'),
+    (N'Tỏi', N'Tỏi.'),
+    (N'Hành tây', N'Hành tây.'),
+    (N'Hành tím', N'Hành tím.'),
+    (N'Nước tương', N'Nước tương.'),
+    (N'Dầu ăn', N'Dầu ăn.'),
+    (N'Hạt nêm', N'Hạt nêm.'),
+    (N'Muối hạt', N'Muối hạt.'),
+    (N'Nước', N'Nước dùng để nấu lẩu.');
+
+    DECLARE @MaxNL INT;
+
+    SELECT @MaxNL =
+        ISNULL(MAX(TRY_CONVERT(INT, SUBSTRING(MaNguyenLieu, 3, 18))), 0)
+    FROM dbo.NguyenLieu;
+
+    ;WITH NLCanThem AS
+    (
+        SELECT
+            TenNguyenLieu,
+            MoTa,
+            ROW_NUMBER() OVER (ORDER BY TenNguyenLieu) AS STT
+        FROM @NL nl
+        WHERE NOT EXISTS
+        (
+            SELECT 1
+            FROM dbo.NguyenLieu x
+            WHERE x.TenNguyenLieu = nl.TenNguyenLieu
+        )
+    )
+    INSERT dbo.NguyenLieu (MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT
+        N'NL' + CONVERT(NVARCHAR(18), @MaxNL + STT),
+        TenNguyenLieu,
+        MoTa
+    FROM NLCanThem;
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn, MaDanhMuc, TenMonAn, MoTa,
+        ThoiGianCheBien, ThoiGianChuanBi, DoKho, DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn, @MaDanhMuc, N'Lẩu gà ớt hiểm',
+        N'Nếu bạn là một tín đồ của món lẩu và muốn thưởng thức hương vị thơm ngon cay nồng thì lẩu gà tiềm ớt hiểm chính là gợi ý dành cho bạn.',
+        40, 30, N'Trung bình', NULL
+    );
+
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc, MaMonAn, MoTa, SoKhauPhanChuan, DaCongBo
+    )
+    VALUES
+    (
+        @MaCongThuc, @MaMonAn,
+        N'Lẩu gà ớt hiểm cay nồng, thơm ngon.',
+        4, 0
+    );
+
+    DECLARE @TP TABLE
+    (
+        MaThanhPhan NVARCHAR(20) PRIMARY KEY,
+        TenNguyenLieu NVARCHAR(150),
+        MaDonVi NVARCHAR(20),
+        SoLuong DECIMAL(12,3)
+    );
+
+    INSERT INTO @TP
+    VALUES
+    (N'TP1198', N'Gà (1 con)', N'DVT002', 1.2),
+    (N'TP1199', N'Ớt hiểm', N'DVT001', 100),
+    (N'TP1200', N'Kỷ tử', N'DVT001', 5),
+    (N'TP1201', N'Sả', N'DVT001', 100),
+    (N'TP1202', N'Tỏi', N'DVT001', 20),
+    (N'TP1203', N'Hành tây', N'DVT010', 1),
+    (N'TP1204', N'Hành tím', N'DVT001', 20),
+    (N'TP1205', N'Nước tương', N'DVT006', 2),
+    (N'TP1206', N'Dầu ăn', N'DVT003', 100),
+    (N'TP1207', N'Hạt nêm', N'DVT001', 30),
+    (N'TP1208', N'Muối hạt', N'DVT014', 1),
+    (N'TP1209', N'Nước', N'DVT004', 2);
+
+    IF EXISTS
+    (
+        SELECT 1
+        FROM @TP tp
+        LEFT JOIN dbo.NguyenLieu nl ON nl.TenNguyenLieu = tp.TenNguyenLieu
+        LEFT JOIN dbo.DonViTinh dv ON dv.MaDonVi = tp.MaDonVi
+        WHERE nl.MaNguyenLieu IS NULL OR dv.MaDonVi IS NULL
+    )
+        THROW 51263, N'Không tìm thấy nguyên liệu hoặc đơn vị tính.', 1;
+
+    INSERT dbo.ThanhPhanCongThuc
+    (
+        MaThanhPhan, MaCongThuc, MaNguyenLieu, MaDonVi, SoLuong
+    )
+    SELECT
+        tp.MaThanhPhan, @MaCongThuc, nl.MaNguyenLieu,
+        tp.MaDonVi, tp.SoLuong
+    FROM @TP tp
+    INNER JOIN dbo.NguyenLieu nl
+        ON nl.TenNguyenLieu = tp.TenNguyenLieu;
+
+    INSERT dbo.BuocCheBien
+    (
+        MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien
+    )
+    VALUES
+    (
+        N'BCB92801', @MaCongThuc, 1,
+        N'~ Sơ chế nguyên liệu ~
+
+Bạn cho muối hạt và ớt hiểm vào cối, giã nhuyễn rồi chia làm 2 phần, 1 phần để ướp gà và 1 phần làm nước chấm.
+
+Hành tím, tỏi lột vỏ, rửa sạch và băm nhỏ. Hành tây sau khi lột vỏ thì bạn rửa sạch, cắt thành múi cau, để ráo.
+
+Sả rửa sạch, đập dập. Kỷ tử rửa sạch.
+
+Gà sau khi làm sạch thì chặt làm 8 phần, rồi bạn cho hành tím, tỏi băm, 1/2 muỗng cà phê hạt nêm, 1 muỗng canh nước tương và ướp gà trong khoảng 15 phút.',
+        30
+    ),
+    (
+        N'BCB92802', @MaCongThuc, 2,
+        N'~ Chế biến ~
+
+Bắc chảo lên bếp, đun sôi 100ml dầu ăn sau đó chiên sơ sả trong dầu cho thơm rồi vớt ra, cho gà vào. Bạn chiên gà khoảng 10 phút ở lửa nhỏ cho săn lại, tới khi thịt chín vàng đều thì vớt ra.
+
+Sau đó, bạn bắc nồi lên bếp, cho vào 2 lít nước để đun sôi, lần lượt cho hành tây, sả, gà vào nồi nước đang sôi.
+
+Tiếp đó, cho vào nồi khoảng 100gr ớt hiểm, 30gr hạt nêm, 1 muỗng canh nước tương, nêm nếm gia vị lại cho vừa ăn. Đun hỗn hợp ở lửa vừa trong khoảng 10 phút cho đến khi gà mềm.
+
+Khi thịt gà chín mềm thì cho tiếp kỷ tử vào nồi lẩu rồi đun tiếp trong 1 phút thì tắt bếp. Bạn có thể cho lẩu ra nồi lẩu điện để tiện lợi hơn khi thưởng thức.',
+        40
+    ),
+    (
+        N'BCB92803', @MaCongThuc, 3,
+        N'~ Thành phẩm ~
+
+Vị cay nồng của ớt, vị ngọt của gà, hòa quyện cùng mùi thơm nức mũi của hành tây, sả. Tất cả tạo nên một hương vị đặc trưng đậm đà khó tả. Còn gì bằng ngày mưa lành lạnh thưởng thức một chén gà tiềm ớt hiểm nóng hổi, gia đình quây quần bên mâm cơm.
+
+Món ăn tăng thêm phần hương vị khi dùng kèm với các loại rau: mồng tơi, xà lách xoong, bún tươi hoặc mì.
+
+Nước chấm không thể thiếu muối tiêu chanh đơn giản nhưng vô cùng chuẩn vị đấy nhé!',
+        5
+    );
+
+    INSERT dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim, MaCongThuc, TieuDe, DuongDan, MoTa
+    )
+    VALUES
+    (
+        N'DP928', @MaCongThuc, N'Lẩu gà ớt hiểm',
+        N'https://www.youtube.com/watch?v=9xMDMP6q8Mo',
+        N'Video hướng dẫn làm lẩu gà ớt hiểm.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = @MaCongThuc;
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20) = N'MA929';
+    DECLARE @MaCongThuc NVARCHAR(20) = N'CT929';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    SELECT @MaDanhMuc = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món lẩu';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51270, N'Không tìm thấy danh mục Món lẩu.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = @MaMonAn)
+        THROW 51271, N'Mã món MA929 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc = @MaCongThuc)
+        THROW 51272, N'Mã công thức CT929 đã tồn tại.', 1;
+
+    IF COL_LENGTH(N'dbo.MonAn', N'ThoiGianChuanBi') IS NULL
+        ALTER TABLE dbo.MonAn ADD ThoiGianChuanBi INT NULL;
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi = N'DVT014')
+        INSERT dbo.DonViTinh (MaDonVi, TenDonVi, KyHieu, HeSoGramChuan)
+        VALUES (N'DVT014', N'Ít', N'ít', NULL);
+
+    DECLARE @NL TABLE
+    (
+        TenNguyenLieu NVARCHAR(150) PRIMARY KEY,
+        MoTa NVARCHAR(500)
+    );
+
+    INSERT INTO @NL
+    VALUES
+    (N'Kim chi Hàn Quốc', N'Kim chi Hàn Quốc.'),
+    (N'Xương heo', N'Xương heo.'),
+    (N'Thịt ba chỉ', N'Thịt ba chỉ.'),
+    (N'Nấm rơm', N'Nấm rơm.'),
+    (N'Tôm', N'Tôm tươi.'),
+    (N'Nghêu', N'Nghêu tươi.'),
+    (N'Thịt bò', N'Thịt bò.'),
+    (N'Mực', N'Mực tươi.'),
+    (N'Đậu', N'Đậu dùng ăn kèm.'),
+    (N'Gia vị (Nước mắm/ mì chính/ bột canh/ hành tươi/ ớt tươi/ tỏi/ hành tây/...)', N'Nước mắm, mì chính, bột canh, hành tươi, ớt tươi, tỏi, hành tây.'),
+    (N'Rau ăn kèm (Cải thảo/ rau cần/ hành tây/ rau muống)', N'Cải thảo, rau cần, hành tây và rau muống.'),
+    (N'Mì gói Hàn Quốc (tùy sở thích có thể chọn mì tôm, mì gạo)', N'Mì ăn kèm lẩu.');
+
+    DECLARE @MaxNL INT;
+
+    SELECT @MaxNL = ISNULL(MAX(TRY_CONVERT(INT, SUBSTRING(MaNguyenLieu, 3, 18))), 0)
+    FROM dbo.NguyenLieu;
+
+    ;WITH NLCanThem AS
+    (
+        SELECT TenNguyenLieu, MoTa,
+               ROW_NUMBER() OVER (ORDER BY TenNguyenLieu) AS STT
+        FROM @NL nl
+        WHERE NOT EXISTS
+        (
+            SELECT 1 FROM dbo.NguyenLieu x
+            WHERE x.TenNguyenLieu = nl.TenNguyenLieu
+        )
+    )
+    INSERT dbo.NguyenLieu (MaNguyenLieu, TenNguyenLieu, MoTa)
+    SELECT N'NL' + CONVERT(NVARCHAR(18), @MaxNL + STT), TenNguyenLieu, MoTa
+    FROM NLCanThem;
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn, MaDanhMuc, TenMonAn, MoTa,
+        ThoiGianCheBien, ThoiGianChuanBi, DoKho, DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn, @MaDanhMuc, N'Lẩu kim chi Hàn Quốc',
+        N'Kim chi là món ăn truyền thống của Hàn Quốc với nhiều cách chế biến khác nhau, trong đó có món lẩu kim chi. Với nguyên liệu đơn giản bạn có thể thực hiện món này đãi cả gia đình và bạn bè trong tiết trời se lạnh. Hương vị cay cay, tê tê của món ăn này khiến ai cũng sẽ phải xuýt xoa thích thú .',
+        60, 20, N'Dễ', NULL
+    );
+
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc, MaMonAn, MoTa, SoKhauPhanChuan, DaCongBo
+    )
+    VALUES
+    (
+        @MaCongThuc, @MaMonAn,
+        N'Lẩu kim chi Hàn Quốc cay nồng, thơm ngon.',
+        4, 0
+    );
+
+    DECLARE @TP TABLE
+    (
+        MaThanhPhan NVARCHAR(20) PRIMARY KEY,
+        TenNguyenLieu NVARCHAR(150),
+        MaDonVi NVARCHAR(20),
+        SoLuong DECIMAL(12,3)
+    );
+
+    INSERT INTO @TP
+    VALUES
+    (N'TP1210', N'Kim chi Hàn Quốc', N'DVT001', 500),
+    (N'TP1211', N'Xương heo', N'DVT001', 500),
+    (N'TP1212', N'Thịt ba chỉ', N'DVT001', 300),
+    (N'TP1213', N'Nấm rơm', N'DVT001', 100),
+    (N'TP1214', N'Tôm', N'DVT001', 200),
+    (N'TP1215', N'Nghêu', N'DVT001', 300),
+    (N'TP1216', N'Thịt bò', N'DVT001', 200),
+    (N'TP1217', N'Mực', N'DVT001', 100),
+    (N'TP1218', N'Đậu', N'DVT009', 3),
+    (N'TP1219', N'Gia vị (Nước mắm/ mì chính/ bột canh/ hành tươi/ ớt tươi/ tỏi/ hành tây/...)', N'DVT014', 1),
+    (N'TP1220', N'Rau ăn kèm (Cải thảo/ rau cần/ hành tây/ rau muống)', N'DVT014', 1),
+    (N'TP1221', N'Mì gói Hàn Quốc (tùy sở thích có thể chọn mì tôm, mì gạo)', N'DVT014', 1);
+
+    INSERT dbo.ThanhPhanCongThuc
+    (
+        MaThanhPhan, MaCongThuc, MaNguyenLieu, MaDonVi, SoLuong
+    )
+    SELECT
+        tp.MaThanhPhan, @MaCongThuc, nl.MaNguyenLieu,
+        tp.MaDonVi, tp.SoLuong
+    FROM @TP tp
+    INNER JOIN dbo.NguyenLieu nl
+        ON nl.TenNguyenLieu = tp.TenNguyenLieu;
+
+    INSERT dbo.BuocCheBien
+    (
+        MaBuoc, MaCongThuc, ThuTu, NoiDung, ThoiGianThucHien
+    )
+    VALUES
+    (
+        N'BCB92901', @MaCongThuc, 1,
+        N'~ Sơ chế nguyên liệu ~
+
+Kim chi: Bạn nên mua tại siêu thị sẽ có kim chi ngon và đảm bảo chất lượng, tuy nhiên nếu bạn nào đã thử mà có chỗ tin tưởng thì nên mua chỗ quen biết, tránh mua kim chi không ngon sẽ mất hương vị của lẩu kim chi.
+
+Xương ống: Rửa sạch sau đó luộc qua rồi đổ nước luộc đầu đi để nước dùng thơm và ngọt hơn.
+
+Thịt ba chỉ: Rửa sạch, thái mỏng vừa ăn. Có thể ướp chút hạt nêm để thịt nhúng được đằm nhé.
+
+Nghêu ngâm trong vòng 30 phút rồi rửa sạch cát, bày chung với thịt đã thái ở trên.
+
+Tôm lột vỏ hoặc để nguyên tùy ý thích của bản thân. Nên cắt râu và ngạnh nếu để vỏ để tránh đâm vào miệng khi ăn, bày ra dĩa chung với thịt.
+
+Hành, tỏi: Bóc vỏ rửa sạch sau đó băm nhỏ.
+
+Ớt: Thái vát nhỏ sao cho đủ vị cay.
+
+Rau rửa sạch để ráo nước, đậu thái nhỏ và mỏng, xúc xích khía và cắt tùy ý thích, nếu có khách bạn nên tỉa để nồi lẩu kim chi tăng hấp dẫn.',
+        20
+    ),
+    (
+        N'BCB92902', @MaCongThuc, 2,
+        N'~ Làm nước dùng cho lẩu kim chi ~
+
+Xương heo rửa sạch, ướp với 2 muỗng cafe bột nêm, 1 muỗng cafe muối, 1 muỗng cafe đường, đảo đều để khoảng 30 phút.
+
+Bắc lên bếp, cho hành, tỏi vào dầu nóng, thả xương vào đảo sơ cho săn, cho thêm 2 lít nước vào hầm khoảng 60 phút, vớt xương lọc lấy nước dùng.
+
+Mách nhỏ: Bạn nên vớt hết bọt trong quá trình hầm xương để nước dùng lẩu kim chi thơm và trong hơn. Bạn cho một chút bột canh, mì chính để nước dùng đậm đà hơn. Ninh xương trong khoảng 60 phút.',
+        60
+    ),
+    (
+        N'BCB92903', @MaCongThuc, 3,
+        N'~ Hoàn tất nước dùng kim chi ~
+
+Kim chi cải thảo cắt lấy phần gốc (khoảng 1/4 từ gốc trở lên). Phần kim chi còn lại cắt khúc vừa ăn, xếp vào dĩa. Tùy theo sở thích mà có thể dùng nhiều hay ít kim chi trong nước lẩu.
+
+Bắc chảo lên bếp, cho hành, tỏi vào dầu nóng, phi vàng, sau đó cho kim chi phần gốc vào đảo đều, thêm 2 muỗng canh nước kim chi, 1 muỗng đường, 1 muỗng hạt nêm, 1 muỗng cà phê muối, 1 muỗng ớt bột, 1 muỗng tương ớt Hàn Quốc, 1 muỗng nước mắm sau đó đảo đều tắt bếp.
+
+Cho phần kim chi xào vào phần nước hầm xương. Vậy là nước lẩu của cách làm món lẩu kim chi Hàn Quốc đã xong rồi đấy. Đặc biệt bạn cho ớt tươi vào cho vừa đủ với khả năng ăn cay của các thành viên trong gia đình nhé.
+
+Mách nhỏ: Chú ý nên nêm nhạt trong nước lẩu vì khi dùng lẩu sẽ cho nước kim chi vào, nước kim chi cũng đã có sẵn vị mặn.',
+        20
+    ),
+    (
+        N'BCB92904', @MaCongThuc, 4,
+        N'~ Thành phẩm ~
+
+Các bạn cho các loại rau vào nồi, thêm nấm, thịt bò, tôm sú, thịt ba chỉ rồi múc thêm nước lẩu bật bếp đợi sôi và cả nhà cùng thưởng thức nào.',
+        5
+    );
+
+    INSERT dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim, MaCongThuc, TieuDe, DuongDan, MoTa
+    )
+    VALUES
+    (
+        N'DP929', @MaCongThuc, N'Lẩu kim chi Hàn Quốc',
+        N'https://www.youtube.com/watch?v=oAsjJw_fPZs',
+        N'Video hướng dẫn làm lẩu kim chi Hàn Quốc.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = @MaCongThuc;
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+CREATE TABLE dbo.MonAnDanhMuc
+(
+    MaMonAn NVARCHAR(20) NOT NULL,
+    MaDanhMuc NVARCHAR(20) NOT NULL,
+
+    CONSTRAINT PK_MonAnDanhMuc
+        PRIMARY KEY (MaMonAn, MaDanhMuc),
+
+    CONSTRAINT FK_MonAnDanhMuc_MonAn
+        FOREIGN KEY (MaMonAn)
+        REFERENCES dbo.MonAn(MaMonAn)
+        ON DELETE CASCADE,
+
+    CONSTRAINT FK_MonAnDanhMuc_DanhMuc
+        FOREIGN KEY (MaDanhMuc)
+        REFERENCES dbo.DanhMucMonAn(MaDanhMuc)
+        ON DELETE CASCADE
+);
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    /* 1. Tạo bảng cho phép một món thuộc nhiều danh mục. */
+    IF OBJECT_ID(N'dbo.MonAnDanhMuc', N'U') IS NULL
+    BEGIN
+        CREATE TABLE dbo.MonAnDanhMuc
+        (
+            MaMonAn NVARCHAR(20) NOT NULL,
+            MaDanhMuc NVARCHAR(20) NOT NULL,
+
+            CONSTRAINT PK_MonAnDanhMuc
+                PRIMARY KEY (MaMonAn, MaDanhMuc),
+
+            CONSTRAINT FK_MonAnDanhMuc_MonAn
+                FOREIGN KEY (MaMonAn)
+                REFERENCES dbo.MonAn(MaMonAn)
+                ON DELETE CASCADE,
+
+            CONSTRAINT FK_MonAnDanhMuc_DanhMuc
+                FOREIGN KEY (MaDanhMuc)
+                REFERENCES dbo.DanhMucMonAn(MaDanhMuc)
+                ON DELETE CASCADE
+        );
+    END;
+
+    /* 2. Sao chép danh mục gốc của toàn bộ món hiện có.
+          Không thay đổi dbo.MonAn.MaDanhMuc. */
+    INSERT dbo.MonAnDanhMuc (MaMonAn, MaDanhMuc)
+    SELECT m.MaMonAn, m.MaDanhMuc
+    FROM dbo.MonAn m
+    WHERE NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.MonAnDanhMuc mdm
+        WHERE mdm.MaMonAn = m.MaMonAn
+          AND mdm.MaDanhMuc = m.MaDanhMuc
+    );
+
+    /* 3. Danh sách liên kết bổ sung đã rà soát. */
+    DECLARE @DeXuat TABLE
+    (
+        TenMonAn NVARCHAR(150) NOT NULL,
+        TenDanhMuc NVARCHAR(100) NOT NULL,
+
+        PRIMARY KEY (TenMonAn, TenDanhMuc)
+    );
+
+    INSERT INTO @DeXuat (TenMonAn, TenDanhMuc)
+    VALUES
+    /* Món hấp */
+    (N'Bánh bao đào tiên', N'Món hấp'),
+    (N'Bánh bao nhân thịt miến', N'Món hấp'),
+    (N'Bánh bao nhân thịt trứng', N'Món hấp'),
+    (N'Bánh bột lọc nhân tôm thịt bằng bánh tráng', N'Món hấp'),
+
+    /* Món từ gà */
+    (N'Gà ác hầm sâm', N'Món từ gà'),
+    (N'Gà tiềm thuốc bắc', N'Món từ gà'),
+    (N'Gà hấp muối sả', N'Món từ gà'),
+    (N'Gà nướng muối sả', N'Món từ gà'),
+    (N'Lẩu gà ớt hiểm', N'Món từ gà'),
+
+    /* Món từ bò */
+    (N'Canh kim chi thịt bò', N'Món từ bò'),
+    (N'Phở bò', N'Món từ bò'),
+    (N'Lẩu bò Mông Cổ', N'Món từ bò'),
+    (N'Lẩu bò nhúng giấm (dấm)', N'Món từ bò'),
+
+    /* Món tráng miệng */
+    (N'Bingsu trái cây', N'Món tráng miệng'),
+    (N'Kem chuối que', N'Món tráng miệng'),
+    (N'Kem trái cây nước dừa', N'Món tráng miệng'),
+    (N'Chè trái lê táo đỏ', N'Món tráng miệng'),
+    (N'Tàu hủ nước đường bằng máy xay sinh tố', N'Món tráng miệng'),
+    (N'Sương sáo nước cốt dừa', N'Món tráng miệng'),
+    (N'Chè khúc bạch', N'Món tráng miệng'),
+    (N'Chè đậu đỏ bột lọc', N'Món tráng miệng'),
+    (N'Cream brulee', N'Món tráng miệng'),
+    (N'Pudding xoài', N'Món tráng miệng'),
+    (N'Bánh mochi nhân kem sầu riêng', N'Món tráng miệng'),
+    (N'Bánh bông lan bơ nho', N'Món tráng miệng'),
+    (N'Bánh bò thốt nốt nướng', N'Món tráng miệng'),
+
+    /* Ăn vặt */
+    (N'Đậu hũ non chiên xù', N'Ăn vặt'),
+    (N'Sụn gà chiên nước mắm', N'Ăn vặt'),
+    (N'Răng mực xào bơ tỏi', N'Ăn vặt'),
+    (N'Tôm sốt phô mai', N'Ăn vặt');
+
+    /* 4. Không cho chạy nếu sai tên món hoặc tên danh mục. */
+    IF EXISTS
+    (
+        SELECT 1
+        FROM @DeXuat dx
+        LEFT JOIN dbo.MonAn m
+            ON m.TenMonAn = dx.TenMonAn
+        LEFT JOIN dbo.DanhMucMonAn dm
+            ON dm.TenDanhMuc = dx.TenDanhMuc
+        WHERE m.MaMonAn IS NULL
+           OR dm.MaDanhMuc IS NULL
+    )
+    BEGIN
+        SELECT
+            dx.TenMonAn AS MonKhongTimThay,
+            dx.TenDanhMuc AS DanhMucKhongTimThay
+        FROM @DeXuat dx
+        LEFT JOIN dbo.MonAn m
+            ON m.TenMonAn = dx.TenMonAn
+        LEFT JOIN dbo.DanhMucMonAn dm
+            ON dm.TenDanhMuc = dx.TenDanhMuc
+        WHERE m.MaMonAn IS NULL
+           OR dm.MaDanhMuc IS NULL;
+
+        THROW 51301, N'Có món ăn hoặc danh mục không tồn tại nên giao dịch đã dừng.', 1;
+    END;
+
+    /* 5. Thêm các danh mục bổ sung, không tạo bản ghi trùng. */
+    INSERT dbo.MonAnDanhMuc (MaMonAn, MaDanhMuc)
+    SELECT
+        m.MaMonAn,
+        dm.MaDanhMuc
+    FROM @DeXuat dx
+    INNER JOIN dbo.MonAn m
+        ON m.TenMonAn = dx.TenMonAn
+    INNER JOIN dbo.DanhMucMonAn dm
+        ON dm.TenDanhMuc = dx.TenDanhMuc
+    WHERE NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.MonAnDanhMuc mdm
+        WHERE mdm.MaMonAn = m.MaMonAn
+          AND mdm.MaDanhMuc = dm.MaDanhMuc
+    );
+
+    COMMIT TRANSACTION;
+
+    SELECT
+        dm.TenDanhMuc,
+        COUNT(*) AS SoMon
+    FROM dbo.MonAnDanhMuc mdm
+    INNER JOIN dbo.DanhMucMonAn dm
+        ON dm.MaDanhMuc = mdm.MaDanhMuc
+    GROUP BY dm.TenDanhMuc
+    ORDER BY dm.TenDanhMuc;
+
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+UPDATE m
+SET m.DuongDanAnh = x.Url
+FROM dbo.MonAn m
+INNER JOIN
+(
+    VALUES
+    (N'MA928', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714962/lau-ga-ot-hiem.png'),
+    (N'MA913', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714959/ca-loc-kho-to.png'),
+    (N'MA923', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714958/ca-loc-hap-tuong.png'),
+    (N'MA918', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714958/cha-gio-mien-nam.png'),
+    (N'MA903', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714958/ca-basa-nuong-mo-hanh.png'),
+    (N'MA911', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714958/ca-tim-xao-toi-ot.png'),
+    (N'MA906', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714957/chao-tom-bi-do.png'),
+    (N'MA905', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714957/chao-thit-bam-tia-to.png'),
+    (N'MA919', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714957/com-chien-dua.png'),
+    (N'MA920', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714957/ga-hap-muoi-sa.png'),
+    (N'MA916', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714957/dau-hu-non-chien-xu.png'),
+    (N'MA926', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714956/lau-cua-dong.png'),
+    (N'MA902', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714956/ga-nuong-muoi-xa.png'),
+    (N'MA924', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714956/lau-bo-mong-co.png'),
+    (N'MA925', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714956/lau-bo-nhung-giam.png'),
+    (N'MA908', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714955/nam-xao-chua-ngot-chay.png'),
+    (N'MA901', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714955/nem-nuong-ninh-hoa.png'),
+    (N'MA922', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714955/ngheu-hap-thai.png'),
+    (N'MA909', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714955/rang-muc-xao-bo-toi.png'),
+    (N'MA927', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714954/vit-nau-chao.jpg'),
+    (N'MA929', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714954/lau-kim-chi-han-quoc.png'),
+    (N'MA912', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714954/oc-mong-tay-xao-bo-toi.png'),
+    (N'MA910', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714954/tom-sot-pho-mai.jpg'),
+    (N'MA917', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714954/rang-muc-chien-nuoc-mam.png'),
+    (N'MA907', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714953/mi-y-ga-gion-sot-kem.png'),
+    (N'MA921', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714953/oc-nhoi-hap-sa.jpg'),
+    (N'MA914', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714953/suon-kho-thom.jpg'),
+    (N'MA904', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714952/suon-dut-lo.jpg'),
+    (N'MA915', N'https://res.cloudinary.com/i0qfutld/image/upload/v1793714953/thit-kho-tau.jpg')
+) AS x(MaMonAn, Url)
+    ON x.MaMonAn = m.MaMonAn
+WHERE m.DuongDanAnh IS NULL
+   OR LTRIM(RTRIM(m.DuongDanAnh)) = N'';
+
+SELECT
+    MaMonAn,
+    TenMonAn,
+    DuongDanAnh
+FROM dbo.MonAn
+WHERE MaMonAn IN
+(
+    N'MA928',N'MA913',N'MA923',N'MA918',N'MA903',
+    N'MA911',N'MA906',N'MA905',N'MA919',N'MA920',
+    N'MA916',N'MA926',N'MA902',N'MA924',N'MA925',
+    N'MA908',N'MA901',N'MA922',N'MA909',N'MA927',
+    N'MA929',N'MA912',N'MA910',N'MA917',N'MA907',
+    N'MA921',N'MA914',N'MA904',N'MA915'
+)
+ORDER BY MaMonAn;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20) = N'MA930';
+    DECLARE @MaCongThuc NVARCHAR(20) = N'CT930';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    SELECT @MaDanhMuc = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món gỏi - salad';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51310, N'Không tìm thấy danh mục Món gỏi - salad.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = @MaMonAn)
+        THROW 51311, N'Mã món MA930 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc = @MaCongThuc)
+        THROW 51312, N'Mã công thức CT930 đã tồn tại.', 1;
+
+    IF COL_LENGTH(N'dbo.MonAn', N'ThoiGianChuanBi') IS NULL
+        ALTER TABLE dbo.MonAn ADD ThoiGianChuanBi INT NULL;
+
+    IF NOT EXISTS
+    (
+        SELECT 1 FROM dbo.DonViTinh
+        WHERE MaDonVi = N'DVT014'
+    )
+    BEGIN
+        INSERT dbo.DonViTinh
+        (
+            MaDonVi,
+            TenDonVi,
+            KyHieu,
+            HeSoGramChuan
+        )
+        VALUES
+        (
+            N'DVT014',
+            N'Ít',
+            N'ít',
+            NULL
+        );
+    END;
+
+    DECLARE @NL TABLE
+    (
+        TenNguyenLieu NVARCHAR(150) PRIMARY KEY,
+        MoTa NVARCHAR(500)
+    );
+
+    INSERT INTO @NL
+    VALUES
+    (N'Hàu sữa tươi', N'Hàu sữa tươi.'),
+    (N'Sả', N'Sả tươi.'),
+    (N'Hành tím', N'Hành tím.'),
+    (N'Tỏi', N'Tỏi.'),
+    (N'Gừng', N'Gừng tươi.'),
+    (N'Ớt', N'Ớt tươi.'),
+    (N'Đường', N'Đường.'),
+    (N'Nước cốt chanh', N'Nước cốt chanh.'),
+    (N'Nước mắm', N'Nước mắm.'),
+    (N'Ớt bột', N'Ớt bột.'),
+    (N'Tương ớt', N'Tương ớt.'),
+    (N'Lá húng lủi', N'Lá húng lủi.'),
+    (N'Hành tây nhỏ', N'Hành tây nhỏ.');
+
+    DECLARE @MaxNL INT;
+
+    SELECT @MaxNL =
+        ISNULL(MAX(TRY_CONVERT(INT, SUBSTRING(MaNguyenLieu, 3, 18))), 0)
+    FROM dbo.NguyenLieu;
+
+    ;WITH NLCanThem AS
+    (
+        SELECT
+            TenNguyenLieu,
+            MoTa,
+            ROW_NUMBER() OVER (ORDER BY TenNguyenLieu) AS STT
+        FROM @NL n
+        WHERE NOT EXISTS
+        (
+            SELECT 1
+            FROM dbo.NguyenLieu x
+            WHERE x.TenNguyenLieu = n.TenNguyenLieu
+        )
+    )
+    INSERT dbo.NguyenLieu
+    (
+        MaNguyenLieu,
+        TenNguyenLieu,
+        MoTa
+    )
+    SELECT
+        N'NL' + CONVERT(NVARCHAR(18), @MaxNL + STT),
+        TenNguyenLieu,
+        MoTa
+    FROM NLCanThem;
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        ThoiGianChuanBi,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Gỏi hàu sốt Thái',
+        N'Những món ăn với sốt thái chua cay luôn có sức hấp dẫn đặc biệt và trong bài viết này, cùng vào bếp với CookHub thực hiện món gỏi hàu sốt thái, sự kết hợp giữa vị tươi ngọt của thịt hàu cùng vị chua cay của nước sốt đặc biệt chắc chắn sẽ khiến các tín đồ ăn cay không thể làm ngơ.',
+        25,
+        NULL,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DaCongBo
+    )
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Gỏi hàu sốt Thái chua cay.',
+        3,
+        0
+    );
+
+    DECLARE @TP TABLE
+    (
+        MaThanhPhan NVARCHAR(20) PRIMARY KEY,
+        TenNguyenLieu NVARCHAR(150),
+        MaDonVi NVARCHAR(20),
+        SoLuong DECIMAL(12,3)
+    );
+
+    INSERT INTO @TP
+    VALUES
+    (N'TP1222', N'Hàu sữa tươi', N'DVT001', 500),
+    (N'TP1223', N'Sả', N'DVT001', 200),
+    (N'TP1224', N'Hành tím', N'DVT001', 300),
+    (N'TP1225', N'Tỏi', N'DVT012', 2),
+    (N'TP1226', N'Gừng', N'DVT011', 1),
+    (N'TP1227', N'Ớt', N'DVT005', 4),
+    (N'TP1228', N'Đường', N'DVT006', 2),
+    (N'TP1229', N'Nước cốt chanh', N'DVT006', 2),
+    (N'TP1230', N'Nước mắm', N'DVT006', 2),
+    (N'TP1231', N'Ớt bột', N'DVT006', 2),
+    (N'TP1232', N'Tương ớt', N'DVT006', 2),
+    (N'TP1233', N'Lá húng lủi', N'DVT001', 5),
+    (N'TP1234', N'Hành tây nhỏ', N'DVT010', 1);
+
+    IF EXISTS
+    (
+        SELECT 1
+        FROM @TP tp
+        LEFT JOIN dbo.NguyenLieu nl
+            ON nl.TenNguyenLieu = tp.TenNguyenLieu
+        LEFT JOIN dbo.DonViTinh dv
+            ON dv.MaDonVi = tp.MaDonVi
+        WHERE nl.MaNguyenLieu IS NULL
+           OR dv.MaDonVi IS NULL
+    )
+        THROW 51313, N'Không tìm thấy nguyên liệu hoặc đơn vị tính.', 1;
+
+    INSERT dbo.ThanhPhanCongThuc
+    (
+        MaThanhPhan,
+        MaCongThuc,
+        MaNguyenLieu,
+        MaDonVi,
+        SoLuong
+    )
+    SELECT
+        tp.MaThanhPhan,
+        @MaCongThuc,
+        nl.MaNguyenLieu,
+        tp.MaDonVi,
+        tp.SoLuong
+    FROM @TP tp
+    INNER JOIN dbo.NguyenLieu nl
+        ON nl.TenNguyenLieu = tp.TenNguyenLieu;
+
+    INSERT dbo.BuocCheBien
+    (
+        MaBuoc,
+        MaCongThuc,
+        ThuTu,
+        NoiDung,
+        ThoiGianThucHien
+    )
+    VALUES
+    (
+        N'BCB93001',
+        @MaCongThuc,
+        1,
+        N'~ Sơ chế nguyên liệu ~
+
+Hàu các bạn rửa sạch, để ráo, sau đó tách để riêng phần thịt hàu.
+
+Sả rửa sạch để ráo rồi cắt nhỏ. Gừng bạn gọt vỏ, cắt lát. Tỏi bóc vỏ, băm nhỏ.
+
+Hành tím lột vỏ, cắt lát. Húng lủi rửa sạch, để ráo rồi cắt nhỏ. Hành tây lột vỏ, cắt khoanh tròn.',
+        10
+    ),
+    (
+        N'BCB93002',
+        @MaCongThuc,
+        2,
+        N'~ Làm sốt Thái ~
+
+Bạn cho vào cối xay 100 gr sả, 100 gr hành tím, 2 tép tỏi, 1 nhánh gừng, 4 trái ớt xay nhuyễn sau đó cho hỗn hợp ra tô.
+
+Nếu không có cối xay, bạn dùng cối giã tay cũng được nhé!
+
+Thêm vào hỗn hợp 2 muỗng canh đường, 2 muỗng canh nước mắm, 2 muỗng canh ớt bột, 2 củ hành tím, 2 muỗng nước cốt chanh, 2 muỗng canh tương ớt, bạn đảo đều.',
+        10
+    ),
+    (
+        N'BCB93003',
+        @MaCongThuc,
+        3,
+        N'~ Làm hàu sốt Thái ~
+
+Bạn bắc nồi nước lên bếp, đợi sôi thêm 3 lát gừng, cho phần thịt hàu vào luộc sơ, sau đó vớt ra cho vào tô.
+
+Bạn thêm vào tô hàu 5 gr lá húng lủi, 1 củ hành tây, phần sốt Thái, 3 củ hành tím, 2 nhánh sả, trộn đều và sắp ra dĩa mời gia đình cùng thưởng thức thôi nào!',
+        5
+    ),
+    (
+        N'BCB93004',
+        @MaCongThuc,
+        4,
+        N'~ Thành phẩm ~
+
+Gỏi hàu sốt Thái chua cay, đậm đà, kích thích vị giác, bạn có thể ăn kèm món ăn với cơm nóng, bánh mì đều ngon nhé!',
+        5
+    );
+
+    INSERT dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim,
+        MaCongThuc,
+        TieuDe,
+        DuongDan,
+        MoTa
+    )
+    VALUES
+    (
+        N'DP930',
+        @MaCongThuc,
+        N'Gỏi hàu sốt Thái',
+        N'https://www.youtube.com/watch?v=APtF8TtBv-4',
+        N'Video hướng dẫn làm gỏi hàu sốt Thái.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = @MaCongThuc;
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @MaMonAn NVARCHAR(20) = N'MA931';
+    DECLARE @MaCongThuc NVARCHAR(20) = N'CT931';
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    SELECT @MaDanhMuc = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món chay';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51320, N'Không tìm thấy danh mục Món chay.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = @MaMonAn)
+        THROW 51321, N'Mã món MA931 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc = @MaCongThuc)
+        THROW 51322, N'Mã công thức CT931 đã tồn tại.', 1;
+
+    IF COL_LENGTH(N'dbo.MonAn', N'ThoiGianChuanBi') IS NULL
+        ALTER TABLE dbo.MonAn ADD ThoiGianChuanBi INT NULL;
+
+    IF NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.DonViTinh
+        WHERE MaDonVi = N'DVT014'
+    )
+    BEGIN
+        INSERT dbo.DonViTinh
+        (
+            MaDonVi,
+            TenDonVi,
+            KyHieu,
+            HeSoGramChuan
+        )
+        VALUES
+        (
+            N'DVT014',
+            N'Ít',
+            N'ít',
+            NULL
+        );
+    END;
+
+    IF NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.DonViTinh
+        WHERE MaDonVi = N'DVT015'
+    )
+    BEGIN
+        INSERT dbo.DonViTinh
+        (
+            MaDonVi,
+            TenDonVi,
+            KyHieu,
+            HeSoGramChuan
+        )
+        VALUES
+        (
+            N'DVT015',
+            N'Gói',
+            N'gói',
+            NULL
+        );
+    END;
+
+    DECLARE @NL TABLE
+    (
+        TenNguyenLieu NVARCHAR(150) PRIMARY KEY,
+        MoTa NVARCHAR(500)
+    );
+
+    INSERT INTO @NL
+    VALUES
+    (N'Ngó sen', N'Ngó sen.'),
+    (N'Cà rốt', N'Cà rốt.'),
+    (N'Dưa leo', N'Dưa leo.'),
+    (N'Bắp cải tím', N'Bắp cải tím.'),
+    (N'Bánh phồng tôm chay', N'Bánh phồng tôm chay.'),
+    (N'Đậu hũ chiên (1 bìa)', N'Đậu hũ chiên.'),
+    (N'Nước mắm chay', N'Nước mắm chay.'),
+    (N'Đường', N'Đường.'),
+    (N'Nước cốt chanh', N'Nước cốt chanh.'),
+    (N'Giấm', N'Giấm.'),
+    (N'Đậu phộng', N'Đậu phộng.'),
+    (N'Ớt', N'Ớt tươi.');
+
+    DECLARE @MaxNL INT;
+
+    SELECT @MaxNL =
+        ISNULL(MAX(TRY_CONVERT(INT, SUBSTRING(MaNguyenLieu, 3, 18))), 0)
+    FROM dbo.NguyenLieu;
+
+    ;WITH NLCanThem AS
+    (
+        SELECT
+            TenNguyenLieu,
+            MoTa,
+            ROW_NUMBER() OVER (ORDER BY TenNguyenLieu) AS STT
+        FROM @NL n
+        WHERE NOT EXISTS
+        (
+            SELECT 1
+            FROM dbo.NguyenLieu x
+            WHERE x.TenNguyenLieu = n.TenNguyenLieu
+        )
+    )
+    INSERT dbo.NguyenLieu
+    (
+        MaNguyenLieu,
+        TenNguyenLieu,
+        MoTa
+    )
+    SELECT
+        N'NL' + CONVERT(NVARCHAR(18), @MaxNL + STT),
+        TenNguyenLieu,
+        MoTa
+    FROM NLCanThem;
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        ThoiGianChuanBi,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        @MaMonAn,
+        @MaDanhMuc,
+        N'Gỏi ngó sen chay',
+        N'Những ngày chay, bạn có thể kết hợp ngó sen cùng các nguyên liệu rau củ làm món gỏi ngó sen chay lạ miệng rất ngon.',
+        15,
+        10,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DaCongBo
+    )
+    VALUES
+    (
+        @MaCongThuc,
+        @MaMonAn,
+        N'Gỏi ngó sen chay thanh tịnh, thơm ngon.',
+        4,
+        0
+    );
+
+    DECLARE @TP TABLE
+    (
+        MaThanhPhan NVARCHAR(20) PRIMARY KEY,
+        TenNguyenLieu NVARCHAR(150),
+        MaDonVi NVARCHAR(20),
+        SoLuong DECIMAL(12,3)
+    );
+
+    INSERT INTO @TP
+    VALUES
+    (N'TP1235', N'Ngó sen', N'DVT001', 300),
+    (N'TP1236', N'Cà rốt', N'DVT010', 1),
+    (N'TP1237', N'Dưa leo', N'DVT005', 1),
+    (N'TP1238', N'Bắp cải tím', N'DVT005', 1),
+    (N'TP1239', N'Bánh phồng tôm chay', N'DVT015', 1),
+    (N'TP1240', N'Đậu hũ chiên (1 bìa)', N'DVT009', 1),
+    (N'TP1241', N'Nước mắm chay', N'DVT006', 3),
+    (N'TP1242', N'Đường', N'DVT006', 4),
+    (N'TP1243', N'Nước cốt chanh', N'DVT006', 3),
+    (N'TP1244', N'Giấm', N'DVT003', 100),
+    (N'TP1245', N'Đậu phộng', N'DVT001', 100),
+    (N'TP1246', N'Ớt', N'DVT005', 2);
+
+    IF EXISTS
+    (
+        SELECT 1
+        FROM @TP tp
+        LEFT JOIN dbo.NguyenLieu nl
+            ON nl.TenNguyenLieu = tp.TenNguyenLieu
+        LEFT JOIN dbo.DonViTinh dv
+            ON dv.MaDonVi = tp.MaDonVi
+        WHERE nl.MaNguyenLieu IS NULL
+           OR dv.MaDonVi IS NULL
+    )
+        THROW 51323, N'Không tìm thấy nguyên liệu hoặc đơn vị tính.', 1;
+
+    INSERT dbo.ThanhPhanCongThuc
+    (
+        MaThanhPhan,
+        MaCongThuc,
+        MaNguyenLieu,
+        MaDonVi,
+        SoLuong
+    )
+    SELECT
+        tp.MaThanhPhan,
+        @MaCongThuc,
+        nl.MaNguyenLieu,
+        tp.MaDonVi,
+        tp.SoLuong
+    FROM @TP tp
+    INNER JOIN dbo.NguyenLieu nl
+        ON nl.TenNguyenLieu = tp.TenNguyenLieu;
+
+    INSERT dbo.BuocCheBien
+    (
+        MaBuoc,
+        MaCongThuc,
+        ThuTu,
+        NoiDung,
+        ThoiGianThucHien
+    )
+    VALUES
+    (
+        N'BCB93101',
+        @MaCongThuc,
+        1,
+        N'~ Sơ chế nguyên liệu ~
+
+- Rửa sạch và cắt sợi cà rốt, bắp cải tím, dưa leo, cắt khúc ngó sen nếu ngó sen lớn thì chẻ làm 2 hoặc 4.
+
+- Băm nhuyễn 2 trái ớt. Ngâm cà rốt, ngó sen với 50 ml giấm và 1 muỗng canh đường, vớt ra vắt ráo.
+
+- Chiên phồng tôm, và đậu hũ cắt sợi chiên vàng.',
+        10
+    ),
+    (
+        N'BCB93102',
+        @MaCongThuc,
+        2,
+        N'~ Trộn gỏi ~
+
+- Pha 3 muỗng canh nước mắm, 3 muỗng canh đường, 3 muỗng nước cốt chanh, ớt băm.
+
+- Cho các thành phần như bắp cải tím, dưa leo, cà rốt, ngó sen vào 1 cái tô lớn.
+
+- Sau đó vừa trộn vừa cho nước mắm vào đến khi vừa ăn, sau đốc đậu hũ vào trộn nhẹ để tránh nát đậu hũ.',
+        10
+    ),
+    (
+        N'BCB93103',
+        @MaCongThuc,
+        3,
+        N'~ Thành phẩm ~
+
+Để gỏi ra dĩa thưởng thức, ăn kèm với bánh phồng tôm chay.',
+        5
+    );
+
+    INSERT dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim,
+        MaCongThuc,
+        TieuDe,
+        DuongDan,
+        MoTa
+    )
+    VALUES
+    (
+        N'DP931',
+        @MaCongThuc,
+        N'Gỏi ngó sen chay',
+        N'https://www.youtube.com/watch?v=1oAlzu6Q2c0',
+        N'Video hướng dẫn làm gỏi ngó sen chay.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = @MaCongThuc;
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    IF OBJECT_ID(N'dbo.MonAnDanhMuc', N'U') IS NULL
+        THROW 51330, N'Chưa có bảng MonAnDanhMuc. Hãy chạy lệnh tạo bảng liên kết trước.', 1;
+
+    INSERT dbo.MonAnDanhMuc (MaMonAn, MaDanhMuc)
+    SELECT x.MaMonAn, x.MaDanhMuc
+    FROM
+    (
+        SELECT
+            N'MA930' AS MaMonAn,
+            dm.MaDanhMuc
+        FROM dbo.DanhMucMonAn dm
+        WHERE dm.TenDanhMuc = N'Món gỏi - salad'
+
+        UNION ALL
+
+        SELECT
+            N'MA931' AS MaMonAn,
+            dm.MaDanhMuc
+        FROM dbo.DanhMucMonAn dm
+        WHERE dm.TenDanhMuc IN
+        (
+            N'Món gỏi - salad',
+            N'Món chay'
+        )
+    ) x
+    WHERE EXISTS
+    (
+        SELECT 1
+        FROM dbo.MonAn m
+        WHERE m.MaMonAn = x.MaMonAn
+    )
+    AND NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.MonAnDanhMuc mdm
+        WHERE mdm.MaMonAn = x.MaMonAn
+          AND mdm.MaDanhMuc = x.MaDanhMuc
+    );
+
+    COMMIT TRANSACTION;
+
+    SELECT
+        m.MaMonAn,
+        m.TenMonAn,
+        dm.TenDanhMuc
+    FROM dbo.MonAnDanhMuc mdm
+    INNER JOIN dbo.MonAn m
+        ON m.MaMonAn = mdm.MaMonAn
+    INNER JOIN dbo.DanhMucMonAn dm
+        ON dm.MaDanhMuc = mdm.MaDanhMuc
+    WHERE m.MaMonAn IN (N'MA930', N'MA931')
+    ORDER BY m.MaMonAn, dm.TenDanhMuc;
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    IF EXISTS (
+        SELECT 1
+        FROM dbo.MonAn
+        WHERE MaMonAn = N'MA932'
+    )
+        THROW 51200, N'Mã món MA932 đã tồn tại.', 1;
+
+    IF EXISTS (
+        SELECT 1
+        FROM dbo.CongThuc
+        WHERE MaCongThuc = N'CT932'
+    )
+        THROW 51201, N'Mã công thức CT932 đã tồn tại.', 1;
+
+    DECLARE @MaDanhMuc NVARCHAR(20);
+
+    SELECT @MaDanhMuc = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món gỏi - salad';
+
+    IF @MaDanhMuc IS NULL
+        THROW 51202, N'Không tìm thấy danh mục Món gỏi - salad.', 1;
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        N'MA932',
+        @MaDanhMuc,
+        N'Hải sản sốt Thái',
+        N'Nếu bạn là tín đồ của các món gỏi trộn chua cay thì tuyệt đối không thể bỏ lỡ bài viết này.',
+        20,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT dbo.MonAnDanhMuc
+    (
+        MaMonAn,
+        MaDanhMuc
+    )
+    VALUES
+    (
+        N'MA932',
+        @MaDanhMuc
+    );
+
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DuongDanAnh,
+        DaCongBo
+    )
+    VALUES
+    (
+        N'CT932',
+        N'MA932',
+        N'Nếu bạn là tín đồ của các món gỏi trộn chua cay thì tuyệt đối không thể bỏ lỡ bài viết này.',
+        4,
+        NULL,
+        0
+    );
+
+   DECLARE @NL TABLE
+(
+    MaThanhPhan NVARCHAR(20),
+    MaNguyenLieu NVARCHAR(20),
+    MaDonVi NVARCHAR(20),
+    SoLuong DECIMAL(18,2)
+);
+
+INSERT @NL
+VALUES
+(N'TP93201', N'NL966',  N'DVT001', 300), -- Tôm tươi
+(N'TP93202', N'NL1179', N'DVT001', 500), -- Bạch tuộc
+(N'TP93203', N'NL1133', N'DVT001', 300), -- Nghêu
+(N'TP93204', N'NL051',  N'DVT012',   3), -- Tỏi
+(N'TP93205', N'NL934',  N'DVT005',   2), -- Ớt
+(N'TP93206', N'NL943',  N'DVT006',   1), -- Ớt bột
+(N'TP93207', N'NL053',  N'DVT011',   3), -- Sả
+(N'TP93208', N'NL049',  N'DVT010',   5), -- Hành tím
+(N'TP93209', N'NL137',  N'DVT011',   5), -- Ngò gai
+(N'TP93210', N'NL997',  N'DVT006',   1), -- Tương ớt
+(N'TP93211', N'NL1141', N'DVT006',   1), -- Rượu trắng
+(N'TP93212', N'NL1123', N'DVT006',   2), -- Nước cốt chanh
+(N'TP93213', N'NL070', N'DVT006',   4), -- Nước mắm
+(N'TP93214', N'NL074',  N'DVT006',   3); -- Đường
+
+INSERT dbo.ThanhPhanCongThuc
+(
+    MaThanhPhan,
+    MaCongThuc,
+    MaNguyenLieu,
+    MaDonVi,
+    SoLuong
+)
+SELECT
+    MaThanhPhan,
+    N'CT932',
+    MaNguyenLieu,
+    MaDonVi,
+    SoLuong
+FROM @NL;
+    
+
+    INSERT dbo.BuocCheBien
+    (
+        MaBuoc,
+        MaCongThuc,
+        ThuTu,
+        NoiDung,
+        ThoiGianThucHien
+    )
+    VALUES
+    (
+        N'BCB93201',
+        N'CT932',
+        1,
+        N'~ Sơ chế hải sản ~
+
+Nghêu rửa sạch và ngâm trong nước muối pha loãng thêm vài lát ớt. Ngâm khoảng 1 - 2 giờ, như vậy nghêu sẽ sạch cát và bụi bẩn bên trong.
+
+Bạch tuộc rửa sạch và ngâm 5 phút trong nước muối pha loãng để khử mùi tanh. Sau đó, bạn rửa bạch tuộc lại một lần nữa rồi cắt thành khúc nhỏ vừa ăn.
+
+Tôm bạn làm sạch, lột vỏ, lấy chỉ đen, tiếp đến bạn rửa sạch rồi để ráo.
+
+~ Lưu ý: Cách sơ chế nghêu sạch, hết cát ~
+
+- Bạn có thể ngâm ngao trong thau nước lạnh có bỏ vài viên đá sẽ làm ngao nhanh nhả cát hơn. Thông thường chỉ mất 10 phút là đã có những con ngao sạch sẽ để chế biến món ăn.
+- Bạn có thể ngâm ngao trong chậu nước muối có thêm ớt bột/ ớt cắt lát, khoảng 3 giờ.
+- Ngoài ra, ngâm ngao trong chậu nước muối và gừng đập dập hoặc nước vo gạo cũng giúp ngao nhanh nhả sạch cát và chất bẩn.
+
+~ Cách rút chỉ lưng tôm nhanh ~
+
+- Cách 1: Bóc vỏ đầu và vỏ thân tôm từ phần chân, đến phần đuôi dùng hai ngón tay giữ chặt phần đốt cuối rồi rút ra. Tiếp theo dùng dao khía lưng tôm để lộ chỉ đen rồi lấy tăm khều ra.
+- Cách 2: Tôm sau khi đã rửa sạch bạn lách tăm vào giữa cổ tôm rồi lôi phần chỉ đen ra, loại bỏ.
+- Cách 3: Rửa sạch tôm dùng kéo cắt dọc vỏ tôm lộ chỉ đen sau đó rửa dưới vòi nước cho sạch.',
+        10
+    ),
+    (
+        N'BCB93202',
+        N'CT932',
+        2,
+        N'~ Luộc hải sản ~
+
+Bạn bắc nồi lên bếp mở lửa vừa, thêm 1 lít nước, 1 muỗng canh rượu nấu sôi, cho hải sản vào luộc 3 - 5 phút rồi vớt ra tô.',
+        5
+    ),
+    (
+        N'BCB93203',
+        N'CT932',
+        3,
+        N'~ Làm sốt Thái ~
+
+Bạn cho vào tô 3 muỗng canh đường, 4 muỗng canh nước mắm, 2 muỗng canh nước cốt chanh, 3 tép tỏi băm, 2 quả ớt cắt nhỏ, 1 muỗng canh ớt bột, 1 muỗng canh tương ớt.
+
+Tiếp đó thêm 5 củ hành tím cắt lát, 3 nhánh sả đập dập cắt nhỏ, 5 nhánh ngò gai cắt nhỏ, bạn đảo đều nhẹ nhàng cho tan đường.',
+        5
+    ),
+    (
+        N'BCB93204',
+        N'CT932',
+        4,
+        N'~ Trộn hải sản ~
+
+Bạn cho sốt Thái vào tô hải sản, trộn đều nhẹ nhàng, có thể thưởng thức luôn hoặc để 15 phút cho hải sản thấm gia vị.',
+        15
+    ),
+    (
+        N'BCB93205',
+        N'CT932',
+        5,
+        N'~ Thành phẩm ~
+
+Hải sản sốt Thái với màu sắc bắt mắt, thơm ngon hấp dẫn với thịt tôm, bạch tuộc giòn ngon, nghêu ngọt, kèm vị sốt cay cay ngọt ngọt, chua chua rất ngon miệng, mời gia đình cùng thưởng thức thôi.',
+        NULL
+    );
+
+    INSERT dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim,
+        MaCongThuc,
+        TieuDe,
+        DuongDan,
+        MoTa
+    )
+    VALUES
+    (
+        N'DP932',
+N'CT932',
+        N'Hải sản sốt Thái',
+        N'https://www.youtube.com/watch?v=qwBAkykTXX0',
+        N'Video hướng dẫn làm hải sản sốt Thái.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = N'CT932';
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm món Hải sản sốt Thái với mã MA932 và CT932.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+INSERT dbo.NguyenLieu
+(
+    MaNguyenLieu,
+    TenNguyenLieu,
+    MoTa
+)
+VALUES
+(
+    N'NL1184',
+    N'Thịt thăn bò',
+    N'Thịt thăn bò tươi.'
+),
+(
+    N'NL1185',
+    N'Rong biển cháy tỏi',
+    N'Rong biển cháy tỏi.'
+),
+(
+    N'NL1186',
+    N'Cơm nóng',
+    N'Cơm nóng.'
+);
+GO
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM dbo.NguyenLieu
+    WHERE MaNguyenLieu = N'NL1180'
+)
+BEGIN
+    INSERT dbo.NguyenLieu
+    (
+        MaNguyenLieu,
+        TenNguyenLieu,
+        MoTa
+    )
+    VALUES
+    (
+        N'NL1180',
+        N'Dầu cà ri',
+        N'Dầu cà ri.'
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM dbo.NguyenLieu
+    WHERE MaNguyenLieu = N'NL1181'
+)
+BEGIN
+    INSERT dbo.NguyenLieu
+    (
+        MaNguyenLieu,
+        TenNguyenLieu,
+        MoTa
+    )
+    VALUES
+    (
+        N'NL1181',
+        N'Bột cà ri',
+        N'Bột cà ri.'
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM dbo.NguyenLieu
+    WHERE MaNguyenLieu = N'NL1182'
+)
+BEGIN
+    INSERT dbo.NguyenLieu
+    (
+        MaNguyenLieu,
+        TenNguyenLieu,
+        MoTa
+    )
+    VALUES
+    (
+        N'NL1182',
+        N'Xốt bò kho',
+        N'Xốt gia vị bò kho.'
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM dbo.NguyenLieu
+    WHERE MaNguyenLieu = N'NL1183'
+)
+BEGIN
+    INSERT dbo.NguyenLieu
+    (
+        MaNguyenLieu,
+        TenNguyenLieu,
+        MoTa
+    )
+    VALUES
+    (
+        N'NL1183',
+        N'Bột bò kho',
+        N'Bột gia vị bò kho.'
+    );
+END;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = N'MA933')
+        THROW 51300, N'Mã món MA933 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc = N'CT933')
+        THROW 51301, N'Mã công thức CT933 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.DoanPhimHuongDan WHERE MaDoanPhim = N'DP933')
+        THROW 51302, N'Mã video DP933 đã tồn tại.', 1;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM dbo.DanhMucMonAn
+        WHERE MaDanhMuc = N'DM031'
+          AND TenDanhMuc = N'Món từ bò'
+    )
+        THROW 51303, N'Không tìm thấy danh mục Món từ bò.', 1;
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        N'MA933',
+        N'DM031',
+        N'Cơm thăn bò rong biển',
+        N'Cơm thăn bò rong biển sốt tương với miếng thịt thăn bò được ướp chiên đậm vị, sau đó cắt thành từng miếng hấp dẫn, ăn cùng với cơm trắng và rong biển cháy tỏi, đảm bảo ăn vào là thích mê.',
+        15,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT dbo.MonAnDanhMuc
+    (
+        MaMonAn,
+        MaDanhMuc
+    )
+    VALUES
+    (
+        N'MA933',
+        N'DM031'
+    );
+
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DuongDanAnh,
+        DaCongBo
+    )
+    VALUES
+    (
+        N'CT933',
+        N'MA933',
+        N'Cơm thăn bò rong biển sốt tương với miếng thịt thăn bò được ướp chiên đậm vị, sau đó cắt thành từng miếng hấp dẫn, ăn cùng với cơm trắng và rong biển cháy tỏi, đảm bảo ăn vào là thích mê.',
+        4,
+        NULL,
+        0
+    );
+
+    DECLARE @TP TABLE
+    (
+        MaThanhPhan NVARCHAR(20),
+        TenNguyenLieu NVARCHAR(150),
+        MaDonVi NVARCHAR(20),
+        SoLuong DECIMAL(18,2)
+    );
+
+    INSERT @TP
+    VALUES
+    (N'TP93301', N'Thịt thăn bò', N'DVT001', 200),
+    (N'TP93302', N'Tỏi', N'DVT006', 1),
+    (N'TP93303', N'Rượu trắng', N'DVT006', 1),
+    (N'TP93304', N'Rong biển cháy tỏi', N'DVT001', 100),
+    (N'TP93305', N'Cơm nóng', N'DVT016', 2),
+    (N'TP93306', N'Dầu ăn', N'DVT006', 1),
+    (N'TP93307', N'Tiêu xay', N'DVT006', 1),
+    (N'TP93308', N'Gia vị thông dụng', N'DVT001', 20);
+
+    IF EXISTS
+    (
+        SELECT 1
+        FROM @TP x
+        LEFT JOIN dbo.NguyenLieu n
+            ON n.TenNguyenLieu = x.TenNguyenLieu
+        WHERE n.MaNguyenLieu IS NULL
+    )
+        THROW 51304, N'Có nguyên liệu chưa tồn tại trong bảng NguyenLieu. Hãy kiểm tra tên nguyên liệu.', 1;
+
+    INSERT dbo.ThanhPhanCongThuc
+    (
+        MaThanhPhan,
+        MaCongThuc,
+        MaNguyenLieu,
+        MaDonVi,
+        SoLuong
+    )
+    SELECT
+        x.MaThanhPhan,
+        N'CT933',
+        n.MaNguyenLieu,
+        x.MaDonVi,
+        x.SoLuong
+    FROM @TP x
+    JOIN dbo.NguyenLieu n
+        ON n.TenNguyenLieu = x.TenNguyenLieu;
+
+    INSERT dbo.BuocCheBien
+    (
+        MaBuoc,
+        MaCongThuc,
+        ThuTu,
+        NoiDung,
+        ThoiGianThucHien
+    )
+    VALUES
+    (
+        N'BCB93301',
+        N'CT933',
+        1,
+        N'~ Làm sốt tương ~
+
+Bạn bắc chảo lên bếp đợi nóng, sau đó thêm 1 muỗng canh dầu ăn, 1 muỗng canh tỏi vào phi thơm.
+
+Khi tỏi đã vàng thơm, bạn thêm 2 muỗng canh nước tương, 2 muỗng canh đường, 1 muỗng canh dầu mè, 1 muỗng canh rượu trắng đảo đều đợi sôi.
+
+Khi sốt tương sôi, bạn thêm 1 muỗng canh dầu hào vào đảo đều rồi tắt bếp.',
+        5
+    ),
+    (
+        N'BCB93302',
+        N'CT933',
+        2,
+        N'~ Áp chảo thăn bò ~
+
+Thịt thăn bò bạn ướp 1 ít muối, 1 ít tiêu.
+
+Bạn bắc chảo lên bếp, thêm 1 muỗng canh dầu ăn đợi nóng, sau đó cho thịt thăn bò vào áp chảo đều 4 mặt ở lửa nhỏ, mỗi mặt tầm 1 phút.
+
+Sau đó bạn cắt thăn bò thành miếng vừa ăn.',
+        5
+    ),
+    (
+        N'BCB93303',
+        N'CT933',
+        3,
+        N'~ Thành phẩm ~
+
+Bạn dọn ra ăn cùng cơm nóng, rong biển, thêm trứng chiên hoặc luộc lòng đào tùy theo ý thích của bạn, và ăn kèm sốt tương.',
+        NULL
+    );
+
+    INSERT dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim,
+        MaCongThuc,
+        TieuDe,
+        DuongDan,
+        MoTa
+    )
+    VALUES
+    (
+        N'DP933',
+        N'CT933',
+        N'Cơm thăn bò rong biển',
+        N'https://www.youtube.com/watch?v=Y5lP-J3QGZc',
+        N'Video hướng dẫn làm cơm thăn bò rong biển.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = N'CT933';
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm thành công MA933 - Cơm thăn bò rong biển.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = N'MA934')
+        THROW 51400, N'Mã món MA934 đã tồn tại.', 1;
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        N'MA934',
+        N'DM031',
+        N'Cà ri bò',
+        N'Cà ri bò là một món từ bò rất lý tưởng để bạn lựa chọn đổi gió cho bữa cơm gia đình thêm phần ngon miệng.',
+        55,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT dbo.MonAnDanhMuc
+    (
+        MaMonAn,
+        MaDanhMuc
+    )
+    VALUES
+    (
+        N'MA934',
+        N'DM031'
+    );
+
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DuongDanAnh,
+        DaCongBo
+    )
+    VALUES
+    (
+        N'CT934',
+        N'MA934',
+        N'Cà ri bò là một món từ bò rất lý tưởng để bạn lựa chọn đổi gió cho bữa cơm gia đình thêm phần ngon miệng.',
+        4,
+        NULL,
+        0
+    );
+
+    INSERT dbo.ThanhPhanCongThuc
+    (
+        MaThanhPhan,
+        MaCongThuc,
+        MaNguyenLieu,
+        MaDonVi,
+        SoLuong
+    )
+    VALUES
+    (N'TP93401', N'CT934', N'NL011',  N'DVT001', 1000), -- Thịt bò
+    (N'TP93402', N'CT934', N'NL036',  N'DVT010', 1),    -- Cà rốt
+    (N'TP93403', N'CT934', N'NL009',  N'DVT010', 2),    -- Khoai lang
+    (N'TP93404', N'CT934', N'NL958',  N'DVT010', 3),    -- Khoai tây
+    (N'TP93405', N'CT934', N'NL048',  N'DVT010', 1),    -- Hành tây
+    (N'TP93406', N'CT934', N'NL068',  N'DVT003', 300),  -- Nước cốt dừa
+    (N'TP93407', N'CT934', N'NL053',  N'DVT011', 2),    -- Sả
+    (N'TP93408', N'CT934', N'NL072',  N'DVT006', 2),    -- Dầu ăn
+    (N'TP93409', N'CT934', N'NL1180',N'DVT006', 2),    -- Dầu cà ri
+    (N'TP93410', N'CT934', N'NL1181',N'DVT006', 1),    -- Bột cà ri
+    (N'TP93411', N'CT934', N'NL239',  N'DVT014', 1);   -- Gia vị thông dụng
+
+    INSERT dbo.BuocCheBien
+    (
+        MaBuoc,
+        MaCongThuc,
+        ThuTu,
+        NoiDung,
+        ThoiGianThucHien
+    )
+    VALUES
+    (
+        N'BCB93401',
+        N'CT934',
+        1,
+        N'~ Sơ chế nguyên liệu ~
+
+Cà rốt, khoai tây, khoai lang, hành tây mua về rửa sạch với nước rồi gọt bỏ vỏ, cắt khúc vừa ăn khoảng 1.5 lóng tay, bạn có thể tỉa hoa tùy ý thích.
+
+Sả bạn cắt bỏ gốc rễ, rửa sạch rồi đập dập, cắt khúc hoặc để nguyên tùy ý thích.
+
+Thịt bò mua về rửa với nước sạch rồi cắt miếng vừa ăn khoảng 1 lóng tay.
+
+~ Mách nhỏ ~
+
+- Để khoai tây không bị thâm đen sau khi gọt vỏ, bạn có thể ngâm khoai đã cắt với nước nhé.
+- Để khử mùi hôi thịt bò nhưng vẫn đảm bảo giữ được chất dinh dưỡng, bạn có thể thử qua cách dùng khăn sạch, ẩm lau sơ qua miếng thịt một lần hoặc dùng gừng đã giã nhuyễn chà xát vào thịt.',
+        10
+    ),
+    (
+        N'BCB93402',
+        N'CT934',
+        2,
+        N'~ Ướp thịt bò ~
+
+Ướp thịt bò với 1/2 muỗng canh dầu ăn, 1/2 muỗng canh muối, 1 muỗng canh dầu cà ri, 1 muỗng canh bột cà ri.
+
+Trộn đều và để ướp trong khoảng 15 - 30 phút cho thịt thấm gia vị.',
+        20
+    ),
+    (
+        N'BCB93403',
+        N'CT934',
+        3,
+        N'~ Xào nguyên liệu ~
+
+Bắc nồi lên bếp, đến khi nồi nóng thì cho vào 1.5 muỗng canh dầu ăn và cho thịt bò đã ướp vào, xào với lửa vừa khoảng 3 phút đến khi thịt bắt đầu chuyển màu và săn lại thì vớt thịt ra.
+
+Tiếp ở nồi xào thịt bò, bạn cho sả vào xào thơm, tiếp đó thêm 1 muỗng dầu cà ri, khoai tây, cà rốt, khoai lang, hành tây vào xào 3 phút.',
+        5
+    ),
+    (
+        N'BCB93404',
+        N'CT934',
+        4,
+        N'~ Nấu cà ri ~
+
+Bạn thêm vào nồi thịt bò 300ml nước cốt dừa, 250ml nước lọc, 1 muỗng canh hạt nêm, phần thịt bò đã xào vào khoảng 3 phút.
+
+Bạn đảo đều tay, đợi sôi sau đó đậy nắp, chỉnh lửa nhỏ hầm 30 phút. Cuối cùng, bạn thêm 1 muỗng canh đường, nêm nếm lại cho vừa ăn là hoàn thành rồi nè!',
+        35
+    ),
+    (
+        N'BCB93405',
+        N'CT934',
+        5,
+        N'~ Thành phẩm ~
+
+Cà ri bò hoàn thành trông rất bắt mắt, cà ri nóng hổi thơm lừng mùi cà ri đặc trưng, vị nước súp đậm đà, ngọt thanh từ rau củ kết hợp với từng miếng thịt bò dai sần sật, thấm vị vừa ăn.
+
+Món này kết hợp với bánh mì thì đảm bảo ăn mãi không thấy ngán đấy nhé!',
+        NULL
+    );
+
+    INSERT dbo.DoanPhimHuongDan
+(
+    MaDoanPhim,
+    MaCongThuc,
+    TieuDe,
+    DuongDan,
+    MoTa
+)
+VALUES
+(
+    N'DP934',
+    N'CT934',
+    N'Cà ri bò',
+    N'https://www.youtube.com/watch?v=K2PykRCJ1hA',
+    N'Video hướng dẫn làm cà ri bò.'
+);
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = N'CT934';
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm thành công món Cà ri bò MA934.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = N'MA935')
+        THROW 51500, N'Mã món MA935 đã tồn tại.', 1;
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        N'MA935',
+        N'DM031',
+        N'Bò kho miền Nam',
+        N'Bạn muốn vào bếp với món kho bò kho miền Nam chuẩn vị? Công thức này sẽ hướng dẫn cách nấu bò kho miền Nam thơm lừng, thịt bò mềm tan, đậm đà hương nước dừa.',
+        60,
+        N'Trung bình',
+        NULL
+    );
+
+    INSERT dbo.MonAnDanhMuc
+    (
+        MaMonAn,
+        MaDanhMuc
+    )
+    VALUES
+    (
+        N'MA935',
+        N'DM031'
+    );
+
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DuongDanAnh,
+        DaCongBo
+    )
+    VALUES
+    (
+        N'CT935',
+        N'MA935',
+        N'Bạn muốn vào bếp với món kho bò kho miền Nam chuẩn vị? Công thức này sẽ hướng dẫn cách nấu bò kho miền Nam thơm lừng, thịt bò mềm tan, đậm đà hương nước dừa.',
+        8,
+        NULL,
+        0
+    );
+
+    INSERT dbo.ThanhPhanCongThuc
+    (
+        MaThanhPhan,
+        MaCongThuc,
+        MaNguyenLieu,
+        MaDonVi,
+        SoLuong
+    )
+    VALUES
+    (N'TP93501', N'CT935', N'NL011',  N'DVT001', 2000), -- Thịt bò
+    (N'TP93502', N'CT935', N'NL318',  N'DVT003', 2800), -- Nước dừa tươi
+    (N'TP93503', N'CT935', N'NL036',  N'DVT001', 500),  -- Cà rốt
+    (N'TP93504', N'CT935', N'NL187',  N'DVT006', 3),    -- Sữa đặc
+    (N'TP93505', N'CT935', N'NL1182', N'DVT015', 2),    -- Xốt bò kho
+    (N'TP93506', N'CT935', N'NL1183', N'DVT015', 1),    -- Bột bò kho
+    (N'TP93507', N'CT935', N'NL051',  N'DVT006', 2),    -- Tỏi băm
+    (N'TP93508', N'CT935', N'NL049',  N'DVT006', 2),    -- Hành tím băm
+    (N'TP93509', N'CT935', N'NL053',  N'DVT011', 2),    -- Sả
+    (N'TP93510', N'CT935', N'NL239',  N'DVT014', 1),    -- Gia vị thông dụng
+    (N'TP93511', N'CT935', N'NL1141', N'DVT014', 1);    -- Rượu trắng
+
+    INSERT dbo.BuocCheBien
+    (
+        MaBuoc,
+        MaCongThuc,
+        ThuTu,
+        NoiDung,
+        ThoiGianThucHien
+    )
+    VALUES
+    (
+        N'BCB93501',
+        N'CT935',
+        1,
+        N'~ Sơ chế thịt bò và cà rốt ~
+
+Bạn đem 2kg thịt bò rửa sạch với hỗn hợp rượu trắng và gừng đập dập để khử hoàn toàn mùi hôi của bò. Sau đó, bạn rửa lại với nước sạch, để thật ráo rồi cắt thịt thành những miếng vuông vừa ăn khoảng 3 - 4cm.
+
+Với 500gr cà rốt, bạn gọt vỏ, có thể tỉa hoa cho đẹp mắt rồi cắt lát dày khoảng 1cm.',
+        10
+    ),
+    (
+        N'BCB93502',
+        N'CT935',
+        2,
+        N'~ Ướp thịt bò ~
+
+Bạn cho thịt bò vào thau lớn, nêm vào 2 gói xốt bò kho, 1 gói bột bò kho, 1 muỗng canh hành tím băm, 1 muỗng canh tỏi băm, 1 muỗng canh bột ngọt, 1 muỗng cà phê hạt nêm và 3 muỗng canh đường.
+
+Đặc biệt, bạn cho thêm 3 muỗng canh sữa đặc để thịt bò mềm và béo hơn. Bạn trộn đều tất cả và để thịt thấm gia vị trong vòng 30 phút.',
+        30
+    ),
+    (
+        N'BCB93503',
+        N'CT935',
+        3,
+        N'~ Chiên sơ cà rốt và xào thịt ~
+
+Bạn bắc chảo lên bếp với một ít dầu ăn, cho cà rốt đã cắt vào chiên sơ. Việc này giúp cà rốt giữ nguyên miếng, không bị mềm ruột khi hầm lâu hoặc khi hâm lại món ăn.
+
+Sau đó, bạn bắc nồi lớn, phi thơm sả đập dập cùng phần hành tỏi băm còn lại rồi cho thịt bò đã ướp vào xào ở lửa lớn đến khi thớ thịt săn lại hoàn toàn.',
+        10
+    ),
+    (
+        N'BCB93504',
+        N'CT935',
+        4,
+        N'~ Hầm bò kho và bí quyết ủ thịt ~
+
+Bạn đổ 2.8 lít nước dừa tươi vào nồi thịt bò. Khi nước sôi bùng lên, bạn tiến hành hớt thật sạch bọt để nước dùng được trong, sau đó thêm 1 muỗng cà phê muối vào. Bạn nấu thịt bò trong khoảng 30 phút ở lửa vừa, sau đó tắt bếp, đậy kín nắp nồi và ủ thịt trong ít nhất 30 phút đến 1 tiếng.
+
+Sau khi ủ, bạn bật bếp trở lại, cho phần cà rốt đã chiên sơ vào nồi. Bạn tiếp tục nấu thêm một lúc cho đến khi cà rốt chín mềm và nước dùng hơi sánh lại thì nêm nếm lại cho vừa khẩu vị gia đình rồi tắt bếp.',
+        60
+    ),
+    (
+        N'BCB93505',
+        N'CT935',
+        5,
+        N'~ Thành phẩm ~
+
+Bò kho sau khi hoàn thành có màu đỏ cam vô cùng hấp dẫn và hương thơm nức mũi. Miếng thịt bò mềm nhừ, phần gân nở giòn dẻo, thấm vị ngọt thanh của nước dừa quyện cùng vị béo ngậy của sữa đặc.
+
+Món này dùng kèm bánh mì, hủ tiếu hoặc cơm nóng đều rất tuyệt vời.',
+        NULL
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = N'CT935';
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm thành công món Bò kho miền Nam MA935.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET XACT_ABORT ON;
+
+BEGIN TRANSACTION;
+
+-- Thịt bò dùng cho Bò kho miền Nam
+UPDATE dbo.NguyenLieu
+SET MoTa = N'Thịt bò (bao gồm sườn và gân bò).'
+WHERE MaNguyenLieu = N'NL011';
+
+-- Bột bò kho có ghi chú 25gr
+UPDATE dbo.NguyenLieu
+SET MoTa = N'Bột bò kho (25gr).'
+WHERE MaNguyenLieu = N'NL1183';
+
+-- Rượu trắng/gừng/dầu ăn ghi 1 ít
+UPDATE dbo.NguyenLieu
+SET MoTa = N'Rượu trắng/gừng/dầu ăn (1 ít).'
+WHERE MaNguyenLieu = N'NL1141';
+
+-- Chú thích dùng chung cho gia vị
+UPDATE dbo.NguyenLieu
+SET MoTa = N'(Muối/đường/bột ngọt/hạt nêm).'
+WHERE MaNguyenLieu = N'NL239';
+
+COMMIT TRANSACTION;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @NL TABLE
+    (
+        TenNguyenLieu NVARCHAR(150),
+        MoTa NVARCHAR(500)
+    );
+
+    INSERT INTO @NL
+    VALUES
+    -- Phở cuốn chay
+    (N'Đậu phộng rang', N'Đậu phộng rang.'),
+    (N'Mè rang', N'Mè rang.'),
+    (N'Sữa tươi', N'Sữa tươi.'),
+    (N'Bột gạo', N'Bột gạo.'),
+    (N'Bột khoai tây', N'Bột khoai tây.'),
+    (N'Củ sắn', N'Củ sắn.'),
+    (N'Nấm đùi gà', N'Nấm đùi gà.'),
+    (N'Cà rốt', N'Cà rốt.'),
+    (N'Tương ớt chay', N'Tương ớt chay.'),
+    (N'Nấm đông cô tươi', N'Nấm đông cô tươi.'),
+    (N'Muối', N'Muối.'),
+    (N'Đường', N'Đường.'),
+    (N'Hạt nêm chay', N'Hạt nêm chay.'),
+    (N'Hành boa rô', N'Hành boa rô.'),
+    (N'Dầu hào chay', N'Dầu hào chay.'),
+    (N'Dầu mè', N'Dầu mè.'),
+    (N'Xà lách', N'Xà lách.'),
+    (N'Rau diếp cá', N'Rau diếp cá.'),
+
+    -- Cơm chay lá sen
+    (N'Gạo dẻo', N'Gạo dẻo.'),
+    (N'Sen tươi', N'Sen tươi.'),
+    (N'Chả chay', N'Chả chay (cắt hạt lựu).'),
+    (N'Đậu que', N'Đậu que (cắt hạt lựu).'),
+    (N'Lá sen', N'Lá sen.'),
+    (N'Hạt nêm', N'Hạt nêm chay.'),
+
+    -- Cà ri xanh chay
+    (N'Nước cốt dừa', N'Nước cốt dừa.'),
+    (N'Gà lát chay', N'Gà lát chay.'),
+    (N'Bắp non', N'Bắp non.'),
+    (N'Cà tím', N'Cà tím.'),
+    (N'Bông cải xanh', N'Bông cải xanh.'),
+    (N'Nấm hương', N'Nấm hương.'),
+    (N'Ớt sừng xanh', N'Ớt sừng xanh.'),
+    (N'Riềng', N'Riềng.'),
+    (N'Hạt ngò', N'Hạt ngò.'),
+    (N'Hạt thì là', N'Hạt thì là.'),
+    (N'Tiêu sọ', N'Tiêu sọ.'),
+    (N'Ngò rí', N'Ngò rí.'),
+    (N'Rễ ngò', N'Rễ ngò.'),
+    (N'Tỏi', N'Tỏi.'),
+    (N'Hành tím', N'Hành tím.'),
+    (N'Vỏ chanh', N'Vỏ chanh.'),
+    (N'Dầu ăn', N'Dầu ăn.'),
+    (N'Hành boa rô', N'Hành boa rô.'),
+    (N'Đường phèn', N'Đường phèn.'),
+    (N'Muối', N'Muối.'),
+    (N'Hạt nêm chay', N'Hạt nêm chay.');
+
+    DECLARE @MaxNL INT;
+
+    SELECT @MaxNL =
+        ISNULL(
+            MAX(TRY_CONVERT(INT, SUBSTRING(MaNguyenLieu, 3, 20))),
+            0
+        )
+    FROM dbo.NguyenLieu;
+
+    ;WITH NguyenLieuMoi AS
+    (
+        SELECT
+            TenNguyenLieu,
+            MoTa,
+            ROW_NUMBER() OVER
+            (
+                ORDER BY TenNguyenLieu
+            ) AS STT
+        FROM @NL x
+        WHERE NOT EXISTS
+        (
+            SELECT 1
+            FROM dbo.NguyenLieu n
+            WHERE n.TenNguyenLieu = x.TenNguyenLieu
+        )
+    )
+    INSERT dbo.NguyenLieu
+    (
+        MaNguyenLieu,
+        TenNguyenLieu,
+        MoTa
+    )
+    SELECT
+        N'NL' + CONVERT(NVARCHAR(20), @MaxNL + STT),
+        TenNguyenLieu,
+        MoTa
+    FROM NguyenLieuMoi;
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm hoặc kiểm tra xong nguyên liệu cho 3 món chay.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = N'MA936')
+        THROW 51600, N'Mã món MA936 đã tồn tại.', 1;
+
+    IF EXISTS (SELECT 1 FROM dbo.CongThuc WHERE MaCongThuc = N'CT936')
+        THROW 51601, N'Mã công thức CT936 đã tồn tại.', 1;
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        N'MA936',
+        N'DM025',
+        N'Phở cuốn chay',
+        N'Các món chay thơm ngon giúp bữa cơm chay vừa thêm phần hấp dẫn, vừa bổ sung thêm nhiều chất dinh dưỡng.',
+        45,
+        N'Trung bình',
+        NULL
+    );
+
+    INSERT dbo.MonAnDanhMuc
+    (
+        MaMonAn,
+        MaDanhMuc
+    )
+    VALUES
+    (N'MA936', N'DM025'),
+    (N'MA936', N'DM029');
+
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DuongDanAnh,
+        DaCongBo
+    )
+    VALUES
+    (
+        N'CT936',
+        N'MA936',
+        N'Các món chay thơm ngon giúp bữa cơm chay vừa thêm phần hấp dẫn, vừa bổ sung thêm nhiều chất dinh dưỡng.',
+        3,
+        NULL,
+        0
+    );
+
+    INSERT dbo.ThanhPhanCongThuc
+    (
+        MaThanhPhan,
+        MaCongThuc,
+        MaNguyenLieu,
+        MaDonVi,
+        SoLuong
+    )
+    VALUES
+    (N'TP93601', N'CT936', N'NL936',  N'DVT001', 50),  -- Đậu phộng rang
+    (N'TP93602', N'CT936', N'NL982',  N'DVT001', 50),  -- Mè rang
+    (N'TP93603', N'CT936', N'NL321',  N'DVT003', 150), -- Sữa tươi
+    (N'TP93604', N'CT936', N'NL007',  N'DVT001', 200), -- Bột gạo
+    (N'TP93605', N'CT936', N'NL1188', N'DVT001', 50),  -- Bột khoai tây
+    (N'TP93606', N'CT936', N'NL304',  N'DVT010', 1),   -- Củ sắn
+    (N'TP93607', N'CT936', N'NL032',  N'DVT001', 50),  -- Nấm đùi gà
+    (N'TP93608', N'CT936', N'NL036',  N'DVT010', 0.5), -- Cà rốt
+    (N'TP93609', N'CT936', N'NL1202', N'DVT006', 1),   -- Tương ớt chay
+    (N'TP93610', N'CT936', N'NL987',  N'DVT001', 50),  -- Nấm đông cô
+    (N'TP93611', N'CT936', N'NL073',  N'DVT014', 1),   -- Muối
+    (N'TP93612', N'CT936', N'NL074',  N'DVT006', 1),   -- Đường
+    (N'TP93613', N'CT936', N'NL312',  N'DVT007', 2),   -- Hạt nêm chay
+    (N'TP93614', N'CT936', N'NL311',  N'DVT006', 2),   -- Hành boa rô
+    (N'TP93615', N'CT936', N'NL1190', N'DVT006', 1),   -- Dầu hào chay
+    (N'TP93616', N'CT936', N'NL091',  N'DVT006', 1),   -- Dầu mè
+    (N'TP93617', N'CT936', N'NL040',  N'DVT013', 1),   -- Xà lách
+    (N'TP93618', N'CT936', N'NL1198', N'DVT013', 1);   -- Rau diếp cá
+
+    INSERT dbo.BuocCheBien
+    (
+        MaBuoc,
+        MaCongThuc,
+        ThuTu,
+        NoiDung,
+        ThoiGianThucHien
+    )
+    VALUES
+    (
+        N'BCB93601',
+        N'CT936',
+        1,
+        N'~ Làm tương đậu phộng ~
+
+Dùng máy xay sinh tố xay 50gr đậu phộng rang và 50gr mè rang đến khi nhuyễn mịn.
+
+Bắc chảo lên bếp rồi cho một muỗng canh dầu ăn vào. Khi dầu đủ nóng bạn cho một muỗng canh hành boa rô vào khử. Khi hành vừa vàng bạn cho 150ml sữa tươi vào chảo.
+
+Tiếp đến, bạn cho hỗn hợp đậu và mè vừa xay vào chảo, thêm 1 muỗng canh tương ớt chay, 1 muỗng canh đường, 1 muỗng cà phê hạt nêm chay, 1/2 muỗng cà phê muối vào hỗn hợp và khuấy đều.
+
+Tiếp tục khuấy và đun phần tương đậu phộng trên bếp lửa nhỏ trong 5 phút. Sau khi tương chín sẽ có màu vàng ươm đẹp mắt, kết cấu sánh mịn.',
+        10
+    ),
+    (
+        N'BCB93602',
+        N'CT936',
+        2,
+        N'~ Xào nhân nấm ~
+
+Bạn cắt 1 củ sắn, 1/2 củ cà rốt, 50gr nấm đùi gà, 2 bìa tàu hủ chiên, 50gr nấm đông cô thành sợi và miếng vừa ăn để chuẩn bị làm nhân.
+
+Sau khi đã sơ chế nguyên liệu, bạn bắc chảo cho vào một muỗng canh dầu ăn. Tiếp đến, cho lần lượt củ sắn, cà rốt, nấm đùi gà, nấm đông cô vào xào. Lưu ý, mỗi khi thêm nguyên liệu vào bạn xào sơ rồi mới thêm nguyên liệu kế tiếp.
+
+Xào đến khi nguyên liệu hơi chín thì bạn có thể nêm nếm được rồi. Với phần nhân này thì bạn có thể nêm 1 muỗng canh đường, 1 muỗng cà phê hạt nêm chay, 1/2 muỗng cà phê muối, 1 muỗng canh dầu hào chay.
+
+Xào đến khi củ sắn, cà rốt, nấm đã chín thì bạn mới cho tàu hủ chiên đã cắt lát vào chảo. Thêm một ít dầu mè vào và xào đến khi tàu hủ thấm đều gia vị.',
+        10
+    ),
+    (
+        N'BCB93603',
+        N'CT936',
+        3,
+        N'~ Đổ bánh phở cuốn ~
+
+Để làm phần bánh phở, bạn trộn 200gr bột gạo và 50gr bột khoai tây lại với nhau. Cho thêm 1/2 muỗng cà phê muối, 500ml nước lọc, 15ml dầu ăn vào hỗn hợp và khuấy đều bằng que đánh trứng đến khi bột tan đều.
+
+Để hấp bánh, bạn buộc chặt miếng vải sạch lên miệng nồi nước và đun đến khi sôi. Khi hơi nước vừa đủ, bạn múc một vá bột đã trộn trải đều lên trên mặt vải và đậy nắp nồi để hấp bánh.
+
+Khi bột đã trong, bạn lấy bánh ra khỏi vải và tiếp tục đổ bột để hấp phần bánh tiếp theo đến khi hết bột.
+
+Bạn có thể thay thế nồi hấp hơi bằng cách nấu bánh phở bằng chảo chống dính. Kết cấu bánh phở làm bằng chảo có thể sẽ không đẹp mắt bằng cách dùng nồi nhưng vẫn sẽ dai ngon vừa miệng đấy!',
+        15
+    ),
+    (
+        N'BCB93604',
+        N'CT936',
+        4,
+        N'~ Cuốn phở ~
+
+Trải bánh phở lên trên mặt phẳng để dễ cuốn. Cho một lượng vừa đủ xà lách, rau diếp cá và nhân nấm đã chuẩn bị lên trên mặt phở và bắt đầu cuốn.
+
+Mỗi cuốn bánh phở bạn cắt ra thành nhiều khúc vừa ăn và trình bày lên dĩa.',
+        5
+    ),
+    (
+        N'BCB93605',
+        N'CT936',
+        5,
+        N'~ Hoàn thành ~
+
+Bánh phở cuốn chay có lớp vỏ ngoài dai dai và phần nhân giòn giòn. Nhân nấm thơm ngon từ nấm, rau củ, tàu hủ ăn cùng rau sống bọc trong bánh phở sẽ khiến bạn vô cùng hài lòng.
+
+Chấm cuốn phở chay với phần tương đậu phộng đã chuẩn bị sẵn sẽ khiến món ăn còn hấp dẫn hơn nữa đấy! Nếu ở nhà có ai thích ăn cay thì hãy thêm một ít ớt vào phần tương này để thêm hương vị nhé!!',
+        NULL
+    );
+
+    INSERT dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim,
+        MaCongThuc,
+        TieuDe,
+        DuongDan,
+        MoTa
+    )
+    VALUES
+    (
+        N'DP936',
+        N'CT936',
+        N'Phở cuốn chay',
+        N'https://www.youtube.com/watch?v=Dde-DHOZH0w',
+        N'Video hướng dẫn làm phở cuốn chay.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = N'CT936';
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm thành công món Phở cuốn chay MA936.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = N'MA937')
+        THROW 51700, N'Mã món MA937 đã tồn tại.', 1;
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn, MaDanhMuc, TenMonAn, MoTa,
+        ThoiGianCheBien, DoKho, DuongDanAnh
+    )
+    VALUES
+    (
+        N'MA937',
+        N'DM025',
+        N'Cơm chay lá sen',
+        N'Món cơm chay lá sen thanh đạm và đầy đủ dưỡng chất với vị bùi bùi của hạt sen hòa quyện cùng những hạt cơm mềm dẻo, thơm ngon.',
+        30,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT dbo.MonAnDanhMuc
+    (
+        MaMonAn,
+        MaDanhMuc
+    )
+    VALUES
+    (
+        N'MA937',
+        N'DM025'
+    );
+
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DuongDanAnh,
+        DaCongBo
+    )
+    VALUES
+    (
+        N'CT937',
+        N'MA937',
+        N'Món cơm chay lá sen thanh đạm và đầy đủ dưỡng chất với vị bùi bùi của hạt sen hòa quyện cùng những hạt cơm mềm dẻo, thơm ngon.',
+        4,
+        NULL,
+        0
+    );
+
+    INSERT dbo.ThanhPhanCongThuc
+    (
+        MaThanhPhan,
+        MaCongThuc,
+        MaNguyenLieu,
+        MaDonVi,
+        SoLuong
+    )
+    VALUES
+    (N'TP93701', N'CT937', N'NL1193', N'DVT016', 2),
+    (N'TP93702', N'CT937', N'NL1200', N'DVT001', 150),
+    (N'TP93703', N'CT937', N'NL1189', N'DVT001', 150),
+    (N'TP93704', N'CT937', N'NL987',  N'DVT001', 10),
+    (N'TP93705', N'CT937', N'NL036',  N'DVT001', 100),
+    (N'TP93706', N'CT937', N'NL1191', N'DVT001', 100),
+    (N'TP93707', N'CT937', N'NL1196', N'DVT005', 2),
+    (N'TP93708', N'CT937', N'NL074',  N'DVT001', 10),
+    (N'TP93709', N'CT937', N'NL312',  N'DVT001', 10),
+    (N'TP93710', N'CT937', N'NL071',  N'DVT001', 10),
+    (N'TP93711', N'CT937', N'NL1190', N'DVT001', 10);
+
+    INSERT dbo.BuocCheBien
+    (
+        MaBuoc,
+        MaCongThuc,
+        ThuTu,
+        NoiDung,
+        ThoiGianThucHien
+    )
+    VALUES
+    (
+        N'BCB93701',
+        N'CT937',
+        1,
+        N'~ Luộc hạt sen ~
+
+Rửa thật sạch hạt sen sau đó luộc hạt sen với 1 ít muối đến khi mềm thì vớt ra, phần nước sen dùng để nấu cơm.',
+        10
+    ),
+    (
+        N'BCB93702',
+        N'CT937',
+        2,
+        N'~ Nấu cơm ~
+
+Vo gạo sạch rồi nấu bằng nước luộc sen.',
+        20
+    ),
+    (
+        N'BCB93703',
+        N'CT937',
+        3,
+        N'~ Xào nguyên liệu ~
+
+Bắt chảo lên bếp, cho 1 ít dầu ăn, sau đó cho cà rốt, đậu ve, nấm đông cô, chả chay vào, 1 muỗng đường, 1 muỗng hạt nêm chay, 1 muỗng dầu hào chay, 1 muỗng nước tương đảo đều các nguyên liệu, rồi cho hạt sen vào đảo đều, nhắc chảo xuống.',
+        10
+    ),
+    (
+        N'BCB93704',
+        N'CT937',
+        4,
+        N'~ Trộn và hấp cơm ~
+
+Cho hỗn hợp mới xào cùng với cơm trắng trộn đều, gói vào lá sen rồi hấp khi nước sôi từ 5 đến 7 phút.',
+        7
+    ),
+    (
+        N'BCB93705',
+        N'CT937',
+        5,
+        N'~ Thành phẩm ~
+
+Món cơm chay lá sen thanh đạm và đầy đủ dưỡng chất thiết yếu với vị ngọt mát của hạt sen quyện cùng những hạt cơm thơm ngon, dẻo ngọt, sự phong phú của các nguyên liệu.',
+        NULL
+    );
+
+    INSERT dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim,
+        MaCongThuc,
+        TieuDe,
+        DuongDan,
+        MoTa
+    )
+    VALUES
+    (
+        N'DP937',
+        N'CT937',
+        N'Cơm chay lá sen',
+        N'https://www.youtube.com/watch?v=7GgbbpV-0Ns',
+        N'Video hướng dẫn làm cơm chay lá sen.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = N'CT937';
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm thành công món Cơm chay lá sen MA937.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    IF EXISTS (SELECT 1 FROM dbo.MonAn WHERE MaMonAn = N'MA938')
+        THROW 51800, N'Mã món MA938 đã tồn tại.', 1;
+
+    INSERT dbo.MonAn
+    (
+        MaMonAn,
+        MaDanhMuc,
+        TenMonAn,
+        MoTa,
+        ThoiGianCheBien,
+        DoKho,
+        DuongDanAnh
+    )
+    VALUES
+    (
+        N'MA938',
+        N'DM025',
+        N'Cà ri xanh chay',
+        N'Nếu bạn muốn thay đổi khẩu vị cho bữa ăn gia đình trong những ngày chay thanh tịnh hay chiêu đãi bạn bè món ngon vào những dịp gặp mặt, thì để CookHub chia sẻ với bạn cách làm cà ri xanh chay thơm ngon, cay nồng, ai ai cũng mê nhé.',
+        40,
+        N'Dễ',
+        NULL
+    );
+
+    INSERT dbo.MonAnDanhMuc
+    (
+        MaMonAn,
+        MaDanhMuc
+    )
+    VALUES
+    (
+        N'MA938',
+        N'DM025'
+    );
+
+    INSERT dbo.CongThuc
+    (
+        MaCongThuc,
+        MaMonAn,
+        MoTa,
+        SoKhauPhanChuan,
+        DuongDanAnh,
+        DaCongBo
+    )
+    VALUES
+    (
+        N'CT938',
+        N'MA938',
+        N'Nếu bạn muốn thay đổi khẩu vị cho bữa ăn gia đình trong những ngày chay thanh tịnh hay chiêu đãi bạn bè món ngon vào những dịp gặp mặt, thì để CookHub chia sẻ với bạn cách làm cà ri xanh chay thơm ngon, cay nồng, ai ai cũng mê nhé.',
+        4,
+        NULL,
+        0
+    );
+
+    INSERT dbo.ThanhPhanCongThuc
+    (
+        MaThanhPhan,
+        MaCongThuc,
+        MaNguyenLieu,
+        MaDonVi,
+        SoLuong
+    )
+    VALUES
+    (N'TP93801', N'CT938', N'NL068',  N'DVT004', 1),
+    (N'TP93802', N'CT938', N'NL1192', N'DVT001', 50),
+    (N'TP93803', N'CT938', N'NL1187', N'DVT001', 30),
+    (N'TP93804', N'CT938', N'NL1021', N'DVT001', 100),
+    (N'TP93805', N'CT938', N'NL047',  N'DVT005', 0.25),
+    (N'TP93806', N'CT938', N'NL034',  N'DVT001', 30),
+    (N'TP93807', N'CT938', N'NL1197', N'DVT005', 5),
+    (N'TP93808', N'CT938', N'NL053',  N'DVT011', 2),
+    (N'TP93809', N'CT938', N'NL1199', N'DVT011', 1),
+    (N'TP93810', N'CT938', N'NL1194', N'DVT007', 1),
+    (N'TP93811', N'CT938', N'NL1195', N'DVT007', 1),
+    (N'TP93812', N'CT938', N'NL1201', N'DVT006', 1),
+    (N'TP93813', N'CT938', N'NL160',  N'DVT011', 5),
+    (N'TP93814', N'CT938', N'NL319',  N'DVT011', 5),
+    (N'TP93815', N'CT938', N'NL051',  N'DVT012', 5),
+    (N'TP93816', N'CT938', N'NL049',  N'DVT010', 3),
+    (N'TP93817', N'CT938', N'NL1203', N'DVT005', 1),
+    (N'TP93818', N'CT938', N'NL311', N'DVT006', 1),
+    (N'TP93819', N'CT938', N'NL072', N'DVT006', 2),
+    (N'TP93820', N'CT938', N'NL131', N'DVT006', 2),
+    (N'TP93821', N'CT938', N'NL312', N'DVT006', 4),
+    (N'TP93822', N'CT938', N'NL073', N'DVT014', 1);
+
+    INSERT dbo.BuocCheBien
+    (
+        MaBuoc,
+        MaCongThuc,
+        ThuTu,
+        NoiDung,
+        ThoiGianThucHien
+    )
+    VALUES
+    (
+        N'BCB93801',
+        N'CT938',
+        1,
+        N'~ Sơ chế nguyên liệu ~
+
+Bắc chảo lên bếp mở lửa vừa, bạn cho vào chảo 1 muỗng cà phê hạt ngò, 1 muỗng cà phê hạt thì là, 1 muỗng canh tiêu sọ rồi đảo đều khoảng 5 phút thì tắt bếp, để nguội.
+
+Ngò rí bạn rửa sạch, cắt để riêng phần lá và phần rễ, bạn cho phần lá ngò rí với 1/2 chén nước vào máy xay sinh tố xay nhuyễn.',
+        10
+    ),
+    (
+        N'BCB93802',
+        N'CT938',
+        2,
+        N'~ Làm sốt cà ri xanh ~
+
+Bạn cho hỗn hợp vừa rang vào máy xay sinh tố, thêm 5 quả ớt sừng xanh, 2 nhánh sả, 5 nhánh rễ ngò, 1 nhánh riềng, 5 tép tỏi, 3 củ hành tím, vỏ 1 quả chanh, 1 muỗng cà phê muối, 1 chén nước rồi bấm xay nhuyễn.',
+        5
+    ),
+    (
+        N'BCB93803',
+        N'CT938',
+        3,
+        N'~ Xào rau củ ~
+
+Bạn bắc chảo lên bếp mở lửa vừa, cho vào chảo 2 muỗng canh dầu ăn, đợi dầu nóng bạn phi thơm 1 muỗng canh hành boa rô.
+
+Khi hành thơm, bạn thêm 50gr gà lát chay, 100gr cà tím, 30gr bắp non, 1/4 bông cải xanh, 30gr nấm hương, bạn xào ở lửa vừa 10 phút rồi bạn nêm gia vị với 1 muỗng canh hạt nêm và tắt bếp.',
+        10
+    ),
+    (
+        N'BCB93804',
+        N'CT938',
+        4,
+        N'~ Nấu cà ri xanh chay ~
+
+Bắc nồi lên bếp mở lửa vừa, bạn cho phần sốt cà ri xanh vào nồi, thêm 1 lít nước cốt dừa rồi đảo nhẹ nhàng 10 phút.
+
+Sau 10 phút, bạn cho phần rau củ xào vào và nêm với 3 muỗng canh hạt nêm chay, 2 muỗng canh đường phèn, thêm phần nước ngò rí xay nhuyễn vào, bạn nấu sôi lại và nêm nếm lại cho vừa ăn là hoàn thành rồi nè!',
+        20
+    ),
+    (
+        N'BCB93805',
+        N'CT938',
+        5,
+        N'~ Thành phẩm ~
+
+Vậy là bạn đã hoàn thành xong món cà ri xanh chay rồi, món ăn mang màu sắc đẹp cùng với cách bày trí bắt mắt, sẽ thích hợp cho những dịp lễ, ngày rằm.
+
+Món này bạn có thể ăn cùng bánh mì hoặc với cơm đều rất ngon, trổ taì vào bếp thực hiện chiêu đãi cả nhà thôi nè!',
+        NULL
+    );
+
+    INSERT dbo.DoanPhimHuongDan
+    (
+        MaDoanPhim,
+        MaCongThuc,
+        TieuDe,
+        DuongDan,
+        MoTa
+    )
+    VALUES
+    (
+        N'DP938',
+        N'CT938',
+        N'Cà ri xanh chay',
+        N'https://www.youtube.com/watch?v=LdqpRmigcf0',
+        N'Video hướng dẫn làm cà ri xanh chay.'
+    );
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = N'CT938';
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã thêm thành công món Cà ri xanh chay MA938.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
 GO

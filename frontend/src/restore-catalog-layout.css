@@ -10,6 +10,22 @@
 @media(max-width:1050px){.discover-category-panel .discover-categories{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:600px){.discover-category-panel{padding:14px}.discover-category-panel .discover-categories{grid-template-columns:repeat(2,minmax(0,1fr))}.discover-category-panel .discover-categories button{grid-template-columns:29px minmax(0,1fr) auto;padding:8px 7px}}
 @media(max-width:760px){.search-hub .ingredient-hub{display:block;padding:18px!important}.search-hub .ingredient-hub>div:first-child,.search-hub .ingredient-chips{max-width:none}.search-hub .ingredient-chips{justify-content:flex-start;margin-top:12px}}
 
+/* Keep the category picker compact until the user expands it. */
+.discover-category-panel .discover-categories.collapsed button:nth-child(n+13){display:none}
+@media(max-width:1050px){.discover-category-panel .discover-categories.collapsed button:nth-child(n+7){display:none}}
+@media(max-width:600px){.discover-category-panel .discover-categories.collapsed button:nth-child(n+5){display:none}}
+
 /* Compact category icons. */
 .discover-category-panel .discover-categories button{grid-template-columns:28px minmax(0,1fr) auto}
 .discover-category-panel .category-icon{width:28px;height:28px;display:grid;place-items:center;font-size:17px;border-radius:9px;overflow:hidden}
+
+/* This layout file loads after theme.css, so its light surfaces need dark counterparts. */
+html[data-theme="dark"] .search-hub .ingredient-hub{background:linear-gradient(105deg,#19392d,#283928)!important;box-shadow:0 12px 24px #0003}
+html[data-theme="dark"] .discover-category-panel{border-color:var(--color-border);background:linear-gradient(135deg,#1b352b,#1a3027);box-shadow:0 8px 20px #0003}
+html[data-theme="dark"] .discover-category-heading h2{color:var(--color-text-primary)}
+html[data-theme="dark"] .discover-category-heading small{color:#86dfb0}
+html[data-theme="dark"] .discover-category-heading>span{color:var(--color-text-secondary)}
+html[data-theme="dark"] .discover-category-panel button:not(.active)>small{background:#315143;color:#d1e8db}
+html[data-theme="dark"] .discover-category-more{border-color:var(--color-border);background:var(--color-bg-elevated);color:var(--color-text-primary)}
+html[data-theme="dark"] .discover-video-filter{color:var(--color-text-primary)}
+html[data-theme="dark"] .discover-video-filter small{background:var(--color-bg-muted);color:var(--color-text-secondary)}

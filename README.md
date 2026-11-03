@@ -13,7 +13,7 @@ Clone Git không tự cài Python, Node hay SQL Server, và **không chứa `bac
 ## Cài lần đầu trên Windows
 
 1. Clone repo và mở PowerShell tại thư mục gốc.
-2. Tạo database mới bằng SSMS ở chế độ **Query → SQLCMD Mode**: chạy [QuanLyThucDon.sql](QuanLyThucDon.sql), sau đó [Bo-sung.sql](Bo-sung.sql). File đầu chỉ dành cho database chưa tồn tại. Không chạy lại trên database đang có dữ liệu.
+2. Tạo database mới bằng SSMS ở chế độ **Query → SQLCMD Mode** và chạy theo thứ tự: [QuanLyThucDon.sql](QuanLyThucDon.sql), [Bo-sung.sql](Bo-sung.sql), [Du-lieu-65-mon-cu.sql](Du-lieu-65-mon-cu.sql). `QuanLyThucDon.sql` chứa schema và bộ món của nhánh mới (34 món gốc cùng món Phở bò mới); `Bo-sung.sql` bổ sung dinh dưỡng và quy đổi đơn vị. File `Du-lieu-65-mon-cu.sql` chỉ chứa dữ liệu món từ nhánh 65 món cũ, thêm 58 món còn thiếu và không ghi đè món/công thức hiện tại. Có thể bỏ qua file này nếu chỉ muốn dùng bộ món mới. Kết quả là **93 món, 93 món có ảnh**. Chỉ chạy file đầu trên máy chưa có database `QuanLyThucDon`.
 3. Chạy `powershell -ExecutionPolicy Bypass -File .\setup.ps1`. Script tạo Python virtual environment, cài thư viện backend và frontend, tạo `backend/.env` nếu thiếu, hỏi `DATABASE_URL` của máy này và kiểm tra schema.
 4. Mở hai terminal tại thư mục gốc:
 
@@ -37,9 +37,21 @@ Nếu mật khẩu chứa ký tự đặc biệt, mã hóa URL cho phần user/p
 
 Đã cài xong thì kiểm tra lại bằng `powershell -ExecutionPolicy Bypass -File .\setup.ps1 -CheckOnly`.
 
+## Đã có database: cập nhật mà không tạo lại
+
+`git pull` chỉ cập nhật code và file SQL, **không tự sửa database**. Giữ database hiện tại và sao lưu nó trước khi chạy các script dưới đây bằng SSMS ở SQLCMD Mode, theo thứ tự:
+
+1. Nếu database chưa có dữ liệu dinh dưỡng và quy đổi của nhánh `2-11-26`, chạy [Bo-sung.sql](Bo-sung.sql).
+2. Chạy [Du-lieu-65-mon-cu.sql](Du-lieu-65-mon-cu.sql) để thêm những món còn thiếu; script giữ nguyên món và công thức đã có.
+3. Chạy [Review-auto-publish.sql](Review-auto-publish.sql) để chuyển đánh giá cũ đang chờ duyệt sang hiển thị ngay.
+4. Chạy [Remove-duplicate-pho.sql](Remove-duplicate-pho.sql) để bỏ Phở bò viên cũ nếu đã từng gộp bản trước. Script sẽ dừng nếu món này có dữ liệu người dùng, tránh xóa nhầm.
+5. Chạy [Dish-images-cloudinary.sql](Dish-images-cloudinary.sql) để nối ảnh Cloudinary cho các món còn thiếu và thay ảnh Phở bò.
+
+Không chạy lại `QuanLyThucDon.sql` trên database đang sử dụng. Nếu database cũ có schema khác bản `2-11-26`, kiểm tra schema trước khi cập nhật; các script trên không thay thế việc di trú schema tùy chỉnh.
+
 ## Cloudinary và ảnh
 
-Hai file [manifest backend](backend/app/cloudinary_images.json) và [manifest frontend](frontend/src/cloudinary-images.json) phải có trong commit khi push. Chúng chứa URL ảnh công khai, không chứa API secret. Người clone **xem được ảnh cũ mà không cần khóa Cloudinary**.
+Hai file [manifest backend](backend/app/cloudinary_images.json) và [manifest frontend](frontend/src/cloudinary-images.json) phải có trong commit khi push. Chúng chứa URL ảnh công khai, không chứa API secret. Ảnh các món bổ sung được ghi trực tiếp bằng URL Cloudinary trong SQL. Người clone **xem được ảnh mà không cần khóa Cloudinary**.
 
 Muốn **upload ảnh mới từ trang quản trị**, mỗi máy chạy backend cần `CLOUDINARY_URL` trong `backend/.env`. Chủ tài khoản Cloudinary phải cấp khóa qua kênh riêng hoặc cấu hình nó trực tiếp trên máy đó. Không đưa API secret lên Git. Nếu chưa có khóa, các phần còn lại vẫn chạy; ảnh upload mới chỉ được lưu cục bộ trên máy đó.
 

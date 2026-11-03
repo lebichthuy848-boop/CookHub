@@ -7,7 +7,9 @@ import '../admin.css';
 import '../recipe-studio.css';
 import '../user-center.css';
 import '../category-studio.css';
+import '../category-theme.css';
 import '../video-studio.css';
+import '../admin-content-theme.css';
 import ReviewStudio from './ReviewStudio';
 
 const titles={categories:'Quản lý danh mục',dishes:'Quản lý món ăn',recipes:'Quản lý công thức',videos:'Quản lý video',reviews:'Quản lý đánh giá',users:'Người dùng & phân quyền'};

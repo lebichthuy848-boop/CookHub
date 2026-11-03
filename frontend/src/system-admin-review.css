@@ -1,0 +1,54 @@
+.system-users-toolbar{grid-template-columns:repeat(3,minmax(0,1fr))}
+.system-users-card .system-users-toolbar{grid-template-columns:minmax(180px,1fr) minmax(130px,170px) minmax(130px,170px) minmax(130px,170px) 52px auto}
+.system-users-card .system-users-toolbar .system-users-direction{width:52px;min-height:46px;padding:0;font-size:22px;line-height:1;white-space:nowrap}
+.system-users-toolbar input{min-width:0}
+.system-users-result-count{margin:0 0 10px;color:var(--color-text-secondary);font-size:12px}
+.system-users-pagination{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:18px;color:var(--color-text-primary);font-size:12px}
+.system-users-pagination button:disabled{opacity:.45;cursor:not-allowed}
+.system-users-table{max-width:100%;overflow-x:auto}
+.system-users-table table{min-width:760px}
+.system-users-modal{padding:16px}
+.system-users-dialog{max-height:calc(100vh - 32px);overflow:auto}
+.system-overview .usage-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.system-overview .usage-grid div{min-width:0}
+.system-overview .role-row b{white-space:nowrap}
+.system-overview .role-row{grid-template-columns:minmax(115px,1fr) 82px minmax(90px,1.4fr);gap:12px}
+.system-overview .role-row>span{min-width:0}
+.system-overview .role-row>b{font-variant-numeric:tabular-nums}
+.system-overview .status-chart{display:flex;align-items:center;gap:24px;min-height:145px}
+.system-overview .status-chart .donut{position:relative;display:grid;place-items:center;flex:0 0 132px;width:132px;height:132px;border-radius:50%;background:conic-gradient(#20ad78 0 var(--active),#f28a59 var(--active) 360deg)}
+.system-overview .status-chart .donut::before{content:'';position:absolute;inset:15px;border-radius:50%;background:var(--color-bg-card)}
+.system-overview .status-chart .donut strong{position:relative;z-index:1;display:grid;justify-items:center;color:var(--color-text-primary);font-size:26px;line-height:1.2}
+.system-overview .status-chart .donut small{color:var(--color-text-secondary);font-size:10px;font-weight:500}
+.system-overview .status-legend{display:grid;gap:10px;min-width:0;flex:1}
+.system-overview .status-legend button{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:10px 12px;border:1px solid var(--color-border);border-radius:10px;background:var(--color-bg-muted);color:var(--color-text-primary);white-space:nowrap;text-align:left}
+.system-overview .status-legend button b{margin-left:auto;font-variant-numeric:tabular-nums}
+.reports-chart-wrap{position:relative}
+.reports-axis-y,.reports-axis-x{display:block;color:var(--color-text-secondary);font-size:11px}
+.reports-axis-y{margin:4px 0 8px}
+.reports-axis-x{margin:10px 0 0;text-align:center}
+.reports-empty,.reports-limitation{padding:14px;border:1px solid var(--color-border);border-radius:10px;background:var(--color-bg-muted);color:var(--color-text-secondary);font-size:12px}
+.reports-compare{display:block;margin-top:8px;color:var(--color-text-secondary);line-height:1.5}
+.system-reports .reports-filter select,.system-reports .reports-filter input{min-width:0}
+@media(max-width:1100px){
+  .system-users-toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .system-users-card .system-users-toolbar{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .system-overview .usage-grid{grid-template-columns:1fr}
+}
+@media(max-width:800px){
+  .system-users-toolbar{grid-template-columns:1fr}
+  .system-users-card .system-users-toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .system-users-card .system-users-toolbar input{grid-column:1/-1}
+  .system-users-card .system-users-toolbar button:last-child{grid-column:1/-1;width:auto}
+  .system-overview-hero{gap:14px;flex-wrap:wrap}
+  .system-overview .role-row{min-width:0}
+  .system-overview .status-chart{flex-wrap:wrap}
+  .reports-actions{display:flex;flex-wrap:wrap}
+  .reports-filter{gap:10px}
+}
+@media(max-width:600px){
+  .system-overview .role-row{grid-template-columns:minmax(0,1fr) 82px}
+  .system-overview .role-row>div{grid-column:1/-1}
+  .system-overview .status-chart{justify-content:center}
+  .system-overview .status-legend{flex-basis:100%}
+}

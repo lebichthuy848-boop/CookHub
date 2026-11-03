@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     facebook_app_secret: str = ''
     facebook_redirect_uri: str = ''
     cloudinary_url: str = ''
+    cloudinary_cloud_name: str = ''
+    cloudinary_api_key: str = ''
+    cloudinary_api_secret: str = ''
 
 settings = Settings()
 

@@ -53,7 +53,7 @@
   .auth-page { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; padding: 24px; background: #f8f4e9; }
   .auth-page::before { display: none; }
   .auth-responsive-banner, .auth-side { grid-area: 1 / 1; }
-  .auth-responsive-banner { display: block; position: relative; width: 100%; aspect-ratio: 4 / 5; max-height: none; overflow: hidden; border-radius: 26px; background: #fbf4e7 url('/images/auth-responsive-v2.png') center / 100% 100% no-repeat; box-shadow: 0 18px 42px #2b462a22; }
+  .auth-responsive-banner { display: block; position: relative; width: 100%; aspect-ratio: 4 / 5; max-height: none; overflow: hidden; border-radius: 26px; background: #fbf4e7 url('https://res.cloudinary.com/ncpoysfj/image/upload/v1792714126/cookhub/auth-background.png') center / 100% 100% no-repeat; box-shadow: 0 18px 42px #2b462a22; }
   .auth-banner-copy { position: absolute; top: 2%; left: 8%; right: 8%; color: #174d39; }
   .auth-banner-brand { display: flex; align-items: center; gap: 8px; line-height: 1; }
   .auth-banner-brand > span { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 11px; background: #f46b1c; color: #fff; font-size: 25px; }

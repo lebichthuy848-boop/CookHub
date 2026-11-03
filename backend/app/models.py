@@ -6,13 +6,13 @@ from .database import Base
 class NguoiDung(Base):
     __tablename__ = "NguoiDung"
     maNguoiDung = Column(String(50), primary_key=True)
-    hoTen = Column(String(150), nullable=True)
+    hoTen = Column(Unicode(150), nullable=True)
     # Giữ tên thuộc tính cũ để các service/API không đổi giao diện,
     # nhưng ánh xạ đúng tên cột SQL Server V2.
-    thuDienTu = Column("ThuDienTu", String(150), nullable=False, unique=True)
+    thuDienTu = Column("ThuDienTu", Unicode(150), nullable=False, unique=True)
     matKhauBam = Column("MatKhauBam", String(255), nullable=False)
-    vaiTro = Column(String(50), nullable=True)
-    trangThai = Column(String(50), nullable=True)
+    vaiTro = Column(Unicode(50), nullable=True)
+    trangThai = Column(Unicode(50), nullable=True)
     ngayTao = Column('NgayTao', DateTime, nullable=True)
 
 
@@ -63,8 +63,8 @@ class DanhMucMonAn(Base):
 class NguyenLieu(Base):
     __tablename__ = "NguyenLieu"
     maNguyenLieu = Column(String(50), primary_key=True)
-    tenNguyenLieu = Column(String(150), nullable=True)
-    moTa = Column(String(500), nullable=True)
+    tenNguyenLieu = Column(Unicode(150), nullable=True)
+    moTa = Column(Unicode(500), nullable=True)
 
 
 class DonViTinh(Base):
@@ -132,6 +132,13 @@ class MonAn(Base):
     thoiGianCheBien = Column(Integer, nullable=True)
     doKho = Column(String(50), nullable=True)
     duongDanAnh = Column("DuongDanAnh", String(500), nullable=True)
+
+
+class MonAnDanhMuc(Base):
+    """Liên kết nhiều-nhiều giữa món ăn và danh mục."""
+    __tablename__ = "MonAnDanhMuc"
+    maMonAn = Column(String(50), ForeignKey("MonAn.maMonAn", ondelete="CASCADE"), primary_key=True)
+    maDanhMuc = Column(String(50), ForeignKey("DanhMucMonAn.maDanhMuc", ondelete="CASCADE"), primary_key=True)
 
 
 class CongThuc(Base):
@@ -235,7 +242,7 @@ class DanhGiaMonAn(Base):
     soSao = Column(Integer, nullable=True)
     noiDung = Column(String(1000), nullable=True)
     ngayDanhGia = Column(Date, nullable=True)
-    trangThaiKiemDuyet = Column("TrangThaiKiemDuyet", Unicode(20), nullable=False, default='Chờ duyệt')
+    trangThaiKiemDuyet = Column("TrangThaiKiemDuyet", Unicode(20), nullable=False, default='Đã duyệt')
     maNguoiKiemDuyet = Column("MaNguoiKiemDuyet", String(50), ForeignKey("NguoiDung.maNguoiDung"), nullable=True)
     ngayKiemDuyet = Column("NgayKiemDuyet", DateTime, nullable=True)
     ghiChuKiemDuyet = Column("GhiChuKiemDuyet", Unicode(500), nullable=True)

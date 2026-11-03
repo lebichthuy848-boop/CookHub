@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from .config import MEDIA_ROOT, settings
-from .routers import auth, catalog, personal, admin, uploads, preferences
+from .routers import auth, catalog, personal, admin, uploads, preferences, backup
 
 def document_client_header(client: str | None = Header(default=None, alias='X-CookHub-Client', description='Set to web for POST, PUT and DELETE requests.')):
     # Enforcement is centralized in protect_requests; this exposes it in Swagger.
@@ -27,7 +27,7 @@ async def integrity_error(request, exc):
     logger.exception('SQL integrity error: number=%s procedure=%s line=%s message=%s',
                      number, getattr(orig, 'procedure', None), getattr(orig, 'line', None), message)
     if number in {2601, 2627} or 'duplicate' in message.lower() or 'unique' in message.lower():
-        return JSONResponse(status_code=409, content={'detail':'Email đã tồn tại.'})
+        return JSONResponse(status_code=409, content={'detail':'Dữ liệu đã tồn tại. Vui lòng tải lại trang và thử lại.'})
     if number == 547:
         return JSONResponse(status_code=409, content={'detail':'Dữ liệu vi phạm ràng buộc cơ sở dữ liệu.'})
     return JSONResponse(status_code=500, content={'detail':'Lỗi cơ sở dữ liệu khi xử lý yêu cầu.'})
@@ -89,7 +89,7 @@ app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins,
     allow_credentials=True, allow_methods=['GET','POST','PUT','DELETE','OPTIONS'],
     allow_headers=['Content-Type','X-CookHub-Client'])
 
-for router in (auth.router, catalog.router, personal.router, preferences.router, admin.router, uploads.router):
+for router in (auth.router, catalog.router, personal.router, preferences.router, admin.router, uploads.router, backup.router):
     app.include_router(router, prefix='/api')
 
 @app.get('/api/health', tags=['Health'])

@@ -40,7 +40,7 @@ def test_passwords_roles_and_statuses_match_v2(real_db):
     bcrypt = re.compile(r"^\$2[aby]\$(0[4-9]|[12][0-9]|3[01])\$[./A-Za-z0-9]{53}$")
     for password_hash, role, status in rows:
         assert bcrypt.fullmatch(password_hash)
-        assert role in {"Người dùng", "Quản trị viên"}
+        assert role in {"Người dùng", "Quản trị nội dung", "Quản trị hệ thống"}
         assert status in {"Đang hoạt động", "Tạm khóa"}
 
 def test_nutrition_json_is_valid(real_db):

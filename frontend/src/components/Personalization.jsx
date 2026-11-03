@@ -7,7 +7,7 @@ import { Notice, MatchProgress } from './Common';
 import './Personalization.css';
 
 export const questions = [
-  {key:'ingredients', title:'Nguyên liệu ưa thích của bạn là gì?', options:[['chicken','🍗','Thịt gà'],['pork','🥩','Thịt heo'],['seafood','🐟','Hải sản & Cá'],['beef','🥩','Thịt bò'],['vegetables','🥦','Món chay / Rau củ'],['eggs_tofu','🥚','Trứng & Đậu hũ']]},
+  {key:'ingredients', title:'Món bạn thích ăn là gì?', options:[['chicken','🍗','Thịt gà'],['pork','🥩','Thịt heo'],['seafood','🐟','Hải sản & Cá'],['beef','🥩','Thịt bò'],['vegetables','🥦','Món chay / Rau củ'],['eggs','🥚','Trứng'],['tofu','🫘','Đậu hũ']]},
   {key:'occasions', title:'Bạn thường nấu cho ai & theo chế độ nào?', options:[['solo','👤','Bữa ăn 1 người'],['family','👨‍👩‍👧','Gia đình ấm cúng'],['healthy','🥗','Ăn uống cân bằng / Healthy'],['low_carb','🥑','Ít tinh bột / Low Carb'],['children','👶','Món cho trẻ nhỏ'],['friends','🍻','Tụ tập bạn bè']]},
   {key:'tastes', title:'Khẩu vị nào khiến bạn thích mê?', options:[['savory','🧂','Đậm đà / Mặn mà'],['spicy','🌶️','Cay nồng bùng vị'],['sweet_sour','🍋','Chua ngọt hài hòa'],['light','🌿','Thanh nhẹ / Nguyên bản'],['rich','🥥','Béo ngậy / Cốt dừa']]},
   {key:'time', title:'Bạn có bao nhiêu thời gian cho mỗi bữa?', single:true, options:[['quick','⚡','Nhanh gọn · <15 phút'],['medium','⏱️','Vừa đủ · 15–30 phút'],['relaxed','🍳','Thong thả · >45 phút']]},
@@ -16,9 +16,10 @@ export const questions = [
   {key:'avoid', title:'Bạn có dị ứng hoặc kiêng nguyên liệu nào không?', options:[['none','👍','Không kiêng'],['seafood_allergy','🦐','Hải sản / Tôm cua'],['peanut','🥜','Đậu nành / Lạc'],['lactose','🥛','Sữa / Lactose'],['spicy_avoid','🌶️','Đồ cay']]},
   {key:'budget', title:'Ngân sách dự kiến cho một bữa ăn?', single:true, options:[['saving','💰','Tiết kiệm · <50k'],['normal','💵','Bình dân · tối đa 150k'],['comfortable','💳','Thoải mái · không giới hạn']]},
   {key:'skill', title:'Mức độ thành thạo kỹ năng nấu nướng?', single:true, options:[['beginner','🐣','Mới bắt đầu'],['basic','🍳','Nấu ăn cơ bản'],['chef','🧑‍🍳','Bếp trưởng gia đình']]},
-  {key:'meals', title:'Loại bữa ăn bạn quan tâm nhất hiện tại?', options:[['breakfast','🌅','Bữa sáng nhanh'],['lunch','🍱','Cơm trưa văn phòng'],['dinner','🌙','Bữa tối gia đình'],['snack','🍰','Ăn vặt / Tráng miệng']]},
+  {key:'meals', title:'Loại bữa ăn bạn quan tâm nhất hiện tại?', options:[['breakfast','🌅','Bữa sáng nhanh'],['lunch','🍱','Cơm trưa'],['dinner','🌙','Bữa tối gia đình'],['snack','🍰','Ăn vặt / Tráng miệng']]},
 ];
 export const emptyAnswers = () => ({ingredients:[], occasions:[], tastes:[], time:'', tools:[], regions:[], avoid:[], budget:'', skill:'', meals:[]});
+const upgradeAnswers = answers => ({...emptyAnswers(), ...answers, ingredients:(answers?.ingredients || []).flatMap(value => value === 'eggs_tofu' ? ['eggs','tofu'] : [value])});
 const avoidLabels = {seafood_allergy:'cá và hải sản', peanut:'đậu nành và lạc', lactose:'sữa', spicy_avoid:'món cay'};
 const listed = (values, names) => (values || []).map(value => names[value]).filter(Boolean).join(', ');
 export function describeEatingStyle(answers) {
@@ -44,7 +45,7 @@ export function describeEatingStyle(answers) {
     conclusion = `Bạn có xu hướng chọn món chính có cả thịt hoặc cá và rau, vị ${taste}, nhưng không muốn nhiều công đoạn. Một món xào hoặc áp chảo có rau sẽ hợp hơn món hầm lâu.`;
   } else if (vegetables && !meatOrFish) {
     title = `Gu ${taste}, thiên về món rau và đậu`;
-    conclusion = `Bạn nghiêng về món rau${has('ingredients', 'eggs_tofu') ? ' cùng trứng hoặc đậu hũ' : ''}. Đổi cách chế biến và gia vị sẽ giúp bữa ăn bớt lặp lại mà vẫn giữ đúng kiểu món bạn thích.`;
+    conclusion = `Bạn nghiêng về món rau${has('ingredients', 'eggs') && has('ingredients', 'tofu') ? ' cùng trứng hoặc đậu hũ' : has('ingredients', 'eggs') ? ' cùng trứng' : has('ingredients', 'tofu') ? ' cùng đậu hũ' : ''}. Đổi cách chế biến và gia vị sẽ giúp bữa ăn bớt lặp lại mà vẫn giữ đúng kiểu món bạn thích.`;
   } else {
     title = `Gu ${taste}${quick ? ', thích nấu gọn' : ', thích tự tay chuẩn bị bữa ăn'}`;
     conclusion = `Điểm chung trong lựa chọn của bạn là hương vị ${taste}${quick ? ' và thời gian chuẩn bị ngắn' : ''}. Hãy bắt đầu từ những công thức có vị rõ ràng, rồi điều chỉnh nguyên liệu cho bữa ăn bạn quan tâm.`;
@@ -131,7 +132,7 @@ export function OnboardingSurvey({onComplete, onFavorites}) {
 }
 export function PreferencesSettings({onSaved}) {
   const {setUser} = useAuth(); const resource=useApi('/v1/user/preferences'); const [answers,setAnswers] = useState(emptyAnswers), [busy,setBusy]=useState(false), [error,setError]=useState(''), [message,setMessage]=useState(''), [showStyle,setShowStyle]=useState(false);
-  useEffect(()=>{if(resource.data)setAnswers({...emptyAnswers(), ...(resource.data.answers || {})});},[resource.data?.answers]);
+  useEffect(()=>{if(resource.data)setAnswers(upgradeAnswers(resource.data.answers));},[resource.data?.answers]);
   const eatingStyle = describeEatingStyle(answers);
   return <section className="panel preference-settings"><div className="survey-eyebrow">✦ COOKHUB · GU ĂN UỐNG CỦA BẠN</div><h2>Sở thích & nhịp sống</h2><p>Tinh chỉnh góc bếp, để mỗi gợi ý đều gần bạn hơn.</p><Notice error={error || resource.error} message={message}/>{(showStyle || (resource.data?.answers && answers.ingredients.length)) && <div className="eating-style-card"><h3>{eatingStyle.title}</h3>{eatingStyle.details.map((detail,index)=><p key={index}>{detail}</p>)}</div>}{resource.loading?<p role="status">Đang tải sở thích…</p>:resource.error?<button onClick={resource.reload}>Thử lại</button>:<form onSubmit={async event=>{event.preventDefault();setBusy(true);setError('');setMessage('');try{setUser(await api('/v1/user/preferences',{method:'POST',body:answers}));setMessage('Đã cập nhật sở thích. Gợi ý món ăn đã sẵn sàng.');setShowStyle(true);onSaved?.();}catch(err){setError(err.message);}finally{setBusy(false);}}}>{questions.map(question=><fieldset key={question.key}><legend>{question.title} <small>({question.single?'Chọn một':'Có thể chọn nhiều'})</small></legend><BubbleChoices question={question} answers={answers} setAnswers={setAnswers} disabled={busy}/></fieldset>)}<button className="survey-cta" disabled={busy || questions.some(q=>!hasAnswer(answers,q))}>{busy?'Đang lưu…':'Cập nhật sở thích'}</button></form>}</section>;
 }
@@ -139,7 +140,7 @@ export function PreferencesSettings({onSaved}) {
 export function CompactPreferencesSettings() {
   const { setUser } = useAuth(); const resource = useApi('/v1/user/preferences');
   const [answers, setAnswers] = useState(emptyAnswers()); const [busy, setBusy] = useState(false); const [message, setMessage] = useState(''); const [error, setError] = useState('');
-  useEffect(() => { if (resource.data) setAnswers({ ...emptyAnswers(), ...(resource.data.answers || {}) }); }, [resource.data?.answers]);
+  useEffect(() => { if (resource.data) setAnswers(upgradeAnswers(resource.data.answers)); }, [resource.data?.answers]);
   const fields = questions.map(question => ({ ...question, multi: !question.single }));
   function change(question, event) { const values = [...event.target.selectedOptions].map(option => option.value); setAnswers(previous => ({ ...previous, [question.key]: question.multi ? values : values[0] || '' })); }
   async function save(event) { event.preventDefault(); setBusy(true); setError(''); setMessage(''); try { setUser(await api('/v1/user/preferences', { method: 'PUT', body: answers })); setMessage('Đã cập nhật sở thích thành công!'); } catch (err) { setError(err.message); } finally { setBusy(false); } }

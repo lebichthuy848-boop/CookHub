@@ -1,0 +1,15 @@
+/* Category Studio uses its own cards, so align them with the application theme. */
+html[data-theme="dark"] .category-studio{background:var(--color-bg-page);color:var(--color-text-primary)}
+html[data-theme="dark"] .category-studio .category-card{background:var(--color-bg-card)!important;border-color:var(--color-border);color:var(--color-text-primary)}
+html[data-theme="dark"] .category-studio .category-card h3{color:var(--color-text-primary)!important}
+html[data-theme="dark"] .category-studio .category-card p,html[data-theme="dark"] .category-studio .category-card em,html[data-theme="dark"] .category-studio .category-card small{color:var(--color-text-secondary)!important}
+html[data-theme="dark"] .category-studio .category-icon{background:var(--color-bg-elevated)}
+html[data-theme="dark"] .category-studio .category-toolbar label,html[data-theme="dark"] .category-studio .category-toolbar input{background:var(--color-bg-input);color:var(--color-text-primary);border-color:var(--color-border)}
+html[data-theme="dark"] .category-studio .category-toolbar span{color:var(--color-text-secondary)}
+html[data-theme="dark"] .category-studio .category-actions button{background:var(--color-bg-elevated);border-color:var(--color-border);color:var(--color-text-primary)}
+html[data-theme="dark"] .category-studio .category-actions .category-delete-trigger{color:#ff9b93}
+html[data-theme="dark"] .category-studio .category-delete-dialog,html[data-theme="dark"] .category-studio .category-modal-card{background:var(--color-bg-card);border-color:var(--color-border);color:var(--color-text-primary)}
+html[data-theme="dark"] .category-studio .category-delete-summary{background:var(--color-bg-muted)}
+html[data-theme="dark"] .category-studio .category-delete-dialog>p,html[data-theme="dark"] .category-studio .category-delete-summary small{color:var(--color-text-secondary)}
+html[data-theme="dark"] .category-studio .category-delete-dialog footer button:not(.category-delete-confirm){background:var(--color-bg-elevated);color:var(--color-text-primary);border-color:var(--color-border)}
+html[data-theme="dark"] .category-studio .category-command h1,html[data-theme="dark"] .category-studio .category-command p{color:#fff!important}

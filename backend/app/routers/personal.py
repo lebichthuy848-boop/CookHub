@@ -245,7 +245,7 @@ def add_review(dish_id: str, data: s.Review, user=Depends(current_user), db: Ses
     key = allocate_code(db, 'DanhGiaMonAn', 'DGMA')
     db.add(m.DanhGiaMonAn(maDanhGia=key, maNguoiDung=user.maNguoiDung,
         maMonAn=dish_id, soSao=data.rating, noiDung=data.comment, ngayDanhGia=date.today(),
-        trangThaiKiemDuyet='Chờ duyệt'))
+        trangThaiKiemDuyet='Đã duyệt'))
     db.commit()
     return {'id': key}
 
@@ -260,7 +260,7 @@ def update_review(dish_id: str, review_id: str, data: s.Review, user=Depends(cur
     review.soSao = data.rating
     review.noiDung = data.comment
     review.ngayDanhGia = date.today()
-    review.trangThaiKiemDuyet = 'Chờ duyệt'
+    review.trangThaiKiemDuyet = 'Đã duyệt'
     db.commit()
     return {'id': review_id}
 
@@ -331,6 +331,20 @@ def menu(start: date, end: date, user=Depends(current_user), db: Session = Depen
 @router.get('/menu/nutrition')
 def menu_nutrition_for_day(on: date, user=Depends(current_user), db: Session = Depends(get_db)):
     return menu_nutrition(db, user.maNguoiDung, on)
+
+@router.get('/menu/nutrition/week')
+def menu_nutrition_for_week(start: date, user=Depends(current_user), db: Session = Depends(get_db)):
+    items = menu(start, start + timedelta(days=6), user, db)
+    days = []
+    for offset in range(7):
+        current = start + timedelta(days=offset)
+        meals = {item['meal'] for item in items if item['date'] == current}
+        days.append({
+            'date': current,
+            'main_meals': len(meals & {'Sáng', 'Trưa', 'Tối'}),
+            'nutrition': menu_nutrition(db, user.maNguoiDung, current),
+        })
+    return {'start': start, 'days': days}
 
 @router.post('/menu', status_code=201)
 def add_menu(data: s.MenuItem, user=Depends(current_user), db: Session = Depends(get_db)):

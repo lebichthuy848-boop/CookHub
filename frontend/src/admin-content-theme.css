@@ -1,0 +1,18 @@
+/* Content administration: pair dark surfaces with readable text across tabs. */
+html[data-theme="dark"] :is(.recipe-studio,.video-studio){background:var(--color-bg-page);color:var(--color-text-primary)}
+html[data-theme="dark"] :is(.studio-recipe-card,.studio-table-wrap,.video-card,.video-empty,.studio-drawer,.video-modal-card){background:var(--color-bg-card);border-color:var(--color-border);color:var(--color-text-primary)}
+html[data-theme="dark"] :is(.studio-recipe-card,.video-card) h3,html[data-theme="dark"] .studio-drawer h2{color:var(--color-text-primary)!important}
+html[data-theme="dark"] :is(.studio-card-body,.video-body,.studio-drawer) p,html[data-theme="dark"] :is(.studio-card-body,.video-body,.studio-drawer) small,html[data-theme="dark"] .studio-drawer li{color:var(--color-text-secondary)!important}
+html[data-theme="dark"] :is(.studio-search,.studio-search input,.studio-toolbar select,.video-toolbar input){background:var(--color-bg-input);border-color:var(--color-border);color:var(--color-text-primary)}
+html[data-theme="dark"] :is(.studio-toolbar button,.studio-recipe-card button,.studio-actions button,.studio-actions label,.studio-table button,.video-body button){background:var(--color-bg-elevated);border-color:var(--color-border);color:var(--color-text-primary)}
+html[data-theme="dark"] .studio-actions .primary,html[data-theme="dark"] .studio-view-switch button.active{background:#ffc94f;color:#174535}
+html[data-theme="dark"] .studio-table th{background:var(--color-bg-muted);color:var(--color-text-secondary)}
+html[data-theme="dark"] .studio-table td{border-color:var(--color-divider)}
+html[data-theme="dark"] :is(.studio-kanban>section,.studio-bulk){background:var(--color-bg-muted);color:var(--color-text-primary)}
+html[data-theme="dark"] .studio-card-cover{background:var(--color-bg-muted)}
+html[data-theme="dark"] .video-toolbar span{color:var(--color-text-secondary)}
+html[data-theme="dark"] .video-body a{color:var(--color-primary)}
+html[data-theme="dark"] :is(.studio-command,.video-command) h1,html[data-theme="dark"] :is(.studio-command,.video-command) p{color:#fff!important}
+html[data-theme="dark"] .admin-center :is(.admin-panel,.admin-metric,.admin-favorites-modal){background:var(--color-bg-card);border-color:var(--color-border);color:var(--color-text-primary)}
+html[data-theme="dark"] .admin-center :is(.admin-panel,.admin-metric,.admin-favorites-modal) :is(h2,h3,b,strong){color:var(--color-text-primary)}
+html[data-theme="dark"] .admin-center :is(.admin-panel,.admin-metric,.admin-favorites-modal) :is(p,small){color:var(--color-text-secondary)}

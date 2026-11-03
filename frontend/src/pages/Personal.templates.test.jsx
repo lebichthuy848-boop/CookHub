@@ -15,10 +15,10 @@ vi.mock('../hooks', () => ({ useApi: path => ({
   error: null,
   reload: vi.fn(),
   data: path === '/dishes' ? [
-    { id: 'MA004', name: 'Cá hồi áp chảo', image: 'salmon.jpg' },
-    { id: 'MA007', name: 'Salad ức gà', image: 'salad.jpg' },
-    { id: 'MA046', name: 'Yến mạch trái cây', image: 'oats.jpg' },
-    { id: 'MA053', name: 'Rau củ hấp', image: 'vegetables.jpg' },
+    { id: 'MA062', name: 'Cá hồi sốt mật ong chanh', image: 'salmon.jpg' },
+    { id: 'MA064', name: 'Gà sốt cam', image: 'chicken.jpg' },
+    { id: 'MA104', name: 'Canh chua cá lóc', image: 'soup.jpg' },
+    { id: 'MA061', name: 'Bò xào nấm', image: 'beef.jpg' },
   ] : [],
 }) }));
 afterEach(() => { cleanup(); mocks.api.mockClear(); });
@@ -30,7 +30,7 @@ it('opens the exact seven-day template schedule without adding dishes', () => {
   const dialog = screen.getByRole('dialog', { name: /Clean Eating 7 ngày thanh lọc/ });
   expect(dialog.querySelectorAll('.template-preview-day')).toHaveLength(7);
   expect(dialog.querySelectorAll('.template-preview-meal')).toHaveLength(21);
-  expect(within(dialog).getAllByText('Cá hồi áp chảo').length).toBeGreaterThan(0);
+  expect(within(dialog).getAllByText('Cá hồi sốt mật ong chanh').length).toBeGreaterThan(0);
   expect(mocks.api).not.toHaveBeenCalled();
   fireEvent.click(within(dialog).getByRole('button', { name: 'Đóng chi tiết thực đơn' }));
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument();

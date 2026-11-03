@@ -26,11 +26,12 @@ def cloud_name():
 
 
 def is_cloudinary_image(value):
-    if not value or not cloud_name():
+    if not value:
         return False
     parsed = urlparse(value)
     return (parsed.scheme == 'https' and parsed.hostname == 'res.cloudinary.com'
-            and parsed.path.startswith(f'/{cloud_name()}/image/upload/'))
+            and parsed.path.startswith('/')
+            and '/image/upload/' in parsed.path)
 
 
 def cloudinary_image_url(local_path):
@@ -44,14 +45,22 @@ def original_image_path(url):
 
 
 def configure_upload():
-    if not settings.cloudinary_url:
-        raise RuntimeError('Chưa cấu hình CLOUDINARY_URL trong backend/.env.')
-    parsed = urlparse(settings.cloudinary_url)
-    if parsed.scheme != 'cloudinary' or not all((parsed.username, parsed.password, parsed.hostname)):
-        raise RuntimeError('CLOUDINARY_URL không đúng định dạng.')
     import cloudinary
-    cloudinary.config(cloud_name=parsed.hostname, api_key=unquote(parsed.username),
-                      api_secret=unquote(parsed.password), secure=True)
+    if settings.cloudinary_url:
+        parsed = urlparse(settings.cloudinary_url)
+        if parsed.scheme != 'cloudinary' or not all((parsed.username, parsed.password, parsed.hostname)):
+            raise RuntimeError('CLOUDINARY_URL không đúng định dạng.')
+        cloudinary.config(cloud_name=parsed.hostname, api_key=unquote(parsed.username),
+                          api_secret=unquote(parsed.password), secure=True)
+        return
+    if all((settings.cloudinary_cloud_name, settings.cloudinary_api_key,
+            settings.cloudinary_api_secret)):
+        cloudinary.config(cloud_name=settings.cloudinary_cloud_name,
+                          api_key=settings.cloudinary_api_key,
+                          api_secret=settings.cloudinary_api_secret,
+                          secure=True)
+        return
+    raise RuntimeError('Chưa cấu hình Cloudinary trong backend/.env.')
 
 
 def upload_image(file, public_id):
