@@ -12,7 +12,7 @@ it('shows only active tabs and maps legacy cooking links to appearance',()=>{
   render(<Page initial="/settings?tab=cooking"/>);
   const nav=screen.getByRole('navigation',{name:'Nhóm cài đặt'});
   expect(nav.querySelectorAll('button')).toHaveLength(2);
-  expect(screen.getByRole('switch',{name:'Hiện dinh dưỡng'})).toBeInTheDocument();
+  expect(screen.queryByRole('switch',{name:'Hiện dinh dưỡng'})).not.toBeInTheDocument();
   expect(screen.queryByRole('button',{name:'Khi nấu ăn'})).not.toBeInTheDocument();
   fireEvent.click(screen.getByRole('button',{name:'Dữ liệu & khôi phục'}));
   expect(screen.getByRole('button',{name:'Mở sao lưu & khôi phục'})).toBeInTheDocument();
@@ -24,6 +24,7 @@ it('rejects unknown or malformed imports without changing saved settings',()=>{
   expect(()=>parseSettingsImport({version:1,settings:{theme:'dark',token:'secret'}})).toThrow();
   expect(()=>parseSettingsImport({version:1,settings:{volume:500}})).toThrow();
   expect(parseSettingsImport({version:1,settings:{theme:'dark'}})).toEqual({...defaultSettings,theme:'dark'});
+  expect(parseSettingsImport({version:1,settings:{theme:'dark',showNutrition:false}})).toEqual({...defaultSettings,theme:'dark'});
 });
 
 function SettingProbe(){const {settings,update}=useSettings();return <><span>{settings.theme}</span><button onClick={()=>update('theme','dark')}>Đổi giao diện</button></>}

@@ -4,7 +4,7 @@ import { useAuth } from './auth';
 export const defaultSettings = {
   theme: 'system', fontScale: 'medium', density: 'comfortable', reducedMotion: false,
   sidebarCollapsed: false, sidebarFixed: true, rememberSidebar: true,
-  dishView: 'auto', showImages: true, showNutrition: true, measurement: 'metric',
+  dishView: 'auto', showImages: true, measurement: 'metric',
   soundEnabled: true, alertSound: 'beep', volume: 70, autoplayVideo: false,
   wakeLock: false, readAloud: false,
 };
@@ -12,7 +12,7 @@ const allowed = {
   theme: ['system','light','dark'], fontScale: ['small','medium','large'], density: ['comfortable','compact'],
   dishView: ['auto','grid','list'], measurement: ['metric','imperial'], alertSound: ['beep','kitchen','soft'],
 };
-const exportKeys = ['theme','fontScale','density','reducedMotion','sidebarCollapsed','dishView','showNutrition',
+const exportKeys = ['theme','fontScale','density','reducedMotion','sidebarCollapsed','dishView',
   'soundEnabled','alertSound','volume','autoplayVideo','wakeLock','readAloud'];
 const keyFor = id => `cookhub:settings:v1:${id || 'guest'}`;
 function valid(value) {
@@ -28,7 +28,8 @@ function valid(value) {
 export function parseSettingsImport(value) {
   const incoming = value?.version === 1 ? value.settings : value;
   if (!incoming || typeof incoming !== 'object' || Array.isArray(incoming)) throw new Error('File không chứa cài đặt hợp lệ.');
-  const keys = Object.keys(incoming);
+  // Older backups may include the retired display-only nutrition option.
+  const keys = Object.keys(incoming).filter(key => key !== 'showNutrition');
   if (!keys.length || keys.some(key => !Object.hasOwn(defaultSettings,key))) throw new Error('File chứa tùy chọn không được hỗ trợ.');
   for (const key of keys) {
     if (allowed[key] ? !allowed[key].includes(incoming[key]) :
@@ -62,7 +63,7 @@ export function SettingsProvider({ children }) {
     root.classList.toggle('settings-sidebar-collapsed', settings.sidebarCollapsed);
     root.classList.toggle('settings-sidebar-fixed', settings.sidebarFixed);
     root.classList.remove('settings-hide-images');
-    root.classList.toggle('settings-hide-nutrition', !settings.showNutrition);
+    root.classList.remove('settings-hide-nutrition');
     delete root.dataset.dishView;
   }, [settings, storageKey]);
   useEffect(() => {

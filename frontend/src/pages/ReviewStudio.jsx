@@ -1,53 +1,72 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { api, media } from '../api';
 import { useApi } from '../hooks';
-import '../review-studio.css';
+import '../review-studio-new.css';
 
-const statuses=['Tất cả','Chờ duyệt','Đã duyệt','Từ chối'];
-const formatDate=value=>value?new Intl.DateTimeFormat('vi-VN').format(new Date(value)):'—';
-const Stars=({value})=><span className="review-stars" aria-label={`${value}/5 sao`}>{'★'.repeat(value)}<i>{'★'.repeat(5-value)}</i> <b>{value}/5</b></span>;
-const Status=({value})=><span className={`review-status status-${value?.replaceAll(' ','-').toLocaleLowerCase('vi-VN')}`}>{value}</span>;
-function FilterMenu({value,onChange,options,label}){const [open,setOpen]=useState(false);const current=options.find(([key])=>key===value)?.[1]||label;return <div className={`review-dish-filter review-filter-menu ${open?'is-open':''}`}><button type="button" aria-haspopup="listbox" aria-expanded={open} onClick={()=>setOpen(v=>!v)}><span>{current}</span><i aria-hidden="true"/></button>{open&&<div className="review-dish-menu" role="listbox">{options.map(([key,text])=><button type="button" role="option" aria-selected={value===key} className={value===key?'selected':''} onClick={()=>{onChange(key);setOpen(false)}} key={key}>{text}</button>)}</div>}</div>}
+const dateText = value => value ? new Intl.DateTimeFormat('vi-VN').format(new Date(value)) : '—';
 
-function ActionModal({action,item,busy,onCancel,onConfirm}){
-  const [note,setNote]=useState('');
-  const deleting=action==='delete', approving=action==='approve';
-  const title=deleting?'Xóa đánh giá?':approving?'Duyệt đánh giá?':'Từ chối đánh giá?';
-  return <div className="review-modal-backdrop" onMouseDown={e=>e.target===e.currentTarget&&!busy&&onCancel()}><section className="review-confirm">
-    <h2>{title}</h2><p>{deleting?'Đánh giá sẽ bị xóa khỏi hệ thống. Hành động này không thể hoàn tác.':approving?'Nội dung đánh giá sẽ được phép hiển thị công khai cho người dùng.':'Đánh giá sẽ không được hiển thị công khai.'}</p>
-    <div className="review-confirm-info"><b>{item.dish_name}</b><span>{item.user_name} · {item.rating}/5 sao</span>{!approving&&<small>{item.comment}</small>}</div>
-    {!deleting&&<label>{approving?'Ghi chú kiểm duyệt (không bắt buộc)':'Lý do / ghi chú kiểm duyệt'}<textarea value={note} onChange={e=>setNote(e.target.value)} maxLength="500" placeholder={approving?'Nhập ghi chú nếu cần...':'Nhập lý do từ chối đánh giá...'}/></label>}
-    <footer><button disabled={busy} onClick={onCancel}>Hủy</button><button disabled={busy} className={deleting||!approving?'danger':'primary'} onClick={()=>onConfirm(note)}>{busy?'Đang xử lý…':deleting?'Xóa đánh giá':approving?'Duyệt đánh giá':'Từ chối đánh giá'}</button></footer>
-  </section></div>;
+function DishThumbnail({ path, name }) {
+  const [failed, setFailed] = useState(false);
+  if (!path || failed) return <span className="review-new-image" role="img" aria-label={`${name} chưa có ảnh`}>Chưa có ảnh</span>;
+  return <img src={media(path)} alt={name} onError={() => setFailed(true)}/>;
 }
 
-function Detail({item,onClose,onAction}){
-  return <div className="review-drawer-backdrop" onMouseDown={e=>e.target===e.currentTarget&&onClose()}><aside className="review-drawer"><button className="review-drawer-close" onClick={onClose}>×</button><small>ĐÁNH GIÁ MÓN ĂN</small><h2>Chi tiết đánh giá</h2>
-    <div className="review-dish-summary"><img src={media(item.dish_image)} alt=""/><div><b>{item.dish_name}</b><span>{item.dish_id}</span></div></div>
-    <dl><div><dt>Người đánh giá</dt><dd>{item.user_name}<small>{item.user_id}</small></dd></div><div><dt>Đánh giá</dt><dd><Stars value={item.rating}/></dd></div><div><dt>Ngày đánh giá</dt><dd>{formatDate(item.date)}</dd></div><div><dt>Trạng thái</dt><dd><Status value={item.status}/></dd></div></dl>
-    <section><h3>Nội dung đánh giá</h3><p>{item.comment||'Không có nội dung.'}</p></section>
-    {item.moderator_id&&<section className="review-audit"><h3>Thông tin kiểm duyệt</h3><p><b>{item.moderator_name||item.moderator_id}</b> · {formatDate(item.moderated_at)}</p><p>{item.note||'Không có ghi chú.'}</p></section>}
-    <footer><button onClick={onClose}>Đóng</button>{item.status!=='Đã duyệt'&&<>{item.status!=='Từ chối'&&<button className="danger" onClick={()=>onAction('reject',item)}>Từ chối</button>}<button className="primary" onClick={()=>onAction('approve',item)}>{item.status==='Từ chối'?'Duyệt lại':'Duyệt đánh giá'}</button></>}</footer>
-  </aside></div>;
-}
+export default function ReviewStudio() {
+  const reviews = useApi('/admin/reviews');
+  const [query, setQuery] = useState('');
+  const [selected, setSelected] = useState(null);
+  const [toDelete, setToDelete] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState('');
+  const groups = useMemo(() => {
+    const map = new Map();
+    for (const review of reviews.data || []) {
+      if (!map.has(review.dish_id)) map.set(review.dish_id, { id: review.dish_id, name: review.dish_name, image: review.dish_image, items: [] });
+      map.get(review.dish_id).items.push(review);
+    }
+    return [...map.values()].map(group => ({ ...group,
+      average: group.items.reduce((total, item) => total + item.rating, 0) / group.items.length,
+      latest: Math.max(...group.items.map(item => new Date(item.date).getTime() || 0)),
+      items: group.items.sort((a, b) => new Date(b.date) - new Date(a.date)),
+    })).sort((a, b) => b.latest - a.latest || a.name.localeCompare(b.name, 'vi'));
+  }, [reviews.data]);
+  const filtered = groups.filter(group => `${group.name} ${group.id}`.toLocaleLowerCase('vi-VN').includes(query.trim().toLocaleLowerCase('vi-VN')));
+  const current = groups.find(group => group.id === selected);
 
-export default function ReviewStudio(){
-  const resource=useApi('/admin/reviews');
-  const [tab,setTab]=useState('Chờ duyệt'),[query,setQuery]=useState(''),[dish,setDish]=useState('all'),[stars,setStars]=useState('all'),[sort,setSort]=useState('newest');
-  const [dishOpen,setDishOpen]=useState(false),dishMenuRef=useRef(null);
-  const [detail,setDetail]=useState(null),[pending,setPending]=useState(null),[busy,setBusy]=useState(false),[toast,setToast]=useState('');
-  const all=resource.data||[];
-  const dishOptions=useMemo(()=>Array.from(new Map(all.map(x=>[x.dish_id,x.dish_name])).entries()).sort((a,b)=>a[1].localeCompare(b[1],'vi')),[all]);
-  const counts=useMemo(()=>Object.fromEntries(statuses.map(status=>[status,status==='Tất cả'?all.length:all.filter(x=>x.status===status).length])),[all]);
-  useEffect(()=>{if(!toast)return;const timer=setTimeout(()=>setToast(''),5000);return()=>clearTimeout(timer)},[toast]);
-  useEffect(()=>{const close=event=>{if(!dishMenuRef.current?.contains(event.target))setDishOpen(false)};document.addEventListener('pointerdown',close);return()=>document.removeEventListener('pointerdown',close)},[]);
-  const items=useMemo(()=>all.filter(x=>(tab==='Tất cả'||x.status===tab)&&(dish==='all'||x.dish_id===dish)&&(stars==='all'||x.rating===Number(stars))&&`${x.id} ${x.dish_name} ${x.user_name} ${x.comment}`.toLocaleLowerCase('vi-VN').includes(query.toLocaleLowerCase('vi-VN'))).sort((a,b)=>sort==='oldest'?new Date(a.date)-new Date(b.date):sort==='high'?b.rating-a.rating:sort==='low'?a.rating-b.rating:new Date(b.date)-new Date(a.date)),[all,tab,dish,stars,query,sort]);
-  const reset=()=>{setQuery('');setDish('all');setStars('all');setSort('newest');setTab(counts['Chờ duyệt']?'Chờ duyệt':'Tất cả')};
-  const act=async note=>{setBusy(true);try{if(pending.action==='delete')await api(`/admin/reviews/${pending.item.id}`,{method:'DELETE'});else await api(`/admin/reviews/${pending.item.id}/moderation`,{method:'PUT',body:{status:pending.action==='approve'?'Đã duyệt':'Từ chối',note}});setToast(pending.action==='delete'?'Đã xóa đánh giá.':pending.action==='approve'?'Đã duyệt đánh giá thành công.':'Đã từ chối đánh giá.');setPending(null);setDetail(null);resource.reload();window.dispatchEvent(new Event('reviews-updated'))}catch(error){setToast(error.message)}finally{setBusy(false)}};
-  const openAction=(action,item)=>setPending({action,item});
-  return <div className="review-studio"><section className="review-hero"><div><small>COOKHUB CONTENT MODERATION</small><h1>Quản lý đánh giá &amp; kiểm duyệt</h1><p>Theo dõi phản hồi của người dùng và kiểm soát chất lượng đánh giá món ăn.</p></div><span>✓</span></section>
-    <section className="review-metrics">{[['Tổng đánh giá','Tất cả','◫'],['Chờ duyệt','Chờ duyệt','◷'],['Đã duyệt','Đã duyệt','✓'],['Từ chối','Từ chối','×']].map(([label,key,icon])=><button key={key} className={key==='Chờ duyệt'?'pending':''} onClick={()=>setTab(key)}><i>{icon}</i><span>{label}<b>{counts[key]||0}</b></span></button>)}</section>
-    <section className="review-panel"><nav className="review-tabs">{statuses.map(x=><button className={tab===x?'active':''} onClick={()=>setTab(x)} key={x}>{x}<span>{counts[x]||0}</span></button>)}</nav><div className="review-toolbar"><label>⌕<input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Tìm món ăn, người đánh giá hoặc nội dung..."/></label><FilterMenu value={dish} onChange={setDish} label="Tất cả món ăn" options={[["all","Tất cả món ăn"],...dishOptions]}/><FilterMenu value={stars} onChange={setStars} label="Tất cả số sao" options={[["all","Tất cả số sao"],["5","5 sao"],["4","4 sao"],["3","3 sao"],["2","2 sao"],["1","1 sao"]]}/><FilterMenu value={sort} onChange={setSort} label="Mới nhất" options={[["newest","Mới nhất"],["oldest","Cũ nhất"],["high","Sao cao nhất"],["low","Sao thấp nhất"]]}/></div>
-      {resource.loading?<div className="review-loading">{[1,2,3,4].map(x=><i key={x}/>)}</div>:resource.error?<div className="review-empty"><h3>Không thể tải danh sách đánh giá.</h3><p>{resource.error}</p><button onClick={resource.reload}>Thử lại</button></div>:items.length?<><div className="review-table-wrap"><table><thead><tr><th>Món ăn</th><th>Người đánh giá</th><th>Nội dung đánh giá</th><th>Đánh giá</th><th>Ngày</th><th>Trạng thái</th><th>Thao tác</th></tr></thead><tbody>{items.map(item=><tr key={item.id}><td><div className="review-dish"><img src={media(item.dish_image)} alt=""/><span><b>{item.dish_name}</b><small>{item.dish_id}</small></span></div></td><td><b>{item.user_name}</b><small>{item.user_id}</small></td><td><p className="review-comment">{item.comment}</p><button className="review-link" onClick={()=>setDetail(item)}>Xem chi tiết</button></td><td><Stars value={item.rating}/></td><td>{formatDate(item.date)}</td><td><Status value={item.status}/></td><td><div className="review-actions"><button onClick={()=>setDetail(item)}>Xem</button>{item.status!=='Đã duyệt'&&<><button className="approve" onClick={()=>openAction('approve',item)}>{item.status==='Từ chối'?'Duyệt lại':'Duyệt'}</button>{item.status!=='Từ chối'&&<button className="reject" onClick={()=>openAction('reject',item)}>Từ chối</button>}<button className="delete" title="Xóa đánh giá" onClick={()=>openAction('delete',item)}>⋮</button></>}</div></td></tr>)}</tbody></table></div><div className="review-mobile-list">{items.map(item=><article key={item.id}><header><div className="review-dish"><img src={media(item.dish_image)} alt=""/><span><b>{item.dish_name}</b><small>{item.user_name}</small></span></div><Status value={item.status}/></header><Stars value={item.rating}/><p>{item.comment}</p><small>{formatDate(item.date)}</small><div className="review-actions"><button onClick={()=>setDetail(item)}>Xem</button>{item.status!=='Đã duyệt'&&<><button className="approve" onClick={()=>openAction('approve',item)}>{item.status==='Từ chối'?'Duyệt lại':'Duyệt'}</button>{item.status!=='Từ chối'&&<button className="reject" onClick={()=>openAction('reject',item)}>Từ chối</button>}<button className="delete" onClick={()=>openAction('delete',item)}>Xóa</button></>}</div></article>)}</div></>:<div className="review-empty"><h3>{tab==='Chờ duyệt'&&!query&&dish==='all'&&stars==='all'?'Không có đánh giá chờ duyệt':'Không tìm thấy đánh giá phù hợp.'}</h3><p>{tab==='Chờ duyệt'&&!query&&dish==='all'&&stars==='all'?'Tất cả đánh giá hiện tại đã được xử lý.':'Hãy thử thay đổi từ khóa hoặc bộ lọc.'}</p><button onClick={reset}>Xóa bộ lọc</button></div>}
-    </section>{toast&&<p className="review-toast">✓ {toast}</p>}{detail&&<Detail item={detail} onClose={()=>setDetail(null)} onAction={openAction}/>} {pending&&<ActionModal action={pending.action} item={pending.item} busy={busy} onCancel={()=>setPending(null)} onConfirm={act}/>}</div>;
+  async function removeReview() {
+    if (!toDelete) return;
+    setBusy(true);
+    setMessage('');
+    try {
+      await api(`/admin/reviews/${encodeURIComponent(toDelete.id)}`, { method: 'DELETE' });
+      setToDelete(null);
+      setMessage('Đã xóa đánh giá.');
+      reviews.reload();
+    } catch (error) {
+      setMessage(error.message || 'Không thể xóa đánh giá.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return <div className="review-studio-new">
+    <header className="review-new-hero"><small>QUẢN TRỊ NỘI DUNG</small><h1>Đánh giá món ăn</h1><p>Người dùng có thể đăng đánh giá ngay. Bạn có thể xem phản hồi theo từng món và xóa nội dung không phù hợp.</p></header>
+    <div className="review-new-summary"><span><b>{reviews.data?.length || 0}</b> đánh giá</span><span><b>{groups.length}</b> món đã được đánh giá</span></div>
+    {message && <p className="review-new-message" role="status">{message}</p>}
+    <div className="review-new-layout">
+      <section className="review-new-list" aria-label="Các món được đánh giá">
+        <label className="review-new-search">Tìm món ăn<input value={query} onChange={event => setQuery(event.target.value)} placeholder="Nhập tên món ăn..."/></label>
+        {reviews.loading ? <p>Đang tải đánh giá…</p> : reviews.error ? <p role="alert">{reviews.error} <button onClick={reviews.reload}>Thử lại</button></p> : filtered.length ? filtered.map(group => <button key={group.id} type="button" className={'review-new-dish' + (selected === group.id ? ' active' : '')} onClick={() => setSelected(group.id)}>
+          <DishThumbnail path={group.image} name={group.name}/>
+          <span className="review-new-dish-info"><b>{group.name}</b><small>{group.items.length} đánh giá · ★ {group.average.toFixed(1)}</small></span><span aria-hidden="true">›</span>
+        </button>) : <p className="review-new-empty">{query ? 'Không tìm thấy món ăn phù hợp.' : 'Chưa có đánh giá nào.'}</p>}
+      </section>
+      <section className="review-new-detail" aria-label="Đánh giá của món ăn">
+        {current ? <><header><div><small>ĐÁNH GIÁ THEO MÓN</small><h2>{current.name}</h2><p>{current.items.length} đánh giá · Trung bình ★ {current.average.toFixed(1)}/5</p></div></header>
+          <div className="review-new-items">{current.items.map(item => <article key={item.id} className="review-new-item"><div className="review-new-item-head"><div><b>{item.user_name}</b><small>{dateText(item.date)}</small></div><strong aria-label={`${item.rating} trên 5 sao`}>★ {item.rating}/5</strong></div><p>{item.comment || 'Không có nội dung.'}</p><button type="button" onClick={() => setToDelete(item)}>Xóa đánh giá</button></article>)}</div>
+        </> : <div className="review-new-placeholder">{reviews.loading ? 'Đang tải…' : 'Chọn một món ăn để xem từng đánh giá.'}</div>}
+      </section>
+    </div>
+    {toDelete && <div className="review-new-backdrop" onMouseDown={event => { if (event.target === event.currentTarget && !busy) setToDelete(null); }}><section role="dialog" aria-modal="true" aria-labelledby="review-delete-title" className="review-new-confirm"><h2 id="review-delete-title">Xóa đánh giá?</h2><p>Đánh giá của {toDelete.user_name} về món {toDelete.dish_name} sẽ bị xóa vĩnh viễn.</p><blockquote>{toDelete.comment}</blockquote><div><button type="button" disabled={busy} onClick={() => setToDelete(null)}>Hủy</button><button type="button" disabled={busy} className="danger" onClick={removeReview}>{busy ? 'Đang xóa…' : 'Xóa đánh giá'}</button></div></section></div>}
+  </div>;
 }

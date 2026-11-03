@@ -1,4 +1,6 @@
-﻿-- Run after QuanLyThucDon.sql and Bo-sung.sql. Adds only dishes missing by name.
+-- DATA FROM THE OLD 65-DISH BRANCH ONLY. Run after QuanLyThucDon.sql and Bo-sung.sql.
+-- Inserts only dishes missing by name; 58 of the old 65 are added to the current 35-dish base.
+-- Phở bò viên from the old branch overlaps Phở bò in the current catalog; keep the current recipe.
 -- Existing dishes, ingredient nutrition and unit conversions are not updated.
 USE QuanLyThucDon;
 GO
@@ -168,7 +170,9 @@ SELECT v.MaMonAn INTO #ImportDish FROM (VALUES
     (N'MA058', N'Sinh tố bơ'),
     (N'MA059', N'Pudding sữa chua'),
     (N'MA060', N'Cháo cá')
-) v(MaMonAn,TenMonAn) WHERE NOT EXISTS (SELECT 1 FROM dbo.MonAn existing WHERE existing.TenMonAn=v.TenMonAn);
+) v(MaMonAn,TenMonAn)
+WHERE NOT EXISTS (SELECT 1 FROM dbo.MonAn existing WHERE existing.TenMonAn=v.TenMonAn)
+  AND NOT (v.MaMonAn = N'MA001' AND EXISTS (SELECT 1 FROM dbo.MonAn currentPho WHERE currentPho.TenMonAn = N'Phở bò'));
 IF EXISTS (SELECT 1 FROM #ImportDish selected JOIN dbo.MonAn existing ON existing.MaMonAn=selected.MaMonAn) THROW 51001, N'Mã món đã được dùng cho tên khác.', 1;
 INSERT dbo.[MonAn] ([MaMonAn], [MaDanhMuc], [TenMonAn], [MoTa], [ThoiGianCheBien], [DoKho], [DuongDanAnh], [TrangThaiHienThi], [NgayCapNhat])
 SELECT v.[MaMonAn], v.[MaDanhMuc], v.[TenMonAn], v.[MoTa], v.[ThoiGianCheBien], v.[DoKho], v.[DuongDanAnh], v.[TrangThaiHienThi], v.[NgayCapNhat]

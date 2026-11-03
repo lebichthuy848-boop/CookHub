@@ -23,10 +23,10 @@ try:
         dishes = connection.execute(text("SELECT COUNT(*) FROM dbo.MonAn")).scalar()
         nutrition = connection.execute(text("SELECT COUNT(*) FROM dbo.ThongTinDinhDuong WHERE TRY_CONVERT(INT,SUBSTRING(MaThongTin,3,20)) BETWEEN 91 AND 220")).scalar()
         conversions = connection.execute(text("SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE TRY_CONVERT(INT,SUBSTRING(MaQuyDoi,3,20)) BETWEEN 32 AND 111")).scalar()
-    if dishes < 94 or nutrition < 130 or conversions < 80:
-        raise RuntimeError('Thiếu món, dinh dưỡng hoặc quy đổi; kiểm tra cả ba file SQL.')
+    if dishes < 35 or nutrition < 130 or conversions < 80:
+        raise RuntimeError('Thiếu món, dinh dưỡng hoặc quy đổi; kiểm tra QuanLyThucDon.sql và Bo-sung.sql.')
 except Exception:
-    print('Database CookHub chưa hoàn chỉnh. Kiểm tra DATABASE_URL; chạy lần lượt QuanLyThucDon.sql, Bo-sung.sql và Merge-65-mon.sql trên database mới.', file=sys.stderr)
+    print('Database CookHub chưa hoàn chỉnh. Kiểm tra DATABASE_URL; chạy QuanLyThucDon.sql rồi Bo-sung.sql trên database mới (Du-lieu-65-mon-cu.sql là tùy chọn).', file=sys.stderr)
     raise SystemExit(1)
 
 print('Database CookHub: OK')

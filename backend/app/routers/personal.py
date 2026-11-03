@@ -245,7 +245,7 @@ def add_review(dish_id: str, data: s.Review, user=Depends(current_user), db: Ses
     key = allocate_code(db, 'DanhGiaMonAn', 'DGMA')
     db.add(m.DanhGiaMonAn(maDanhGia=key, maNguoiDung=user.maNguoiDung,
         maMonAn=dish_id, soSao=data.rating, noiDung=data.comment, ngayDanhGia=date.today(),
-        trangThaiKiemDuyet='Chờ duyệt'))
+        trangThaiKiemDuyet='Đã duyệt'))
     db.commit()
     return {'id': key}
 
@@ -260,7 +260,7 @@ def update_review(dish_id: str, review_id: str, data: s.Review, user=Depends(cur
     review.soSao = data.rating
     review.noiDung = data.comment
     review.ngayDanhGia = date.today()
-    review.trangThaiKiemDuyet = 'Chờ duyệt'
+    review.trangThaiKiemDuyet = 'Đã duyệt'
     db.commit()
     return {'id': review_id}
 

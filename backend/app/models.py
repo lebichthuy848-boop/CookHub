@@ -235,7 +235,7 @@ class DanhGiaMonAn(Base):
     soSao = Column(Integer, nullable=True)
     noiDung = Column(String(1000), nullable=True)
     ngayDanhGia = Column(Date, nullable=True)
-    trangThaiKiemDuyet = Column("TrangThaiKiemDuyet", Unicode(20), nullable=False, default='Chờ duyệt')
+    trangThaiKiemDuyet = Column("TrangThaiKiemDuyet", Unicode(20), nullable=False, default='Đã duyệt')
     maNguoiKiemDuyet = Column("MaNguoiKiemDuyet", String(50), ForeignKey("NguoiDung.maNguoiDung"), nullable=True)
     ngayKiemDuyet = Column("NgayKiemDuyet", DateTime, nullable=True)
     ghiChuKiemDuyet = Column("GhiChuKiemDuyet", Unicode(500), nullable=True)
