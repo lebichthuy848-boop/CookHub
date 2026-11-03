@@ -22998,3 +22998,333 @@ BEGIN CATCH
     THROW;
 END CATCH;
 GO
+
+USE QuanLyThucDon;
+GO
+
+UPDATE dbo.MonAn
+SET DuongDanAnh = N'https://res.cloudinary.com/i0qfutld/image/upload/v1793723618/goi-ngo-sen-chay.png'
+WHERE MaMonAn = N'MA931'
+  AND (DuongDanAnh IS NULL OR LTRIM(RTRIM(DuongDanAnh)) = N'');
+
+UPDATE dbo.MonAn
+SET DuongDanAnh = N'https://res.cloudinary.com/i0qfutld/image/upload/v1793723617/hai-san-sot-thai.png'
+WHERE MaMonAn = N'MA932'
+  AND (DuongDanAnh IS NULL OR LTRIM(RTRIM(DuongDanAnh)) = N'');
+
+UPDATE dbo.MonAn
+SET DuongDanAnh = N'https://res.cloudinary.com/i0qfutld/image/upload/v1793723617/goi-hau-sot-thai.png'
+WHERE MaMonAn = N'MA930'
+  AND (DuongDanAnh IS NULL OR LTRIM(RTRIM(DuongDanAnh)) = N'');
+
+UPDATE dbo.MonAn
+SET DuongDanAnh = N'https://res.cloudinary.com/i0qfutld/image/upload/v1793723609/com-than-bo-rong-bien.png'
+WHERE MaMonAn = N'MA933'
+  AND (DuongDanAnh IS NULL OR LTRIM(RTRIM(DuongDanAnh)) = N'');
+
+UPDATE dbo.MonAn
+SET DuongDanAnh = N'https://res.cloudinary.com/i0qfutld/image/upload/v1793723609/cari-bo.png'
+WHERE MaMonAn = N'MA934'
+  AND (DuongDanAnh IS NULL OR LTRIM(RTRIM(DuongDanAnh)) = N'');
+
+UPDATE dbo.MonAn
+SET DuongDanAnh = N'https://res.cloudinary.com/i0qfutld/image/upload/v1793723608/bo-kho-mien-nam.png'
+WHERE MaMonAn = N'MA935'
+  AND (DuongDanAnh IS NULL OR LTRIM(RTRIM(DuongDanAnh)) = N'');
+
+UPDATE dbo.MonAn
+SET DuongDanAnh = N'https://res.cloudinary.com/i0qfutld/image/upload/v1793723608/pho-cuon-chay.png'
+WHERE MaMonAn = N'MA936'
+  AND (DuongDanAnh IS NULL OR LTRIM(RTRIM(DuongDanAnh)) = N'');
+
+UPDATE dbo.MonAn
+SET DuongDanAnh = N'https://res.cloudinary.com/i0qfutld/image/upload/v1793723607/com-chay-la-sen.png'
+WHERE MaMonAn = N'MA937'
+  AND (DuongDanAnh IS NULL OR LTRIM(RTRIM(DuongDanAnh)) = N'');
+
+UPDATE dbo.MonAn
+SET DuongDanAnh = N'https://res.cloudinary.com/i0qfutld/image/upload/v1793723607/cari-xanh-chay.png'
+WHERE MaMonAn = N'MA938'
+  AND (DuongDanAnh IS NULL OR LTRIM(RTRIM(DuongDanAnh)) = N'');
+
+GO
+
+SELECT
+    MaMonAn,
+    TenMonAn,
+    DuongDanAnh
+FROM dbo.MonAn
+WHERE MaMonAn BETWEEN N'MA930' AND N'MA938'
+ORDER BY MaMonAn;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    ALTER TABLE dbo.ThongTinDinhDuong
+    ALTER COLUMN Natri DECIMAL(10,2) NULL;
+
+    DECLARE @DD TABLE
+    (
+        MaThongTin NVARCHAR(50),
+        MaNguyenLieu NVARCHAR(50),
+        NangLuong DECIMAL(10,2),
+        ChatDam DECIMAL(10,2),
+        ChatBotDuong DECIMAL(10,2),
+        ChatBeo DECIMAL(10,2),
+        ChatXo DECIMAL(10,2),
+        Natri DECIMAL(10,2) NULL
+    );
+
+    INSERT INTO @DD
+    VALUES
+    -- 3 nguyên liệu đã đối chiếu trước đó
+    (N'DD036', N'NL036', 44, 1.50, 9.03, 0.17, 1.20, NULL), -- Cà rốt
+    (N'DD046', N'NL046', 28, 3.20, 3.26, 0.24, 1.00, NULL), -- Rau muống
+    (N'DD047', N'NL047', 39, 2.95, 6.08, 0.30, 3.20, NULL), -- Bông cải xanh
+
+    -- Các nguyên liệu trong file PDF
+    (N'DD091',  N'NL091',  900, 0.00, 0.00, 100.00, 0.00, NULL), -- Dầu mè
+    (N'DD094',  N'NL094',  55,  6.30, 7.40, 0.00,  0.80, 5637), -- Xì dầu
+    (N'DD095',  N'NL095',  43,  0.90, 9.70, 0.00,  1.40, 3.50), -- Cam vàng
+    (N'DD098',  N'NL098',  46, 10.30, 1.00, 0.10,  0.00, 215),  -- Lòng trắng trứng gà
+    (N'DD103',  N'NL103',  44, 2.60, 7.80, 0.20,  2.70, 3),    -- Nấm kim châm
+    (N'DD069',  N'NL069',  756,0.50, 0.50, 83.50, 0.00, 11),   -- Bơ lạt
+    (N'DD073',  N'NL073',  1,  0.00, 0.00, 0.00,  0.00, 38758),-- Muối
+    (N'DD1015', N'NL1015', 700,20.00,20.00, 60.00, 0.00, 1600),-- Rong biển
+    (N'DD1021', N'NL1021', 28, 1.00, 6.00, 0.00,  1.50, NULL), -- Cà tím
+    (N'DD1037', N'NL1037', 97,18.20,0.00, 2.70, 0.00, NULL),  -- Cá quả/Cá lóc
+    (N'DD1039', N'NL1039', 21, 0.40, 4.70, 0.10, 0.00, NULL), -- Nước dừa
+    (N'DD1041', N'NL1041', 32, 0.80, 7.30, 0.00, 0.80, 24.20),-- Thơm/Dứa
+    (N'DD1050', N'NL1050', 97,10.90, 1.10, 5.40, 0.40, 7),    -- Đậu hũ non/Đậu phụ
+    (N'DD997',  N'NL997',  41, 0.50, 8.50, 0.50, 0.90, 25);   -- Tương ớt
+
+    -- Cập nhật dòng đã có
+    UPDATE dd
+    SET
+        dd.KhoiLuongChuan = 100,
+        dd.MaDonVi = N'DVT001',
+        dd.NangLuong = x.NangLuong,
+        dd.ChatDam = x.ChatDam,
+        dd.ChatBotDuong = x.ChatBotDuong,
+        dd.ChatBeo = x.ChatBeo,
+        dd.ChatXo = x.ChatXo,
+        dd.Natri = x.Natri
+    FROM dbo.ThongTinDinhDuong AS dd
+    INNER JOIN @DD AS x
+        ON x.MaNguyenLieu = dd.MaNguyenLieu;
+
+    -- Thêm dòng chưa có
+    INSERT INTO dbo.ThongTinDinhDuong
+    (
+        MaThongTin,
+        MaNguyenLieu,
+        KhoiLuongChuan,
+        MaDonVi,
+        NangLuong,
+        ChatDam,
+        ChatBotDuong,
+        ChatBeo,
+        ChatXo,
+        Natri
+    )
+    SELECT
+        x.MaThongTin,
+        x.MaNguyenLieu,
+        100,
+        N'DVT001',
+        x.NangLuong,
+        x.ChatDam,
+        x.ChatBotDuong,
+        x.ChatBeo,
+        x.ChatXo,
+        x.Natri
+    FROM @DD AS x
+    WHERE NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.ThongTinDinhDuong AS dd
+        WHERE dd.MaNguyenLieu = x.MaNguyenLieu
+    );
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã cập nhật và thêm dữ liệu dinh dưỡng thành công.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+SELECT
+    dd.MaNguyenLieu,
+    nl.TenNguyenLieu,
+    dd.KhoiLuongChuan,
+    dv.TenDonVi,
+    dd.NangLuong,
+    dd.ChatDam,
+    dd.ChatBotDuong,
+    dd.ChatBeo,
+    dd.ChatXo,
+    dd.Natri
+FROM dbo.ThongTinDinhDuong AS dd
+INNER JOIN dbo.NguyenLieu AS nl
+    ON nl.MaNguyenLieu = dd.MaNguyenLieu
+INNER JOIN dbo.DonViTinh AS dv
+    ON dv.MaDonVi = dd.MaDonVi
+WHERE dd.MaNguyenLieu IN
+(
+    N'NL036',
+    N'NL046',
+    N'NL047',
+    N'NL091',
+    N'NL094',
+    N'NL095',
+    N'NL098',
+    N'NL103',
+    N'NL069',
+    N'NL073',
+    N'NL1015',
+    N'NL1021',
+    N'NL1037',
+    N'NL1039',
+    N'NL1041',
+    N'NL1050',
+    N'NL997'
+)
+ORDER BY dd.MaNguyenLieu;
+GO
+
+USE QuanLyThucDon;
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    ALTER TABLE dbo.ThongTinDinhDuong
+    ALTER COLUMN Natri DECIMAL(10,2) NULL;
+
+    DECLARE @DD TABLE
+    (
+        MaThongTin NVARCHAR(50),
+        MaNguyenLieu NVARCHAR(50),
+        NangLuong DECIMAL(10,2),
+        ChatDam DECIMAL(10,2),
+        ChatBotDuong DECIMAL(10,2),
+        ChatBeo DECIMAL(10,2),
+        ChatXo DECIMAL(10,2),
+        Natri DECIMAL(10,2) NULL
+    );
+
+    INSERT INTO @DD
+    VALUES
+    -- Ốc móng tay luộc
+    (N'DD1028', N'NL1028', 123, 15.80, 2.00, 5.60, 0.00, NULL),
+
+    -- Mực tươi quy đổi cho Răng mực
+    (N'DD1003', N'NL1003', 73, 16.30, 0.00, 0.90, 0.00, 44),
+
+    -- Cải thảo tươi quy đổi cho Kim chi cải thảo
+    (N'DD0101', N'NL101', 14, 0.90, 2.50, 0.00, 0.00, NULL),
+
+    -- Rau cải chíp quy đổi cho Rau cải
+    (N'DD0100', N'NL100', 17, 1.50, 2.10, 0.20, 1.00, 65),
+
+    -- Sữa bột đậu nành quy đổi cho Đậu nành
+    (N'DD0133', N'NL133', 413, 31.10, 50.40, 9.70, 2.20, NULL);
+
+    -- Cập nhật dòng đã tồn tại
+    UPDATE dd
+    SET
+        dd.KhoiLuongChuan = 100,
+        dd.MaDonVi = N'DVT001',
+        dd.NangLuong = x.NangLuong,
+        dd.ChatDam = x.ChatDam,
+        dd.ChatBotDuong = x.ChatBotDuong,
+        dd.ChatBeo = x.ChatBeo,
+        dd.ChatXo = x.ChatXo,
+        dd.Natri = x.Natri
+    FROM dbo.ThongTinDinhDuong AS dd
+    INNER JOIN @DD AS x
+        ON x.MaNguyenLieu = dd.MaNguyenLieu;
+
+    -- Thêm dòng chưa tồn tại
+    INSERT INTO dbo.ThongTinDinhDuong
+    (
+        MaThongTin,
+        MaNguyenLieu,
+        KhoiLuongChuan,
+        MaDonVi,
+        NangLuong,
+        ChatDam,
+        ChatBotDuong,
+        ChatBeo,
+        ChatXo,
+        Natri
+    )
+    SELECT
+        x.MaThongTin,
+        x.MaNguyenLieu,
+        100,
+        N'DVT001',
+        x.NangLuong,
+        x.ChatDam,
+        x.ChatBotDuong,
+        x.ChatBeo,
+        x.ChatXo,
+        x.Natri
+    FROM @DD AS x
+    WHERE NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.ThongTinDinhDuong AS dd
+        WHERE dd.MaNguyenLieu = x.MaNguyenLieu
+    );
+
+    COMMIT TRANSACTION;
+
+    PRINT N'Đã cập nhật/thêm 5 nguyên liệu dinh dưỡng thành công.';
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+SELECT
+    dd.MaNguyenLieu,
+    nl.TenNguyenLieu,
+    dd.KhoiLuongChuan,
+    dd.NangLuong,
+    dd.ChatDam,
+    dd.ChatBotDuong,
+    dd.ChatBeo,
+    dd.ChatXo,
+    dd.Natri
+FROM dbo.ThongTinDinhDuong AS dd
+INNER JOIN dbo.NguyenLieu AS nl
+    ON nl.MaNguyenLieu = dd.MaNguyenLieu
+WHERE dd.MaNguyenLieu IN
+(
+    N'NL1028',
+    N'NL1003',
+    N'NL101',
+    N'NL100',
+    N'NL133'
+)
+ORDER BY dd.MaNguyenLieu;
+GO

@@ -1,15 +1,21 @@
 import logging
 import secrets
+import smtplib
+from datetime import datetime, timedelta, timezone
+from email.message import EmailMessage
 from fastapi import APIRouter, Depends, HTTPException, Response, Cookie
 from sqlalchemy import select, func, text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from .. import models as m, schemas as s
 from ..database import get_db
+from ..config import settings
 from ..security import current_user, verify_password, passwords, public_user, create_session, COOKIE
 
 router = APIRouter(prefix='/auth', tags=['Authentication'])
 logger = logging.getLogger(__name__)
+_reset_tokens = {}
+_RESET_TOKEN_MINUTES = 15
 
 def by_email(db, email):
     return db.scalar(select(m.NguoiDung).where(func.lower(m.NguoiDung.thuDienTu) == email.lower()))
@@ -106,11 +112,55 @@ def change_password(data: s.PasswordChange, response: Response, user=Depends(cur
     db.commit()
     response.delete_cookie(COOKIE, path='/')
 
-@router.post('/forgot', status_code=501)
-def forgot():
-    raise HTTPException(501, 'Schema V2 không có bảng lưu mã khôi phục. Hãy đổi mật khẩu sau khi đăng nhập.')
+@router.post('/forgot')
+def forgot(data: s.Forgot, db: Session = Depends(get_db)):
+    # Always return the same response to avoid revealing whether an email exists.
+    user = by_email(db, data.email)
+    if user:
+        token = secrets.token_urlsafe(32)
+        _reset_tokens[token] = (user.maNguoiDung, datetime.now(timezone.utc) + timedelta(minutes=_RESET_TOKEN_MINUTES))
+        link = f'{settings.frontend_url.rstrip("/")}/reset?token={token}'
+        try:
+            _send_reset_email(user.thuDienTu, link)
+        except Exception:
+            _reset_tokens.pop(token, None)
+            logger.exception('Could not send password reset email')
+            raise HTTPException(503, 'Không thể gửi email lúc này. Vui lòng kiểm tra cấu hình SMTP.')
+    return {'message': 'Nếu email tồn tại, chúng tôi đã gửi hướng dẫn khôi phục mật khẩu.'}
 
-@router.post('/reset', status_code=501)
-def reset():
-    raise HTTPException(501, 'Schema V2 không hỗ trợ mã khôi phục mật khẩu.')
+def _send_reset_email(recipient, link):
+    if not settings.smtp_host or not settings.smtp_username or not settings.smtp_password:
+        raise RuntimeError('SMTP is not configured')
+    message = EmailMessage()
+    message['Subject'] = 'Khôi phục mật khẩu CookHub'
+    message['From'] = settings.smtp_from or settings.smtp_username
+    message['To'] = recipient
+    message.set_content(
+        'Bạn vừa yêu cầu khôi phục mật khẩu CookHub.\n\n'
+        f'Mở liên kết sau trong vòng {_RESET_TOKEN_MINUTES} phút để đặt mật khẩu mới:\n{link}\n\n'
+        'Nếu bạn không thực hiện yêu cầu này, hãy bỏ qua email này.'
+    )
+    with smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=15) as server:
+        if settings.smtp_starttls:
+            server.starttls()
+        server.login(settings.smtp_username, settings.smtp_password)
+        server.send_message(message)
+
+@router.post('/reset')
+def reset(data: s.Reset, response: Response, db: Session = Depends(get_db)):
+    record = _reset_tokens.get(data.token)
+    if not record:
+        raise HTTPException(400, 'Liên kết khôi phục không hợp lệ hoặc đã hết hạn.')
+    user_id, expires_at = record
+    if datetime.now(timezone.utc) >= expires_at:
+        _reset_tokens.pop(data.token, None)
+        raise HTTPException(400, 'Liên kết khôi phục đã hết hạn. Vui lòng yêu cầu mã mới.')
+    user = db.get(m.NguoiDung, user_id)
+    if not user:
+        _reset_tokens.pop(data.token, None)
+        raise HTTPException(400, 'Liên kết khôi phục không hợp lệ.')
+    user.matKhauBam = passwords.hash(data.password)
+    db.commit()
+    _reset_tokens.pop(data.token, None)
+    return {'message': 'Đã đổi mật khẩu. Bạn có thể đăng nhập.'}
 
