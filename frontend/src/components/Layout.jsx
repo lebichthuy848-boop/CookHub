@@ -3,6 +3,7 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import { useAuth, landing } from '../auth';
 import { api, media } from '../api';
+import { useSettings } from '../settings-context';
 
 const userNav = [['home', 'home', 'Trang chủ'], ['suggest', 'sparkle', 'Đề xuất'], ['search', 'search', 'Tìm kiếm'], ['menu', 'calendar', 'Thực đơn'], ['foods', 'utensils', 'Khám phá món ăn'], ['pantry', 'leaf', 'Nguyên liệu'], ['favorites', 'heart', 'Yêu thích'], ['profile', 'user', 'Hồ sơ'], ['settings', 'settings', 'Cài đặt']];
 const adminNav = [['system', 'grid', 'Tổng quan'], ['categories', 'grid', 'Danh mục'], ['recipes', 'book', 'Món ăn & Công thức'], ['videos', 'chart', 'Video hướng dẫn'], ['reviews', 'check', 'Đánh giá & Kiểm duyệt']];
@@ -36,12 +37,15 @@ function useTypingPlaceholder(words) {
 
 export default function Layout() {
   const { user, logout } = useAuth();
-<<<<<<< Updated upstream
-  const [open, setOpen] = useState(false); const [error, setError] = useState(''); const [searching, setSearching] = useState(false); const [pendingReviews,setPendingReviews]=useState(0); const [logoutOpen,setLogoutOpen]=useState(false); const [logoutBusy,setLogoutBusy]=useState(false);
-=======
-  const {settings,update} = useSettings();
-  const [open, setOpen] = useState(false); const [error, setError] = useState(''); const [searching, setSearching] = useState(false); const [pendingReviews,setPendingReviews]=useState(0); const [logoutOpen,setLogoutOpen]=useState(false); const [logoutBusy,setLogoutBusy]=useState(false); const [toast,setToast]=useState('');
->>>>>>> Stashed changes
+  const {settings, update} = useSettings();
+
+  const [open, setOpen] = useState(false);
+  const [error, setError] = useState('');
+  const [searching, setSearching] = useState(false);
+  const [pendingReviews, setPendingReviews] = useState(0);
+  const [logoutOpen, setLogoutOpen] = useState(false);
+  const [logoutBusy, setLogoutBusy] = useState(false);
+  const [toast, setToast] = useState('');
   const navigate = useNavigate(); const systemAdmin = user.role === 'Quản trị viên'; const admin = systemAdmin || user.role === 'Quản trị nội dung'; const nav = systemAdmin ? systemNav : admin ? adminNav : userNav;
   useEffect(()=>{if(user.role!=='Quản trị nội dung')return;let active=true;const load=()=>api('/admin/reviews').then(items=>{if(active)setPendingReviews(items.filter(x=>x.status==='Chờ duyệt').length)}).catch(()=>{});load();window.addEventListener('reviews-updated',load);return()=>{active=false;window.removeEventListener('reviews-updated',load)}},[user.role]);
   useEffect(()=>{const request=()=>setLogoutOpen(true);window.addEventListener('request-logout',request);return()=>window.removeEventListener('request-logout',request)},[]);

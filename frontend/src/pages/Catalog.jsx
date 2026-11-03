@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Link, useSearchParams } from 'react-router-dom';
 
+import { useSettings } from '../settings-context';
+
 import { api, media, today } from '../api';
 
 import { useApi } from '../hooks';
@@ -172,9 +174,7 @@ function ExploreCatalog({ dishes, categories, params, setParams, favorites, onFa
 
 
 function DiscoverCatalog({ dishes, categories: dbCategories, favorites, onFavorite, onHide, error }) {
-<<<<<<< Updated upstream
-  const [view, setView] = useState('grid');
-=======
+
   const {settings,update} = useSettings();
   const view = settings.dishView === 'list' ? 'list' : 'grid';
   const [randomDish,setRandomDish] = useState(null), [previewImage,setPreviewImage] = useState(null), [category,setCategory] = useState('all'), [showAll,setShowAll] = useState(false), [onlyWithVideo,setOnlyWithVideo] = useState(false), [sortOrder,setSortOrder] = useState('az');
@@ -191,7 +191,7 @@ function DiscoverCatalog({ dishes, categories: dbCategories, favorites, onFavori
 function DiscoverCatalogLegacy({ dishes, categories: dbCategories, favorites, onFavorite, onHide, error }) {
   const {settings,update} = useSettings();
   const view = settings.dishView === 'list' ? 'list' : 'grid';
->>>>>>> Stashed changes
+
   const [sortBy, setSortBy] = useState('rating');
   const [order, setOrder] = useState('desc');
   const [randomDish, setRandomDish] = useState(null);
@@ -207,7 +207,7 @@ function DiscoverCatalogLegacy({ dishes, categories: dbCategories, favorites, on
     document.body.classList.add('lightbox-open');
     return () => { document.removeEventListener('keydown', closeOnEscape); document.body.classList.remove('lightbox-open'); };
   }, [previewImage]);
-  return <div className="discover-page"><Notice error={error}/><section className="discover-hero"><div><span>✨ COOKHUB RECIPE LIBRARY</span><h1>Thư Viện Ẩm Thực CookHub 🍲</h1><p>Khám phá hơn 1.000+ công thức nấu ăn đa dạng từ khắp các vùng miền.</p></div><button className="random-recipe" onClick={() => { setPreviewImage(null); setRandomDish(sorted[Math.floor(Math.random() * sorted.length)]); }}>🎲 Gợi ý món ngẫu nhiên</button></section>{randomDish && <div className="random-result"><div><span className="random-label">Gợi ý hôm nay</span><small>⏱ {randomDish.time || 0} phút · Độ khó: {randomDish.difficulty || 'Trung bình'}</small><h2>Hôm nay thử <b>{randomDish.name}</b> nhé!</h2><p>💡 Món ngon phù hợp để đổi vị hôm nay, dễ làm và đưa cơm.</p></div><div className="random-thumbs">{(randomDish.images || [randomDish.image]).slice(0,3).map((image,index) => <button type="button" className="random-thumb" key={image || index} onClick={() => setPreviewImage(image)} aria-label={`Phóng to ảnh ${index + 1} của ${randomDish.name}`}><img src={media(image)} alt={`${randomDish.name} - ảnh ${index + 1}`}/></button>)}<button type="button" className="random-dismiss" aria-label="Đóng gợi ý" onClick={() => { setPreviewImage(null); setRandomDish(null); }}>×</button></div></div>}<nav className="discover-categories">{categories.map(item => <button className={category === item.id ? 'active' : ''} key={item.id} onClick={() => setCategory(item.id)}>{item.name}</button>)}</nav><div className="discover-toolbar"><span>Hiển thị <b>{sorted.length}</b> món ăn</span><div className="discover-actions"><button className={sortBy === 'rating' ? 'active' : ''} onClick={() => setSortBy('rating')}>★ Đánh giá</button><button className={sortBy === 'favorite' ? 'active' : ''} onClick={() => setSortBy('favorite')}>♥ Yêu thích</button><button className={order === 'desc' ? 'active' : ''} onClick={() => setOrder('desc')}>↑</button><button className={order === 'asc' ? 'active' : ''} onClick={() => setOrder('asc')}>↓</button><button onClick={() => setView(view === 'grid' ? 'list' : 'grid')}>{view === 'grid' ? '☷' : '▦'}</button></div></div><div className={'dish-grid discover-grid ' + (view === 'list' ? 'list-view' : '')}>{sorted.map(dish => <DishCard key={dish.id} dish={dish} favorite={favorites.includes(dish.id)} onFavorite={onFavorite} onHide={onHide}/>)}{previewImage && <div className="dish-lightbox" role="dialog" aria-modal="true" aria-label={`Ảnh phóng to của ${randomDish?.name || 'món ăn'}`} onMouseDown={event => { if (event.target === event.currentTarget) setPreviewImage(null); }}><figure><img src={media(previewImage)} alt={randomDish?.name || 'Món ăn'}/><figcaption>{randomDish?.name}</figcaption><button type="button" aria-label="Đóng ảnh phóng to" onClick={() => setPreviewImage(null)}>×</button></figure></div>}</div></div>;
+  return <div className="discover-page"><Notice error={error}/><section className="discover-hero"><div><span>✨ onClick={() => update('dishView', view === 'grid' ? 'list' : 'grid')}COOKHUB RECIPE LIBRARY</span><h1>Thư Viện Ẩm Thực CookHub 🍲</h1><p>Khám phá hơn 1.000+ công thức nấu ăn đa dạng từ khắp các vùng miền.</p></div><button className="random-recipe" onClick={() => { setPreviewImage(null); setRandomDish(sorted[Math.floor(Math.random() * sorted.length)]); }}>🎲 Gợi ý món ngẫu nhiên</button></section>{randomDish && <div className="random-result"><div><span className="random-label">Gợi ý hôm nay</span><small>⏱ {randomDish.time || 0} phút · Độ khó: {randomDish.difficulty || 'Trung bình'}</small><h2>Hôm nay thử <b>{randomDish.name}</b> nhé!</h2><p>💡 Món ngon phù hợp để đổi vị hôm nay, dễ làm và đưa cơm.</p></div><div className="random-thumbs">{(randomDish.images || [randomDish.image]).slice(0,3).map((image,index) => <button type="button" className="random-thumb" key={image || index} onClick={() => setPreviewImage(image)} aria-label={`Phóng to ảnh ${index + 1} của ${randomDish.name}`}><img src={media(image)} alt={`${randomDish.name} - ảnh ${index + 1}`}/></button>)}<button type="button" className="random-dismiss" aria-label="Đóng gợi ý" onClick={() => { setPreviewImage(null); setRandomDish(null); }}>×</button></div></div>}<nav className="discover-categories">{categories.map(item => <button className={category === item.id ? 'active' : ''} key={item.id} onClick={() => setCategory(item.id)}>{item.name}</button>)}</nav><div className="discover-toolbar"><span>Hiển thị <b>{sorted.length}</b> món ăn</span><div className="discover-actions"><button className={sortBy === 'rating' ? 'active' : ''} onClick={() => setSortBy('rating')}>★ Đánh giá</button><button className={sortBy === 'favorite' ? 'active' : ''} onClick={() => setSortBy('favorite')}>♥ Yêu thích</button><button className={order === 'desc' ? 'active' : ''} onClick={() => setOrder('desc')}>↑</button><button className={order === 'asc' ? 'active' : ''} onClick={() => setOrder('asc')}>↓</button><button >{view === 'grid' ? '☷' : '▦'}</button></div></div><div className={'dish-grid discover-grid ' + (view === 'list' ? 'list-view' : '')}>{sorted.map(dish => <DishCard key={dish.id} dish={dish} favorite={favorites.includes(dish.id)} onFavorite={onFavorite} onHide={onHide}/>)}{previewImage && <div className="dish-lightbox" role="dialog" aria-modal="true" aria-label={`Ảnh phóng to của ${randomDish?.name || 'món ăn'}`} onMouseDown={event => { if (event.target === event.currentTarget) setPreviewImage(null); }}><figure><img src={media(previewImage)} alt={randomDish?.name || 'Món ăn'}/><figcaption>{randomDish?.name}</figcaption><button type="button" aria-label="Đóng ảnh phóng to" onClick={() => setPreviewImage(null)}>×</button></figure></div>}</div></div>;
 }
 
 function GeneratedRecipeIdea({ingredients}) {
