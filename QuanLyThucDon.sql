@@ -631,15 +631,15 @@
 	 SELECT dd.MaThongTin,dd.KhoiLuongChuan,dd.MaDonVi AS DonViDinhDuong,
 	  gia.MaGia,gia.NgayApDung,gia.MaDonVi AS DonViGia,gia.GiaThamKhao,gia.KhuVuc,
 	  f.HeSoDinhDuong,gia.LuongTinhGia,
-	  CASE WHEN v.ThieuPhepTinh=0 THEN raw.NangLuong END NangLuong,
-	  CASE WHEN v.ThieuPhepTinh=0 THEN raw.ChatDam END ChatDam,
-	  CASE WHEN v.ThieuPhepTinh=0 THEN raw.ChatBotDuong END ChatBotDuong,
-	  CASE WHEN v.ThieuPhepTinh=0 THEN raw.ChatBeo END ChatBeo,
-	  CASE WHEN v.ThieuPhepTinh=0 THEN raw.ChatXo END ChatXo,
-	  CASE WHEN v.ThieuPhepTinh=0 THEN raw.natri END natri,
+	  raw.NangLuong,
+	  raw.ChatDam,
+	  raw.ChatBotDuong,
+	  raw.ChatBeo,
+	  raw.ChatXo,
+	  raw.natri,
 	  CASE WHEN raw.ChiPhi>0 OR @SoLuong=0 OR gia.GiaThamKhao=0 THEN raw.ChiPhi END ChiPhi,
 	  CAST(CASE WHEN dd.MaThongTin IS NULL THEN 1 ELSE 0 END AS BIT) ThieuDinhDuong,
-	  CAST(CASE WHEN dd.MaThongTin IS NOT NULL AND v.ThieuPhepTinh=1 THEN 1 ELSE 0 END AS BIT) ThieuQuyDoiDinhDuong,
+	  CAST(CASE WHEN dd.MaThongTin IS NOT NULL AND (raw.NangLuong IS NULL OR (@SoLuong>0 AND dd.NangLuong>0 AND raw.NangLuong=0)) THEN 1 ELSE 0 END AS BIT) ThieuQuyDoiDinhDuong,
 	  CAST(CASE WHEN gia.MaGia IS NULL OR raw.ChiPhi IS NULL OR (@SoLuong>0 AND gia.GiaThamKhao>0 AND raw.ChiPhi=0) THEN 1 ELSE 0 END AS BIT) ThieuGiaKhaDung
 	 FROM (VALUES(1)) anchor(n)
 	 LEFT JOIN dbo.ThongTinDinhDuong dd ON dd.MaNguyenLieu=@MaNguyenLieu
@@ -17007,7 +17007,7 @@ BEGIN TRY
 
     INSERT dbo.ThanhPhanCongThuc
     (MaThanhPhan,MaCongThuc,MaNguyenLieu,MaDonVi,SoLuong)
-    SELECT N'TP1037',@MaCongThuc,MaNguyenLieu,N'DVT005',1
+    SELECT N'TP1037',@MaCongThuc,MaNguyenLieu,N'DVT001',500
     FROM dbo.NguyenLieu
     WHERE TenNguyenLieu=N'Cá lóc (khoảng 500gr)';
 
@@ -23327,4 +23327,28 @@ WHERE dd.MaNguyenLieu IN
     N'NL133'
 )
 ORDER BY dd.MaNguyenLieu;
+GO
+
+USE QuanLyThucDon;
+GO
+
+UPDATE dbo.ThanhPhanCongThuc
+SET
+    MaDonVi = N'DVT001',
+    SoLuong = 500
+WHERE MaThanhPhan = N'TP1037'
+  AND MaCongThuc = N'CT913'
+  AND MaNguyenLieu = N'NL1037';
+GO
+
+SELECT
+    tp.MaThanhPhan,
+    nl.TenNguyenLieu,
+    tp.SoLuong,
+    dv.TenDonVi,
+    dv.KyHieu
+FROM dbo.ThanhPhanCongThuc tp
+JOIN dbo.NguyenLieu nl ON nl.MaNguyenLieu = tp.MaNguyenLieu
+JOIN dbo.DonViTinh dv ON dv.MaDonVi = tp.MaDonVi
+WHERE tp.MaCongThuc = N'CT913';
 GO
