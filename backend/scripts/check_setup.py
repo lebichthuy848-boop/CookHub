@@ -13,12 +13,20 @@ try:
         ready = connection.execute(text("""
             SELECT CASE WHEN OBJECT_ID(N'dbo.MonAn', N'U') IS NOT NULL
                          AND OBJECT_ID(N'dbo.BoSuuTapYeuThich', N'U') IS NOT NULL
+                         AND OBJECT_ID(N'dbo.ThongTinDinhDuong', N'U') IS NOT NULL
+                         AND OBJECT_ID(N'dbo.QuyDoiDonViNguyenLieu', N'U') IS NOT NULL
                         THEN 1 ELSE 0 END
         """)).scalar()
     if ready != 1:
-        raise RuntimeError('Thiếu bảng MonAn hoặc BoSuuTapYeuThich.')
+        raise RuntimeError('Thiếu bảng CookHub cần thiết.')
+    with engine.connect() as connection:
+        dishes = connection.execute(text("SELECT COUNT(*) FROM dbo.MonAn")).scalar()
+        nutrition = connection.execute(text("SELECT COUNT(*) FROM dbo.ThongTinDinhDuong WHERE TRY_CONVERT(INT,SUBSTRING(MaThongTin,3,20)) BETWEEN 91 AND 220")).scalar()
+        conversions = connection.execute(text("SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE TRY_CONVERT(INT,SUBSTRING(MaQuyDoi,3,20)) BETWEEN 32 AND 111")).scalar()
+    if dishes < 94 or nutrition < 130 or conversions < 80:
+        raise RuntimeError('Thiếu món, dinh dưỡng hoặc quy đổi; kiểm tra cả ba file SQL.')
 except Exception:
-    print('Không kết nối được database CookHub hoặc thiếu schema. Kiểm tra DATABASE_URL; tạo database từ QuanLyThucDon.sql rồi chạy Bo-sung.sql.', file=sys.stderr)
+    print('Database CookHub chưa hoàn chỉnh. Kiểm tra DATABASE_URL; chạy lần lượt QuanLyThucDon.sql, Bo-sung.sql và Merge-65-mon.sql trên database mới.', file=sys.stderr)
     raise SystemExit(1)
 
 print('Database CookHub: OK')

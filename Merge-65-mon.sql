@@ -1,5 +1,7 @@
 ﻿-- Run after QuanLyThucDon.sql and Bo-sung.sql. Adds only dishes missing by name.
 -- Existing dishes, ingredient nutrition and unit conversions are not updated.
+USE QuanLyThucDon;
+GO
 SET XACT_ABORT ON;
 BEGIN TRANSACTION;
 BEGIN TRY
@@ -1554,6 +1556,31 @@ FROM (VALUES
 JOIN dbo.CongThuc recipe ON recipe.MaCongThuc=v.[MaCongThuc]
 JOIN #ImportDish selected ON selected.MaMonAn=recipe.MaMonAn;
 SELECT (SELECT COUNT(*) FROM #ImportDish) AS ImportedDishes, (SELECT COUNT(*) FROM dbo.MonAn) AS TotalDishes;
+DECLARE @LoaiMa SYSNAME, @TenBang SYSNAME, @TenCot SYSNAME, @TienTo NVARCHAR(10),
+        @MaxMa BIGINT, @Sql NVARCHAR(MAX);
+DECLARE cap_ma CURSOR LOCAL FAST_FORWARD FOR
+    SELECT LoaiMa, TenBang, TenCot, TienTo FROM dbo.QuyUocMaHeThong;
+OPEN cap_ma;
+FETCH NEXT FROM cap_ma INTO @LoaiMa, @TenBang, @TenCot, @TienTo;
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    IF EXISTS (SELECT 1 FROM sys.tables t JOIN sys.columns c ON c.object_id=t.object_id
+               WHERE t.schema_id=SCHEMA_ID(N'dbo') AND t.name=@TenBang AND c.name=@TenCot)
+    BEGIN
+        SET @MaxMa = NULL;
+        SET @Sql = N'SELECT @MaxMa=MAX(TRY_CONVERT(BIGINT,SUBSTRING('
+                 + QUOTENAME(@TenCot) + N',LEN(@TienTo)+1,20))) FROM dbo.'
+                 + QUOTENAME(@TenBang) + N' WHERE LEFT('
+                 + QUOTENAME(@TenCot) + N',LEN(@TienTo))=@TienTo';
+        EXEC sys.sp_executesql @Sql, N'@TienTo NVARCHAR(10), @MaxMa BIGINT OUTPUT',
+             @TienTo=@TienTo, @MaxMa=@MaxMa OUTPUT;
+        UPDATE dbo.QuyUocMaHeThong SET SoHienTai=@MaxMa
+        WHERE LoaiMa=@LoaiMa AND @MaxMa>SoHienTai;
+    END;
+    FETCH NEXT FROM cap_ma INTO @LoaiMa, @TenBang, @TenCot, @TienTo;
+END;
+CLOSE cap_ma;
+DEALLOCATE cap_ma;
 COMMIT TRANSACTION;
 END TRY
 BEGIN CATCH

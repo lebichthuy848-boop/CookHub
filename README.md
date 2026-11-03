@@ -13,7 +13,7 @@ Clone Git không tự cài Python, Node hay SQL Server, và **không chứa `bac
 ## Cài lần đầu trên Windows
 
 1. Clone repo và mở PowerShell tại thư mục gốc.
-2. Tạo database mới bằng SSMS ở chế độ **Query → SQLCMD Mode**: chạy [QuanLyThucDon.sql](QuanLyThucDon.sql), sau đó [Bo-sung.sql](Bo-sung.sql). File đầu chỉ dành cho database chưa tồn tại. Không chạy lại trên database đang có dữ liệu.
+2. Tạo database mới bằng SSMS ở chế độ **Query → SQLCMD Mode** và chạy theo thứ tự: [QuanLyThucDon.sql](QuanLyThucDon.sql), [Bo-sung.sql](Bo-sung.sql), [Merge-65-mon.sql](Merge-65-mon.sql). File thứ hai bổ sung 130 dòng dinh dưỡng và 80 quy đổi đơn vị; file thứ ba thêm 59 món còn thiếu, đạt 94 món và đồng bộ bộ cấp mã. Chỉ chạy file đầu trên database chưa tồn tại; không chạy lại trên database đang có dữ liệu.
 3. Chạy `powershell -ExecutionPolicy Bypass -File .\setup.ps1`. Script tạo Python virtual environment, cài thư viện backend và frontend, tạo `backend/.env` nếu thiếu, hỏi `DATABASE_URL` của máy này và kiểm tra schema.
 4. Mở hai terminal tại thư mục gốc:
 

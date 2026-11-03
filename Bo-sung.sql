@@ -1393,3 +1393,657 @@ END;
 CLOSE cap_ma;
 DEALLOCATE cap_ma;
 GO
+
+-- Dữ liệu dinh dưỡng bổ sung cho máy mới: giá trị tham khảo/ước tính trên 100 g.
+-- Không ghi đè giá trị dinh dưỡng hoặc quy đổi đã có trong database.
+USE QuanLyThucDon;
+GO
+SET XACT_ABORT ON;
+BEGIN TRANSACTION;
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL091')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD091',N'NL091',100.00,N'DVT001',884.00,0.00,0.00,100.00,0.00,0.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL092')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD092',N'NL092',100.00,N'DVT001',341.00,10.41,79.12,1.04,15.20,73.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL093')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD093',N'NL093',100.00,N'DVT001',53.00,0.00,27.70,0.00,0.20,10600.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL094')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD094',N'NL094',100.00,N'DVT001',53.00,8.14,4.93,0.57,0.80,5493.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL095')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD095',N'NL095',100.00,N'DVT001',47.00,0.94,11.75,0.12,2.40,0.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL096')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD096',N'NL096',100.00,N'DVT001',0.00,0.00,0.00,0.00,0.00,12300.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL097')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD097',N'NL097',100.00,N'DVT001',267.00,16.66,18.01,13.88,0.00,23875.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL098')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD098',N'NL098',100.00,N'DVT001',52.00,10.90,0.73,0.17,0.00,166.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL099')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD099',N'NL099',100.00,N'DVT001',331.00,16.55,72.73,0.73,9.00,60.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL100')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD100',N'NL100',100.00,N'DVT001',27.00,2.86,4.67,0.42,3.20,20.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL101')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD101',N'NL101',100.00,N'DVT001',15.00,1.10,2.40,0.50,1.60,498.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL102')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD102',N'NL102',100.00,N'DVT001',371.00,62.44,0.00,13.44,0.00,200.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL103')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD103',N'NL103',100.00,N'DVT001',37.00,2.66,7.81,0.29,2.70,3.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL104')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD104',N'NL104',100.00,N'DVT001',92.00,2.50,19.79,0.30,2.40,1338.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL105')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD105',N'NL105',100.00,N'DVT001',36.00,2.52,3.53,1.20,0.00,143.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL106')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD106',N'NL106',100.00,N'DVT001',215.00,18.60,0.00,15.06,0.00,70.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL107')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD107',N'NL107',100.00,N'DVT001',72.00,1.40,17.51,0.20,1.50,50.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL108')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD108',N'NL108',100.00,N'DVT001',74.00,2.60,17.23,0.10,4.90,40.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL109')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD109',N'NL109',100.00,N'DVT001',161.00,9.50,29.50,0.50,0.80,13.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL110')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD110',N'NL110',100.00,N'DVT001',367.00,7.54,76.25,3.20,3.60,5.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL111')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD111',N'NL111',100.00,N'DVT001',158.00,13.05,0.41,11.09,0.00,141.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL112')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD112',N'NL112',100.00,N'DVT001',118.00,1.53,27.88,0.17,4.10,9.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL113')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD113',N'NL113',100.00,N'DVT001',72.00,1.40,17.51,0.20,1.50,50.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL114')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD114',N'NL114',100.00,N'DVT001',72.00,1.40,17.51,0.20,1.50,50.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL115')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD115',N'NL115',100.00,N'DVT001',72.00,1.40,17.51,0.20,1.50,50.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL116')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD116',N'NL116',100.00,N'DVT001',349.00,14.26,77.06,0.39,13.00,298.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL117')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD117',N'NL117',100.00,N'DVT001',38.00,0.80,8.30,0.20,0.70,33.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL118')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD118',N'NL118',100.00,N'DVT001',72.00,1.40,17.51,0.20,1.50,50.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL119')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD119',N'NL119',100.00,N'DVT001',72.00,1.40,17.51,0.20,1.50,50.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL120')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD120',N'NL120',100.00,N'DVT001',72.00,1.40,17.51,0.20,1.50,50.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL121')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD121',N'NL121',100.00,N'DVT001',72.00,1.40,17.51,0.20,1.50,50.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL122')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD122',N'NL122',100.00,N'DVT001',286.00,4.90,74.00,0.40,3.00,48.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL123')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD123',N'NL123',100.00,N'DVT001',19.00,0.72,3.71,0.20,1.10,105.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL124')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD124',N'NL124',100.00,N'DVT001',16.00,0.90,2.80,0.20,1.10,53.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL125')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD125',N'NL125',100.00,N'DVT001',22.00,3.09,3.26,0.34,1.00,5.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL126')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD126',N'NL126',100.00,N'DVT001',36.00,2.52,3.53,1.20,0.00,143.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL127')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD127',N'NL127',100.00,N'DVT001',87.00,18.06,0.04,1.08,0.00,293.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL128')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD128',N'NL128',100.00,N'DVT001',69.00,12.06,3.18,0.49,0.00,392.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL129')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD129',N'NL129',100.00,N'DVT001',306.00,6.21,80.88,0.30,7.70,102.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL130')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD130',N'NL130',100.00,N'DVT001',296.00,9.58,75.37,0.99,11.50,13.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL131')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD131',N'NL131',100.00,N'DVT001',387.00,0.00,99.98,0.00,0.00,1.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL132')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD132',N'NL132',100.00,N'DVT001',51.00,1.35,10.92,0.25,0.30,2733.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL133')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD133',N'NL133',100.00,N'DVT001',446.00,36.49,30.16,19.94,9.30,2.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL134')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD134',N'NL134',100.00,N'DVT001',23.00,2.13,3.67,0.52,2.80,46.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL135')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD135',N'NL135',100.00,N'DVT001',14.00,1.10,2.63,0.10,1.40,16.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL136')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD136',N'NL136',100.00,N'DVT001',40.00,1.87,8.81,0.44,1.50,9.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL137')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD137',N'NL137',100.00,N'DVT001',23.00,2.13,3.67,0.52,2.80,46.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL138')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD138',N'NL138',100.00,N'DVT001',44.00,3.29,8.41,0.73,6.80,30.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL139')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD139',N'NL139',100.00,N'DVT001',44.00,3.29,8.41,0.73,6.80,30.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL140')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD140',N'NL140',100.00,N'DVT001',182.00,20.27,0.00,10.63,0.00,73.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL141')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD141',N'NL141',100.00,N'DVT001',134.00,0.50,5.00,0.00,0.00,2.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL142')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD142',N'NL142',100.00,N'DVT001',33.00,1.93,7.45,0.19,3.20,7.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL143')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD143',N'NL143',100.00,N'DVT001',185.00,12.81,1.45,13.77,0.00,146.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL144')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD144',N'NL144',100.00,N'DVT001',364.00,10.33,76.31,0.98,2.70,2.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL145')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD145',N'NL145',100.00,N'DVT001',362.00,8.20,78.03,0.86,1.70,2.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL146')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD146',N'NL146',100.00,N'DVT001',381.00,0.26,91.27,0.05,0.90,9.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL147')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD147',N'NL147',100.00,N'DVT001',362.00,8.20,78.80,1.60,0.60,33.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL148')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD148',N'NL148',100.00,N'DVT001',43.00,1.61,9.56,0.17,2.80,78.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL149')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD149',N'NL149',100.00,N'DVT001',884.00,0.00,0.00,100.00,0.00,0.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL150')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD150',N'NL150',100.00,N'DVT001',387.00,0.00,99.98,0.00,0.00,1.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL151')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD151',N'NL151',100.00,N'DVT001',380.00,0.12,98.09,0.00,0.00,28.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL152')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD152',N'NL152',100.00,N'DVT001',335.00,85.60,0.00,0.10,0.00,196.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL153')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD153',N'NL153',100.00,N'DVT001',579.00,21.15,21.55,49.93,12.50,1.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL154')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD154',N'NL154',100.00,N'DVT001',322.00,15.86,3.59,26.54,0.00,48.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL155')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD155',N'NL155',100.00,N'DVT001',52.00,10.90,0.73,0.17,0.00,166.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL156')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD156',N'NL156',100.00,N'DVT001',325.00,40.44,41.22,7.61,26.90,51.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL157')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD157',N'NL157',100.00,N'DVT001',351.00,0.16,86.09,0.06,0.50,10.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL158')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD158',N'NL158',100.00,N'DVT001',0.00,0.00,0.00,0.00,0.00,27360.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL159')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD159',N'NL159',100.00,N'DVT001',296.00,9.58,75.37,0.99,11.50,13.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL160')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD160',N'NL160',100.00,N'DVT001',23.00,2.13,3.67,0.52,2.80,46.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL161')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD161',N'NL161',100.00,N'DVT001',299.00,3.30,79.32,0.25,4.50,26.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL162')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD162',N'NL162',100.00,N'DVT001',51.00,0.39,13.60,0.05,0.20,6.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL163')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD163',N'NL163',100.00,N'DVT001',0.00,0.00,0.00,0.00,0.00,0.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL164')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD164',N'NL164',100.00,N'DVT001',250.00,0.00,0.10,0.00,0.00,1.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL165')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD165',N'NL165',100.00,N'DVT001',147.00,1.47,27.09,5.33,3.80,2.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL166')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD166',N'NL166',100.00,N'DVT001',496.00,26.32,38.42,26.71,0.00,371.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL167')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD167',N'NL167',100.00,N'DVT001',63.50,0.04,15.21,0.01,0.15,1.50);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL168')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD168',N'NL168',100.00,N'DVT001',236.00,17.18,0.00,17.99,0.00,65.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL169')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD169',N'NL169',100.00,N'DVT001',143.00,12.56,0.72,9.51,0.00,142.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL170')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD170',N'NL170',100.00,N'DVT001',288.00,0.06,12.65,0.06,0.00,9.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL171')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD171',N'NL171',100.00,N'DVT001',340.00,2.84,2.84,36.08,0.00,27.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL172')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD172',N'NL172',100.00,N'DVT001',60.00,0.82,14.98,0.38,1.60,1.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL173')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD173',N'NL173',100.00,N'DVT001',381.00,7.80,90.50,0.00,0.00,466.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL174')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD174',N'NL174',100.00,N'DVT001',381.00,7.80,90.50,0.00,0.00,466.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL175')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD175',N'NL175',100.00,N'DVT001',354.00,3.33,15.23,33.49,9.00,20.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL176')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD176',N'NL176',100.00,N'DVT001',329.00,19.87,62.90,0.53,12.70,5.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL177')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD177',N'NL177',100.00,N'DVT001',446.00,36.49,30.16,19.94,9.30,2.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL178')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD178',N'NL178',100.00,N'DVT001',335.00,85.60,0.00,0.10,0.00,196.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL179')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD179',N'NL179',100.00,N'DVT001',579.00,21.15,21.55,49.93,12.50,1.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL180')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD180',N'NL180',100.00,N'DVT001',298.00,12.37,54.99,17.77,41.90,35.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL181')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD181',N'NL181',100.00,N'DVT001',36.00,2.97,6.33,0.79,3.30,56.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL182')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD182',N'NL182',100.00,N'DVT001',57.00,0.36,15.23,0.14,3.10,1.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL183')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD183',N'NL183',100.00,N'DVT001',0.00,0.00,0.00,0.00,0.00,4.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL184')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD184',N'NL184',100.00,N'DVT001',0.00,0.00,0.00,0.00,0.00,4.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL185')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD185',N'NL185',100.00,N'DVT001',1.10,0.23,0.13,0.01,0.05,4.10);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL186')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD186',N'NL186',100.00,N'DVT001',3.60,0.30,0.63,0.08,0.33,5.60);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL187')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD187',N'NL187',100.00,N'DVT001',321.00,7.91,54.40,8.70,0.00,127.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL188')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD188',N'NL188',100.00,N'DVT001',281.00,4.72,72.52,0.50,6.00,5.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL189')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD189',N'NL189',100.00,N'DVT001',45.00,0.70,9.60,0.40,1.10,13.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL230')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD190',N'NL230',100.00,N'DVT001',143.00,3.20,31.70,0.40,0.00,31.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL232')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD191',N'NL232',100.00,N'DVT001',182.00,20.27,0.00,10.63,0.00,73.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL233')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD192',N'NL233',100.00,N'DVT001',298.00,12.37,54.99,17.77,41.90,35.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL238')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD193',N'NL238',100.00,N'DVT001',13.00,1.50,2.18,0.20,1.00,65.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL239')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD194',N'NL239',100.00,N'DVT001',322.00,4.50,58.00,0.00,13.30,7203.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL240')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD195',N'NL240',100.00,N'DVT001',251.00,10.39,63.95,3.26,25.30,20.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL301')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD196',N'NL301',100.00,N'DVT001',364.00,10.33,76.31,0.98,2.70,2.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL302')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD197',N'NL302',100.00,N'DVT001',16.00,1.20,3.23,0.20,1.20,9.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL303')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD198',N'NL303',100.00,N'DVT001',89.00,1.09,22.84,0.33,2.60,1.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL304')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD199',N'NL304',100.00,N'DVT001',38.00,0.72,8.82,0.09,4.90,4.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL305')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD200',N'NL305',100.00,N'DVT001',347.00,23.86,62.62,1.15,16.30,15.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL306')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD201',N'NL306',100.00,N'DVT001',354.00,3.33,15.23,33.49,9.00,20.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL307')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD202',N'NL307',100.00,N'DVT001',30.00,0.61,7.55,0.15,0.40,1.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL308')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD203',N'NL308',100.00,N'DVT001',34.00,0.84,8.16,0.19,0.90,16.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL309')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD204',N'NL309',100.00,N'DVT001',34.00,0.84,8.16,0.19,0.90,16.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL310')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD205',N'NL310',100.00,N'DVT001',36.00,0.54,9.09,0.14,0.80,18.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL311')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD206',N'NL311',100.00,N'DVT001',61.00,1.50,14.15,0.30,1.80,20.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL312')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD207',N'NL312',100.00,N'DVT001',267.00,16.66,18.01,13.88,0.00,23875.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL313')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD208',N'NL313',100.00,N'DVT001',114.00,1.80,26.50,0.10,1.20,10.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL314')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD209',N'NL314',100.00,N'DVT001',95.00,1.72,23.25,0.64,1.50,2.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL315')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD210',N'NL315',100.00,N'DVT001',34.00,2.24,6.79,0.49,2.50,9.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL316')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD211',N'NL316',100.00,N'DVT001',304.00,10.60,65.00,0.20,7.00,70.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL317')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD212',N'NL317',100.00,N'DVT001',69.00,0.72,18.10,0.16,0.90,2.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL318')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD213',N'NL318',100.00,N'DVT001',19.00,0.72,3.71,0.20,1.10,105.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL319')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD214',N'NL319',100.00,N'DVT001',23.00,2.13,3.67,0.52,2.80,46.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL320')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD215',N'NL320',100.00,N'DVT001',27.00,1.70,6.20,0.10,3.60,20.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL321')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD216',N'NL321',100.00,N'DVT001',61.00,3.15,4.78,3.27,0.00,43.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL322')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD217',N'NL322',100.00,N'DVT001',85.00,20.10,0.00,0.51,0.00,119.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL323')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD218',N'NL323',100.00,N'DVT001',251.00,10.39,63.95,3.26,25.30,20.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL324')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD219',N'NL324',100.00,N'DVT001',291.00,9.80,57.90,1.50,1.80,572.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu=N'NL325')
+    INSERT INTO dbo.ThongTinDinhDuong (MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+    VALUES (N'DD220',N'NL325',100.00,N'DVT001',322.00,4.50,58.00,0.00,13.30,7203.00);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL008' AND MaDonVi=N'DVT009')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD032',N'NL008',N'DVT009',10.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL029' AND MaDonVi=N'DVT009')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD033',N'NL029',N'DVT009',100.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL035' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD034',N'NL035',N'DVT005',120.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL036' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD035',N'NL036',N'DVT005',80.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL048' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD036',N'NL048',N'DVT005',150.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL049' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD037',N'NL049',N'DVT005',25.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL049' AND MaDonVi=N'DVT007')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD038',N'NL049',N'DVT007',3.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL050' AND MaDonVi=N'DVT008')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD039',N'NL050',N'DVT008',100.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL050' AND MaDonVi=N'DVT011')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD040',N'NL050',N'DVT011',10.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL052' AND MaDonVi=N'DVT011')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD041',N'NL052',N'DVT011',10.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL054' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD042',N'NL054',N'DVT005',10.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL055' AND MaDonVi=N'DVT006')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD043',N'NL055',N'DVT006',2.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL062' AND MaDonVi=N'DVT006')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD044',N'NL062',N'DVT006',15.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL065' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD045',N'NL065',N'DVT005',12.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL067' AND MaDonVi=N'DVT015')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD046',N'NL067',N'DVT015',200.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL069' AND MaDonVi=N'DVT014')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD047',N'NL069',N'DVT014',5.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL073' AND MaDonVi=N'DVT006')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD048',N'NL073',N'DVT006',15.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL073' AND MaDonVi=N'DVT014')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD049',N'NL073',N'DVT014',1.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL075' AND MaDonVi=N'DVT006')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD050',N'NL075',N'DVT006',7.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL076' AND MaDonVi=N'DVT007')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD051',N'NL076',N'DVT007',7.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL091' AND MaDonVi=N'DVT006')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD052',N'NL091',N'DVT006',14.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL092' AND MaDonVi=N'DVT006')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD053',N'NL092',N'DVT006',7.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL093' AND MaDonVi=N'DVT007')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD054',N'NL093',N'DVT007',4.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL095' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD055',N'NL095',N'DVT005',130.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL096' AND MaDonVi=N'DVT006')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD056',N'NL096',N'DVT006',15.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL097' AND MaDonVi=N'DVT006')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD057',N'NL097',N'DVT006',12.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL097' AND MaDonVi=N'DVT007')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD058',N'NL097',N'DVT007',4.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL097' AND MaDonVi=N'DVT014')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD059',N'NL097',N'DVT014',2.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL098' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD060',N'NL098',N'DVT005',33.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL099' AND MaDonVi=N'DVT006')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD061',N'NL099',N'DVT006',8.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL104' AND MaDonVi=N'DVT006')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD062',N'NL104',N'DVT006',18.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL111' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD063',N'NL111',N'DVT005',9.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL123' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD064',N'NL123',N'DVT005',300.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL124' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD065',N'NL124',N'DVT005',180.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL125' AND MaDonVi=N'DVT009')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD066',N'NL125',N'DVT009',3.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL131' AND MaDonVi=N'DVT006')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD067',N'NL131',N'DVT006',12.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL132' AND MaDonVi=N'DVT006')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD068',N'NL132',N'DVT006',18.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL132' AND MaDonVi=N'DVT007')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD069',N'NL132',N'DVT007',6.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL135' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD070',N'NL135',N'DVT005',200.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL135' AND MaDonVi=N'DVT010')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD071',N'NL135',N'DVT010',200.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL136' AND MaDonVi=N'DVT006')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD072',N'NL136',N'DVT006',10.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL137' AND MaDonVi=N'DVT006')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD073',N'NL137',N'DVT006',2.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL137' AND MaDonVi=N'DVT011')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD074',N'NL137',N'DVT011',3.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL138' AND MaDonVi=N'DVT011')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD075',N'NL138',N'DVT011',3.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL141' AND MaDonVi=N'DVT006')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD076',N'NL141',N'DVT006',15.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL143' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD077',N'NL143',N'DVT005',65.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL146' AND MaDonVi=N'DVT007')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD078',N'NL146',N'DVT007',3.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL148' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD079',N'NL148',N'DVT005',150.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL149' AND MaDonVi=N'DVT006')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD080',N'NL149',N'DVT006',14.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL150' AND MaDonVi=N'DVT014')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD081',N'NL150',N'DVT014',5.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL154' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD082',N'NL154',N'DVT005',17.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL155' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD083',N'NL155',N'DVT005',33.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL160' AND MaDonVi=N'DVT014')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD084',N'NL160',N'DVT014',3.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL162' AND MaDonVi=N'DVT006')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD085',N'NL162',N'DVT006',15.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL165' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD086',N'NL165',N'DVT005',500.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL169' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD087',N'NL169',N'DVT005',50.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL170' AND MaDonVi=N'DVT007')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD088',N'NL170',N'DVT007',5.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL180' AND MaDonVi=N'DVT006')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD089',N'NL180',N'DVT006',10.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL181' AND MaDonVi=N'DVT011')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD090',N'NL181',N'DVT011',10.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL181' AND MaDonVi=N'DVT013')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD091',N'NL181',N'DVT013',5.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL182' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD092',N'NL182',N'DVT005',170.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL187' AND MaDonVi=N'DVT007')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD093',N'NL187',N'DVT007',7.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL230' AND MaDonVi=N'DVT015')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD094',N'NL230',N'DVT015',200.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL233' AND MaDonVi=N'DVT015')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD095',N'NL233',N'DVT015',25.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL238' AND MaDonVi=N'DVT014')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD096',N'NL238',N'DVT014',20.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL239' AND MaDonVi=N'DVT014')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD097',N'NL239',N'DVT014',3.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL240' AND MaDonVi=N'DVT014')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD098',N'NL240',N'DVT014',0.500);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL303' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD099',N'NL303',N'DVT005',100.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL304' AND MaDonVi=N'DVT010')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD100',N'NL304',N'DVT010',250.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL307' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD101',N'NL307',N'DVT005',800.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL308' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD102',N'NL308',N'DVT005',500.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL309' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD103',N'NL309',N'DVT005',500.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL310' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD104',N'NL310',N'DVT005',500.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL312' AND MaDonVi=N'DVT006')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD105',N'NL312',N'DVT006',12.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL317' AND MaDonVi=N'DVT005')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD106',N'NL317',N'DVT005',5.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL319' AND MaDonVi=N'DVT011')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD107',N'NL319',N'DVT011',5.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL320' AND MaDonVi=N'DVT010')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD108',N'NL320',N'DVT010',250.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL323' AND MaDonVi=N'DVT007')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD109',N'NL323',N'DVT007',2.300);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL324' AND MaDonVi=N'DVT015')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD110',N'NL324',N'DVT015',250.000);
+IF NOT EXISTS (SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL325' AND MaDonVi=N'DVT014')
+    INSERT INTO dbo.QuyDoiDonViNguyenLieu (MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram)
+    VALUES (N'QD111',N'NL325',N'DVT014',3.000);
+-- Sửa sáu đơn vị công thức cũ được nhập sai (chỉ khi còn đúng giá trị cũ).
+UPDATE dbo.ThanhPhanCongThuc SET MaDonVi=N'DVT001',SoLuong=800
+WHERE MaThanhPhan=N'TP10301' AND MaDonVi=N'DVT005' AND SoLuong=1;
+UPDATE dbo.ThanhPhanCongThuc SET MaDonVi=N'DVT012',SoLuong=5
+WHERE MaThanhPhan=N'TP20111' AND MaDonVi=N'DVT010' AND SoLuong=5;
+UPDATE dbo.ThanhPhanCongThuc SET MaDonVi=N'DVT001',SoLuong=600
+WHERE MaThanhPhan=N'TP10201' AND MaDonVi=N'DVT005' AND SoLuong=2;
+UPDATE dbo.ThanhPhanCongThuc SET MaDonVi=N'DVT001',SoLuong=30
+WHERE MaThanhPhan=N'TP10202' AND MaDonVi=N'DVT005' AND SoLuong=2;
+UPDATE dbo.ThanhPhanCongThuc SET MaDonVi=N'DVT001',SoLuong=75
+WHERE MaThanhPhan=N'TP10203' AND MaDonVi=N'DVT005' AND SoLuong=0.5;
+UPDATE dbo.ThanhPhanCongThuc SET MaDonVi=N'DVT001',SoLuong=125
+WHERE MaThanhPhan=N'TP21805' AND MaDonVi=N'DVT005' AND SoLuong=5;
+UPDATE dbo.QuyUocMaHeThong SET SoHienTai=(SELECT MAX(TRY_CONVERT(INT,SUBSTRING(MaThongTin,3,20))) FROM dbo.ThongTinDinhDuong) WHERE LoaiMa=N'ThongTinDinhDuong' AND SoHienTai<(SELECT MAX(TRY_CONVERT(INT,SUBSTRING(MaThongTin,3,20))) FROM dbo.ThongTinDinhDuong);
+UPDATE dbo.QuyUocMaHeThong SET SoHienTai=(SELECT MAX(TRY_CONVERT(INT,SUBSTRING(MaQuyDoi,3,20))) FROM dbo.QuyDoiDonViNguyenLieu) WHERE LoaiMa=N'QuyDoiDonViNguyenLieu' AND SoHienTai<(SELECT MAX(TRY_CONVERT(INT,SUBSTRING(MaQuyDoi,3,20))) FROM dbo.QuyDoiDonViNguyenLieu);
+COMMIT TRANSACTION;
+GO

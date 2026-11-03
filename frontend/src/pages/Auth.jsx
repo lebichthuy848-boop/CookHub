@@ -25,7 +25,6 @@ export default function Auth({ mode = 'login' }) {
     try { const result = await api('/auth/' + mode, { method: 'POST', body: form }); if (mode === 'login' || mode === 'register') setUser(result); else setMessage(mode === 'reset' ? 'Đã đổi mật khẩu. Bạn có thể đăng nhập.' : result.message); }
     catch (err) { setError(err.message); } finally { setBusy(false); }
   }
-  async function social(provider) { setBusy(true); setError(''); setMessage(''); try { const result = await api(`/auth/${provider}/start`); if (result?.authorization_url) window.location.assign(result.authorization_url); } catch (err) { setError(err.message); } finally { setBusy(false); } }
   return <main className="auth-page"><aside className="auth-scene"/><div className="auth-responsive-banner"><div className="auth-banner-copy"><div className="auth-banner-brand"><span aria-hidden="true">✿</span><strong>Cook<span>Hub</span><small>Nấu ngon mỗi ngày</small></strong></div><h2><span>Nấu ngon mỗi ngày</span><br/>Sống khỏe mỗi ngày</h2><p>Khám phá món ngon và tạo thực đơn phù hợp cho mỗi ngày.</p></div></div>
     <section className="auth-side"><div className="auth-card">
       <p className="auth-eyebrow">NẤU NGON MỖI NGÀY</p><nav className="auth-tabs" aria-label="Xác thực">{modes.map(([key,label,path]) => <Link key={key} to={path} className={mode === key ? 'active' : ''}>{label}</Link>)}</nav>
@@ -37,6 +36,5 @@ export default function Auth({ mode = 'login' }) {
         {mode === 'register' && <Field label="Nhập lại mật khẩu"><PasswordControl name="confirmPassword" visible={showConfirmPassword} onToggle={() => setShowConfirmPassword(!showConfirmPassword)} minLength={6} autoComplete="new-password"/></Field>}
         <button className="primary auth-cta" disabled={busy}>{busy ? 'Đang xử lý…' : {login:'Đăng nhập',register:'Tạo tài khoản',forgot:'Gửi liên kết khôi phục',reset:'Lưu mật khẩu'}[mode]}<span aria-hidden="true">→</span></button>
       </form>
-      {(mode === 'login' || mode === 'register') && <><div className="auth-divider"><span>hoặc tiếp tục với</span></div><div className="social-login"><button type="button" disabled={busy} onClick={() => social('google')} aria-label="Tiếp tục với Google" title="Tiếp tục với Google"><b className="google">G</b></button><button type="button" disabled={busy} onClick={() => social('facebook')} aria-label="Tiếp tục với Facebook" title="Tiếp tục với Facebook"><b className="facebook">f</b></button></div></>}
     </div></section></main>;
 }
