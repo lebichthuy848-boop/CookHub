@@ -22,3 +22,4 @@ html[data-theme="dark"] .template-preview-modal{border-color:#3c6654;background:
 @media(max-width:700px){.template-preview-days{grid-template-columns:1fr;padding:14px}.template-preview-modal header,.template-preview-modal footer{padding:15px}.template-preview-modal footer{flex-wrap:wrap}.template-preview-modal footer span{flex-basis:100%}}
 
 .avatar-picker{position:absolute;right:-8px;bottom:-8px;display:grid;place-items:center;width:29px;height:29px;border:2px solid #fff;border-radius:50%;background:#f5bd3e;color:#174b38;font-size:13px;cursor:pointer;box-shadow:0 4px 10px #06291e50}.avatar-picker input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.chef-avatar > span,.chef-exp{display:none!important}

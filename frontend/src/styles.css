@@ -291,3 +291,18 @@ main:has(.menu-page){max-width:none;padding-right:38px;padding-left:38px}.menu-p
 .step-title{margin:0 0 14px;color:#1d6047;font-size:15px;font-weight:900;letter-spacing:.1px;line-height:1.35}
 .step-content>.step-title+p{margin-top:0}
 .dish-categories{display:flex;flex-wrap:wrap;align-items:center;gap:5px}
+.interactive-ingredients li>span{white-space:pre-line}
+.interactive-ingredients li b{grid-row:1 / span 2;align-self:center}
+.interactive-ingredients li>span{grid-column:2;grid-row:1 / span 2;align-self:center}
+.interactive-ingredients li>b{grid-column:3;grid-row:1 / span 2}
+.interactive-ingredients li .ingredient-kcal{grid-column:3;grid-row:2}
+.interactive-ingredients li>.ingredient-check{grid-column:1;grid-row:1 / span 2;align-self:center}
+.interactive-ingredients li>b{grid-row:1;white-space:nowrap;justify-self:end;align-self:end;line-height:1.2;text-align:right;margin-bottom:1px}
+.interactive-ingredients li .ingredient-kcal{align-self:start;margin-top:0;white-space:nowrap;line-height:1.1}
+.recipe-time-badges,.recipe-info-badges{display:flex;flex-wrap:wrap;gap:8px}
+.recipe-badges{display:grid;gap:10px;width:100%;margin-top:2px}
+.recipe-time-badges{gap:9px;padding:0 0 10px;border:0;border-bottom:1px solid #dfece1}
+.recipe-time-badges span{min-width:132px;justify-content:center;padding:8px 12px;border-color:#acd9bd!important;border-radius:11px;background:#edf9f0!important;color:#247653!important;font-size:11px;font-weight:800;box-shadow:0 3px 9px rgba(35,117,78,.06)}
+.recipe-time-badges i{font-style:normal;font-size:15px}
+.recipe-info-badges{gap:7px}
+.recipe-info-badges span{padding:6px 9px;font-size:10px}

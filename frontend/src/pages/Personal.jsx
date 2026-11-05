@@ -206,7 +206,8 @@ export function Profile() {
   const { setUser }=useAuth();
   const resource=useApi('/profile'), hidden=useApi('/hidden'), dishes=useApi('/dishes'), preferences=useApi('/v1/user/preferences'), favorites=useApi('/favorites'), history=useApi('/menu/history');
   const [error,setError]=useState(''), [message,setMessage]=useState(''), [busy,setBusy]=useState(false), [tab,setTab]=useState('preferences'), [avatar,setAvatar]=useState('');
-  useEffect(()=>{if(resource.data?.avatar)setAvatar(resource.data.avatar)},[resource.data?.avatar]);
+  useEffect(()=>{if(resource.data?.avatar){setAvatar(resource.data.avatar);window.localStorage.setItem('cookhub-avatar',resource.data.avatar)}},[resource.data?.avatar]);
+  useEffect(()=>{if(avatar){window.localStorage.setItem('cookhub-avatar',avatar);window.dispatchEvent(new CustomEvent('cookhub-avatar-updated',{detail:{avatar}}))}},[avatar]);
   function chooseAvatar(event) { const file=event.target.files?.[0]; if(!file) return; if(!file.type.startsWith('image/')) { setError('Vui lòng chọn tệp hình ảnh.'); return; } const reader=new FileReader(); reader.onload=async()=>{try{const value=String(reader.result);await api('/profile',{method:'PUT',body:{name:resource.data?.name || '',email:resource.data?.email || '',avatar:value}});setAvatar(value);resource.reload();setUser(await api('/auth/me'));setMessage('Đã cập nhật ảnh đại diện.');}catch(err){setError(err.message);}}; reader.readAsDataURL(file); }
   async function submit(event,path) {
     event.preventDefault();setError('');setMessage('');setBusy(true);

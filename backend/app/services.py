@@ -150,7 +150,7 @@ def recipe_data(db):
     for x in rows(db, m.ThanhPhanCongThuc):
         recipe_key = (x.maCongThuc or '').strip().upper()
         components.setdefault(recipe_key, []).append(dict(
-            name=ingredients[x.maNguyenLieu].tenNguyenLieu, ingredient_id=x.maNguyenLieu,
+            name=(ingredients[x.maNguyenLieu].tenNguyenLieu + ('\n' + (ingredients[x.maNguyenLieu].moTa or '').strip() if (ingredients[x.maNguyenLieu].moTa or '').strip().startswith('(') else '')), note=((ingredients[x.maNguyenLieu].moTa or '').strip() if (ingredients[x.maNguyenLieu].moTa or '').strip().startswith('(') else ''), ingredient_id=x.maNguyenLieu,
             quantity=float(x.soLuong or 0), unit_id=x.maDonVi, unit=units[x.maDonVi].kyHieu))
     for x in sorted(rows(db, m.BuocCheBien), key=lambda x: x.thuTu or 0):
         recipe_key = (x.maCongThuc or '').strip().upper()
@@ -230,7 +230,7 @@ def dish_data(db):
             category_ids=category_ids,
             categories=[dict(id=category_id, name=categories[category_id])
                         for category_id in category_ids if category_id in categories],
-            category=categories[x.maDanhMuc], description=x.moTa or '', time=cooking_time,
+            category=' · '.join(dict.fromkeys(categories[category_id] for category_id in category_ids if category_id in categories)) or categories[x.maDanhMuc], description=x.moTa or '', prep_time=x.thoiGianChuanBi or 0, time=cooking_time,
             difficulty=auto_difficulty, step_count=step_count, image=local_image(x.duongDanAnh, x.tenMonAn), images=local_images(x.duongDanAnh, x.tenMonAn), rating=round(sum(ratings)/len(ratings), 1) if ratings else 0,
             review_count=len(ratings), favorite_count=favorites.get(x.maMonAn, 0), cost=cost,
             diets=diets.get(x.maMonAn, []), recipe=recipe,
