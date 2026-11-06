@@ -1,4 +1,4 @@
-﻿import { fireEvent, render, screen, waitFor, cleanup } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, cleanup } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { OnboardingSurvey, PreferencesSettings } from './Personalization';
 const mocks=vi.hoisted(()=>({api:vi.fn(),setUser:vi.fn(),favorites:[],user:{id:'new',survey_pending:true},saved:null}));
@@ -15,7 +15,7 @@ it('collects ten questions, previews without saving, persists favorites, and ret
   render(<OnboardingSurvey onComplete={complete} onFavorites={favorites}/>);
   await screen.findByRole('dialog');
   expect(screen.getByRole('button',{name:'Tiếp theo →'})).toBeDisabled();
-  for(const label of ['Thịt gà','Bữa ăn 1 người','Đậm đà / Mặn mà','Vừa đủ · 15–30 phút','Bếp gas / Bếp từ','Miền Bắc','Không kiêng','Tiết kiệm · <50k','Mới bắt đầu']) {
+  for(const label of ['Thịt gà','Bữa ăn 1 người','Đậm đà / Mặn mà','Vừa đủ · 15–30 phút','Bếp gas / Bếp từ','Miền Bắc','Không kiêng','Xào / áp chảo','Mới bắt đầu']) {
     fireEvent.click(await screen.findByRole('button',{name:new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'))}));
     fireEvent.click(screen.getByRole('button',{name:'Tiếp theo →'}));
   }
@@ -37,7 +37,7 @@ it('collects ten questions, previews without saving, persists favorites, and ret
   mocks.api.mockResolvedValueOnce({id:'new',has_completed_survey:true,survey_pending:false});
   fireEvent.click(screen.getByRole('button',{name:'Lưu sở thích & bắt đầu khám phá ✦'}));
   await waitFor(()=>expect(complete).toHaveBeenCalledTimes(1));
-  expect(mocks.api).toHaveBeenCalledWith('/v1/user/onboarding-preferences',{method:'POST',body:{ingredients:['chicken'],occasions:['solo'],tastes:['savory'],time:'medium',tools:['stove'],regions:['north'],avoid:['none'],budget:'saving',skill:'beginner',meals:['breakfast']}});
+  expect(mocks.api).toHaveBeenCalledWith('/v1/user/onboarding-preferences',{method:'POST',body:{ingredients:['chicken'],occasions:['solo'],tastes:['savory'],time:'medium',tools:['stove'],regions:['north'],avoid:['none'],method:'stir_fry',skill:'beginner',meals:['breakfast']}});
 });
 it('does not display the survey after the database claim was used',async()=>{
   mocks.api.mockResolvedValue({show:false});
@@ -50,8 +50,10 @@ it('loads and edits saved preferences with a static form',async()=>{
   render(<PreferencesSettings/>);
   expect(screen.getByRole('button',{name:/Thịt gà/})).toHaveAttribute('aria-pressed','true');
   fireEvent.click(screen.getByRole('button',{name:/Nhanh gọn/}));
+  fireEvent.click(screen.getByRole('button',{name:/Xào \/ áp chảo/}));
   mocks.api.mockResolvedValue({id:'new',has_completed_survey:true});
   fireEvent.click(screen.getByRole('button',{name:'Cập nhật sở thích'}));
   await screen.findByText('Đã cập nhật sở thích. Gợi ý món ăn đã sẵn sàng.');
-  expect(mocks.api).toHaveBeenCalledWith('/v1/user/preferences',{method:'POST',body:{...mocks.saved,time:'quick'}});
+  const {budget: legacyBudget, ...savedAnswers} = mocks.saved;
+  expect(mocks.api).toHaveBeenCalledWith('/v1/user/preferences',{method:'POST',body:{...savedAnswers,method:'stir_fry',time:'quick'}});
 });

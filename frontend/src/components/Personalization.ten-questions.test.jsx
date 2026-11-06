@@ -20,7 +20,7 @@ it('shows a personal eating style before saving all ten answers', async () => {
   const choices = [
     'Thịt gà', 'Ăn uống cân bằng / Healthy', 'Đậm đà / Mặn mà',
     'Vừa đủ · 15–30 phút', 'Bếp gas / Bếp từ', 'Miền Bắc',
-    'Không kiêng', 'Tiết kiệm · <50k', 'Mới bắt đầu', 'Bữa sáng nhanh',
+    'Không kiêng', 'Xào / áp chảo', 'Mới bắt đầu', 'Bữa sáng nhanh',
   ];
   for (const [index, choice] of choices.entries()) {
     const option = await screen.findByRole('button', { name: choice });
@@ -40,7 +40,7 @@ it('shows a personal eating style before saving all ten answers', async () => {
     body: {
       ingredients: ['chicken'], occasions: ['healthy'], tastes: ['savory'],
       time: 'medium', tools: ['stove'], regions: ['north'], avoid: ['none'],
-      budget: 'saving', skill: 'beginner', meals: ['breakfast'],
+      method: 'stir_fry', skill: 'beginner', meals: ['breakfast'],
     },
   });
 });
@@ -49,7 +49,7 @@ it('draws a conclusion from combinations instead of listing every selected answe
   const style = describeEatingStyle({
     ingredients: ['pork', 'vegetables', 'beef'], occasions: ['family', 'solo'],
     tastes: ['savory'], time: 'medium', tools: ['air_fryer', 'stove'],
-    regions: ['asia'], avoid: ['seafood_allergy'], budget: 'comfortable',
+    regions: ['asia'], avoid: ['seafood_allergy'], method: 'grill',
     skill: 'basic', meals: ['lunch', 'dinner'],
   });
   expect(style.title).toBe('Gu đậm vị, bữa chính nấu gọn');

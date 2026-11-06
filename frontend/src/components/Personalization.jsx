@@ -14,12 +14,12 @@ export const questions = [
   {key:'tools', title:'Trong bếp của bạn có những dụng cụ nào?', options:[['stove','🍳','Bếp gas / Bếp từ'],['air_fryer','🍟','Nồi chiên không dầu'],['pressure_cooker','🍲','Nồi áp suất / Nồi hầm'],['oven','🍞','Lò nướng'],['no_cook','🥗','Không cần nấu']]},
   {key:'regions', title:'Vùng miền / phong cách ẩm thực bạn yêu thích?', options:[['north','🍲','Miền Bắc'],['central','🌶️','Miền Trung'],['south','🥥','Miền Tây / Nam Bộ'],['asia','🥢','Món Á'],['western','🍝','Món Âu']]},
   {key:'avoid', title:'Bạn có dị ứng hoặc kiêng nguyên liệu nào không?', options:[['none','👍','Không kiêng'],['seafood_allergy','🦐','Hải sản / Tôm cua'],['peanut','🥜','Đậu nành / Lạc'],['lactose','🥛','Sữa / Lactose'],['spicy_avoid','🌶️','Đồ cay']]},
-  {key:'budget', title:'Ngân sách dự kiến cho một bữa ăn?', single:true, options:[['saving','💰','Tiết kiệm · <50k'],['normal','💵','Bình dân · tối đa 150k'],['comfortable','💳','Thoải mái · không giới hạn']]},
+  {key:'method', title:'Bạn thích cách chế biến nào?', single:true, options:[['stir_fry','🍳','Xào / áp chảo'],['steam','♨️','Hấp / luộc'],['grill','🔥','Nướng'],['stew','🍲','Hầm / kho']]},
   {key:'skill', title:'Mức độ thành thạo kỹ năng nấu nướng?', single:true, options:[['beginner','🐣','Mới bắt đầu'],['basic','🍳','Nấu ăn cơ bản'],['chef','🧑‍🍳','Bếp trưởng gia đình']]},
   {key:'meals', title:'Loại bữa ăn bạn quan tâm nhất hiện tại?', options:[['breakfast','🌅','Bữa sáng nhanh'],['lunch','🍱','Cơm trưa'],['dinner','🌙','Bữa tối gia đình'],['snack','🍰','Ăn vặt / Tráng miệng']]},
 ];
-export const emptyAnswers = () => ({ingredients:[], occasions:[], tastes:[], time:'', tools:[], regions:[], avoid:[], budget:'', skill:'', meals:[]});
-const upgradeAnswers = answers => ({...emptyAnswers(), ...answers, ingredients:(answers?.ingredients || []).flatMap(value => value === 'eggs_tofu' ? ['eggs','tofu'] : [value])});
+export const emptyAnswers = () => ({ingredients:[], occasions:[], tastes:[], time:'', tools:[], regions:[], avoid:[], method:'', skill:'', meals:[]});
+const upgradeAnswers = answers => ({...emptyAnswers(), ...Object.fromEntries(Object.keys(emptyAnswers()).filter(key => key in (answers || {})).map(key => [key, answers[key]])), ingredients:(answers?.ingredients || []).flatMap(value => value === 'eggs_tofu' ? ['eggs','tofu'] : [value])});
 const avoidLabels = {seafood_allergy:'cá và hải sản', peanut:'đậu nành và lạc', lactose:'sữa', spicy_avoid:'món cay'};
 const listed = (values, names) => (values || []).map(value => names[value]).filter(Boolean).join(', ');
 export function describeEatingStyle(answers) {
@@ -61,8 +61,8 @@ export function describeEatingStyle(answers) {
   if (has('regions', 'asia') && strongTaste) cooking += ' Gia vị kiểu Á cũng hợp gu vị rõ của bạn.';
   const constraints = [];
   if (avoid) constraints.push(`Khi chọn công thức, hãy kiểm tra nguyên liệu cần tránh: ${avoid}${has('avoid', 'seafood_allergy') ? ', kể cả nước mắm' : ''}.`);
-  if (answers.budget === 'saving') constraints.push('Ưu tiên món dùng nguyên liệu phổ biến và có chi phí dưới 50.000đ/phần.');
-  else if (answers.budget === 'normal') constraints.push('Ưu tiên món có chi phí tối đa 150.000đ/phần.');
+  const methodLabel = {stir_fry:'món xào hoặc áp chảo',steam:'món hấp hoặc luộc',grill:'món nướng',stew:'món hầm hoặc kho'}[answers.method];
+  if (methodLabel) constraints.push(`Khi chọn món, bạn có thể ưu tiên ${methodLabel}.`);
   return {
     title,
     details: [conclusion, cooking, ...constraints],

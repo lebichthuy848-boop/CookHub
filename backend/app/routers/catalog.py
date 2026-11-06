@@ -8,7 +8,7 @@ from ..database import get_db
 from ..security import current_user
 from ..services import dish_data, require, rows, ingredient_similarity, normalize_ingredient_text
 from ..nutrition import dish_nutrition
-from ..personalization import load_preferences, rank_dishes, conflicts_with_avoid, within_budget
+from ..personalization import load_preferences, rank_dishes, conflicts_with_avoid
 
 router = APIRouter(tags=['Catalog'], dependencies=[Depends(current_user)])
 
@@ -150,15 +150,13 @@ def recommendations(mode: Literal['for_you', 'taste', 'quick', 'healthy', 'trend
     if answers and mode in {'for_you', 'taste'}:
         if mode == 'taste':
             answers = {**answers, 'ingredients': [], 'occasions': [], 'tools': [], 'time': '',
-                       'regions': [], 'budget': '', 'skill': '', 'meals': []}
+                       'regions': [], 'method': '', 'skill': '', 'meals': []}
         return rank_dishes(db, user.maNguoiDung, answers)
     if mode == 'healthy':
         mode = 'quick'
     result = [x for x in dish_data(db) if x.get('recipe')]
     if answers and answers.get('avoid'):
         result = [dish for dish in result if not conflicts_with_avoid(dish, answers['avoid'])]
-    if answers and answers.get('budget'):
-        result = [dish for dish in result if within_budget(dish, answers['budget'])]
     hidden = set(db.scalars(select(m.MonKhongThich.maMonAn)
                            .where(m.MonKhongThich.maNguoiDung == user.maNguoiDung)))
     preferred = set()

@@ -1,4 +1,3 @@
-﻿from datetime import date
 from pathlib import PurePosixPath
 from difflib import SequenceMatcher
 import re
@@ -179,41 +178,6 @@ def dish_data(db):
         favorites[x.maMonAn] = favorites.get(x.maMonAn, 0) + 1
     for x in rows(db, m.CheDoAnMonAn):
         diets.setdefault(x.maMonAn, []).append(dict(id=x.maCheDoAn, name=diet_names[x.maCheDoAn]))
-    # Use the latest applicable price per ingredient/unit, avoiding duplicate historical prices.
-    prices = {}
-    for x in sorted(rows(db, m.GiaNguyenLieu), key=lambda x: x.ngayApDung or date.min):
-        if x.ngayApDung and x.ngayApDung > date.today():
-            continue
-        if x.giaThamKhao is not None:
-            prices[x.maNguyenLieu] = x
-    units = {x.maDonVi: x for x in rows(db, m.DonViTinh)}
-    conversions = {(x.maNguyenLieu, x.maDonVi): float(x.khoiLuongQuyDoiGram)
-                   for x in rows(db, m.QuyDoiDonViNguyenLieu)}
-
-    def unit_grams(ingredient_id, unit_id):
-        unit = units[unit_id]
-        return conversions.get((ingredient_id, unit_id)) or float(unit.heSoGramChuan or 0)
-
-    def recipe_cost(recipe):
-        if not recipe or not recipe['ingredients']:
-            return None
-        total = 0.0
-        for item in recipe['ingredients']:
-            ingredient_id = item['ingredient_id']
-            price = prices.get(ingredient_id)
-            if price is None:
-                if item['name'].casefold() == 'nước lọc':
-                    continue
-                return None
-            if price.maDonVi == item['unit_id']:
-                total += item['quantity'] * float(price.giaThamKhao)
-                continue
-            amount_grams = unit_grams(ingredient_id, item['unit_id'])
-            price_grams = unit_grams(ingredient_id, price.maDonVi)
-            if not amount_grams or not price_grams:
-                return None
-            total += item['quantity'] * amount_grams / price_grams * float(price.giaThamKhao)
-        return round(total)
     result = []
     for x in rows(db, m.MonAn):
         category_ids = list(dict.fromkeys([
@@ -222,7 +186,6 @@ def dish_data(db):
         ]))
         recipe = recipes.get(x.maMonAn)
         ratings = reviews.get(x.maMonAn, [])
-        cost = recipe_cost(recipe)
         step_count = len(recipe['steps']) if recipe else 0
         cooking_time = x.thoiGianCheBien or 0
         auto_difficulty = 'Dễ' if cooking_time < 30 and step_count <= 5 else 'Khó' if cooking_time > 60 or step_count > 10 else 'Trung bình'
@@ -232,7 +195,7 @@ def dish_data(db):
                         for category_id in category_ids if category_id in categories],
             category=' · '.join(dict.fromkeys(categories[category_id] for category_id in category_ids if category_id in categories)) or categories[x.maDanhMuc], description=x.moTa or '', prep_time=x.thoiGianChuanBi or 0, time=cooking_time,
             difficulty=auto_difficulty, step_count=step_count, image=local_image(x.duongDanAnh, x.tenMonAn), images=local_images(x.duongDanAnh, x.tenMonAn), rating=round(sum(ratings)/len(ratings), 1) if ratings else 0,
-            review_count=len(ratings), favorite_count=favorites.get(x.maMonAn, 0), cost=cost,
+            review_count=len(ratings), favorite_count=favorites.get(x.maMonAn, 0),
             diets=diets.get(x.maMonAn, []), recipe=recipe,
             home_display=True, foods_display=True, home_order=0, foods_order=0))
     return result

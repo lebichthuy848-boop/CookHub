@@ -166,12 +166,12 @@ html[data-theme="dark"] .recipe-back{color:#71dcae}
 html[data-theme="dark"] :is(.recipe-hero,.recipe-panel){border-color:#365b49!important;background:linear-gradient(140deg,#1b352b,#172e26)!important;color:var(--color-text-primary)!important;box-shadow:0 16px 34px #0004,inset 0 1px 0 #ffffff0b!important}
 html[data-theme="dark"] .recipe-hero::before{background:radial-gradient(circle,#43c98b24,transparent 68%)}
 html[data-theme="dark"] :is(.recipe-summary h1,.panel-title h2,.menu-widget h2){color:#f4faf6}
-html[data-theme="dark"] :is(.recipe-description,.recipe-cost,.step-hint,.menu-widget>p,.recipe-panel>p){color:#abc7b9}
+html[data-theme="dark"] :is(.recipe-description,.step-hint,.menu-widget>p,.recipe-panel>p){color:#abc7b9}
 html[data-theme="dark"] :is(.panel-title small,.menu-widget>small){color:#6edaaa}
 html[data-theme="dark"] .recipe-category{border-color:#477961;background:#24483a;color:#9be8c2}
 html[data-theme="dark"] .recipe-badges span{border-color:#3b604f;background:#203b31;color:#c4ddd1;box-shadow:0 3px 9px #0002}
 html[data-theme="dark"] .recipe-badges span:first-child{border-color:#776438;background:#403922;color:#f3ca67}
-html[data-theme="dark"] .recipe-badges i,html[data-theme="dark"] .recipe-cost b{color:#72dcae}
+html[data-theme="dark"] .recipe-badges i{color:#72dcae}
 html[data-theme="dark"] .recipe-favorite{border-color:#8f4a4d;background:linear-gradient(145deg,#342628,#2a2324);color:#ff9a94;box-shadow:0 6px 15px #0003}
 html[data-theme="dark"] .recipe-favorite:hover{border-color:#c86567;background:#442c2e;box-shadow:0 10px 20px #0004}
 html[data-theme="dark"] .recipe-favorite.selected{border-color:#db6d70;background:linear-gradient(145deg,#513033,#3c292b);color:#ffaaa5}

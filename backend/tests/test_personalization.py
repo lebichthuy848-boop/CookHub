@@ -30,7 +30,7 @@ def test_existing_users_not_forced_into_survey_and_preferences_persist(client):
 def test_all_ten_survey_answers_are_saved_and_returned(client):
     login(client)
     answers = {**ANSWERS, 'regions': ['north'], 'avoid': ['none'],
-               'budget': 'saving', 'skill': 'beginner', 'meals': ['breakfast']}
+               'method': 'stir_fry', 'skill': 'beginner', 'meals': ['breakfast']}
     result = client.post('/api/v1/user/onboarding-preferences', json=answers)
     assert result.status_code == 200
     assert result.json()['has_completed_survey'] is True
@@ -138,7 +138,7 @@ def test_avoidance_excludes_dish_from_preview_and_saved_recommendations(client, 
     assert [dish['id'] for dish in client.get('/api/recommendations?mode=for_you').json()] == ['MA001']
 
 
-def test_budget_uses_converted_price_per_serving_and_keeps_unpriced_dishes(client, setup):
+def test_dish_recommendations_do_not_calculate_or_filter_by_sample_prices(client, setup):
     from app import models as m
     login(client)
     _, factory = setup
@@ -147,19 +147,18 @@ def test_budget_uses_converted_price_per_serving_and_keeps_unpriced_dishes(clien
         db.add(m.DonViTinh(maDonVi='DV002', tenDonVi='Kilôgam', kyHieu='kg', heSoGramChuan=1000))
         db.add(m.ThanhPhanCongThuc(maThanhPhan='TP001', maCongThuc='CT001', maNguyenLieu='NL001', maDonVi='DV001', soLuong=200))
         db.commit()
-    saving = {**ANSWERS, 'budget': 'saving'}
-    unpriced = client.post('/api/v1/user/preferences/preview', json=saving).json()
-    assert len(unpriced) == 1 and unpriced[0]['cost'] is None
+    answers = {**ANSWERS, 'method': 'stir_fry'}
+    unpriced = client.post('/api/v1/user/preferences/preview', json=answers).json()
+    assert len(unpriced) == 1 and 'cost' not in unpriced[0]
     with factory() as db:
         db.add(m.GiaNguyenLieu(maGia='G001', maNguyenLieu='NL001', maDonVi='DV002', giaThamKhao=100000))
         db.commit()
-    preview = client.post('/api/v1/user/preferences/preview', json=saving).json()
-    assert preview[0]['cost'] == 20000
-    assert client.post('/api/v1/user/preferences', json=saving).status_code == 200
-    assert client.get('/api/recommendations?mode=trending').json()[0]['cost'] == 20000
+    preview = client.post('/api/v1/user/preferences/preview', json=answers).json()
+    assert [dish['id'] for dish in preview] == [dish['id'] for dish in unpriced]
+    assert client.post('/api/v1/user/preferences', json=answers).status_code == 200
+    assert 'cost' not in client.get('/api/recommendations?mode=trending').json()[0]
     with factory() as db:
         db.get(m.GiaNguyenLieu, 'G001').giaThamKhao = 300000
         db.commit()
-    assert client.post('/api/v1/user/preferences/preview', json=saving).json() == []
-    assert client.get('/api/recommendations?mode=trending').json() == []
-    assert client.post('/api/v1/user/preferences/preview', json={**ANSWERS, 'budget':'normal'}).json()[0]['cost'] == 60000
+    assert client.post('/api/v1/user/preferences/preview', json=answers).json() == preview
+    assert client.get('/api/recommendations?mode=trending').json()

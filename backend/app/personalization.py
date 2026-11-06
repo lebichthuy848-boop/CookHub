@@ -54,21 +54,6 @@ def conflicts_with_avoid(dish, avoid):
                for tag in selected for term in AVOID_INGREDIENTS.get(tag, ()))
 
 
-def within_budget(dish, budget):
-    limit = {'saving': 50000, 'normal': 150000}.get(budget)
-    if limit is None:
-        return True
-    cost = dish.get('cost')
-    if cost is None:
-        # Missing ingredient prices do not prove a dish exceeds the budget.
-        # Keep it eligible; the API leaves cost as null instead of presenting
-        # an unverified estimate.
-        return True
-    servings = (dish.get('recipe') or {}).get('servings') or 1
-    per_serving = cost / servings
-    return per_serving < limit if budget == 'saving' else per_serving <= limit
-
-
 def matches(text, tag):
     # Compare complete words and phrases, preserving accents.
     return any(' ' + word + ' ' in ' ' + text + ' ' for word in WORDS.get(tag, []))
@@ -86,14 +71,14 @@ def load_preferences(db, user_id):
     answers = json.loads(row.answers)
     if not isinstance(answers, dict):
         return None
-    keys = ('ingredients', 'occasions', 'tastes', 'time', 'tools', 'avoid', 'budget')
+    keys = ('ingredients', 'occasions', 'tastes', 'time', 'tools', 'avoid', 'method')
     return answers if any(answers.get(key) for key in keys) else None
 
 
 def rank_dishes(db, user_id, answers):
     if answers:
-        answers = {key: answers.get(key, '' if key in {'time', 'budget'} else [])
-                   for key in ('ingredients', 'occasions', 'tastes', 'time', 'tools', 'avoid', 'budget')}
+        answers = {key: answers.get(key, '' if key in {'time', 'method'} else [])
+                   for key in ('ingredients', 'occasions', 'tastes', 'time', 'tools', 'avoid', 'method')}
     selected_diets = set(answers['occasions']) & DIET_NAMES.keys() if answers else set()
     hidden = set(db.scalars(select(m.MonKhongThich.maMonAn).where(m.MonKhongThich.maNguoiDung == user_id)))
     tastes = {x.maKhauVi: x.tenKhauVi or '' for x in db.scalars(select(m.KhauVi))}
@@ -103,8 +88,7 @@ def rank_dishes(db, user_id, answers):
     result = []
     for dish in dish_data(db):
         if (dish['id'] in hidden or not dish['recipe'] or
-                (answers and (conflicts_with_avoid(dish, answers['avoid']) or
-                              not within_budget(dish, answers['budget']))) or
+                (answers and conflicts_with_avoid(dish, answers['avoid'])) or
                 (selected_diets and not any(matches_diet(dish, tag) for tag in selected_diets))):
             continue
         if not answers:
@@ -125,9 +109,13 @@ def rank_dishes(db, user_id, answers):
         minutes = dish['time']
         hits += [bool(answers['time']) and minutes > 0 and (minutes < 15 if answers['time'] == 'quick' else 15 <= minutes <= 30 if answers['time'] == 'medium' else minutes > 45)]
         hits += [any(matches(text, tag) for tag in answers['tools'])]
-        labels = ['Món bạn thích ăn', 'Bối cảnh / chế độ ăn', 'Khẩu vị', 'Thời gian nấu', 'Dụng cụ (suy luận từ công thức)']
-        weights = [30, 20, 20, 20, 10]
-        active = [bool(answers[k]) for k in ['ingredients', 'occasions', 'tastes', 'time', 'tools']]
+        method_terms = {'stir_fry': ('xào', 'áp chảo'), 'steam': ('hấp', 'luộc'),
+                        'grill': ('nướng',), 'stew': ('hầm', 'kho')}
+        method = answers['method']
+        hits += [bool(method) and any(term in text for term in method_terms.get(method, ()))]
+        labels = ['Món bạn thích ăn', 'Bối cảnh / chế độ ăn', 'Khẩu vị', 'Thời gian nấu', 'Dụng cụ (suy luận từ công thức)', 'Cách chế biến']
+        weights = [30, 20, 20, 20, 10, 10]
+        active = [bool(answers[k]) for k in ['ingredients', 'occasions', 'tastes', 'time', 'tools', 'method']]
         total = sum(w for w, used in zip(weights, active) if used)
         score = round(100 * sum(weight for weight, hit in zip(weights, hits) if hit) / total) if total else 0
         result.append({**dish, 'match_percent': score, 'match_reasons': [label for label, hit in zip(labels, hits) if hit]})

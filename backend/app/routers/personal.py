@@ -118,12 +118,10 @@ def delete_favorite_collection(collection_id: str, user=Depends(current_user), d
 def profile(user=Depends(current_user), db: Session = Depends(get_db)):
     preferences = db.get(m.UserPreferences, user.maNguoiDung)
     preference_data = json.loads(preferences.answers) if preferences and preferences.answers else {}
-    budget = db.scalar(select(m.NganSachAnUong).where(m.NganSachAnUong.maNguoiDung == user.maNguoiDung)
-                       .order_by(m.NganSachAnUong.ngayBatDau.desc()).limit(1))
     diets = db.scalars(select(m.CheDoAn.tenCheDoAn).join(m.CheDoAnNguoiDung,
         m.CheDoAn.maCheDoAn == m.CheDoAnNguoiDung.maCheDoAn)
         .where(m.CheDoAnNguoiDung.maNguoiDung == user.maNguoiDung)).all()
-    return {**public_user(user), 'avatar': preference_data.get('avatar', ''), 'budget': float(budget.mucNganSach or 0) if budget else 0, 'diets': diets}
+    return {**public_user(user), 'avatar': preference_data.get('avatar', ''), 'diets': diets}
 
 @router.put('/profile')
 def update_profile(data: s.Profile, user=Depends(current_user), db: Session = Depends(get_db)):

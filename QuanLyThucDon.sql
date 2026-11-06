@@ -10121,56 +10121,6 @@ BEGIN
 END
 GO
 
-/* Cập nhật công thức Bánh bao đào tiên theo nội dung mới.
-   Khối thực thi nằm ở cuối file, sau khi dữ liệu CT209 đã được tạo. */
-IF 1=0 BEGIN
-USE QuanLyThucDon;
-GO
-SET XACT_ABORT ON;
-BEGIN TRANSACTION;
-
-UPDATE dbo.MonAn
-SET MoTa=N'Bánh bao đào tiên vừa lạ mắt vừa lạ miệng. Chắc chắn cả nhà, đặc biệt là các bé sẽ vô cùng thích thú với món ăn dễ thương này, cùng vào bếp ngay nhé!',
-    ThoiGianChuanBi=120,
-    ThoiGianCheBien=20,
-    DoKho=N'Trung bình'
-WHERE MaMonAn=N'MA209';
-
-UPDATE dbo.CongThuc
-SET MoTa=N'Bánh bao đào tiên vừa lạ mắt vừa lạ miệng. Chắc chắn cả nhà, đặc biệt là các bé sẽ vô cùng thích thú với món ăn dễ thương này, cùng vào bếp ngay nhé!',
-    SoKhauPhanChuan=8
-WHERE MaCongThuc=N'CT209';
-
-DELETE FROM dbo.BuocCheBien WHERE MaCongThuc=N'CT209';
-DELETE FROM dbo.ThanhPhanCongThuc WHERE MaCongThuc=N'CT209';
-
-INSERT dbo.ThanhPhanCongThuc(MaThanhPhan,MaCongThuc,MaNguyenLieu,MaDonVi,SoLuong)
-SELECT CONCAT(N'TP209',RIGHT(N'00'+CONVERT(NVARCHAR(2),ROW_NUMBER() OVER(ORDER BY v.STT)),2)),N'CT209',nl.MaNguyenLieu,v.MaDonVi,v.SoLuong
-FROM (VALUES
- (1,N'Lòng đỏ trứng gà',N'DVT005',2.000),(2,N'Bột bắp',N'DVT001',20.000),
- (3,N'Nước cốt dừa',N'DVT003',70.000),(4,N'Vani',N'DVT007',0.500),
- (5,N'Bơ lạt',N'DVT001',20.000),(6,N'Sữa tươi',N'DVT003',80.000),
- (7,N'Bột mì số 8',N'DVT001',270.000),(8,N'Sữa tươi không đường',N'DVT003',25.000),
- (9,N'Men nở',N'DVT001',3.000),(10,N'Đường',N'DVT001',45.000),
- (11,N'Muối',N'DVT007',0.500),(12,N'Bột nở',N'DVT001',4.000),
- (13,N'Whipping cream',N'DVT001',65.000),(14,N'Lòng trắng trứng',N'DVT005',1.000),
- (15,N'Tangzhong',N'DVT001',90.000),(16,N'Củ dền',N'DVT005',0.500),
- (17,N'Muối',N'DVT001',2.000),(18,N'Đường',N'DVT001',30.000),
- (19,N'Sữa tươi',N'DVT003',50.000)
-) v(STT,TenNguyenLieu,MaDonVi,SoLuong)
-JOIN dbo.NguyenLieu nl ON nl.TenNguyenLieu=v.TenNguyenLieu;
-
-INSERT dbo.BuocCheBien(MaBuoc,MaCongThuc,ThuTu,NoiDung,ThoiGianThucHien)
-VALUES
-(N'BCB20901',N'CT209',1,N'Làm nhân bánh: đánh 2 lòng đỏ trứng với 30gr đường, thêm 80ml sữa tươi, 70ml nước cốt dừa và 20gr bột bắp. Sên đến khi sệt, thêm vani, muối và bơ lạt; để nguội rồi chia 16 phần.',NULL),
-(N'BCB20902',N'CT209',2,N'Làm vỏ bánh: nấu Tangzhong từ 30ml nước, 50ml sữa tươi và 20gr bột mì. Kích hoạt men với 25ml sữa ấm, sau đó nhào cùng bột mì, đường, muối, bột nở, whipping cream, lòng trắng trứng và Tangzhong. Ủ bột 2 giờ, chia 16 phần.',NULL),
-(N'BCB20903',N'CT209',3,N'Cán từng viên bột, cho nhân vào, gói tạo hình núm bánh bao; dùng dao sẻ dọc từ núm xuống thành hình đào tiên. Dùng củ dền chấm màu lên đầu bánh và lót giấy.',NULL),
-(N'BCB20904',N'CT209',4,N'Cho bánh vào nồi hấp hoặc xửng hấp của nồi cơm điện, hấp khoảng 20 phút.',20),
-(N'BCB20905',N'CT209',5,N'Bánh bao đào tiên có vỏ mềm mịn, bông xốp, tạo hình đẹp mắt và thơm ngon.',NULL);
-
-COMMIT TRANSACTION;
-END;
-GO
 -- Thêm cột LoaiDanhMuc nếu chưa có trong bảng DanhMucMonAn
 IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'dbo.DanhMucMonAn') AND name = N'LoaiDanhMuc')
 BEGIN
@@ -21477,6 +21427,11 @@ BEGIN TRY
 
     IF @MaDanhMuc IS NULL
         THROW 51202, N'Không tìm thấy danh mục Món gỏi - salad.', 1;
+
+    -- Nguyên liệu này được CT932 tham chiếu nhưng chưa có trong bộ dữ liệu gốc.
+    IF NOT EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu = N'NL1179')
+        INSERT dbo.NguyenLieu (MaNguyenLieu, TenNguyenLieu, MoTa)
+        VALUES (N'NL1179', N'Bạch tuộc', N'Bạch tuộc tươi.');
 
     INSERT dbo.MonAn
     (
