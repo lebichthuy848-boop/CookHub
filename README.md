@@ -41,6 +41,10 @@ Nếu mật khẩu chứa ký tự đặc biệt, mã hóa URL cho phần user/p
 
 `git pull` chỉ cập nhật code, không tự thay đổi database. `QuanLyThucDon.sql` dành cho cài mới và không chạy trên database đã tồn tại. Hãy sao lưu dữ liệu cũ trước khi tạo lại database; branch này chưa cung cấp script nâng cấp riêng để giữ dữ liệu người dùng.
 
+## Khảo sát gợi ý món
+
+Thiết kế, nguồn tham khảo và giới hạn dữ liệu của khảo sát 10 câu được ghi tại [docs/survey-sources.md](docs/survey-sources.md).
+
 ## Cloudinary và ảnh
 
 Hai file [manifest backend](backend/app/cloudinary_images.json) và [manifest frontend](frontend/src/cloudinary-images.json) phải có trong commit khi push. Chúng chứa URL ảnh công khai, không chứa API secret. Ảnh các món bổ sung được ghi trực tiếp bằng URL Cloudinary trong SQL. Người clone **xem được ảnh mà không cần khóa Cloudinary**.

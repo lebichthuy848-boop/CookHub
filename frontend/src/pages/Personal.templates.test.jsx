@@ -1,43 +1,20 @@
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 import { Menu } from './Personal';
 
-const mocks = vi.hoisted(() => ({ api: vi.fn() }));
 vi.mock('../api', () => ({
-  api: mocks.api,
+  api: vi.fn(),
   today: () => '2026-10-23',
   media: path => path,
-  money: value => String(value),
 }));
-vi.mock('../hooks', () => ({ useApi: path => ({
-  loading: false,
-  error: null,
-  reload: vi.fn(),
-  data: path === '/dishes' ? [
-    { id: 'MA062', name: 'Cá hồi sốt mật ong chanh', image: 'salmon.jpg' },
-    { id: 'MA064', name: 'Gà sốt cam', image: 'chicken.jpg' },
-    { id: 'MA104', name: 'Canh chua cá lóc', image: 'soup.jpg' },
-    { id: 'MA061', name: 'Bò xào nấm', image: 'beef.jpg' },
-  ] : [],
-}) }));
-afterEach(() => { cleanup(); mocks.api.mockClear(); });
+vi.mock('../hooks', () => ({ useApi: () => ({ loading: false, error: null, reload: vi.fn(), data: [] }) }));
+afterEach(cleanup);
 
-it('opens the exact seven-day template schedule without adding dishes', () => {
-  render(<MemoryRouter><Menu/></MemoryRouter>);
-  fireEvent.click(screen.getByRole('button', { name: /Bộ sưu tập thực đơn mẫu/ }));
-  fireEvent.click(screen.getAllByRole('button', { name: 'Xem chi tiết' })[0]);
-  const dialog = screen.getByRole('dialog', { name: /Clean Eating 7 ngày thanh lọc/ });
-  expect(dialog.querySelectorAll('.template-preview-day')).toHaveLength(7);
-  expect(dialog.querySelectorAll('.template-preview-meal')).toHaveLength(21);
-  expect(within(dialog).getAllByText('Cá hồi sốt mật ong chanh').length).toBeGreaterThan(0);
-  expect(mocks.api).not.toHaveBeenCalled();
-  fireEvent.click(within(dialog).getByRole('button', { name: 'Đóng chi tiết thực đơn' }));
-  expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-});
-
-it('opens the Clean Eating template from the home page link', () => {
+it('shows only schedule and history, including for an old template link', () => {
   render(<MemoryRouter initialEntries={['/menu?tab=templates&template=clean']}><Menu/></MemoryRouter>);
-  expect(screen.getByRole('dialog', { name: /Clean Eating 7 ngày thanh lọc/ })).toBeInTheDocument();
-  expect(mocks.api).not.toHaveBeenCalled();
+  expect(screen.getByRole('button', { name: /Lịch trình tuần này/ })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /Lịch sử thực đơn/ })).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: /Bộ sưu tập thực đơn mẫu/ })).not.toBeInTheDocument();
+  expect(screen.queryByText('Clean Eating 7 ngày thanh lọc')).not.toBeInTheDocument();
 });

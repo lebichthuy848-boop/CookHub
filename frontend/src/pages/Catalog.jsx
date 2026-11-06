@@ -109,7 +109,6 @@ const collectionData = [
 
   ['⚡', 'Món ăn dưới 15 phút', 'Nhanh gọn mà vẫn trọn vị', 'banh-mi-trung-op-la.jpg', '/search?max_time=15'],
 
-  ['🥬', 'Thực đơn Eat Clean', 'Xem kế hoạch 7 ngày và các món trong thực đơn', 'salad-uc-ga.jpg', '/menu?tab=templates&template=clean'],
 
   ['🍲', 'Món canh ấm bụng', 'Khám phá những món canh đang có công thức', 'canh-chua-ca-loc.jpg', '/search?topic=warm_soup'],
 
@@ -135,7 +134,7 @@ export function HomeDashboard({ dishes, favorites, favoriteCounts = {}, onFavori
 
     <section className="home-section"><div className="home-heading"><div><h2>Gợi ý dành cho bạn</h2></div><Link to="/suggest">Xem tất cả →</Link></div><div className="home-carousel">{dishes.slice(0, 7).map((dish, index) => <article className="home-dish" style={{ animationDelay: `-${index * .55}s` }} key={dish.id}><Link to={'/dish/' + dish.id}><img src={media(dish.image)} alt={dish.name}/><h3>{dish.name}</h3><small>{dish.time} phút · {dish.category}</small></Link><button className={favorites.includes(dish.id) ? 'selected' : ''} onClick={() => onFavorite(dish.id)}>{favorites.includes(dish.id) ? '♥' : '♡'}</button></article>)}</div></section>
 
-    <section className="home-section"><div className="home-heading"><div><small>CHỦ ĐỀ ĐƯỢC YÊU THÍCH</small><h2>Bộ sưu tập nổi bật</h2></div></div><div className="collection-grid">{collectionData.map(([icon, title, text, image, destination], index) => <Link to={destination} className={'collection-card c' + index} key={title} style={{ backgroundImage: `linear-gradient(120deg,rgba(12,56,40,.76),rgba(12,56,40,.16)),url(${media('images/mon-an/'+image)})` }}><i>{icon}</i><div><h3>{title}</h3><p>{text}</p><span>Khám phá →</span></div></Link>)}</div></section>
+    <section className="home-section"><div className="home-heading"><div><small>CHỦ ĐỀ ĐƯỢC YÊU THÍCH</small><h2>Chủ đề khám phá</h2></div></div><div className="collection-grid">{collectionData.map(([icon, title, text, image, destination], index) => <Link to={destination} className={'collection-card c' + index} key={title} style={{ backgroundImage: `linear-gradient(120deg,rgba(12,56,40,.76),rgba(12,56,40,.16)),url(${media('images/mon-an/'+image)})` }}><i>{icon}</i><div><h3>{title}</h3><p>{text}</p><span>Khám phá →</span></div></Link>)}</div></section>
 
     <section className="home-section community-section"><div className="home-heading"><div><small>COOKHUB COMMUNITY</small><h2>Đầu bếp cộng đồng</h2></div><Link to="/foods">Khám phá món ăn →</Link></div><div className="community-feed">{dishes.slice(3, 7).map(dish => <Link to={'/dish/' + dish.id} key={dish.id}><img src={media(dish.image)} alt=""/><div><small>Đầu bếp CookHub · vừa chia sẻ</small><b>{dish.name}</b><span>♥ {favoriteCounts[dish.id] ?? dish.favorite_count ?? 0} yêu thích</span></div><i>↗</i></Link>)}</div></section>
 
