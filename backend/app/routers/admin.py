@@ -19,6 +19,57 @@ from .auth import by_email
 router = APIRouter(prefix='/admin', tags=['Administration'])
 logger = logging.getLogger(__name__)
 
+@router.get('/nutrition')
+def admin_nutrition(user=Depends(content_user), db: Session = Depends(get_db)):
+    nutrients = {x.maNguyenLieu: x for x in rows(db, m.ThongTinDinhDuong)}
+    conversions = {(x.maNguyenLieu, x.maDonVi): x for x in rows(db, m.QuyDoiDonViNguyenLieu)}
+    units = {x.maDonVi: x for x in rows(db, m.DonViTinh)}
+    result = []
+    for ingredient in rows(db, m.NguyenLieu):
+        nutrition = nutrients.get(ingredient.maNguyenLieu)
+        conversion = next((x for (ingredient_id, _), x in conversions.items() if ingredient_id == ingredient.maNguyenLieu), None)
+        result.append({
+            'id': ingredient.maNguyenLieu,
+            'name': ingredient.tenNguyenLieu,
+            'nutrition_id': nutrition.maThongTin if nutrition else None,
+            'standard_weight': float(nutrition.khoiLuongChuan) if nutrition and nutrition.khoiLuongChuan is not None else None,
+            'standard_unit_id': nutrition.maDonVi if nutrition else None,
+            'energy': float(nutrition.nangLuong) if nutrition and nutrition.nangLuong is not None else None,
+            'protein': float(nutrition.chatDam) if nutrition and nutrition.chatDam is not None else None,
+            'carbs': float(nutrition.chatBotDuong) if nutrition and nutrition.chatBotDuong is not None else None,
+            'fat': float(nutrition.chatBeo) if nutrition and nutrition.chatBeo is not None else None,
+            'fiber': float(nutrition.chatXo) if nutrition and nutrition.chatXo is not None else None,
+            'sodium': float(nutrition.natri) if nutrition and nutrition.natri is not None else None,
+            'conversion': {'unit_id': conversion.maDonVi, 'grams': float(conversion.khoiLuongQuyDoiGram) if conversion.khoiLuongQuyDoiGram is not None else None} if conversion else None,
+            'unit': units.get(nutrition.maDonVi).kyHieu if nutrition and units.get(nutrition.maDonVi) else None,
+        })
+    return result
+
+@router.put('/nutrition/{ingredient_id}')
+def save_nutrition(ingredient_id: str, data: s.Nutrition, user=Depends(content_user), db: Session = Depends(get_db)):
+    if data.ingredient_id != ingredient_id:
+        raise HTTPException(422, 'Mã nguyên liệu không khớp.')
+    require(db, m.NguyenLieu, ingredient_id)
+    require(db, m.DonViTinh, data.unit_id)
+    row = db.scalar(select(m.ThongTinDinhDuong).where(m.ThongTinDinhDuong.maNguyenLieu == ingredient_id))
+    if row is None:
+        row = m.ThongTinDinhDuong(maThongTin=allocate_code(db, 'ThongTinDinhDuong', 'DD'), maNguyenLieu=ingredient_id)
+    row.khoiLuongChuan = data.standard_weight
+    row.maDonVi = data.unit_id
+    row.nangLuong = data.energy
+    row.chatDam = data.protein
+    row.chatBotDuong = data.carbs
+    row.chatBeo = data.fat
+    row.chatXo = data.fiber
+    row.natri = data.sodium
+    db.add(row)
+    try:
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(409, 'Không thể lưu dinh dưỡng. Kiểm tra các chỉ số bắt buộc và mã nguyên liệu.') from exc
+    return {'id': row.maThongTin, 'ingredient_id': ingredient_id}
+
 @router.get('/system-health')
 def system_health(user=Depends(system_user), db: Session = Depends(get_db)):
     checked_at = datetime.now().astimezone().isoformat(timespec='seconds')
@@ -46,7 +97,8 @@ def admin_dishes(user=Depends(roles('Quản trị nội dung', 'Quản trị h�
     categories = {row.maDanhMuc: row.tenDanhMuc for row in rows(db, m.DanhMucMonAn)}
     return [dict(id=row.maMonAn, name=row.tenMonAn, category_id=row.maDanhMuc,
                  category=categories.get(row.maDanhMuc, ''), description=row.moTa or '',
-                 time=row.thoiGianCheBien or 0, image=row.duongDanAnh or '')
+                 prep_time=row.thoiGianChuanBi or 0, time=row.thoiGianCheBien or 0,
+                 image=row.duongDanAnh or '')
             for row in rows(db, m.MonAn)]
 
 @router.get('/categories')
@@ -217,13 +269,15 @@ def create_category(data: s.Category, user=Depends(content_user), db: Session = 
         existing.tenDanhMuc, existing.moTa = name, data.description
         db.commit()
         return {'id': existing.maDanhMuc}
-    # The code counter can lag behind after an import/migration. Pick an
-    # unused key and retry a few times instead of surfacing a generic
-    # duplicate/foreign-key error to the user.
+    # Reuse the smallest unused numeric code.  MaDanhMuc is a business key
+    # (not an IDENTITY column), so deleting DM001 should make DM001 available
+    # again instead of permanently advancing the sequence.
     existing_keys = [row.maDanhMuc for row in db.scalars(select(m.DanhMucMonAn))]
-    numbers = [int(key[2:]) for key in existing_keys
-               if isinstance(key, str) and key.startswith('DM') and key[2:].isdigit()]
-    next_number = max(numbers or [0]) + 1
+    used_numbers = {int(key[2:]) for key in existing_keys
+                    if isinstance(key, str) and key.startswith('DM') and key[2:].isdigit()}
+    next_number = 1
+    while next_number in used_numbers:
+        next_number += 1
     for _ in range(5):
         key = 'DM' + str(next_number).zfill(3)
         next_number += 1
@@ -266,7 +320,7 @@ def store_dish(db, data, key=None):
     image = validate_media(data.image)
     row = require(db, m.MonAn, key) if key else m.MonAn(maMonAn=allocate_code(db, 'MonAn', 'MA'))
     row.tenMonAn, row.maDanhMuc, row.moTa = data.name, data.category_id, data.description
-    row.thoiGianCheBien, row.doKho, row.duongDanAnh = data.time, data.difficulty, image
+    row.thoiGianChuanBi, row.thoiGianCheBien, row.doKho, row.duongDanAnh = data.prep_time, data.time, data.difficulty, image
     db.add(row)
     db.flush()
     db.commit()

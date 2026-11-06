@@ -306,3 +306,31 @@ main:has(.menu-page){max-width:none;padding-right:38px;padding-left:38px}.menu-p
 .recipe-time-badges i{font-style:normal;font-size:15px}
 .recipe-info-badges{gap:7px}
 .recipe-info-badges span{padding:6px 9px;font-size:10px}
+
+/* Keep the logout confirmation above the mobile navigation drawer. */
+.logout-confirm-backdrop{z-index:1500!important}
+.interactive-ingredients li>span{grid-row:1 / span 3}
+.interactive-ingredients li>.ingredient-check{grid-row:1 / span 3}
+.interactive-ingredients li>b{grid-column:3;grid-row:1}
+.interactive-ingredients li .ingredient-approx{grid-column:3;grid-row:2;align-self:start;margin-top:0;color:#7f6a2a;font-size:10px;font-weight:700;white-space:nowrap;line-height:1.1;text-align:right}
+.interactive-ingredients li .ingredient-kcal{grid-column:3;grid-row:3;align-self:start;margin-top:0}
+
+/* Keep quantity and estimated grams on one row, with kcal on the second row. */
+.interactive-ingredients li .ingredient-quantity{grid-column:3;grid-row:1;display:flex;align-items:baseline;justify-content:flex-end;gap:5px;min-width:0;white-space:nowrap}
+.interactive-ingredients li .ingredient-quantity>b{grid-column:auto;grid-row:auto;align-self:baseline;margin:0;white-space:nowrap}
+.interactive-ingredients li .ingredient-quantity .ingredient-approx{grid-column:auto;grid-row:auto;align-self:baseline;margin:0;color:#7f6a2a;font-size:10px;font-weight:700;white-space:nowrap;line-height:1.1}
+.interactive-ingredients li .ingredient-kcal{grid-column:3;grid-row:2;align-self:start;margin-top:0;white-space:nowrap;line-height:1.1}
+.interactive-ingredients li{
+  grid-template-columns:28px minmax(0,1fr) minmax(150px,auto);
+  grid-template-rows:auto auto;
+  align-items:center;
+}
+.interactive-ingredients li>.ingredient-check{grid-column:1;grid-row:1 / span 2;align-self:center}
+.interactive-ingredients li>span:not(.ingredient-quantity):not(.ingredient-kcal){grid-column:2;grid-row:1 / span 2;align-self:center;white-space:pre-line}
+.interactive-ingredients li>.ingredient-quantity{grid-column:3;grid-row:1;display:flex;align-items:baseline;justify-content:flex-end;gap:5px;white-space:nowrap}
+.interactive-ingredients li>.ingredient-quantity>b{margin:0;white-space:nowrap}
+.interactive-ingredients li>.ingredient-quantity .ingredient-approx{margin:0;color:#7f6a2a;font-size:10px;font-weight:700;line-height:1.1;white-space:nowrap}
+.interactive-ingredients li>.ingredient-kcal{grid-column:3;grid-row:2;justify-self:end;margin:2px 0 0;line-height:1.1;white-space:nowrap}
+@media(max-width:600px){
+  .interactive-ingredients li{grid-template-columns:25px minmax(0,1fr) minmax(120px,auto)}
+}

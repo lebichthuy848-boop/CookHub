@@ -146,12 +146,23 @@ def validate_media(path, kind='image'):
 def recipe_data(db):
     ingredients = {x.maNguyenLieu: x for x in rows(db, m.NguyenLieu)}
     units = {x.maDonVi: x for x in rows(db, m.DonViTinh)}
+    conversions = {
+        (x.maNguyenLieu, x.maDonVi): float(x.khoiLuongQuyDoiGram)
+        for x in rows(db, m.QuyDoiDonViNguyenLieu)
+        if x.khoiLuongQuyDoiGram is not None
+    }
+    unit_grams = {
+        x.maDonVi: float(x.heSoGramChuan)
+        for x in units.values()
+        if x.heSoGramChuan is not None
+    }
     components, steps, videos = {}, {}, {}
     for x in rows(db, m.ThanhPhanCongThuc):
         recipe_key = (x.maCongThuc or '').strip().upper()
         components.setdefault(recipe_key, []).append(dict(
             name=(ingredients[x.maNguyenLieu].tenNguyenLieu + ('\n' + (ingredients[x.maNguyenLieu].moTa or '').strip() if (ingredients[x.maNguyenLieu].moTa or '').strip().startswith('(') else '')), note=((ingredients[x.maNguyenLieu].moTa or '').strip() if (ingredients[x.maNguyenLieu].moTa or '').strip().startswith('(') else ''), ingredient_id=x.maNguyenLieu,
-            quantity=float(x.soLuong or 0), unit_id=x.maDonVi, unit=units[x.maDonVi].kyHieu))
+            quantity=float(x.soLuong or 0), unit_id=x.maDonVi, unit=units[x.maDonVi].kyHieu,
+            grams_per_unit=conversions.get((x.maNguyenLieu, x.maDonVi), unit_grams.get(x.maDonVi))))
     for x in sorted(rows(db, m.BuocCheBien), key=lambda x: x.thuTu or 0):
         recipe_key = (x.maCongThuc or '').strip().upper()
         steps.setdefault(recipe_key, []).append(x.noiDung)
@@ -188,11 +199,13 @@ def dish_data(db):
             prices[x.maNguyenLieu] = x
     units = {x.maDonVi: x for x in rows(db, m.DonViTinh)}
     conversions = {(x.maNguyenLieu, x.maDonVi): float(x.khoiLuongQuyDoiGram)
-                   for x in rows(db, m.QuyDoiDonViNguyenLieu)}
+                   for x in rows(db, m.QuyDoiDonViNguyenLieu)
+                   if x.khoiLuongQuyDoiGram is not None}
 
     def unit_grams(ingredient_id, unit_id):
         unit = units[unit_id]
-        return conversions.get((ingredient_id, unit_id)) or float(unit.heSoGramChuan or 0)
+        specific = conversions.get((ingredient_id, unit_id))
+        return specific if specific is not None else float(unit.heSoGramChuan or 0)
 
     def recipe_cost(recipe):
         if not recipe or not recipe['ingredients']:
@@ -260,10 +273,32 @@ def save_recipe(db, data, recipe_id=None, commit=True):
     for model in (m.ThanhPhanCongThuc, m.BuocCheBien):
         db.execute(delete(model).where(model.maCongThuc == record.maCongThuc))
     for item in data.ingredients:
-        require(db, m.DonViTinh, item.unit_id)
-        ingredient = resolve_ingredient(db, item.name)
+        ingredient = require(db, m.NguyenLieu, item.ingredient_id) if item.ingredient_id else resolve_ingredient(db, item.name)
+        unit_id = item.unit_id
+        if item.custom_unit:
+            custom = ' '.join(item.custom_unit.strip().split())
+            unit = next((x for x in rows(db, m.DonViTinh)
+                         if (x.kyHieu or '').strip().casefold() == custom.casefold()), None)
+            if unit is None:
+                unit_id = allocate_code(db, 'DonViTinh', 'DV')
+                unit = m.DonViTinh(maDonVi=unit_id, tenDonVi=custom, kyHieu=custom,
+                                   heSoGramChuan=item.grams_per_unit)
+                db.add(unit)
+                db.flush()
+            else:
+                unit_id = unit.maDonVi
+        else:
+            require(db, m.DonViTinh, unit_id)
+        conversion = next((x for x in rows(db, m.QuyDoiDonViNguyenLieu)
+                           if x.maNguyenLieu == ingredient.maNguyenLieu and x.maDonVi == unit_id), None)
+        if conversion is None:
+            db.add(m.QuyDoiDonViNguyenLieu(maQuyDoi=allocate_code(db, 'QuyDoiDonViNguyenLieu', 'QD'),
+                   maNguyenLieu=ingredient.maNguyenLieu, maDonVi=unit_id,
+                   khoiLuongQuyDoiGram=item.grams_per_unit))
+        else:
+            conversion.khoiLuongQuyDoiGram = item.grams_per_unit
         db.add(m.ThanhPhanCongThuc(maThanhPhan=allocate_code(db, 'ThanhPhanCongThuc', 'TP'), maCongThuc=record.maCongThuc,
-               maNguyenLieu=ingredient.maNguyenLieu, maDonVi=item.unit_id, soLuong=item.quantity))
+               maNguyenLieu=ingredient.maNguyenLieu, maDonVi=unit_id, soLuong=item.quantity))
     for order, text in enumerate(data.steps, 1):
         if not text.strip():
             raise HTTPException(422, 'Bước chế biến không được để trống.')

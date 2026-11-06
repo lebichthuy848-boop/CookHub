@@ -39,7 +39,7 @@ export default function App() {
       <Route path="/profile" element={<Profile/>}/><Route path="/settings" element={<AccountSettings/>}/><Route path="/system-settings" element={<Settings/>}/>
       <Route element={<Guard roles={['Quản trị nội dung']}/>}> 
         <Route path="/content" element={<Dashboard/>}/>
-        {['categories','dishes','recipes','videos','reviews'].map(kind=><Route key={kind} path={'/'+kind} element={<Admin kind={kind} key={kind}/>}/>)}
+        {['categories','dishes','recipes','nutrition','videos','reviews'].map(kind=><Route key={kind} path={'/'+kind} element={<Admin kind={kind} key={kind}/>}/>)}
       </Route>
     </Route></Route>
     <Route element={<Guard roles={['Quản trị hệ thống']}/>}>

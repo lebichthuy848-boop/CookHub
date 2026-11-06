@@ -7,6 +7,8 @@
 .studio-table-actions{display:flex;align-items:center;gap:6px}.studio-table-actions input{accent-color:#0b8a61}.studio-table-actions button{min-width:30px}.studio-table-actions button:last-child{padding-inline:9px}
 .studio-card-cover:after{display:none!important;content:none!important}
 .studio-editor-drawer .drawer-close{display:none}
+.studio-editor-drawer{width:min(50vw,980px);min-width:720px;padding:34px 38px}.studio-editor-drawer .editor{width:100%;box-sizing:border-box}.studio-editor-drawer .recipe-input-table{overflow-x:auto}.studio-editor-drawer .recipe-input-head,.studio-editor-drawer .recipe-input-row{min-width:760px}
+@media(max-width:900px){.studio-editor-drawer{width:min(92vw,760px);min-width:0;padding:24px 20px}}
 .studio-table-actions{justify-content:center;white-space:nowrap}.studio-table-actions button{width:36px;height:36px;min-width:36px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:10px;transition:.18s}.studio-action-icon{width:16px;height:16px}.studio-table-actions button:hover{transform:translateY(-2px);background:#ecfdf5;color:#059669;border-color:#34d399}.studio-table-actions button:nth-of-type(2):hover{background:#eff6ff;color:#2563eb;border-color:#60a5fa}.studio-table-actions button:nth-of-type(3):hover{background:#fffbeb;color:#d97706;border-color:#fbbf24}.studio-table-actions button:active{transform:scale(.94)}
 .studio-select-cell{width:54px;text-align:center}.studio-select-cell input{width:16px;height:16px;accent-color:#0b8a61}
 .studio-table th:last-child,.studio-table td:last-child{text-align:center}.studio-table th:first-child,.studio-table td:first-child{text-align:center}
@@ -36,3 +38,50 @@
 
 /* Custom CMS status dropdown */
 .studio-status-menu{position:relative;flex:0 0 170px;z-index:15}.studio-status-menu>button{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:42px;padding:12px 14px;border:1px solid #d5e5da;border-radius:13px;background:#fff;color:#315d4c;font-weight:600;cursor:pointer}.studio-status-menu>button i{width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);transition:transform .25s}.studio-status-menu.open>button{border-color:#39a978;box-shadow:0 0 0 4px #39a9781c}.studio-status-menu.open>button i{transform:rotate(225deg) translate(-1px,-1px)}.studio-status-menu>div{position:absolute;top:calc(100% + 7px);left:0;width:100%;padding:6px;border:1px solid #cfe3d6;border-radius:12px;background:#fff;box-shadow:0 16px 34px #143c2c26;animation:studio-status-menu-in .2s ease-out}.studio-status-menu>div button{display:flex;align-items:center;justify-content:space-between;width:100%;padding:10px 11px;border:0;border-radius:8px;background:transparent;color:#315d4d;text-align:left;cursor:pointer}.studio-status-menu>div button:hover{background:#f0f8f3;color:#145d43}.studio-status-menu>div button.selected{background:#e5f6eb;color:#145d43;font-weight:800}.studio-status-menu>div button b{color:#16825c}@keyframes studio-status-menu-in{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+.nutrition-studio .nutrition-toolbar{display:flex;align-items:stretch;gap:12px;flex-wrap:wrap}
+.nutrition-studio .nutrition-toolbar .studio-search{flex:1 1 280px;min-width:240px}
+.nutrition-filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nutrition-filter{display:inline-flex;align-items:center;gap:8px;justify-content:center;min-height:48px;padding:10px 13px;border:1px solid #cee2d5;border-radius:12px;background:#fff;color:#285d49;font-weight:700;cursor:pointer;white-space:nowrap}
+.nutrition-filter span{padding:2px 7px;border-radius:99px;background:#e5f4ea;font-size:12px}
+.nutrition-filter.active{background:#087d5b;border-color:#087d5b;color:#fff}
+.nutrition-filter.active span{background:#ffffff30;color:#fff}
+.nutrition-studio .nutrition-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px}
+.nutrition-studio .nutrition-card{min-width:0;overflow:hidden;padding:0}
+.nutrition-studio .nutrition-card .studio-card-body{min-width:0;height:100%;padding:16px;display:flex;flex-direction:column}
+.nutrition-card-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.nutrition-card-heading small{min-width:0;overflow-wrap:anywhere}
+.nutrition-status{flex:none;padding:4px 8px;border-radius:99px;font-size:11px;font-weight:700;background:#e6f5eb;color:#147553}
+.nutrition-status.partial{background:#fff2d8;color:#916314}
+.nutrition-status.none{background:#fce7e7;color:#a34949}
+.nutrition-studio .nutrition-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%;margin:12px 0 16px}
+.nutrition-studio .nutrition-metrics span{min-width:0;padding:10px 8px;overflow-wrap:anywhere}
+.nutrition-studio .nutrition-metrics b{display:block;font-size:16px;line-height:1.25}
+.nutrition-studio .nutrition-metrics .missing{background:#f7f8f6;color:#79877d}
+.nutrition-studio .nutrition-card .studio-card-body>button{align-self:flex-start;margin-top:auto}
+.nutrition-empty{padding:22px;text-align:center;color:#617c6d}
+.recipe-ingredient-picker{display:grid;gap:6px;min-width:0}
+.recipe-ingredient-picker input{width:100%;min-width:0}
+.recipe-input-row:has(.recipe-ingredient-options){align-items:start}
+.recipe-ingredient-control{position:relative}
+.recipe-ingredient-control input{padding-right:38px}
+.recipe-ingredient-control>button{position:absolute;inset:1px 1px 1px auto;display:grid;place-items:center;width:36px;padding:0;border:0;border-radius:8px;background:transparent;color:#287458;cursor:pointer}
+.recipe-ingredient-control>button svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s ease}
+.recipe-ingredient-control>button[aria-expanded="true"] svg{transform:rotate(180deg)}
+.recipe-ingredient-options{display:grid;gap:6px;margin-top:5px;padding:7px;border:1px solid #cbded4;border-radius:10px;background:var(--color-bg-card,#fff);box-shadow:0 5px 14px #184d3615}
+.recipe-ingredient-results{display:grid;max-height:180px;overflow-y:auto;overscroll-behavior:contain}
+.recipe-ingredient-options button{display:flex;align-items:center;width:100%;padding:6px 8px;border:0;border-radius:6px;background:transparent;color:inherit;font-size:.875rem;line-height:1.4;text-align:left;cursor:pointer}
+.recipe-ingredient-options button:is(:hover,:focus-visible,[aria-pressed="true"]),.recipe-ingredient-options .recipe-ingredient-new{background:var(--color-bg-input,#eaf7ef)}
+.recipe-ingredient-options button span{overflow-wrap:anywhere}
+.recipe-ingredient-results p{margin:6px;font-size:.8rem}
+.nutrition-editor{width:min(560px,100vw);overflow-y:auto;padding:28px}
+.nutrition-editor h2{margin:4px 40px 24px 0}
+.nutrition-editor form{display:grid;gap:16px}
+.nutrition-editor form label{display:grid;gap:6px;font-weight:700;color:#285c48}
+.nutrition-editor form input,.nutrition-editor form select{width:100%;min-width:0;padding:11px 12px;border:1px solid #cde2d4;border-radius:10px;background:#fff;color:#173f32;font:inherit}
+.nutrition-editor form select:disabled{background:#e8eee9;color:#718679}
+.nutrition-editor-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.nutrition-editor-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:4px}
+.nutrition-editor-actions button{padding:11px 18px;border:1px solid #cde2d4;border-radius:10px;background:#fff;color:#285c48;cursor:pointer}
+.nutrition-editor-actions .primary{background:#087d5b;color:#fff}
+.nutrition-save-error{color:#b33b3b;margin:0}
+@media(max-width:600px){.nutrition-studio .nutrition-toolbar .studio-search{min-width:100%}.nutrition-filters{width:100%}.nutrition-filter{flex:1 1 auto;white-space:normal}}

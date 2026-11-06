@@ -42,10 +42,22 @@ class Category(Input):
     name: str = Field(min_length=1, max_length=150)
     description: str = Field(default='', max_length=500)
 
+class Nutrition(Input):
+    ingredient_id: str = Field(min_length=1, max_length=50)
+    standard_weight: float = Field(gt=0, le=99999999)
+    unit_id: str = Field(min_length=1, max_length=20)
+    energy: float = Field(ge=0, le=99999999)
+    protein: float = Field(ge=0, le=99999999)
+    carbs: float = Field(ge=0, le=99999999)
+    fat: float | None = Field(default=None, ge=0, le=99999999)
+    fiber: float | None = Field(default=None, ge=0, le=99999999)
+    sodium: float | None = Field(default=None, ge=0, le=99999999)
+
 class Dish(Input):
     name: str = Field(min_length=1, max_length=200)
     category_id: str = Field(min_length=1, max_length=50)
     description: str = ''
+    prep_time: int = Field(default=0, ge=0, le=1440)
     time: int = Field(ge=1, le=1440)
     difficulty: Literal['Dễ', 'Trung bình', 'Khó'] = 'Dễ'
     image: str = Field(default='images/logo.jpg', max_length=500)
@@ -53,9 +65,12 @@ class Dish(Input):
     foods_display: bool = True
 
 class Ingredient(Input):
+    ingredient_id: str | None = Field(default=None, min_length=1, max_length=50)
     name: str = Field(min_length=1, max_length=150)
     quantity: float = Field(gt=0, le=1000000, allow_inf_nan=False)
-    unit_id: str = Field(min_length=1, max_length=50)
+    unit_id: str | None = Field(default=None, max_length=50)
+    custom_unit: str | None = Field(default=None, max_length=50)
+    grams_per_unit: float = Field(gt=0, le=1000000, allow_inf_nan=False)
     group: str | None = Field(default=None, max_length=50)
 
 class PantryQuantity(Input):

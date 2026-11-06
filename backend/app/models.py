@@ -241,7 +241,10 @@ class DanhGiaMonAn(Base):
     maNguoiDung = Column(String(50), ForeignKey("NguoiDung.maNguoiDung"), nullable=False)
     maMonAn = Column(String(50), ForeignKey("MonAn.maMonAn"), nullable=False)
     soSao = Column(Integer, nullable=True)
-    noiDung = Column(String(1000), nullable=True)
+    # Review text may contain Vietnamese diacritics. Use NVARCHAR binding on
+    # SQL Server; String would bind as VARCHAR and replace characters such as
+    # "ấu" with "?" before the value reaches the database.
+    noiDung = Column(Unicode(1000), nullable=True)
     ngayDanhGia = Column(Date, nullable=True)
     trangThaiKiemDuyet = Column("TrangThaiKiemDuyet", Unicode(20), nullable=False, default='Đã duyệt')
     maNguoiKiemDuyet = Column("MaNguoiKiemDuyet", String(50), ForeignKey("NguoiDung.maNguoiDung"), nullable=True)

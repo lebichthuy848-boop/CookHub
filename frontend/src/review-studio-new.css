@@ -3,3 +3,7 @@ html[data-theme="dark"] .review-studio-new{--bg:var(--color-bg-page);--surface:v
 html[data-theme="dark"] .review-new-hero h1,html[data-theme="dark"] .review-new-hero p,html[data-theme="dark"] .review-new-hero small{color:#fff}
 .review-studio-new .review-new-image{box-sizing:border-box;padding:5px;display:grid;place-items:center;background:#e3eee6;color:#456b55;font-size:11px;font-weight:700;text-align:center;line-height:1.2}
 html[data-theme="dark"] .review-studio-new .review-new-image{background:#2b4a3a;color:#d8f0df}
+.review-new-summary{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 18px}
+.review-new-summary span{display:flex;align-items:center;gap:5px;min-height:48px;padding:10px 14px;border:1px solid #d7e9dd;border-left:3px solid #159b70;border-radius:12px;background:linear-gradient(140deg,#fff,#f5fbf7);color:#526e60;font-size:13px;line-height:1.25;white-space:nowrap}
+.review-new-summary b{color:#087d5b;font-size:20px;font-weight:800;line-height:1}
+@media(max-width:480px){.review-new-summary span{padding:9px 11px;font-size:12px}.review-new-summary b{font-size:18px}}

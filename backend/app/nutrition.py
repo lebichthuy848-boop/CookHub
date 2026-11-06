@@ -6,29 +6,36 @@ from .services import require
 METRICS = ('nang_luong', 'chat_dam', 'chat_bot_duong', 'chat_beo', 'chat_xo', 'natri')
 SQL_COLUMNS = {'nang_luong':'NangLuong','chat_dam':'ChatDam','chat_bot_duong':'ChatBotDuong','chat_beo':'ChatBeo','chat_xo':'ChatXo','natri':'natri'}
 
+def _value(values, key):
+    if key in values:
+        return values[key]
+    target = key.casefold()
+    return next((value for name, value in values.items() if str(name).casefold() == target), None)
+
 def _result(rows, ingredient_names=None):
     ingredient_names = ingredient_names or {}
     totals = {key: 0.0 for key in METRICS}; missing = []; partial = []
     breakdown = []
     for row in rows:
         values = dict(row)
-        if values.get('ThieuDinhDuong') or values.get('ThieuQuyDoiDinhDuong'):
-            ingredient_id = values.get('MaNguyenLieu') or values.get('MaNguyenLieuGoc')
+        if _value(values, 'ThieuDinhDuong') or _value(values, 'ThieuQuyDoiDinhDuong'):
+            ingredient_id = _value(values, 'MaNguyenLieu') or _value(values, 'MaNguyenLieuGoc')
             missing.append(ingredient_names.get(ingredient_id, ingredient_id or 'không xác định'))
             continue
         row_missing = False
         for key, column in SQL_COLUMNS.items():
-            if values.get(column) is None:
+            value = _value(values, column)
+            if value is None:
                 row_missing = True
                 continue
-            totals[key] += float(values[column])
+            totals[key] += float(value)
         if row_missing:
-            ingredient_id = values.get('MaNguyenLieu')
+            ingredient_id = _value(values, 'MaNguyenLieu')
             partial.append(ingredient_names.get(ingredient_id, ingredient_id or 'không xác định'))
-        if values.get('NangLuong') is not None:
+        if _value(values, 'NangLuong') is not None:
             breakdown.append({
-                'ingredient_id': values.get('MaNguyenLieu'),
-                'nang_luong': round(float(values.get('NangLuong') or 0), 2),
+                'ingredient_id': _value(values, 'MaNguyenLieu'),
+                'nang_luong': round(float(_value(values, 'NangLuong') or 0), 2),
             })
     return {'totals': {key: round(value, 2) for key, value in totals.items()},
             # Có kcal thì vẫn được xem là đã tính được; chỉ cảnh báo khi thiếu toàn bộ dữ liệu.
