@@ -71,7 +71,7 @@ Push-Location $backend
 try {
     & $pythonExe scripts\check_setup.py
     if ($LASTEXITCODE -ne 0) {
-        throw 'Database CookHub chưa hoàn chỉnh. Chạy QuanLyThucDon.sql rồi Bo-sung.sql bằng SSMS/SQLCMD (Du-lieu-65-mon-cu.sql là tùy chọn); kiểm tra DATABASE_URL trong backend/.env.'
+        throw 'Database CookHub chưa hoàn chỉnh. Chạy QuanLyThucDon.sql bằng SSMS/SQLCMD; kiểm tra DATABASE_URL trong backend/.env.'
     }
 } finally {
     Pop-Location

@@ -73,6 +73,9 @@ class Ingredient(Input):
     grams_per_unit: float = Field(gt=0, le=1000000, allow_inf_nan=False)
     group: str | None = Field(default=None, max_length=50)
 
+class PantryIngredient(Ingredient):
+    grams_per_unit: float | None = Field(default=None, gt=0, le=1000000, allow_inf_nan=False)
+
 class PantryQuantity(Input):
     quantity: float = Field(ge=0, le=1000000, allow_inf_nan=False)
 
@@ -111,17 +114,25 @@ class UserUpdate(Profile):
 
 class Preferences(Input):
     ingredients: list[Literal['chicken', 'pork', 'seafood', 'beef', 'vegetables', 'eggs', 'tofu', 'eggs_tofu']] = Field(min_length=1, max_length=7)
-    occasions: list[Literal['solo', 'family', 'healthy', 'low_carb', 'children', 'friends']] = Field(min_length=1, max_length=6)
+    occasions: Literal['balanced', 'low_carb', 'vegetarian', 'none']
     tastes: list[Literal['savory', 'spicy', 'sweet_sour', 'light', 'rich']] = Field(min_length=1, max_length=5)
     time: Literal['quick', 'medium', 'relaxed']
     tools: list[Literal['stove', 'air_fryer', 'pressure_cooker', 'oven', 'no_cook']] = Field(min_length=1, max_length=5)
-    regions: list[str] = Field(default_factory=list, max_length=5)
-    avoid: list[Literal['none', 'seafood_allergy', 'peanut', 'lactose', 'spicy_avoid']] = Field(default_factory=list, max_length=5)
-    budget: Literal['', 'saving', 'normal', 'comfortable'] = ''
-    skill: str = ''
-    meals: list[str] = Field(default_factory=list, max_length=4)
+    dish_types: list[Literal['rice_noodles', 'soup', 'salad', 'snack', 'dessert']] = Field(default_factory=list, max_length=5)
+    avoid: list[Literal['none', 'fish', 'shellfish', 'peanut', 'soy', 'dairy', 'spicy_avoid', 'seafood_allergy', 'lactose']] = Field(default_factory=list, max_length=9)
+    method: Literal['', 'stir_fry', 'steam', 'grill', 'stew'] = ''
+    skill: Literal['', 'beginner', 'basic', 'chef'] = ''
+    meals: list[Literal['breakfast', 'lunch', 'dinner', 'snack']] = Field(default_factory=list, max_length=4)
 
-    @field_validator('ingredients', 'occasions', 'tastes', 'tools')
+    @field_validator('ingredients', 'tastes', 'tools', 'dish_types', 'meals')
     @classmethod
     def unique_tags(cls, value):
         return list(dict.fromkeys(value))
+
+    @field_validator('avoid')
+    @classmethod
+    def no_mixed_none(cls, value):
+        unique = list(dict.fromkeys(value))
+        if 'none' in unique and len(unique) > 1:
+            raise ValueError('Không kiêng không thể chọn cùng thành phần cần tránh.')
+        return unique

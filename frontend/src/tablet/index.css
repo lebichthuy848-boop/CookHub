@@ -35,7 +35,7 @@
   .menu-aside .nutrition-card { grid-row: span 2; }
   .menu-columns > main { width: 100%; margin: 0; padding: 0; }
   .week-calendar { min-width: 0; }
-  .meal-planner-tabs nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .meal-planner-tabs nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .meal-planner-tabs nav button { min-width: 0; padding: 10px; }
   .meal-planner-tabs nav button small { display: none; }
   .template-grid, .pantry-item-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
