@@ -308,6 +308,9 @@ main:has(.menu-page){max-width:none;padding-right:38px;padding-left:38px}.menu-p
 .recipe-info-badges span{padding:6px 9px;font-size:10px}
 
 /* Keep the logout confirmation above the mobile navigation drawer. */
+.admin-sidebar .side-nav a{min-width:0;height:auto!important;min-height:42px}
+.admin-sidebar .side-nav a>span{width:auto!important;min-width:0;flex:1;white-space:normal!important;overflow-wrap:break-word;line-height:1.5;font-size:12px!important}
+.admin-sidebar .side-nav a>.side-icon{flex-shrink:0}
 .smart-search input,.smart-search input:focus,.smart-search input:focus-visible{outline:none!important;outline-offset:0!important;border:0!important;box-shadow:none!important;border-radius:0!important}
 .logout-confirm-backdrop{z-index:1500!important}
 .logout-confirm-backdrop{position:fixed!important;top:0!important;right:0!important;bottom:0!important;left:0!important;width:100vw!important;height:100vh!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:20px!important}
