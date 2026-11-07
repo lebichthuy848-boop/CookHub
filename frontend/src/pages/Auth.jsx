@@ -3,8 +3,10 @@ import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api';
 import { useAuth, landing } from '../auth';
 import { Field, Notice } from '../components/Common';
+import '../auth-banner.css';
 
 const modes = [['login', 'Đăng nhập', '/login'], ['register', 'Đăng ký', '/register'], ['forgot', 'Quên mật khẩu', '/forgot']];
+function ChefIcon(){return <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M7 15a4 4 0 0 1-2-7 4 4 0 0 1 7-3 4 4 0 0 1 7 3 4 4 0 0 1-2 7v5H7z"/><path d="M7 17h10M10 12v3m4-3v3"/></svg>}
 function InputIcon({ type }) { return <span className="auth-input-icon" aria-hidden="true">{type === 'email' ? '✉' : type === 'name' ? '♙' : '⌑'}</span>; }
 function PasswordControl({ name, visible, onToggle, autoComplete, minLength }) {
   return <div className="auth-input-wrap"><InputIcon type="password"/><input aria-label={name === "confirmPassword" ? "Nhập lại mật khẩu" : "Mật khẩu"} name={name} type={visible ? 'text' : 'password'} required minLength={minLength} autoComplete={autoComplete} placeholder="••••••••"/><button className="password-toggle" type="button" onClick={onToggle} aria-label={visible ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}>{visible ? '◉' : '◌'}</button></div>;
@@ -25,7 +27,8 @@ export default function Auth({ mode = 'login' }) {
     try { const result = await api('/auth/' + mode, { method: 'POST', body: form }); if (mode === 'login' || mode === 'register') setUser(result); else setMessage(mode === 'reset' ? 'Đã đổi mật khẩu. Bạn có thể đăng nhập.' : result.message); }
     catch (err) { setError(err.message); } finally { setBusy(false); }
   }
-  return <main className="auth-page"><aside className="auth-scene"/><div className="auth-responsive-banner"><div className="auth-banner-copy"><div className="auth-banner-brand"><span aria-hidden="true">✿</span><strong>Cook<span>Hub</span><small>Nấu ngon mỗi ngày</small></strong></div><h2><span>Nấu ngon mỗi ngày</span><br/>Sống khỏe mỗi ngày</h2><p>Khám phá món ngon và tạo thực đơn phù hợp cho mỗi ngày.</p></div></div>
+  return <main className="auth-page auth-code-banner"><aside className="kitchen-banner"><div className="kitchen-brand"><span>✿</span><b>Cook<span>Hub</span></b></div><div className="kitchen-board"><div className="kitchen-board-top"><span>GÓC BẾP CỦA BẠN</span><i>● Bữa ngon, thêm gắn kết</i></div><div className="kitchen-features">{[['recipes','♧','Công thức đa dạng','Tìm cảm hứng cho bữa ăn'],['plan','▦','Thực đơn mỗi ngày','Sắp xếp bữa ăn theo cách của bạn'],['video','▷','Vào bếp từng bước','Dễ theo dõi, dễ thực hiện']].map(([id,icon,title,detail])=><article className="kitchen-feature" key={id}><div><span aria-hidden="true">{id === 'recipes' ? <ChefIcon/> : icon}</span><b>{title}</b></div><p>{detail}</p></article>)}</div></div><div className="kitchen-footer"><span>CHỌN MÓN</span><i>·</i><span>VÀO BẾP</span><i>·</i><span>CÙNG THƯỞNG THỨC</span></div></aside>
+    <div className="auth-floating-foods" aria-hidden="true">{['🥑','🍅','🥕','🥦','🍋','🍓','🥐','🍳','🍜','🥬','🍊','🍒'].map((food,index)=><span key={index} style={{'--food-index':index}}>{food}</span>)}</div>
     <section className="auth-side"><div className="auth-card">
       <p className="auth-eyebrow">NẤU NGON MỖI NGÀY</p><nav className="auth-tabs" aria-label="Xác thực">{modes.map(([key,label,path]) => <Link key={key} to={path} className={mode === key ? 'active' : ''}>{label}</Link>)}</nav>
       <h1>{titles[mode]}</h1><p className="auth-intro">{mode === 'forgot' ? 'Nhập email để nhận liên kết khôi phục mật khẩu.' : mode === 'reset' ? 'Tạo một mật khẩu mới để tiếp tục vào CookHub.' : 'Cùng tạo nên những bữa ăn bạn yêu thích.'}</p><Notice error={error} message={message}/>

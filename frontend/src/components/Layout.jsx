@@ -10,7 +10,7 @@ import { defaultAvatar } from '../default-avatar';
 import { useSettings } from '../settings-context';
 
 const userNav = [['home', 'home', 'Trang chủ'], ['suggest', 'sparkle', 'Đề xuất'], ['search', 'search', 'Tìm kiếm'], ['menu', 'calendar', 'Thực đơn'], ['foods', 'utensils', 'Khám phá món ăn'], ['pantry', 'leaf', 'Nguyên liệu'], ['favorites', 'heart', 'Yêu thích'], ['profile', 'user', 'Hồ sơ'], ['settings', 'settings', 'Cài đặt']];
-const adminNav = [['system', 'grid', 'Tổng quan'], ['categories', 'grid', 'Danh mục'], ['recipes', 'book', 'Món ăn & Công thức'], ['videos', 'chart', 'Video hướng dẫn'], ['reviews', 'check', 'Đánh giá món ăn']];
+const adminNav = [['system', 'grid', 'Tổng quan'], ['categories', 'grid', 'Danh mục'], ['recipes', 'book', 'Món ăn & Công thức & Dinh dưỡng'], ['videos', 'chart', 'Video hướng dẫn'], ['reviews', 'check', 'Đánh giá món ăn']];
 const systemNav = [['system', 'grid', 'Tổng quan hệ thống'], ['users', 'users', 'Người dùng & Phân quyền'], ['reports', 'chart', 'Báo cáo & Thống kê']];
 const searchSuggestions = ['Phở bò...', 'Bánh mì...', 'Lẩu hải sản...'];
 
