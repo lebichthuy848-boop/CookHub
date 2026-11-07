@@ -15,6 +15,12 @@
 @media(max-width:1050px){.discover-category-panel .discover-categories.collapsed button:nth-child(n+7){display:none}}
 @media(max-width:600px){.discover-category-panel .discover-categories.collapsed button:nth-child(n+5){display:none}}
 
+.discover-category-panel .discover-category-more[data-has-empty="false"]{display:none}
+.discover-category-panel .discover-categories:has(> button:nth-child(13)) + .discover-category-more,
+.discover-category-panel .discover-category-more[aria-expanded="true"]{display:flex}
+@media(max-width:1050px){.discover-category-panel .discover-categories:has(> button:nth-child(7)) + .discover-category-more{display:flex}}
+@media(max-width:600px){.discover-category-panel .discover-categories:has(> button:nth-child(5)) + .discover-category-more{display:flex}}
+
 /* Compact category icons. */
 .discover-category-panel .discover-categories button{grid-template-columns:28px minmax(0,1fr) auto}
 .discover-category-panel .category-icon{width:28px;height:28px;display:grid;place-items:center;font-size:17px;border-radius:9px;overflow:hidden}

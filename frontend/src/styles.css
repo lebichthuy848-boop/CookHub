@@ -334,3 +334,5 @@ main:has(.menu-page){max-width:none;padding-right:38px;padding-left:38px}.menu-p
 @media(max-width:600px){
   .interactive-ingredients li{grid-template-columns:25px minmax(0,1fr) minmax(120px,auto)}
 }
+.premium-dish-card .dish-meta{flex-wrap:wrap;justify-content:flex-start;gap:4px 8px}
+.premium-dish-card .dish-meta b,.premium-dish-card .dish-meta .dish-time{white-space:nowrap}

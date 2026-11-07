@@ -30369,3 +30369,1435 @@ JOIN dbo.QuyDoiDonViNguyenLieu AS q
     ON q.MaNguyenLieu = d.MaNguyenLieu
    AND q.MaDonVi = d.MaDonVi
 ORDER BY d.STT;
+
+USE [QuanLyThucDon];
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+DECLARE @TenMon NVARCHAR(150) = N'Trà dâu ngâm';
+DECLARE @MoTa NVARCHAR(1000) =
+    N'Trà dâu ngâm có vị chua ngọt của dâu tây, hương trà nhẹ và vị tắc thanh mát.';
+DECLARE @Video NVARCHAR(500) = N'https://www.youtube.com/watch?v=uI5Tjzbu-pU';
+DECLARE @Anh NVARCHAR(500) = NULL; -- Điền đường dẫn ảnh đã tải lên CookHub nếu có.
+
+DECLARE @MaDM NVARCHAR(20), @MaMA NVARCHAR(20), @MaCT NVARCHAR(20);
+DECLARE @MaNL NVARCHAR(20), @MaDV NVARCHAR(20), @MaTP NVARCHAR(20);
+DECLARE @MaBuoc NVARCHAR(20), @MaVideo NVARCHAR(20);
+DECLARE @TenNL NVARCHAR(150), @KyHieu NVARCHAR(20);
+DECLARE @SoLuong DECIMAL(12,3), @NoiDung NVARCHAR(1500), @Loi NVARCHAR(2048);
+DECLARE @i INT;
+
+DECLARE @NguyenLieu TABLE (
+    STT INT PRIMARY KEY,
+    Ten NVARCHAR(150) NOT NULL,
+    DonVi NVARCHAR(20) NOT NULL,
+    SoLuong DECIMAL(12,3) NOT NULL
+);
+
+INSERT INTO @NguyenLieu (STT, Ten, DonVi, SoLuong)
+VALUES
+    (1, N'Dâu tây',      N'g',   300),
+    (2, N'Trà túi lọc',  N'gói',   4),
+    (3, N'Nước cốt tắc', N'ml',   30),
+    (4, N'Đường',       N'g',   300),
+    (5, N'Bột mì',      N'g',    30),
+    (6, N'Muối',        N'ít',    1);
+
+DECLARE @CachLam TABLE (
+    ThuTu INT PRIMARY KEY,
+    NoiDung NVARCHAR(1500) NOT NULL
+);
+
+INSERT INTO @CachLam (ThuTu, NoiDung)
+VALUES
+    (1, N'~ Sơ chế dâu ~' + NCHAR(10) +
+        N'Cắt bỏ cuống dâu. Ngâm dâu khoảng 5 phút trong nước pha 1 muỗng canh muối và 30 g bột mì. Rửa sạch, cắt đôi hoặc cắt tư nếu quả to.'),
+    (2, N'~ Ngâm dâu với đường ~' + NCHAR(10) +
+        N'Trộn dâu với 300 g đường cát. Đậy kín và ngâm ở nơi thoáng mát khoảng 8 tiếng hoặc qua đêm, đến khi đường tan hết.'),
+    (3, N'~ Pha trà ~' + NCHAR(10) +
+        N'Ủ 4 gói trà túi lọc với 300 ml nước sôi trong 15 phút. Cho 150 ml nước cốt trà, 50 ml nước ngâm dâu, 30 ml nước cốt tắc và 100 g đá viên vào bình lắc. Đậy nắp, lắc đều, rót ra ly có đá rồi thêm lát dâu ngâm.'),
+    (4, N'~ Thành phẩm ~' + NCHAR(10) +
+        N'Thưởng thức lạnh. Trà có vị ngọt thanh, chua nhẹ của dâu và tắc, hòa với vị chát nhẹ của trà.');
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    SELECT @MaDM = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Thức uống';
+
+    IF @MaDM IS NULL
+        THROW 51000, N'Chưa tìm thấy danh mục Thức uống trong DB.', 1;
+
+    IF EXISTS (
+        SELECT 1
+        FROM dbo.MonAn WITH (UPDLOCK, HOLDLOCK)
+        WHERE TenMonAn = @TenMon
+    )
+        THROW 51001, N'Món Trà dâu ngâm đã có trong DB.', 1;
+
+    EXEC dbo.SpCapMaMoi
+        @LoaiMa = N'MonAn', @MaMoi = @MaMA OUTPUT;
+
+    INSERT INTO dbo.MonAn
+        (MaMonAn, MaDanhMuc, TenMonAn, MoTa, ThoiGianChuanBi,
+         ThoiGianCheBien, DoKho, DuongDanAnh)
+    VALUES
+        (@MaMA, @MaDM, @TenMon, @MoTa, 10, 5, N'Dễ', @Anh);
+
+    IF OBJECT_ID(N'dbo.MonAnDanhMuc', N'U') IS NOT NULL
+    BEGIN
+        INSERT INTO dbo.MonAnDanhMuc (MaMonAn, MaDanhMuc)
+        SELECT @MaMA, @MaDM
+        WHERE NOT EXISTS (
+            SELECT 1 FROM dbo.MonAnDanhMuc
+            WHERE MaMonAn = @MaMA AND MaDanhMuc = @MaDM
+        );
+    END;
+
+    EXEC dbo.SpCapMaMoi
+        @LoaiMa = N'CongThuc', @MaMoi = @MaCT OUTPUT;
+
+    INSERT INTO dbo.CongThuc
+        (MaCongThuc, MaMonAn, MoTa, SoKhauPhanChuan, DaCongBo)
+    VALUES
+        (@MaCT, @MaMA, @MoTa, 4, 0);
+
+    SET @i = 1;
+    WHILE @i <= (SELECT COUNT(*) FROM @NguyenLieu)
+    BEGIN
+        SELECT @TenNL = Ten, @KyHieu = DonVi, @SoLuong = SoLuong
+        FROM @NguyenLieu
+        WHERE STT = @i;
+
+        SET @MaNL = NULL;
+        SET @MaDV = NULL;
+
+        SELECT @MaDV = MIN(MaDonVi)
+        FROM dbo.DonViTinh
+        WHERE KyHieu = @KyHieu;
+
+        IF @MaDV IS NULL
+        BEGIN
+            SET @Loi = CONCAT(N'Không tìm thấy đơn vị ', @KyHieu, N' trong DB.');
+            THROW 51002, @Loi, 1;
+        END;
+
+        SELECT @MaNL = MIN(MaNguyenLieu)
+        FROM dbo.NguyenLieu WITH (UPDLOCK, HOLDLOCK)
+        WHERE TenNguyenLieu = @TenNL;
+
+        IF @MaNL IS NULL
+        BEGIN
+            EXEC dbo.SpCapMaMoi
+                @LoaiMa = N'NguyenLieu', @MaMoi = @MaNL OUTPUT;
+
+            INSERT INTO dbo.NguyenLieu (MaNguyenLieu, TenNguyenLieu, MoTa)
+            VALUES (@MaNL, @TenNL, @TenNL);
+        END;
+
+        EXEC dbo.SpCapMaMoi
+            @LoaiMa = N'ThanhPhanCongThuc', @MaMoi = @MaTP OUTPUT;
+
+        INSERT INTO dbo.ThanhPhanCongThuc
+            (MaThanhPhan, MaCongThuc, MaNguyenLieu, MaDonVi, SoLuong)
+        VALUES
+            (@MaTP, @MaCT, @MaNL, @MaDV, @SoLuong);
+
+        SET @i += 1;
+    END;
+
+    SET @i = 1;
+    WHILE @i <= (SELECT COUNT(*) FROM @CachLam)
+    BEGIN
+        SELECT @NoiDung = NoiDung FROM @CachLam WHERE ThuTu = @i;
+
+        EXEC dbo.SpCapMaMoi
+            @LoaiMa = N'BuocCheBien', @MaMoi = @MaBuoc OUTPUT;
+
+        INSERT INTO dbo.BuocCheBien (MaBuoc, MaCongThuc, ThuTu, NoiDung)
+        VALUES (@MaBuoc, @MaCT, @i, @NoiDung);
+
+        SET @i += 1;
+    END;
+
+    EXEC dbo.SpCapMaMoi
+        @LoaiMa = N'DoanPhimHuongDan', @MaMoi = @MaVideo OUTPUT;
+
+    INSERT INTO dbo.DoanPhimHuongDan
+        (MaDoanPhim, MaCongThuc, TieuDe, DuongDan, MoTa)
+    VALUES
+        (@MaVideo, @MaCT, N'Cách làm trà dâu ngâm', @Video,
+         N'Video hướng dẫn sơ chế dâu, ngâm dâu và pha trà.');
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = @MaCT;
+
+    COMMIT TRANSACTION;
+
+    SELECT @MaMA AS MaMonAn, @MaCT AS MaCongThuc,
+           @TenMon AS TenMonAn, N'Thức uống' AS DanhMuc,
+           4 AS KhauPhan, @Video AS Video;
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+    THROW;
+END CATCH;
+
+USE [QuanLyThucDon];
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+DECLARE @MaCT NVARCHAR(20);
+DECLARE @MaBot NVARCHAR(20);
+DECLARE @MaGram NVARCHAR(20);
+DECLARE @MaDD NVARCHAR(20);
+DECLARE @MaQD NVARCHAR(20);
+DECLARE @MaDV NVARCHAR(20);
+DECLARE @Gam DECIMAL(12,3);
+DECLARE @Lan INT;
+DECLARE @STT INT = 1;
+
+DECLARE @QuyDoi TABLE (
+    STT INT PRIMARY KEY,
+    KyHieu NVARCHAR(30) NOT NULL,
+    Gam DECIMAL(12,3) NOT NULL
+);
+
+INSERT INTO @QuyDoi (STT, KyHieu, Gam)
+VALUES
+    (1, N'muỗng cà phê', 3.000),
+    (2, N'muỗng canh',   8.000);
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    SELECT @MaCT = ct.MaCongThuc
+    FROM dbo.CongThuc AS ct
+    JOIN dbo.MonAn AS ma ON ma.MaMonAn = ct.MaMonAn
+    WHERE ma.TenMonAn = N'Trà dâu ngâm';
+
+    IF @MaCT IS NULL
+        THROW 51000, N'Chưa tìm thấy công thức Trà dâu ngâm.', 1;
+
+    IF (
+        SELECT COUNT(*)
+        FROM dbo.ThanhPhanCongThuc AS tp
+        JOIN dbo.NguyenLieu AS nl ON nl.MaNguyenLieu = tp.MaNguyenLieu
+        WHERE tp.MaCongThuc = @MaCT AND nl.TenNguyenLieu = N'Bột mì'
+    ) <> 1
+        THROW 51001, N'Công thức cần có đúng một dòng Bột mì.', 1;
+
+    SELECT @MaBot = tp.MaNguyenLieu
+    FROM dbo.ThanhPhanCongThuc AS tp
+    JOIN dbo.NguyenLieu AS nl ON nl.MaNguyenLieu = tp.MaNguyenLieu
+    WHERE tp.MaCongThuc = @MaCT AND nl.TenNguyenLieu = N'Bột mì';
+
+    SELECT @MaGram = MIN(MaDonVi)
+    FROM dbo.DonViTinh
+    WHERE KyHieu = N'g';
+
+    IF @MaGram IS NULL
+        THROW 51002, N'Không tìm thấy đơn vị g trong DB.', 1;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM dbo.ThongTinDinhDuong WITH (UPDLOCK, HOLDLOCK)
+        WHERE MaNguyenLieu = @MaBot
+    )
+    BEGIN
+        SET @Lan = 0;
+
+        WHILE 1 = 1
+        BEGIN
+            IF @Lan >= 1000
+                THROW 51003, N'Không tìm được mã dinh dưỡng còn trống.', 1;
+
+            EXEC dbo.SpCapMaMoi
+                @LoaiMa = N'ThongTinDinhDuong', @MaMoi = @MaDD OUTPUT;
+
+            SET @Lan += 1;
+
+            IF @MaDD IS NOT NULL AND NOT EXISTS (
+                SELECT 1
+                FROM dbo.ThongTinDinhDuong WITH (UPDLOCK, HOLDLOCK)
+                WHERE MaThongTin = @MaDD
+            )
+                BREAK;
+        END;
+
+        -- USDA SR28, bột mì đa dụng, trên 100 g.
+        INSERT INTO dbo.ThongTinDinhDuong
+            (MaThongTin, MaNguyenLieu, KhoiLuongChuan, MaDonVi,
+             NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, Natri)
+        VALUES
+            (@MaDD, @MaBot, 100, @MaGram,
+             364, 10.33, 76.31, 0.98, 2.70, 2);
+    END;
+
+    WHILE @STT <= 2
+    BEGIN
+        SELECT @MaDV = MIN(dv.MaDonVi)
+        FROM dbo.DonViTinh AS dv
+        JOIN @QuyDoi AS q ON q.KyHieu = dv.KyHieu
+        WHERE q.STT = @STT;
+
+        SELECT @Gam = Gam FROM @QuyDoi WHERE STT = @STT;
+
+        IF @MaDV IS NULL
+            THROW 51004, N'Thiếu đơn vị muỗng trong DB.', 1;
+
+        IF NOT EXISTS (
+            SELECT 1
+            FROM dbo.QuyDoiDonViNguyenLieu WITH (UPDLOCK, HOLDLOCK)
+            WHERE MaNguyenLieu = @MaBot AND MaDonVi = @MaDV
+        )
+        BEGIN
+            SET @Lan = 0;
+
+            WHILE 1 = 1
+            BEGIN
+                IF @Lan >= 1000
+                    THROW 51005, N'Không tìm được mã quy đổi còn trống.', 1;
+
+                EXEC dbo.SpCapMaMoi
+                    @LoaiMa = N'QuyDoiDonViNguyenLieu', @MaMoi = @MaQD OUTPUT;
+
+                SET @Lan += 1;
+
+                IF @MaQD IS NOT NULL AND NOT EXISTS (
+                    SELECT 1
+                    FROM dbo.QuyDoiDonViNguyenLieu WITH (UPDLOCK, HOLDLOCK)
+                    WHERE MaQuyDoi = @MaQD
+                )
+                    BREAK;
+            END;
+
+            INSERT INTO dbo.QuyDoiDonViNguyenLieu
+                (MaQuyDoi, MaNguyenLieu, MaDonVi, KhoiLuongQuyDoiGram)
+            VALUES (@MaQD, @MaBot, @MaDV, @Gam);
+        END
+        ELSE
+        BEGIN
+            UPDATE dbo.QuyDoiDonViNguyenLieu
+            SET KhoiLuongQuyDoiGram = @Gam
+            WHERE MaNguyenLieu = @MaBot
+              AND MaDonVi = @MaDV
+              AND KhoiLuongQuyDoiGram IS NULL;
+        END;
+
+        SET @STT += 1;
+    END;
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0 ROLLBACK TRANSACTION;
+    THROW;
+END CATCH;
+
+SELECT nl.TenNguyenLieu, tp.SoLuong, dv.KyHieu AS DonViCongThuc,
+       dd.KhoiLuongChuan, dvdd.KyHieu AS DonViDinhDuong,
+       dd.NangLuong, dd.ChatDam, dd.ChatBotDuong, dd.ChatBeo, dd.ChatXo, dd.Natri
+FROM dbo.ThanhPhanCongThuc AS tp
+JOIN dbo.NguyenLieu AS nl ON nl.MaNguyenLieu = tp.MaNguyenLieu
+JOIN dbo.DonViTinh AS dv ON dv.MaDonVi = tp.MaDonVi
+LEFT JOIN dbo.ThongTinDinhDuong AS dd ON dd.MaNguyenLieu = tp.MaNguyenLieu
+LEFT JOIN dbo.DonViTinh AS dvdd ON dvdd.MaDonVi = dd.MaDonVi
+WHERE tp.MaCongThuc = @MaCT
+ORDER BY tp.MaThanhPhan;
+
+SELECT dv.KyHieu AS DonVi, q.KhoiLuongQuyDoiGram AS GamMoiDonVi
+FROM dbo.QuyDoiDonViNguyenLieu AS q
+JOIN dbo.DonViTinh AS dv ON dv.MaDonVi = q.MaDonVi
+WHERE q.MaNguyenLieu = @MaBot
+  AND dv.KyHieu IN (N'muỗng cà phê', N'muỗng canh');
+
+USE [QuanLyThucDon];
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+DECLARE @TenMon NVARCHAR(150) = N'Trân châu phô mai';
+DECLARE @MoTa NVARCHAR(1000) =
+    N'Trân châu nhân phô mai béo, lớp vỏ bột năng mềm dai, dùng kèm trà sữa.';
+DECLARE @Anh NVARCHAR(500) = NULL;
+DECLARE @Video NVARCHAR(500) =
+    N'https://www.youtube.com/watch?v=shavr0crYtk';
+
+DECLARE @MaDM NVARCHAR(20), @MaMon NVARCHAR(20), @MaCT NVARCHAR(20);
+DECLARE @MaNL NVARCHAR(20), @MaDV NVARCHAR(20), @MaTP NVARCHAR(20);
+DECLARE @MaDD NVARCHAR(20), @MaQD NVARCHAR(20);
+DECLARE @MaBuoc NVARCHAR(20), @MaVideo NVARCHAR(20);
+DECLARE @TenNL NVARCHAR(150), @TenThayThe NVARCHAR(150);
+DECLARE @SoLuong DECIMAL(12,3), @GamMoiDonVi DECIMAL(12,3);
+DECLARE @i INT;
+
+DECLARE @ThanhPhan TABLE (
+    STT INT PRIMARY KEY,
+    Ten NVARCHAR(150) NOT NULL,
+    TenThayThe NVARCHAR(150) NULL,
+    MaDV NVARCHAR(20) NOT NULL,
+    SoLuong DECIMAL(12,3) NOT NULL,
+    GamMoiDonVi DECIMAL(12,3) NULL,
+    Kcal DECIMAL(10,2) NULL,
+    Dam DECIMAL(10,2) NULL,
+    Carb DECIMAL(10,2) NULL,
+    Beo DECIMAL(10,2) NULL,
+    Xo DECIMAL(10,2) NULL,
+    Natri DECIMAL(10,2) NULL
+);
+
+-- Dinh dưỡng trên 100 g. DVT009 = miếng, DVT006 = muỗng canh.
+INSERT INTO @ThanhPhan
+VALUES
+    (1, N'Phô mai',   NULL,      N'DVT009', 8, NULL,  NULL, NULL, NULL,   NULL, NULL, NULL),
+    (2, N'Đường bột', NULL,      N'DVT006', 3, 8.165, 389,  0,    99.77,  0,    0,    2),
+    (3, N'Bột năng',  NULL,      N'DVT006', 3, 7.500, 350,  0,    90.00,  0,    0,    0),
+    (4, N'Đường cát', N'Đường',  N'DVT006', 3, 14.00, 387,  0,    100.00, 0,    0,    1);
+
+DECLARE @CachLam TABLE (
+    ThuTu INT PRIMARY KEY,
+    NoiDung NVARCHAR(1500) NOT NULL
+);
+
+INSERT INTO @CachLam
+VALUES
+    (1, N'~ Làm viên trân châu ~' + NCHAR(10) +
+        N'Bóc vỏ 8 miếng phô mai, cắt đôi từng miếng và vo tròn, được khoảng 16 viên.'),
+    (2, N'~ Lăn bột ~' + NCHAR(10) +
+        N'Cho đường bột và bột năng ra hai đĩa riêng. Lăn từng viên qua đường bột rồi qua bột năng. Để trong ngăn mát 20 phút, sau đó lăn thêm một lớp bột năng.'),
+    (3, N'~ Luộc và ngâm trân châu ~' + NCHAR(10) +
+        N'Đun sôi 500 ml nước, thả nhẹ các viên vào và luộc lửa nhỏ khoảng 10 phút đến khi lớp vỏ trong. Vớt ra ngâm nước đá 5 phút. Hòa 3 muỗng canh đường cát với 50 ml nước lọc rồi chuyển trân châu sang tô nước đường.'),
+    (4, N'~ Thành phẩm ~' + NCHAR(10) +
+        N'Cho trân châu phô mai vào ly trà sữa cùng đá khi dùng.');
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    SELECT @MaDM = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Trà sữa';
+
+    IF @MaDM IS NULL
+        THROW 51000, N'Chưa tìm thấy danh mục Trà sữa.', 1;
+
+    IF EXISTS (
+        SELECT 1 FROM dbo.MonAn WITH (UPDLOCK, HOLDLOCK)
+        WHERE TenMonAn = @TenMon
+    )
+        THROW 51001, N'Món Trân châu phô mai đã có trong DB.', 1;
+
+    IF (SELECT COUNT(*) FROM dbo.DonViTinh
+        WHERE (MaDonVi = N'DVT001' AND KyHieu = N'g')
+           OR (MaDonVi = N'DVT006' AND KyHieu = N'muỗng canh')
+           OR (MaDonVi = N'DVT009' AND KyHieu = N'miếng')) <> 3
+        THROW 51002, N'Mã đơn vị g, muỗng canh hoặc miếng không khớp với DB.', 1;
+
+    EXEC dbo.SpCapMaMoi
+        @LoaiMa = N'MonAn', @MaMoi = @MaMon OUTPUT;
+
+    INSERT INTO dbo.MonAn
+        (MaMonAn, MaDanhMuc, TenMonAn, MoTa, ThoiGianChuanBi,
+         ThoiGianCheBien, DoKho, DuongDanAnh)
+    VALUES
+        (@MaMon, @MaDM, @TenMon, @MoTa, 5, 15, N'Dễ', @Anh);
+
+    IF OBJECT_ID(N'dbo.MonAnDanhMuc', N'U') IS NOT NULL
+    BEGIN
+        INSERT INTO dbo.MonAnDanhMuc (MaMonAn, MaDanhMuc)
+        SELECT @MaMon, @MaDM
+        WHERE NOT EXISTS (
+            SELECT 1 FROM dbo.MonAnDanhMuc
+            WHERE MaMonAn = @MaMon AND MaDanhMuc = @MaDM
+        );
+    END;
+
+    EXEC dbo.SpCapMaMoi
+        @LoaiMa = N'CongThuc', @MaMoi = @MaCT OUTPUT;
+
+    INSERT INTO dbo.CongThuc
+        (MaCongThuc, MaMonAn, MoTa, SoKhauPhanChuan, DaCongBo)
+    VALUES (@MaCT, @MaMon, @MoTa, 4, 0);
+
+    SET @i = 1;
+    WHILE @i <= 4
+    BEGIN
+        SELECT @TenNL = Ten, @TenThayThe = TenThayThe,
+               @MaDV = MaDV, @SoLuong = SoLuong,
+               @GamMoiDonVi = GamMoiDonVi
+        FROM @ThanhPhan WHERE STT = @i;
+
+        SET @MaNL = NULL;
+
+        SELECT TOP (1) @MaNL = MaNguyenLieu
+        FROM dbo.NguyenLieu WITH (UPDLOCK, HOLDLOCK)
+        WHERE TenNguyenLieu IN (@TenNL, @TenThayThe)
+        ORDER BY CASE WHEN TenNguyenLieu = @TenNL THEN 0 ELSE 1 END,
+                 MaNguyenLieu;
+
+        IF @MaNL IS NULL
+        BEGIN
+            EXEC dbo.SpCapMaMoi
+                @LoaiMa = N'NguyenLieu', @MaMoi = @MaNL OUTPUT;
+
+            WHILE EXISTS (
+                SELECT 1 FROM dbo.NguyenLieu WITH (UPDLOCK, HOLDLOCK)
+                WHERE MaNguyenLieu = @MaNL
+            )
+            BEGIN
+                EXEC dbo.SpCapMaMoi
+                    @LoaiMa = N'NguyenLieu', @MaMoi = @MaNL OUTPUT;
+            END;
+
+            INSERT INTO dbo.NguyenLieu (MaNguyenLieu, TenNguyenLieu, MoTa)
+            VALUES (@MaNL, @TenNL, @TenNL);
+        END;
+
+        EXEC dbo.SpCapMaMoi
+            @LoaiMa = N'ThanhPhanCongThuc', @MaMoi = @MaTP OUTPUT;
+
+        INSERT INTO dbo.ThanhPhanCongThuc
+            (MaThanhPhan, MaCongThuc, MaNguyenLieu, MaDonVi, SoLuong)
+        VALUES (@MaTP, @MaCT, @MaNL, @MaDV, @SoLuong);
+
+        IF EXISTS (SELECT 1 FROM @ThanhPhan WHERE STT = @i AND Kcal IS NOT NULL)
+           AND NOT EXISTS (
+               SELECT 1 FROM dbo.ThongTinDinhDuong WITH (UPDLOCK, HOLDLOCK)
+               WHERE MaNguyenLieu = @MaNL
+           )
+        BEGIN
+            EXEC dbo.SpCapMaMoi
+                @LoaiMa = N'ThongTinDinhDuong', @MaMoi = @MaDD OUTPUT;
+
+            WHILE EXISTS (
+                SELECT 1 FROM dbo.ThongTinDinhDuong WITH (UPDLOCK, HOLDLOCK)
+                WHERE MaThongTin = @MaDD
+            )
+            BEGIN
+                EXEC dbo.SpCapMaMoi
+                    @LoaiMa = N'ThongTinDinhDuong', @MaMoi = @MaDD OUTPUT;
+            END;
+
+            INSERT INTO dbo.ThongTinDinhDuong
+                (MaThongTin, MaNguyenLieu, KhoiLuongChuan, MaDonVi,
+                 NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, Natri)
+            SELECT @MaDD, @MaNL, 100, N'DVT001',
+                   Kcal, Dam, Carb, Beo, Xo, Natri
+            FROM @ThanhPhan WHERE STT = @i;
+        END;
+
+        IF @GamMoiDonVi IS NOT NULL
+        BEGIN
+            SET @MaQD = NULL;
+
+            SELECT @MaQD = MaQuyDoi
+            FROM dbo.QuyDoiDonViNguyenLieu WITH (UPDLOCK, HOLDLOCK)
+            WHERE MaNguyenLieu = @MaNL AND MaDonVi = @MaDV;
+
+            IF @MaQD IS NULL
+            BEGIN
+                EXEC dbo.SpCapMaMoi
+                    @LoaiMa = N'QuyDoiDonViNguyenLieu', @MaMoi = @MaQD OUTPUT;
+
+                WHILE EXISTS (
+                    SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WITH (UPDLOCK, HOLDLOCK)
+                    WHERE MaQuyDoi = @MaQD
+                )
+                BEGIN
+                    EXEC dbo.SpCapMaMoi
+                        @LoaiMa = N'QuyDoiDonViNguyenLieu', @MaMoi = @MaQD OUTPUT;
+                END;
+
+                INSERT INTO dbo.QuyDoiDonViNguyenLieu
+                    (MaQuyDoi, MaNguyenLieu, MaDonVi, KhoiLuongQuyDoiGram)
+                VALUES (@MaQD, @MaNL, @MaDV, @GamMoiDonVi);
+            END
+            ELSE
+            BEGIN
+                UPDATE dbo.QuyDoiDonViNguyenLieu
+                SET KhoiLuongQuyDoiGram = @GamMoiDonVi
+                WHERE MaQuyDoi = @MaQD AND KhoiLuongQuyDoiGram IS NULL;
+            END;
+        END;
+
+        SET @i += 1;
+    END;
+
+    SET @i = 1;
+    WHILE @i <= 4
+    BEGIN
+        EXEC dbo.SpCapMaMoi
+            @LoaiMa = N'BuocCheBien', @MaMoi = @MaBuoc OUTPUT;
+
+        INSERT INTO dbo.BuocCheBien (MaBuoc, MaCongThuc, ThuTu, NoiDung)
+        SELECT @MaBuoc, @MaCT, ThuTu, NoiDung
+        FROM @CachLam WHERE ThuTu = @i;
+
+        SET @i += 1;
+    END;
+
+    EXEC dbo.SpCapMaMoi
+        @LoaiMa = N'DoanPhimHuongDan', @MaMoi = @MaVideo OUTPUT;
+
+    INSERT INTO dbo.DoanPhimHuongDan
+        (MaDoanPhim, MaCongThuc, TieuDe, DuongDan, MoTa)
+    VALUES
+        (@MaVideo, @MaCT, N'Cách làm trân châu phô mai', @Video,
+         N'Video hướng dẫn làm topping trân châu phô mai.');
+
+    UPDATE dbo.CongThuc
+    SET DaCongBo = 1
+    WHERE MaCongThuc = @MaCT;
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0 ROLLBACK TRANSACTION;
+    THROW;
+END CATCH;
+
+SELECT @MaMon AS MaMonAn, @MaCT AS MaCongThuc,
+       @TenMon AS TenMonAn, N'Trà sữa' AS DanhMuc, 4 AS KhauPhan;
+
+SELECT nl.MaNguyenLieu, nl.TenNguyenLieu, tp.SoLuong,
+       dv.KyHieu AS DonVi,
+       q.KhoiLuongQuyDoiGram AS GamMoiDonVi,
+       dd.KhoiLuongChuan, dd.NangLuong
+FROM dbo.ThanhPhanCongThuc AS tp
+JOIN dbo.NguyenLieu AS nl ON nl.MaNguyenLieu = tp.MaNguyenLieu
+JOIN dbo.DonViTinh AS dv ON dv.MaDonVi = tp.MaDonVi
+LEFT JOIN dbo.QuyDoiDonViNguyenLieu AS q
+    ON q.MaNguyenLieu = tp.MaNguyenLieu AND q.MaDonVi = tp.MaDonVi
+LEFT JOIN dbo.ThongTinDinhDuong AS dd
+    ON dd.MaNguyenLieu = tp.MaNguyenLieu
+WHERE tp.MaCongThuc = @MaCT
+ORDER BY tp.MaThanhPhan;
+
+USE [QuanLyThucDon];
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+-- Điền khối lượng ruột dưa đã bỏ vỏ và hạt nếu đã cân.
+-- Để NULL thì lưu 1 quả như công thức gốc.
+DECLARE @GamRuotDuaHau DECIMAL(12,3) = NULL;
+
+DECLARE @Mon TABLE (
+    STT INT PRIMARY KEY,
+    Ten NVARCHAR(150),
+    DanhMuc NVARCHAR(100),
+    MoTa NVARCHAR(1000),
+    ChuanBi INT,
+    CheBien INT,
+    KhauPhan INT,
+    Video NVARCHAR(500)
+);
+
+INSERT INTO @Mon VALUES
+    (1, N'Dưa hấu chanh tuyết', N'Sinh tố',
+        N'Dưa hấu cấp đông xay cùng nước cốt chanh, vỏ chanh và đường.',
+        120, 5, 4, N'https://www.youtube.com/watch?v=81BymmUCoWU'),
+    (2, N'Nước ép cà rốt bằng máy xay sinh tố', N'Nước ép',
+        N'Cà rốt xay lọc lấy nước, pha với nước cam tươi và đường.',
+        5, 10, 2, N'https://www.youtube.com/watch?v=DHjg50xsu7E');
+
+DECLARE @ThanhPhan TABLE (
+    Mon INT,
+    STT INT,
+    MaNL NVARCHAR(20) NULL,
+    TenNL NVARCHAR(150),
+    MaDV NVARCHAR(20),
+    SoLuong DECIMAL(12,3),
+    PRIMARY KEY (Mon, STT)
+);
+
+INSERT INTO @ThanhPhan VALUES
+    (1, 1, N'NL307', N'Dưa hấu',
+        CASE WHEN @GamRuotDuaHau IS NULL THEN N'DVT005' ELSE N'DVT001' END,
+        COALESCE(@GamRuotDuaHau, 1)),
+    (1, 2, N'NL074', N'Đường',          N'DVT006', 3),
+    (1, 3, N'NL1123', N'Nước cốt chanh', N'DVT003', 30),
+    (1, 4, N'NL1203', N'Vỏ chanh',       N'DVT005', 1),
+    (2, 1, N'NL036', N'Cà rốt',         N'DVT010', 2),
+    (2, 2, NULL,     N'Nước cốt cam',   N'DVT001', 86),
+    (2, 3, N'NL074', N'Đường',          N'DVT006', 2),
+    (2, 4, N'NL080', N'Nước lọc',       N'DVT003', 300);
+
+DECLARE @Buoc TABLE (
+    Mon INT,
+    STT INT,
+    NoiDung NVARCHAR(1500),
+    PRIMARY KEY (Mon, STT)
+);
+
+INSERT INTO @Buoc VALUES
+    (1, 1, N'~ Cắt và cấp đông dưa hấu ~' + NCHAR(10) +
+        N'Gọt vỏ, bỏ hạt, cắt ruột dưa thành khối vuông rồi cấp đông khoảng 2 giờ.'),
+    (1, 2, N'~ Xay dưa hấu ~' + NCHAR(10) +
+        N'Vắt chanh, đong 30 ml nước cốt và cắt nhỏ vỏ của 1 trái. Xay cùng dưa hấu đông lạnh và 3 muỗng canh đường.'),
+    (1, 3, N'~ Thành phẩm ~' + NCHAR(10) +
+        N'Rót ra ly, trang trí và dùng ngay khi còn lạnh.'),
+    (2, 1, N'~ Sơ chế cà rốt ~' + NCHAR(10) +
+        N'Bào vỏ, rửa sạch và cắt cà rốt thành miếng nhỏ cho dễ xay.'),
+    (2, 2, N'~ Làm nước ép cà rốt ~' + NCHAR(10) +
+        N'Xay cà rốt với 300 ml nước lọc trong 2–3 phút. Để yên khoảng 10 phút, lọc qua rây và ép nhẹ phần bã để lấy nước. Vắt 1 quả cam vào nước ép, thêm 2 muỗng canh đường rồi khuấy tan.'),
+    (2, 3, N'~ Thành phẩm ~' + NCHAR(10) +
+        N'Rót ra ly và thưởng thức lạnh.');
+
+DECLARE @i INT = 1, @j INT;
+DECLARE @MaDM NVARCHAR(20), @MaMon NVARCHAR(20), @MaCT NVARCHAR(20);
+DECLARE @MaNL NVARCHAR(20), @MaCam NVARCHAR(20), @MaMoi NVARCHAR(20);
+DECLARE @TenMon NVARCHAR(150), @TenNL NVARCHAR(150);
+
+DECLARE @KetQua TABLE (
+    TenMon NVARCHAR(150),
+    MaMonAn NVARCHAR(20),
+    MaCongThuc NVARCHAR(20),
+    TrangThai NVARCHAR(30)
+);
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    -- Kiểm tra mã và ký hiệu đơn vị đang dùng.
+    IF (
+        SELECT COUNT(*) FROM dbo.DonViTinh
+        WHERE (MaDonVi = N'DVT001' AND KyHieu = N'g')
+           OR (MaDonVi = N'DVT003' AND KyHieu = N'ml')
+           OR (MaDonVi = N'DVT005' AND KyHieu = N'quả')
+           OR (MaDonVi = N'DVT006' AND KyHieu = N'muỗng canh')
+           OR (MaDonVi = N'DVT010' AND KyHieu = N'củ')
+    ) <> 5
+        THROW 51000, N'Mã đơn vị trong script không khớp với DB.', 1;
+
+    IF @GamRuotDuaHau <= 0
+        THROW 51001, N'Khối lượng ruột dưa hấu phải lớn hơn 0.', 1;
+
+    WHILE @i <= 2
+    BEGIN
+        SELECT @TenMon = Ten FROM @Mon WHERE STT = @i;
+
+        SET @MaMon = NULL;
+        SET @MaCT = NULL;
+
+        SELECT @MaMon = MaMonAn
+        FROM dbo.MonAn WITH (UPDLOCK, HOLDLOCK)
+        WHERE TenMonAn = @TenMon;
+
+        IF @MaMon IS NOT NULL
+        BEGIN
+            SELECT @MaCT = MaCongThuc
+            FROM dbo.CongThuc WHERE MaMonAn = @MaMon;
+
+            INSERT INTO @KetQua
+            VALUES (@TenMon, @MaMon, @MaCT, N'Đã tồn tại');
+
+            SET @i += 1;
+            CONTINUE;
+        END;
+
+        SET @MaDM = NULL;
+
+        SELECT @MaDM = dm.MaDanhMuc
+        FROM @Mon AS m
+        JOIN dbo.DanhMucMonAn AS dm ON dm.TenDanhMuc = m.DanhMuc
+        WHERE m.STT = @i;
+
+        IF @MaDM IS NULL
+            THROW 51002, N'Chưa có danh mục Sinh tố hoặc Nước ép.', 1;
+
+        IF EXISTS (
+            SELECT 1
+            FROM @ThanhPhan AS tp
+            LEFT JOIN dbo.NguyenLieu AS nl
+                ON nl.MaNguyenLieu = tp.MaNL
+               AND nl.TenNguyenLieu = tp.TenNL
+            WHERE tp.Mon = @i AND tp.MaNL IS NOT NULL
+              AND nl.MaNguyenLieu IS NULL
+        )
+            THROW 51003, N'Mã nguyên liệu có sẵn không khớp với tên trong DB.', 1;
+
+        EXEC dbo.SpCapMaMoi N'MonAn', @MaMon OUTPUT;
+
+        INSERT INTO dbo.MonAn
+            (MaMonAn, MaDanhMuc, TenMonAn, MoTa, ThoiGianChuanBi,
+             ThoiGianCheBien, DoKho, DuongDanAnh)
+        SELECT @MaMon, @MaDM, Ten, MoTa, ChuanBi, CheBien, N'Dễ', NULL
+        FROM @Mon WHERE STT = @i;
+
+        IF OBJECT_ID(N'dbo.MonAnDanhMuc', N'U') IS NOT NULL
+            INSERT INTO dbo.MonAnDanhMuc (MaMonAn, MaDanhMuc)
+            SELECT @MaMon, @MaDM
+            WHERE NOT EXISTS (
+                SELECT 1 FROM dbo.MonAnDanhMuc
+                WHERE MaMonAn = @MaMon AND MaDanhMuc = @MaDM
+            );
+
+        EXEC dbo.SpCapMaMoi N'CongThuc', @MaCT OUTPUT;
+
+        INSERT INTO dbo.CongThuc
+            (MaCongThuc, MaMonAn, MoTa, SoKhauPhanChuan, DaCongBo)
+        SELECT @MaCT, @MaMon, MoTa, KhauPhan, 0
+        FROM @Mon WHERE STT = @i;
+
+        SET @j = 1;
+
+        WHILE @j <= 4
+        BEGIN
+            SELECT @MaNL = MaNL, @TenNL = TenNL
+            FROM @ThanhPhan WHERE Mon = @i AND STT = @j;
+
+            IF @MaNL IS NULL
+            BEGIN
+                SELECT @MaNL = MIN(MaNguyenLieu)
+                FROM dbo.NguyenLieu WITH (UPDLOCK, HOLDLOCK)
+                WHERE TenNguyenLieu = @TenNL;
+
+                IF @MaNL IS NULL
+                BEGIN
+                    EXEC dbo.SpCapMaMoi N'NguyenLieu', @MaNL OUTPUT;
+
+                    WHILE EXISTS (
+                        SELECT 1 FROM dbo.NguyenLieu WITH (UPDLOCK, HOLDLOCK)
+                        WHERE MaNguyenLieu = @MaNL
+                    )
+                        EXEC dbo.SpCapMaMoi N'NguyenLieu', @MaNL OUTPUT;
+
+                    INSERT INTO dbo.NguyenLieu (MaNguyenLieu, TenNguyenLieu, MoTa)
+                    VALUES (@MaNL, @TenNL, N'Nước vắt từ cam tươi.');
+                END;
+
+                SET @MaCam = @MaNL;
+            END;
+
+            EXEC dbo.SpCapMaMoi N'ThanhPhanCongThuc', @MaMoi OUTPUT;
+
+            INSERT INTO dbo.ThanhPhanCongThuc
+                (MaThanhPhan, MaCongThuc, MaNguyenLieu, MaDonVi, SoLuong)
+            SELECT @MaMoi, @MaCT, @MaNL, MaDV, SoLuong
+            FROM @ThanhPhan WHERE Mon = @i AND STT = @j;
+
+            SET @j += 1;
+        END;
+
+        SET @j = 1;
+
+        WHILE @j <= 3
+        BEGIN
+            EXEC dbo.SpCapMaMoi N'BuocCheBien', @MaMoi OUTPUT;
+
+            INSERT INTO dbo.BuocCheBien (MaBuoc, MaCongThuc, ThuTu, NoiDung)
+            SELECT @MaMoi, @MaCT, STT, NoiDung
+            FROM @Buoc WHERE Mon = @i AND STT = @j;
+
+            SET @j += 1;
+        END;
+
+        EXEC dbo.SpCapMaMoi N'DoanPhimHuongDan', @MaMoi OUTPUT;
+
+        INSERT INTO dbo.DoanPhimHuongDan
+            (MaDoanPhim, MaCongThuc, TieuDe, DuongDan)
+        SELECT @MaMoi, @MaCT, N'Cách làm ' + Ten, Video
+        FROM @Mon WHERE STT = @i;
+
+        UPDATE dbo.CongThuc SET DaCongBo = 1 WHERE MaCongThuc = @MaCT;
+
+        INSERT INTO @KetQua VALUES (@TenMon, @MaMon, @MaCT, N'Đã thêm');
+        SET @i += 1;
+    END;
+
+    -- Bổ sung dinh dưỡng trên 100 g nếu nguyên liệu chưa có bản ghi.
+    DECLARE @DD TABLE (
+        STT INT PRIMARY KEY,
+        MaNL NVARCHAR(20) NULL,
+        Kcal DECIMAL(10,2),
+        Dam DECIMAL(10,2),
+        Carb DECIMAL(10,2),
+        Beo DECIMAL(10,2),
+        Xo DECIMAL(10,2),
+        Natri DECIMAL(10,2)
+    );
+
+    INSERT INTO @DD VALUES
+        (1, N'NL307',  30, 0.61,  7.55, 0.15, 0.40, 1), -- Dưa hấu
+        (2, N'NL1123', 25, 0.42,  8.42, 0.07, 0.40, 2), -- Nước cốt chanh
+        (3, @MaCam,    45, 0.70, 10.40, 0.20, 0.20, 1); -- Nước cốt cam
+
+    SET @i = 1;
+
+    WHILE @i <= 3
+    BEGIN
+        SELECT @MaNL = MaNL FROM @DD WHERE STT = @i;
+
+        IF @MaNL IS NOT NULL
+           AND EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu = @MaNL)
+           AND NOT EXISTS (
+               SELECT 1 FROM dbo.ThongTinDinhDuong WITH (UPDLOCK, HOLDLOCK)
+               WHERE MaNguyenLieu = @MaNL
+           )
+        BEGIN
+            EXEC dbo.SpCapMaMoi N'ThongTinDinhDuong', @MaMoi OUTPUT;
+
+            WHILE EXISTS (
+                SELECT 1 FROM dbo.ThongTinDinhDuong WITH (UPDLOCK, HOLDLOCK)
+                WHERE MaThongTin = @MaMoi
+            )
+                EXEC dbo.SpCapMaMoi N'ThongTinDinhDuong', @MaMoi OUTPUT;
+
+            INSERT INTO dbo.ThongTinDinhDuong
+                (MaThongTin, MaNguyenLieu, KhoiLuongChuan, MaDonVi,
+                 NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, Natri)
+            SELECT @MaMoi, MaNL, 100, N'DVT001', Kcal, Dam, Carb, Beo, Xo, Natri
+            FROM @DD WHERE STT = @i;
+        END;
+
+        SET @i += 1;
+    END;
+
+    -- Chỉ bổ sung gam/củ cho cà rốt nếu chưa có quy đổi
+    -- và đơn vị củ không có hệ số chuẩn chung.
+    IF EXISTS (SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu = N'NL036')
+       AND EXISTS (
+           SELECT 1 FROM dbo.DonViTinh
+           WHERE MaDonVi = N'DVT010' AND HeSoGramChuan IS NULL
+       )
+       AND NOT EXISTS (
+           SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WITH (UPDLOCK, HOLDLOCK)
+           WHERE MaNguyenLieu = N'NL036' AND MaDonVi = N'DVT010'
+       )
+    BEGIN
+        EXEC dbo.SpCapMaMoi N'QuyDoiDonViNguyenLieu', @MaMoi OUTPUT;
+
+        WHILE EXISTS (
+            SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WITH (UPDLOCK, HOLDLOCK)
+            WHERE MaQuyDoi = @MaMoi
+        )
+            EXEC dbo.SpCapMaMoi N'QuyDoiDonViNguyenLieu', @MaMoi OUTPUT;
+
+        INSERT INTO dbo.QuyDoiDonViNguyenLieu
+            (MaQuyDoi, MaNguyenLieu, MaDonVi, KhoiLuongQuyDoiGram)
+        VALUES (@MaMoi, N'NL036', N'DVT010', 78.000);
+    END;
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0 ROLLBACK TRANSACTION;
+    THROW;
+END CATCH;
+
+SELECT TenMon, MaMonAn, MaCongThuc, TrangThai
+FROM @KetQua;
+
+SELECT k.TenMon, nl.TenNguyenLieu, tp.SoLuong, dv.KyHieu AS DonVi,
+       COALESCE(q.KhoiLuongQuyDoiGram, dv.HeSoGramChuan) AS GamMoiDonVi,
+       dd.KhoiLuongChuan, dd.NangLuong
+FROM @KetQua AS k
+JOIN dbo.ThanhPhanCongThuc AS tp ON tp.MaCongThuc = k.MaCongThuc
+JOIN dbo.NguyenLieu AS nl ON nl.MaNguyenLieu = tp.MaNguyenLieu
+JOIN dbo.DonViTinh AS dv ON dv.MaDonVi = tp.MaDonVi
+LEFT JOIN dbo.QuyDoiDonViNguyenLieu AS q
+    ON q.MaNguyenLieu = tp.MaNguyenLieu AND q.MaDonVi = tp.MaDonVi
+LEFT JOIN dbo.ThongTinDinhDuong AS dd ON dd.MaNguyenLieu = tp.MaNguyenLieu
+ORDER BY k.TenMon, tp.MaThanhPhan;
+
+USE [QuanLyThucDon];
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+DECLARE @TenMon NVARCHAR(150) = N'Củ kiệu chua ngọt';
+DECLARE @MoTa NVARCHAR(1000) =
+    N'Củ kiệu muối giấm đường, giòn và chua ngọt, dùng ăn kèm các món ngày Tết.';
+DECLARE @Anh NVARCHAR(500) = NULL; -- Điền đường dẫn ảnh nếu đã tải lên.
+DECLARE @Video NVARCHAR(500) =
+    N'https://www.youtube.com/watch?v=IHKqJZqPlCM';
+
+DECLARE @MaDM NVARCHAR(20), @MaMon NVARCHAR(20), @MaCT NVARCHAR(20);
+DECLARE @MaNL NVARCHAR(20), @MaKieu NVARCHAR(20), @MaGram NVARCHAR(20);
+DECLARE @MaDV NVARCHAR(20), @MaMoi NVARCHAR(20);
+DECLARE @TenNL NVARCHAR(150), @TenThayThe NVARCHAR(150);
+DECLARE @KyHieu NVARCHAR(20), @SoLuong DECIMAL(12,3);
+DECLARE @Loi NVARCHAR(2048), @i INT;
+
+DECLARE @ThanhPhan TABLE (
+    STT INT PRIMARY KEY,
+    Ten NVARCHAR(150),
+    TenThayThe NVARCHAR(150) NULL,
+    KyHieu NVARCHAR(20),
+    SoLuong DECIMAL(12,3)
+);
+
+INSERT INTO @ThanhPhan VALUES
+    (1, N'Củ kiệu',  NULL,    N'kg',           1),
+    (2, N'Đường',    NULL,    N'g',          400),
+    (3, N'Giấm ăn',  N'Giấm', N'ml',         500),
+    (4, N'Phèn chua', NULL,   N'muỗng cà phê', 1),
+    (5, N'Muối',     NULL,    N'ít',           1);
+
+DECLARE @Buoc TABLE (
+    ThuTu INT PRIMARY KEY,
+    NoiDung NVARCHAR(1500)
+);
+
+INSERT INTO @Buoc VALUES
+    (1, N'~ Ngâm củ kiệu ~' + NCHAR(10) +
+        N'Hòa 100 g muối và 1 muỗng cà phê phèn chua vào tô nước. Ngâm kiệu khoảng 12 tiếng hoặc qua đêm, sau đó rửa sạch nhiều lần và bỏ nước ngâm.'),
+    (2, N'~ Cắt củ kiệu ~' + NCHAR(10) +
+        N'Cắt rễ, ngọn và bỏ vỏ lụa. Tránh cắt sâu vào thân củ. Để kiệu ráo nước.'),
+    (3, N'~ Ướp và phơi kiệu ~' + NCHAR(10) +
+        N'Trộn kiệu với 300 g đường, trải ra mâm và phơi trong bóng râm khoảng 3–4 tiếng đến khi săn lại. Đảo đều và che bằng vải thưa để hạn chế bụi.'),
+    (4, N'~ Pha nước ngâm ~' + NCHAR(10) +
+        N'Đun 500 ml giấm với 100 g đường và 1 muỗng cà phê muối. Khi đường tan hết, tắt bếp và để nguội.'),
+    (5, N'~ Muối kiệu chua ngọt ~' + NCHAR(10) +
+        N'Rửa sạch và tráng hũ thủy tinh bằng nước sôi. Xếp kiệu vào hũ, đổ hỗn hợp giấm đường đã nguội rồi đậy nắp. Ngâm khoảng 2–3 ngày theo công thức.'),
+    (6, N'~ Thành phẩm ~' + NCHAR(10) +
+        N'Kiệu có màu trắng, giòn và vị chua ngọt. Dùng ăn kèm bánh chưng, bánh tét hoặc thịt đông.');
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    SELECT @MaDM = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Ngày lễ - Tết';
+
+    IF @MaDM IS NULL
+        THROW 51000, N'Chưa tìm thấy danh mục Ngày lễ - Tết.', 1;
+
+    IF EXISTS (
+        SELECT 1 FROM dbo.MonAn WITH (UPDLOCK, HOLDLOCK)
+        WHERE TenMonAn = @TenMon
+    )
+        THROW 51001, N'Món Củ kiệu chua ngọt đã có trong DB.', 1;
+
+    SELECT @MaGram = MIN(MaDonVi)
+    FROM dbo.DonViTinh WHERE KyHieu = N'g';
+
+    IF @MaGram IS NULL
+        THROW 51002, N'Không tìm thấy đơn vị g.', 1;
+
+    EXEC dbo.SpCapMaMoi
+        @LoaiMa = N'MonAn', @MaMoi = @MaMon OUTPUT;
+
+    INSERT INTO dbo.MonAn
+        (MaMonAn, MaDanhMuc, TenMonAn, MoTa, ThoiGianChuanBi,
+         ThoiGianCheBien, DoKho, DuongDanAnh)
+    VALUES (@MaMon, @MaDM, @TenMon, @MoTa, 10, 80, N'Dễ', @Anh);
+
+    IF OBJECT_ID(N'dbo.MonAnDanhMuc', N'U') IS NOT NULL
+    BEGIN
+        INSERT INTO dbo.MonAnDanhMuc (MaMonAn, MaDanhMuc)
+        SELECT @MaMon, @MaDM
+        WHERE NOT EXISTS (
+            SELECT 1 FROM dbo.MonAnDanhMuc
+            WHERE MaMonAn = @MaMon AND MaDanhMuc = @MaDM
+        );
+    END;
+
+    EXEC dbo.SpCapMaMoi
+        @LoaiMa = N'CongThuc', @MaMoi = @MaCT OUTPUT;
+
+    INSERT INTO dbo.CongThuc
+        (MaCongThuc, MaMonAn, MoTa, SoKhauPhanChuan, DaCongBo)
+    VALUES (@MaCT, @MaMon, @MoTa, 1, 0);
+
+    SET @i = 1;
+    WHILE @i <= (SELECT COUNT(*) FROM @ThanhPhan)
+    BEGIN
+        SELECT @TenNL = Ten, @TenThayThe = TenThayThe,
+               @KyHieu = KyHieu, @SoLuong = SoLuong
+        FROM @ThanhPhan WHERE STT = @i;
+
+        SELECT @MaDV = MIN(MaDonVi)
+        FROM dbo.DonViTinh WHERE KyHieu = @KyHieu;
+
+        IF @MaDV IS NULL
+        BEGIN
+            SET @Loi = CONCAT(N'Không tìm thấy đơn vị ', @KyHieu, N'.');
+            THROW 51003, @Loi, 1;
+        END;
+
+        SET @MaNL = NULL;
+
+        SELECT TOP (1) @MaNL = MaNguyenLieu
+        FROM dbo.NguyenLieu WITH (UPDLOCK, HOLDLOCK)
+        WHERE TenNguyenLieu IN (@TenNL, @TenThayThe)
+        ORDER BY CASE WHEN TenNguyenLieu = @TenNL THEN 0 ELSE 1 END,
+                 MaNguyenLieu;
+
+        IF @MaNL IS NULL
+        BEGIN
+            EXEC dbo.SpCapMaMoi
+                @LoaiMa = N'NguyenLieu', @MaMoi = @MaNL OUTPUT;
+
+            WHILE EXISTS (
+                SELECT 1 FROM dbo.NguyenLieu WITH (UPDLOCK, HOLDLOCK)
+                WHERE MaNguyenLieu = @MaNL
+            )
+                EXEC dbo.SpCapMaMoi
+                    @LoaiMa = N'NguyenLieu', @MaMoi = @MaNL OUTPUT;
+
+            INSERT INTO dbo.NguyenLieu (MaNguyenLieu, TenNguyenLieu, MoTa)
+            VALUES (@MaNL, @TenNL, @TenNL);
+        END;
+
+        IF @i = 1 SET @MaKieu = @MaNL;
+
+        EXEC dbo.SpCapMaMoi
+            @LoaiMa = N'ThanhPhanCongThuc', @MaMoi = @MaMoi OUTPUT;
+
+        INSERT INTO dbo.ThanhPhanCongThuc
+            (MaThanhPhan, MaCongThuc, MaNguyenLieu, MaDonVi, SoLuong)
+        VALUES (@MaMoi, @MaCT, @MaNL, @MaDV, @SoLuong);
+
+        SET @i += 1;
+    END;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM dbo.ThongTinDinhDuong WITH (UPDLOCK, HOLDLOCK)
+        WHERE MaNguyenLieu = @MaKieu
+    )
+    BEGIN
+        EXEC dbo.SpCapMaMoi
+            @LoaiMa = N'ThongTinDinhDuong', @MaMoi = @MaMoi OUTPUT;
+
+        WHILE EXISTS (
+            SELECT 1 FROM dbo.ThongTinDinhDuong WITH (UPDLOCK, HOLDLOCK)
+            WHERE MaThongTin = @MaMoi
+        )
+            EXEC dbo.SpCapMaMoi
+                @LoaiMa = N'ThongTinDinhDuong', @MaMoi = @MaMoi OUTPUT;
+
+        -- MEXT 06305, củ kiệu tươi trên 100 g phần ăn được.
+        INSERT INTO dbo.ThongTinDinhDuong
+            (MaThongTin, MaNguyenLieu, KhoiLuongChuan, MaDonVi,
+             NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, Natri)
+        VALUES (@MaMoi, @MaKieu, 100, @MaGram, 83, 1.40, 29.30, 0.20, 20.70, 2);
+    END;
+
+    SET @i = 1;
+    WHILE @i <= (SELECT COUNT(*) FROM @Buoc)
+    BEGIN
+        EXEC dbo.SpCapMaMoi
+            @LoaiMa = N'BuocCheBien', @MaMoi = @MaMoi OUTPUT;
+
+        INSERT INTO dbo.BuocCheBien (MaBuoc, MaCongThuc, ThuTu, NoiDung)
+        SELECT @MaMoi, @MaCT, ThuTu, NoiDung
+        FROM @Buoc WHERE ThuTu = @i;
+
+        SET @i += 1;
+    END;
+
+    EXEC dbo.SpCapMaMoi
+        @LoaiMa = N'DoanPhimHuongDan', @MaMoi = @MaMoi OUTPUT;
+
+    INSERT INTO dbo.DoanPhimHuongDan
+        (MaDoanPhim, MaCongThuc, TieuDe, DuongDan)
+    VALUES (@MaMoi, @MaCT, N'Cách làm củ kiệu chua ngọt', @Video);
+
+    UPDATE dbo.CongThuc SET DaCongBo = 1 WHERE MaCongThuc = @MaCT;
+
+    COMMIT TRANSACTION;
+
+    SELECT @MaMon AS MaMonAn, @MaCT AS MaCongThuc,
+           @TenMon AS TenMonAn, N'Ngày lễ - Tết' AS DanhMuc,
+           N'1 mẻ dùng 1 kg kiệu' AS KhauPhanChuan;
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0 ROLLBACK TRANSACTION;
+    THROW;
+END CATCH;
+
+USE [QuanLyThucDon];
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+DECLARE @TenMon NVARCHAR(150) = N'Khô heo tẩm vị xé sợi';
+DECLARE @MoTa NVARCHAR(1000) =
+    N'Thịt heo nạc xé sợi, ướp sả ớt và gia vị, rim rồi đảo khô trên chảo.';
+DECLARE @Video NVARCHAR(500) =
+    N'https://www.youtube.com/watch?v=xftx-cT5oyY';
+
+DECLARE @MaDM NVARCHAR(20), @MaMon NVARCHAR(20), @MaCT NVARCHAR(20);
+DECLARE @MaNL NVARCHAR(20), @MaDV NVARCHAR(20), @MaMoi NVARCHAR(20);
+DECLARE @MaNghe NVARCHAR(20), @MaGram NVARCHAR(20), @MaMuongCanh NVARCHAR(20);
+DECLARE @TenNL NVARCHAR(150), @TenThayThe NVARCHAR(150), @KyHieu NVARCHAR(20);
+DECLARE @SoLuong DECIMAL(12,3), @Loi NVARCHAR(2048), @i INT;
+
+DECLARE @ThanhPhan TABLE (
+    STT INT PRIMARY KEY,
+    Ten NVARCHAR(150) NOT NULL,
+    TenThayThe NVARCHAR(150) NULL,
+    DonVi NVARCHAR(20) NOT NULL,
+    SoLuong DECIMAL(12,3) NOT NULL
+);
+
+INSERT INTO @ThanhPhan VALUES
+    (1,  N'Thịt heo nạc',  NULL,             N'kg',           2),
+    (2,  N'Mỡ bò',         NULL,             N'miếng',        1),
+    (3,  N'Sả',            NULL,             N'cây',         14),
+    (4,  N'Gừng',          NULL,             N'củ',           1),
+    (5,  N'Ớt tươi',       N'Ớt',            N'quả',          3),
+    (6,  N'Ớt bột',        N'Bột ớt',        N'muỗng canh',   3),
+    (7,  N'Bột nghệ',      NULL,             N'muỗng canh',   2),
+    (8,  N'Ngũ vị hương',  NULL,             N'gói',          0.5),
+    (9,  N'Dầu màu điều',  N'Dầu điều',      N'muỗng canh',   2),
+    (10, N'Dầu hào',       NULL,             N'muỗng canh',   2),
+    (11, N'Nước luộc thịt', NULL,            N'ml',         200),
+    (12, N'Đường',         N'Đường cát',     N'muỗng canh',   4),
+    (13, N'Hạt nêm',       NULL,             N'muỗng canh',   1),
+    (14, N'Muối',          NULL,             N'muỗng cà phê', 1.5);
+
+DECLARE @Buoc TABLE (
+    ThuTu INT PRIMARY KEY,
+    NoiDung NVARCHAR(1500) NOT NULL
+);
+
+INSERT INTO @Buoc VALUES
+    (1, N'~ Sơ chế thịt heo ~' + NCHAR(10) +
+        N'Rửa thịt, cắt miếng, trụng sơ rồi xả lại bằng nước sạch. Bỏ rễ và lá khô của sả, cắt khúc. Gọt vỏ gừng rồi thái lát.'),
+    (2, N'~ Luộc và xé thịt ~' + NCHAR(10) +
+        N'Luộc thịt với 1 lít nước, 1/2 muỗng cà phê muối, mỡ bò, một nửa phần sả và một ít gừng. Khi thịt chín, vớt ra, đập mềm rồi xé sợi. Giữ lại khoảng 200 ml nước luộc để rim. Xay nhuyễn phần sả còn lại với 3 quả ớt.'),
+    (3, N'~ Ướp, rim và đảo khô ~' + NCHAR(10) +
+        N'Trộn thịt với ớt bột, đường, ngũ vị hương, bột nghệ, hạt nêm, 1 muỗng cà phê muối và hỗn hợp sả ớt. Thêm dầu màu điều và dầu hào rồi ướp 2 tiếng. Thêm 200 ml nước luộc thịt, rim lửa nhỏ đến khi cạn. Chuyển sang chảo chống dính và đảo đều đến khi sợi thịt khô.'),
+    (4, N'~ Thành phẩm ~' + NCHAR(10) +
+        N'Khô heo có màu vàng nâu, sợi tơi và vị cay mặn. Có thể vắt thêm chanh hoặc tắc khi ăn.');
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    SELECT @MaDM = MaDanhMuc
+    FROM dbo.DanhMucMonAn
+    WHERE TenDanhMuc = N'Món khô - mắm';
+
+    IF @MaDM IS NULL
+        THROW 51000, N'Chưa tìm thấy danh mục Món khô - mắm.', 1;
+
+    IF EXISTS (
+        SELECT 1 FROM dbo.MonAn WITH (UPDLOCK, HOLDLOCK)
+        WHERE TenMonAn = @TenMon
+    )
+        THROW 51001, N'Món Khô heo tẩm vị xé sợi đã có trong DB.', 1;
+
+    SELECT @MaGram = MIN(MaDonVi)
+    FROM dbo.DonViTinh WHERE KyHieu = N'g';
+
+    IF @MaGram IS NULL
+        THROW 51002, N'Không tìm thấy đơn vị gam.', 1;
+
+    EXEC dbo.SpCapMaMoi N'MonAn', @MaMon OUTPUT;
+
+    INSERT INTO dbo.MonAn
+        (MaMonAn, MaDanhMuc, TenMonAn, MoTa, ThoiGianChuanBi,
+         ThoiGianCheBien, DoKho, DuongDanAnh)
+    VALUES (@MaMon, @MaDM, @TenMon, @MoTa, 15, 150, N'Dễ', NULL);
+
+    IF OBJECT_ID(N'dbo.MonAnDanhMuc', N'U') IS NOT NULL
+        INSERT INTO dbo.MonAnDanhMuc (MaMonAn, MaDanhMuc)
+        SELECT @MaMon, @MaDM
+        WHERE NOT EXISTS (
+            SELECT 1 FROM dbo.MonAnDanhMuc
+            WHERE MaMonAn = @MaMon AND MaDanhMuc = @MaDM
+        );
+
+    EXEC dbo.SpCapMaMoi N'CongThuc', @MaCT OUTPUT;
+
+    INSERT INTO dbo.CongThuc
+        (MaCongThuc, MaMonAn, MoTa, SoKhauPhanChuan, DaCongBo)
+    VALUES (@MaCT, @MaMon, @MoTa, 2, 0);
+
+    SET @i = 1;
+
+    WHILE @i <= (SELECT COUNT(*) FROM @ThanhPhan)
+    BEGIN
+        SELECT @TenNL = Ten, @TenThayThe = TenThayThe,
+               @KyHieu = DonVi, @SoLuong = SoLuong
+        FROM @ThanhPhan WHERE STT = @i;
+
+        SELECT @MaDV = MIN(MaDonVi)
+        FROM dbo.DonViTinh WHERE KyHieu = @KyHieu;
+
+        IF @MaDV IS NULL
+        BEGIN
+            SET @Loi = CONCAT(N'Không tìm thấy đơn vị ', @KyHieu, N'.');
+            THROW 51003, @Loi, 1;
+        END;
+
+        SET @MaNL = NULL;
+
+        SELECT TOP (1) @MaNL = MaNguyenLieu
+        FROM dbo.NguyenLieu WITH (UPDLOCK, HOLDLOCK)
+        WHERE TenNguyenLieu IN (@TenNL, @TenThayThe)
+        ORDER BY CASE WHEN TenNguyenLieu = @TenNL THEN 0 ELSE 1 END,
+                 MaNguyenLieu;
+
+        IF @MaNL IS NULL
+        BEGIN
+            EXEC dbo.SpCapMaMoi N'NguyenLieu', @MaNL OUTPUT;
+
+            WHILE EXISTS (
+                SELECT 1 FROM dbo.NguyenLieu WITH (UPDLOCK, HOLDLOCK)
+                WHERE MaNguyenLieu = @MaNL
+            )
+                EXEC dbo.SpCapMaMoi N'NguyenLieu', @MaNL OUTPUT;
+
+            INSERT INTO dbo.NguyenLieu (MaNguyenLieu, TenNguyenLieu, MoTa)
+            VALUES (@MaNL, @TenNL, @TenNL);
+        END;
+
+        IF @TenNL = N'Bột nghệ'
+        BEGIN
+            SET @MaNghe = @MaNL;
+            SET @MaMuongCanh = @MaDV;
+        END;
+
+        EXEC dbo.SpCapMaMoi N'ThanhPhanCongThuc', @MaMoi OUTPUT;
+
+        INSERT INTO dbo.ThanhPhanCongThuc
+            (MaThanhPhan, MaCongThuc, MaNguyenLieu, MaDonVi, SoLuong)
+        VALUES (@MaMoi, @MaCT, @MaNL, @MaDV, @SoLuong);
+
+        SET @i += 1;
+    END;
+
+    -- USDA SR28, bột nghệ trên 100 g.
+    IF NOT EXISTS (
+        SELECT 1 FROM dbo.ThongTinDinhDuong WITH (UPDLOCK, HOLDLOCK)
+        WHERE MaNguyenLieu = @MaNghe
+    )
+    BEGIN
+        EXEC dbo.SpCapMaMoi N'ThongTinDinhDuong', @MaMoi OUTPUT;
+
+        WHILE EXISTS (
+            SELECT 1 FROM dbo.ThongTinDinhDuong WITH (UPDLOCK, HOLDLOCK)
+            WHERE MaThongTin = @MaMoi
+        )
+            EXEC dbo.SpCapMaMoi N'ThongTinDinhDuong', @MaMoi OUTPUT;
+
+        INSERT INTO dbo.ThongTinDinhDuong
+            (MaThongTin, MaNguyenLieu, KhoiLuongChuan, MaDonVi,
+             NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, Natri)
+        VALUES (@MaMoi, @MaNghe, 100, @MaGram,
+                312, 9.68, 67.14, 3.25, 22.70, 27);
+    END;
+
+    IF EXISTS (
+        SELECT 1 FROM dbo.DonViTinh WITH (UPDLOCK, HOLDLOCK)
+        WHERE MaDonVi = @MaMuongCanh AND HeSoGramChuan IS NULL
+    )
+    AND NOT EXISTS (
+        SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WITH (UPDLOCK, HOLDLOCK)
+        WHERE MaNguyenLieu = @MaNghe AND MaDonVi = @MaMuongCanh
+    )
+    BEGIN
+        EXEC dbo.SpCapMaMoi N'QuyDoiDonViNguyenLieu', @MaMoi OUTPUT;
+
+        WHILE EXISTS (
+            SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WITH (UPDLOCK, HOLDLOCK)
+            WHERE MaQuyDoi = @MaMoi
+        )
+            EXEC dbo.SpCapMaMoi N'QuyDoiDonViNguyenLieu', @MaMoi OUTPUT;
+
+        INSERT INTO dbo.QuyDoiDonViNguyenLieu
+            (MaQuyDoi, MaNguyenLieu, MaDonVi, KhoiLuongQuyDoiGram)
+        VALUES (@MaMoi, @MaNghe, @MaMuongCanh, 9.400);
+    END;
+
+    SET @i = 1;
+
+    WHILE @i <= (SELECT COUNT(*) FROM @Buoc)
+    BEGIN
+        EXEC dbo.SpCapMaMoi N'BuocCheBien', @MaMoi OUTPUT;
+
+        INSERT INTO dbo.BuocCheBien (MaBuoc, MaCongThuc, ThuTu, NoiDung)
+        SELECT @MaMoi, @MaCT, ThuTu, NoiDung FROM @Buoc WHERE ThuTu = @i;
+
+        SET @i += 1;
+    END;
+
+    EXEC dbo.SpCapMaMoi N'DoanPhimHuongDan', @MaMoi OUTPUT;
+
+    INSERT INTO dbo.DoanPhimHuongDan
+        (MaDoanPhim, MaCongThuc, TieuDe, DuongDan)
+    VALUES (@MaMoi, @MaCT, N'Cách làm khô heo tẩm vị xé sợi', @Video);
+
+    UPDATE dbo.CongThuc SET DaCongBo = 1 WHERE MaCongThuc = @MaCT;
+
+    COMMIT TRANSACTION;
+
+    SELECT @MaMon AS MaMonAn, @MaCT AS MaCongThuc,
+           @TenMon AS TenMonAn, N'Món khô - mắm' AS DanhMuc;
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0 ROLLBACK TRANSACTION;
+    THROW;
+END CATCH;
+
+USE [QuanLyThucDon];
+GO
+
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+DECLARE @ThuMucAnh NVARCHAR(200) =
+    N'https://res.cloudinary.com/i0qfutld/image/upload/v1793996238/';
+
+DECLARE @AnhMon TABLE (
+    TenMonAn NVARCHAR(150) PRIMARY KEY,
+    TenFile NVARCHAR(150) NOT NULL
+);
+
+INSERT INTO @AnhMon (TenMonAn, TenFile)
+VALUES
+    (N'Trà dâu ngâm',                         N'tra-dau-ngam.png'),
+    (N'Trân châu phô mai',                     N'tran-chau-pho-mai.png'),
+    (N'Dưa hấu chanh tuyết',                   N'dua-hau-chanh-tuyet.png'),
+    (N'Nước ép cà rốt bằng máy xay sinh tố',    N'nuoc-ep-ca-rot.png'),
+    (N'Củ kiệu chua ngọt',                     N'cu-kieu-chua-ngot.png'),
+    (N'Khô heo tẩm vị xé sợi',                 N'kho-heo-tam-vi-xe-soi.png');
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    UPDATE m
+    SET m.DuongDanAnh = @ThuMucAnh + a.TenFile
+    FROM dbo.MonAn AS m
+    INNER JOIN @AnhMon AS a ON a.TenMonAn = m.TenMonAn;
+
+    IF @@ROWCOUNT <> 6
+    BEGIN
+        SELECT a.TenMonAn AS MonChuaTimThay
+        FROM @AnhMon AS a
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM dbo.MonAn AS m
+            WHERE m.TenMonAn = a.TenMonAn
+        );
+
+        THROW 51000, N'Không tìm thấy đủ 6 món. Đã hoàn tác cập nhật ảnh.', 1;
+    END;
+
+    COMMIT TRANSACTION;
+
+    SELECT m.MaMonAn, m.TenMonAn, m.DuongDanAnh
+    FROM dbo.MonAn AS m
+    INNER JOIN @AnhMon AS a ON a.TenMonAn = m.TenMonAn
+    ORDER BY m.TenMonAn;
+END TRY
+BEGIN CATCH
+    IF XACT_STATE() <> 0
+        ROLLBACK TRANSACTION;
+    THROW;
+END CATCH;
