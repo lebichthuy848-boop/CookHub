@@ -39,6 +39,8 @@ def save(data: s.Preferences, user=Depends(current_user), db: Session = Depends(
     payload = {key: value for key, value in data.model_dump().items() if value not in ('', [], None)}
     if existing.get('avatar'):
         payload['avatar'] = existing['avatar']
+    if '_household' in existing:
+        payload['_household'] = existing['_household']
     row.answers = json.dumps(payload, ensure_ascii=False)
     row.completed = 1
     row.survey_shown = 1

@@ -1,0 +1,35 @@
+.system-reports{display:grid;gap:18px;min-width:0;max-width:100%;width:100%}
+.system-reports>*,.system-reports .reports-grid>*,.system-reports .reports-kpis>*,.system-reports .reports-chart-wrap{min-width:0;max-width:100%}
+.system-reports .report-bars{display:flex;width:100%;min-width:0;overflow:hidden}
+.system-reports .report-bar{flex:1 1 0;min-width:0}
+.system-reports .report-bar small{white-space:nowrap}
+.system-reports .reports-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.ranking-list{display:grid;gap:16px}.ranking-row{display:flex;align-items:center;gap:12px}.ranking-number{width:18px;color:#80968a;font-size:12px}.ranking-row img{width:48px;height:48px;object-fit:cover;border-radius:11px}.ranking-detail{flex:1;min-width:0}.ranking-detail>b{display:block;font-size:13px;margin-bottom:9px;overflow-wrap:anywhere}.ranking-track{height:7px;background:#edf5ef;border-radius:8px;overflow:hidden}.ranking-track i{display:block;height:100%;background:linear-gradient(90deg,#17815e,#45c39a);border-radius:8px}.ranking-row>strong{min-width:34px;text-align:right;color:#137c59;font-size:18px}.ranking-row>strong small{display:block;font-size:10px;font-weight:400}.ranking-card header button{font-size:12px;padding:7px 10px;border-radius:9px}
+@media(max-width:850px){.system-reports .reports-grid{grid-template-columns:1fr}}
+.system-reports .reports-hero{padding:30px;border-radius:22px;background:linear-gradient(115deg,#075a46,#079b72);box-shadow:0 12px 30px #086b4518}
+.system-reports .reports-hero h1{font-size:28px;letter-spacing:-.6px;margin:10px 0 0}
+.system-reports .reports-actions{display:flex;gap:10px;flex-shrink:0}
+.system-reports .reports-actions button{border-radius:12px;padding:12px 16px;font-size:13px}
+.system-reports .reports-filter{display:flex;align-items:center;flex-wrap:wrap;gap:14px;padding:16px 20px;border-radius:16px;box-shadow:0 4px 16px #153d2707}
+.system-reports .reports-filter>b{white-space:nowrap;font-size:13px}
+.system-reports .reports-filter select{flex:0 1 240px;width:240px;min-width:210px;height:42px;border-radius:10px;background:var(--color-bg-card,#fff)}
+.system-reports .reports-filter>span{margin-left:auto;padding:9px 14px;border-radius:9px;background:#eef7f2;color:#376d58;font-size:12px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.system-reports .reports-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+@media(max-width:1100px){.system-reports .reports-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:550px){.system-reports .reports-kpis{grid-template-columns:1fr}}
+.system-reports .reports-kpis article{position:relative;padding:22px 24px;border-radius:18px;box-shadow:0 5px 18px #153d2708;transition:border-color .2s,transform .2s}
+.system-reports .reports-kpis article:hover{transform:translateY(-2px);border-color:#6cba98}
+.system-reports .reports-kpis article>small{font-size:13px}
+.system-reports .reports-kpis strong{margin:14px 0 10px;font-size:34px;line-height:1.1;font-variant-numeric:tabular-nums}
+.system-reports .reports-kpi-icon{width:40px;height:40px;border-radius:12px}
+.system-reports .reports-card{padding:22px;border-radius:18px;box-shadow:0 5px 18px #153d2708}
+.system-reports .reports-card header{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.system-reports .reports-card h2{font-size:18px;margin:0}
+.system-reports .report-tabs{display:flex;flex-wrap:wrap;gap:5px;padding:5px;border-radius:12px;background:#f0f6f2}
+.system-reports .report-tabs button{border:0;border-radius:9px;padding:9px 12px;font-size:12px;background:transparent;color:#527261}
+.system-reports .report-tabs button.active{background:#128462;color:#fff;box-shadow:0 3px 8px #12634420}
+.system-reports .report-bars{height:230px;padding-top:16px;background:repeating-linear-gradient(to top,transparent 0,transparent 49px,#eaf1ed 50px);gap:6px}
+.system-reports .report-bar i{border-radius:6px 6px 0 0;background:linear-gradient(to top,#108360,#38ba90);min-height:0!important}
+.system-reports .report-bar small{font-size:10px;font-variant-numeric:tabular-nums}
+.system-reports .report-bar:nth-child(even):not(:last-child) small{visibility:hidden}
+@media(max-width:800px){.system-reports .reports-hero{padding:24px;flex-wrap:wrap;gap:18px}.system-reports .reports-hero h1{font-size:23px}.system-reports .reports-filter>span{margin-left:0}.system-reports .report-tabs{width:100%}.system-reports .report-tabs button{flex:1}.system-reports .reports-card{padding:16px}}

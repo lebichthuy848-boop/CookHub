@@ -1,4 +1,6 @@
 from datetime import date
+import re
+import unicodedata
 from typing import Literal
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
@@ -62,22 +64,15 @@ def dishes(q: str = '', category: list[str] = Query(default=[]),
     def query_score(item):
         if not normalized_q:
             return 0
-        text = normalize_ingredient_text(item['name'] + ' ' + item['description'])
-        query_words = normalized_q.split()
-        recipe_names = [normalize_ingredient_text(part['name'])
-                        for part in (item['recipe'] or {}).get('ingredients', [])]
-        searchable = [text, *recipe_names]
-        if contains_words(text, normalized_q):
-            return 1.0
-        if len(query_words) > 1 and not (set(query_words) & set(' '.join(searchable).split())):
-            return 0
-        scores = []
-        for word in query_words:
-            scores.append(max(ingredient_similarity(word, candidate)
-                              for candidate in searchable for _ in [0]))
-        whole_name = max((ingredient_similarity(normalized_q, candidate)
-                          for candidate in searchable), default=0)
-        return max(whole_name, sum(scores) / max(1, len(scores)))
+        query = unicodedata.normalize('NFC', q).casefold().strip()
+        name = unicodedata.normalize('NFC', item['name']).casefold()
+        # Accented input must preserve Vietnamese distinctions (phở != phô).
+        # Plain input remains searchable without accents, using whole words.
+        if query == normalize_ingredient_text(query):
+            name = normalize_ingredient_text(name)
+        words = re.findall(r'\w+', query)
+        name_words = set(re.findall(r'\w+', name))
+        return 1.0 if words and all(word in name_words for word in words) else 0
 
     def has_ingredients(item):
         names = [normalize_ingredient_text(part['name'])

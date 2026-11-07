@@ -35,3 +35,37 @@ it('restricts media URLs',()=>{
 });
 it('uses a local calendar date',()=>expect(today()).toMatch(/^\d{4}-\d{2}-\d{2}$/));
 
+
+it('times out stalled reads and restores the caller with an actionable error', async () => {
+  vi.useFakeTimers();
+  vi.stubGlobal('fetch', vi.fn((url, { signal }) => new Promise((resolve, reject) => {
+    signal.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')));
+  })));
+  try {
+    const result = expect(api('/profile', { timeoutMs: 100 })).rejects.toMatchObject({ name: 'TimeoutError' });
+    await vi.advanceTimersByTimeAsync(100);
+    await result;
+  } finally { vi.useRealTimers(); }
+});
+it('preserves cancellation when leaving a page', async () => {
+  vi.stubGlobal('fetch', vi.fn((url, { signal }) => new Promise((resolve, reject) => {
+    signal.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')));
+  })));
+  const controller = new AbortController();
+  const result = expect(api('/profile', { signal: controller.signal })).rejects.toMatchObject({ name: 'AbortError' });
+  controller.abort();
+  await result;
+});
+it('does not retry an update whose outcome is unknown after timeout', async () => {
+  vi.useFakeTimers();
+  const fetch = vi.fn((url, { signal }) => new Promise((resolve, reject) => {
+    signal.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')));
+  }));
+  vi.stubGlobal('fetch', fetch);
+  try {
+    const result = expect(api('/menu', { method: 'POST', body: {}, timeoutMs: 100 })).rejects.toThrow('kiểm tra kết quả');
+    await vi.advanceTimersByTimeAsync(100);
+    await result;
+    expect(fetch).toHaveBeenCalledTimes(1);
+  } finally { vi.useRealTimers(); }
+});

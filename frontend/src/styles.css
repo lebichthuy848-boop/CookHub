@@ -308,7 +308,10 @@ main:has(.menu-page){max-width:none;padding-right:38px;padding-left:38px}.menu-p
 .recipe-info-badges span{padding:6px 9px;font-size:10px}
 
 /* Keep the logout confirmation above the mobile navigation drawer. */
+.smart-search input,.smart-search input:focus,.smart-search input:focus-visible{outline:none!important;outline-offset:0!important;border:0!important;box-shadow:none!important;border-radius:0!important}
 .logout-confirm-backdrop{z-index:1500!important}
+.logout-confirm-backdrop{position:fixed!important;top:0!important;right:0!important;bottom:0!important;left:0!important;width:100vw!important;height:100vh!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:20px!important}
+.logout-confirm-modal{position:relative!important;inset:auto!important;margin:0 auto!important;flex:0 1 420px!important}
 .interactive-ingredients li>span{grid-row:1 / span 3}
 .interactive-ingredients li>.ingredient-check{grid-row:1 / span 3}
 .interactive-ingredients li>b{grid-column:3;grid-row:1}

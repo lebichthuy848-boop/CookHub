@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate, Link } from 'react-router-dom';
 import React from 'react';
+import './logout-dialog.css';
 import { useEffect, useState } from 'react';
 import { useAuth, landing } from '../auth';
 import { api, media } from '../api';
@@ -52,7 +53,40 @@ export default function Layout() {
   const navigate = useNavigate(); const systemAdmin = user.role === 'Quản trị viên'; const admin = systemAdmin || user.role === 'Quản trị nội dung'; const nav = systemAdmin ? systemNav : admin ? adminNav : userNav;
   useEffect(()=>{const request=()=>setLogoutOpen(true);window.addEventListener('request-logout',request);return()=>window.removeEventListener('request-logout',request)},[]);
   useEffect(()=>{if(!open)return;const close=event=>{if(event.key==='Escape')setOpen(false)};window.addEventListener('keydown',close);return()=>window.removeEventListener('keydown',close)},[open]);
-  useEffect(()=>{if(!user || admin)return;let active=true;const apply=imageUrl=>{const image=document.querySelector('.account img');if(active&&image)image.src=imageUrl||defaultAvatar};apply(defaultAvatar);const refresh=()=>api('/profile').then(profile=>{if(!active)return;if(profile.avatar){window.localStorage.setItem('cookhub-avatar',profile.avatar);apply(profile.avatar)}else{window.localStorage.removeItem('cookhub-avatar');apply(defaultAvatar)}}).catch(()=>{});refresh();const timer=window.setInterval(refresh,5000);const changed=()=>apply(window.localStorage.getItem('cookhub-avatar'));window.addEventListener('storage',changed);window.addEventListener('cookhub-avatar-updated',changed);return()=>{active=false;window.clearInterval(timer);window.removeEventListener('storage',changed);window.removeEventListener('cookhub-avatar-updated',changed)}},[user?.id,admin]);
+  useEffect(() => {
+    if (!user || admin) return;
+    let active = true;
+    let pending = false;
+    let lastRefresh = 0;
+    const apply = imageUrl => {
+      const image = document.querySelector('.account img');
+      if (active && image) image.src = imageUrl || defaultAvatar;
+    };
+    apply(window.localStorage.getItem('cookhub-avatar'));
+    const refresh = async () => {
+      if (pending || document.visibilityState === 'hidden' || Date.now() - lastRefresh < 30000) return;
+      pending = true; lastRefresh = Date.now();
+      try {
+        const profile = await api('/profile');
+        if (!active) return;
+        if (profile.avatar) window.localStorage.setItem('cookhub-avatar', profile.avatar);
+        else window.localStorage.removeItem('cookhub-avatar');
+        apply(profile.avatar);
+      } catch { /* Keep the current avatar if the profile service is unavailable. */ }
+      finally { pending = false; }
+    };
+    const changed = () => apply(window.localStorage.getItem('cookhub-avatar'));
+    refresh();
+    window.addEventListener('focus', refresh);
+    window.addEventListener('storage', changed);
+    window.addEventListener('cookhub-avatar-updated', changed);
+    return () => {
+      active = false;
+      window.removeEventListener('focus', refresh);
+      window.removeEventListener('storage', changed);
+      window.removeEventListener('cookhub-avatar-updated', changed);
+    };
+  }, [user?.id, admin]);
   useEffect(()=>{let node;const show=event=>{window.setTimeout(()=>{if(document.querySelector('.favorite-toast'))return;if(node)node.remove();node=document.createElement('div');node.className='favorite-toast';node.setAttribute('role','status');node.textContent='✓  ' + (event.detail?.message || 'Đã cập nhật thành công');document.body.appendChild(node);const current=node;window.setTimeout(()=>{current.remove();if(node===current)node=null},3000)},80)};window.addEventListener('cookhub-toast',show);return()=>{node?.remove();window.removeEventListener('cookhub-toast',show)}},[]);
   const searchHint = useTypingPlaceholder(searchSuggestions);
   function submitSearch(event) {

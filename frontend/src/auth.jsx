@@ -22,14 +22,22 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     if (!user) return undefined;
     let active = true;
-    const sync = () => api('/favorites/counts').then(value => { if (active) setFavoriteCounts(value); }).catch(() => {});
+    let pending = false;
+    const sync = async () => {
+      if (pending || document.visibilityState === 'hidden') return;
+      pending = true;
+      try { const value = await api('/favorites/counts'); if (active) setFavoriteCounts(value); }
+      catch { /* Background refresh must not interrupt the current page. */ }
+      finally { pending = false; }
+    };
     sync();
-    const timer = window.setInterval(sync, 3000);
+    const timer = window.setInterval(sync, 30000);
+    document.addEventListener('visibilitychange', sync);
     if ('BroadcastChannel' in window) {
       favoriteChannel.current = new BroadcastChannel('cookhub-favorites');
       favoriteChannel.current.onmessage = event => setFavoriteCounts(event.data || {});
     }
-    return () => { active = false; window.clearInterval(timer); favoriteChannel.current?.close(); favoriteChannel.current = null; };
+    return () => { active = false; window.clearInterval(timer); document.removeEventListener('visibilitychange', sync); favoriteChannel.current?.close(); favoriteChannel.current = null; };
   }, [user?.id]);
   function updateFavoriteCount(id, delta) {
     setFavoriteCounts(previous => {

@@ -211,9 +211,9 @@ def dish_data(db):
             home_display=True, foods_display=True, home_order=0, foods_order=0))
     return result
 
-def resolve_ingredient(db, name, group=None):
+def resolve_ingredient(db, name, group=None, ingredients=None):
     clean_name = ' '.join(name.strip().split())
-    ingredients = rows(db, m.NguyenLieu)
+    ingredients = rows(db, m.NguyenLieu) if ingredients is None else ingredients
     normalized_name = unicodedata.normalize('NFC', clean_name).casefold()
     row = next((item for item in ingredients
                 if unicodedata.normalize('NFC', ' '.join(item.tenNguyenLieu.strip().split())).casefold() == normalized_name), None)
@@ -222,6 +222,7 @@ def resolve_ingredient(db, name, group=None):
         row = m.NguyenLieu(maNguyenLieu=allocate_code(db, 'NguyenLieu', 'NL'), tenNguyenLieu=clean_name, moTa=description)
         db.add(row)
         db.flush()
+        ingredients.append(row)
     return row
 
 def save_recipe(db, data, recipe_id=None, commit=True):
@@ -233,29 +234,34 @@ def save_recipe(db, data, recipe_id=None, commit=True):
     db.flush()
     for model in (m.ThanhPhanCongThuc, m.BuocCheBien):
         db.execute(delete(model).where(model.maCongThuc == record.maCongThuc))
+    # Load lookups once per write instead of re-reading whole tables for each row.
+    ingredient_rows = rows(db, m.NguyenLieu)
+    units = {(x.kyHieu or '').strip().casefold(): x for x in rows(db, m.DonViTinh)}
+    conversions = {(x.maNguyenLieu, x.maDonVi): x for x in rows(db, m.QuyDoiDonViNguyenLieu)}
     for item in data.ingredients:
-        ingredient = require(db, m.NguyenLieu, item.ingredient_id) if item.ingredient_id else resolve_ingredient(db, item.name)
+        ingredient = require(db, m.NguyenLieu, item.ingredient_id) if item.ingredient_id else resolve_ingredient(db, item.name, ingredients=ingredient_rows)
         unit_id = item.unit_id
         if item.custom_unit:
             custom = ' '.join(item.custom_unit.strip().split())
-            unit = next((x for x in rows(db, m.DonViTinh)
-                         if (x.kyHieu or '').strip().casefold() == custom.casefold()), None)
+            unit = units.get(custom.casefold())
             if unit is None:
                 unit_id = allocate_code(db, 'DonViTinh', 'DV')
                 unit = m.DonViTinh(maDonVi=unit_id, tenDonVi=custom, kyHieu=custom,
                                    heSoGramChuan=item.grams_per_unit)
                 db.add(unit)
                 db.flush()
+                units[custom.casefold()] = unit
             else:
                 unit_id = unit.maDonVi
         else:
             require(db, m.DonViTinh, unit_id)
-        conversion = next((x for x in rows(db, m.QuyDoiDonViNguyenLieu)
-                           if x.maNguyenLieu == ingredient.maNguyenLieu and x.maDonVi == unit_id), None)
+        conversion = conversions.get((ingredient.maNguyenLieu, unit_id))
         if conversion is None:
-            db.add(m.QuyDoiDonViNguyenLieu(maQuyDoi=allocate_code(db, 'QuyDoiDonViNguyenLieu', 'QD'),
+            conversion = m.QuyDoiDonViNguyenLieu(maQuyDoi=allocate_code(db, 'QuyDoiDonViNguyenLieu', 'QD'),
                    maNguyenLieu=ingredient.maNguyenLieu, maDonVi=unit_id,
-                   khoiLuongQuyDoiGram=item.grams_per_unit))
+                   khoiLuongQuyDoiGram=item.grams_per_unit)
+            db.add(conversion)
+            conversions[(ingredient.maNguyenLieu, unit_id)] = conversion
         else:
             conversion.khoiLuongQuyDoiGram = item.grams_per_unit
         db.add(m.ThanhPhanCongThuc(maThanhPhan=allocate_code(db, 'ThanhPhanCongThuc', 'TP'), maCongThuc=record.maCongThuc,

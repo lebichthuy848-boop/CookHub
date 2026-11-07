@@ -1,17 +1,23 @@
+import { lazy, Suspense } from 'react';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import { useAuth, landing } from './auth';
 import Layout from './components/Layout';
 import Auth from './pages/Auth';
-import Catalog from './pages/Catalog';
-import Dish from './pages/Dish';
-import { Pantry, CustomPantryIngredient, Menu, Profile, Settings } from './pages/Personal';
-import { SettingsPage } from './pages/SettingsPage';
-import Admin, { Dashboard } from './pages/Admin';
-import AdminAccount from './pages/AdminAccount';
-import SystemAdminLayout from './components/SystemAdminLayout';
-import SystemOverview from './pages/SystemOverview';
-import SystemUsers from './pages/SystemUsers';
-import SystemReports from './pages/SystemReports';
+const Catalog = lazy(() => import('./pages/Catalog'));
+const Dish = lazy(() => import('./pages/Dish'));
+const Pantry = lazy(() => import('./pages/Personal').then(m => ({ default: m.Pantry })));
+const CustomPantryIngredient = lazy(() => import('./pages/Personal').then(m => ({ default: m.CustomPantryIngredient })));
+const Menu = lazy(() => import('./pages/Personal').then(m => ({ default: m.Menu })));
+const Profile = lazy(() => import('./pages/Personal').then(m => ({ default: m.Profile })));
+const Settings = lazy(() => import('./pages/Personal').then(m => ({ default: m.Settings })));
+const SettingsPage = lazy(() => import('./pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
+const Admin = lazy(() => import('./pages/Admin'));
+const Dashboard = lazy(() => import('./pages/Admin').then(m => ({ default: m.Dashboard })));
+const AdminAccount = lazy(() => import('./pages/AdminAccount'));
+const SystemAdminLayout = lazy(() => import('./components/SystemAdminLayout'));
+const SystemOverview = lazy(() => import('./pages/SystemOverview'));
+const SystemUsers = lazy(() => import('./pages/SystemUsers'));
+const SystemReports = lazy(() => import('./pages/SystemReports'));
 
 function AccountSettings() {
   const {user}=useAuth();
@@ -31,7 +37,7 @@ function Landing() {
   return <Navigate replace to={user?landing(user.role):'/login'}/>;
 }
 export default function App() {
-  return <Routes>
+  return <Suspense fallback={<p className="empty" role="status">Đang tải trang…</p>}><Routes>
     {['login','register','forgot','reset'].map(mode=><Route key={mode} path={'/'+mode} element={<Auth mode={mode} key={mode}/>}/>)}
     <Route element={<Guard/>}><Route element={<Layout/>}>
       {['home','foods','search','suggest','favorites'].map(page=><Route key={page} path={'/'+page} element={<Catalog page={page} key={page}/>}/>)}
@@ -51,6 +57,6 @@ export default function App() {
       </Route>
     </Route>
     <Route path="*" element={<Landing/>}/>
-  </Routes>;
+  </Routes></Suspense>;
 }
 

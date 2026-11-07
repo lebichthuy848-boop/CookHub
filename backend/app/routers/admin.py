@@ -221,6 +221,15 @@ def system_reports(from_date: date | None = Query(None), to_date: date | None = 
         key = part.maNguyenLieu
         row = ingredients.setdefault(key, {'id': key, 'name': name or key, 'unit': unit or '', 'quantity': 0})
         row['quantity'] += float(part.soLuong or 0)
+    images = dict(db.execute(select(m.MonAn.maMonAn, m.MonAn.duongDanAnh)).all())
+    for entry in top.values():
+        entry['image'] = images.get(entry['id'])
+    favorite_ranking = db.execute(select(m.MonAn.maMonAn, m.MonAn.tenMonAn,
+        func.count()).join(m.MonYeuThich, m.MonYeuThich.maMonAn == m.MonAn.maMonAn).where(
+        m.MonYeuThich.ngayThem >= start, m.MonYeuThich.ngayThem < end + timedelta(days=1)
+        ).group_by(m.MonAn.maMonAn, m.MonAn.tenMonAn)).all()
+    top_favorites = sorted([{'id': key, 'name': name, 'image': images.get(key), 'selections': count}
+        for key, name, count in favorite_ranking], key=lambda row: (-row['selections'], row['name']))
     total_servings = sum(row['servings'] for row in top.values())
     taste_counts = {}
     taste_rows = db.execute(select(m.KhauVi.maKhauVi, m.KhauVi.tenKhauVi).join(
@@ -253,7 +262,8 @@ def system_reports(from_date: date | None = Query(None), to_date: date | None = 
             'trend': [{'date': (start + timedelta(days=offset)).isoformat(),
                        'selections': trend.get((start + timedelta(days=offset)).isoformat(), 0)}
                       for offset in range(period_days)],
-            'top_dishes': sorted(top.values(), key=lambda x: (-x['selections'], x['name']))[:10],
+            'top_dishes': sorted(top.values(), key=lambda x: (-x['selections'], x['name'])),
+            'top_favorites': top_favorites,
             'ingredients': sorted(ingredients.values(), key=lambda x: -x['quantity'])[:10],
             'taste': sorted(taste_counts.values(), key=lambda x: (-x['selections'], x['name']))}
 

@@ -1,6 +1,33 @@
 import cloudinaryImages from './cloudinary-images.json';
 
-export async function api(path, { method = 'GET', body, signal } = {}) {
+// A timeout stops waiting; it does not prove a server-side write was cancelled.
+export async function api(path, { method = 'GET', body, signal, timeoutMs } = {}) {
+  const controller = new AbortController();
+  const abort = () => controller.abort(signal?.reason);
+  if (signal?.aborted) abort();
+  else signal?.addEventListener('abort', abort, { once: true });
+  let timedOut = false;
+  const timeout = timeoutMs ?? (body instanceof FormData ? 120000 : method === 'GET' ? 30000 : 60000);
+  const timer = setTimeout(() => { timedOut = true; controller.abort(); }, timeout);
+  try {
+    return await request(path, { method, body, signal: controller.signal });
+  } catch (error) {
+    if (timedOut && !signal?.aborted) {
+      const message = method === 'GET'
+        ? 'Máy chủ phản hồi quá lâu. Vui lòng thử tải lại dữ liệu.'
+        : 'Máy chủ phản hồi quá lâu. Hãy kiểm tra kết quả trước khi gửi lại để tránh cập nhật trùng.';
+      const failure = new Error(message);
+      failure.name = 'TimeoutError';
+      throw failure;
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+    signal?.removeEventListener('abort', abort);
+  }
+}
+
+async function request(path, { method, body, signal }) {
   const headers = { 'X-CookHub-Client': 'web' };
   if (body && !(body instanceof FormData)) headers['Content-Type'] = 'application/json';
   const response = await fetch('/api' + path, {

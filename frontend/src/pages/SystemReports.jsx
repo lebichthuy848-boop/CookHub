@@ -1,12 +1,16 @@
 import { useMemo, useState } from 'react';
 import { useApi } from '../hooks';
+import { media } from '../api';
 import '../system-reports.css';
 import '../system-admin-review.css';
+import '../system-reports-polish.css';
 
 const localDate = value => [
   value.getFullYear(),String(value.getMonth()+1).padStart(2,'0'),String(value.getDate()).padStart(2,'0')
 ].join('-');
 const metricNames = {new_users:'Tài khoản được tạo',new_menus:'Thực đơn được tạo',favorite_saves:'Lượt lưu yêu thích'};
+const chartNames = {...metricNames,menu_trend:'Xu hướng tạo thực đơn'};
+const displayDate = value => value.split('-').reverse().join('-');
 const csvCell = value => {
   const text = String(value ?? '');
   const safe = /^[\s]*[=+\-@\t\r]/.test(text) ? `'${text}` : text;
@@ -24,15 +28,22 @@ function periodFor(range,custom) {
   return {from:localDate(start),to:localDate(end)};
 }
 function Trend({data,metric}) {
-  const values = data?.trends?.[metric] || [];
+  const daily = data?.trends?.[metric] || [];
+  const groupSize = Math.max(1, Math.ceil(daily.length / 24));
+  const values = [];
+  for (let index = 0; index < daily.length; index += groupSize) {
+    const group = daily.slice(index, index + groupSize);
+    values.push({date:group[0].date,end:group[group.length-1].date,
+      value:group.reduce((sum,item) => sum + Number(item.value || 0),0)});
+  }
   if (!values.length || values.every(item => item.value === 0))
     return <p className="reports-empty">Không có {metricNames[metric].toLocaleLowerCase('vi-VN')} trong kỳ này.</p>;
   const max = Math.max(...values.map(item => item.value));
   return <div className="reports-chart-wrap">
     <div className="report-bars" role="img" aria-label={`Biểu đồ ${metricNames[metric]} theo ngày`}>
-      {values.map(item => <div className="report-bar" key={item.date} title={`${item.date}: ${item.value} ${metricNames[metric].toLocaleLowerCase('vi-VN')}`}>
+      {values.map((item,index) => <div className="report-bar" key={item.date} title={`${item.date}${item.end !== item.date ? ' → '+item.end : ''}: ${item.value} ${metricNames[metric].toLocaleLowerCase('vi-VN')}`}>
         <i style={{height:`${item.value ? Math.max(4,item.value/max*100) : 0}%`}}/>
-        <small>{item.date.slice(5)}</small>
+        <small style={{visibility:index % Math.max(1,Math.ceil(values.length/6)) === 0 || index === values.length-1 ? 'visible':'hidden'}}>{item.date.slice(5)}</small>
       </div>)}
     </div>
   </div>;
@@ -40,6 +51,14 @@ function Trend({data,metric}) {
 function Compare({item}) {
   if (!item) return null;
   return <small className="reports-compare">Kỳ trước: {item.previous}{item.change == null ? '' : ` · ${item.change > 0 ? '+' : ''}${item.change}%`}</small>;
+}
+
+function DishRanking({title,items=[]}) {
+  const [expanded,setExpanded] = useState(false);
+  const max = Math.max(1,...items.map(item=>item.selections));
+  return <section className="reports-card ranking-card"><header><h2>{title}</h2>{items.length>5&&<button onClick={()=>setExpanded(value=>!value)}>{expanded?'Thu gọn':'Xem tất cả'}</button>}</header>
+    {items.length?<div className="ranking-list">{items.slice(0,expanded?items.length:5).map((item,index)=><div className="ranking-row" key={item.id}><span className="ranking-number">{index+1}</span><img src={media(item.image)} alt="" loading="lazy"/><div className="ranking-detail"><b>{item.name}</b><div className="ranking-track"><i style={{width:`${item.selections/max*100}%`}}/></div></div><strong>{item.selections}<small>lượt</small></strong></div>)}</div>:<p className="reports-empty">Chưa có dữ liệu trong kỳ đã chọn.</p>}
+  </section>;
 }
 
 export default function SystemReports() {
@@ -50,8 +69,6 @@ export default function SystemReports() {
   const period = useMemo(() => periodFor(range,custom),[range,custom]);
   const invalid = range === 'custom' && !period;
   const resource = useApi(period ? `/admin/system-reports?from_date=${period.from}&to_date=${period.to}` : null);
-  const health = useApi('/admin/system-health');
-  const access = useApi('/admin/system-overview');
   const data = invalid || resource.error ? null : resource.data;
 
   function exportCsv() {
@@ -79,7 +96,7 @@ export default function SystemReports() {
       setNotice('Đã xuất báo cáo CSV cho kỳ đang chọn.');
     } catch {setNotice('Không thể xuất CSV. Vui lòng thử lại.');}
   }
-  const refresh = () => {setNotice('');resource.reload();health.reload();access.reload();};
+  const refresh = () => {setNotice('');resource.reload();};
   return <div className="system-reports">
     <section className="reports-hero"><div><small>QUẢN TRỊ HỆ THỐNG / PHÂN TÍCH</small><h1>Báo cáo &amp; Thống kê hệ thống</h1></div>
       <div className="reports-actions"><button onClick={refresh}>↻ Làm mới</button><button onClick={exportCsv} disabled={!data}>⇩ Xuất CSV</button></div>
@@ -91,7 +108,7 @@ export default function SystemReports() {
       </select>
       {range === 'custom' && <><label>Từ <input type="date" value={custom.from} onChange={event => setCustom({...custom,from:event.target.value})}/></label>
         <label>Đến <input type="date" value={custom.to} onChange={event => setCustom({...custom,to:event.target.value})}/></label></>}
-      <span>{period ? `${period.from} → ${period.to}` : 'Chọn khoảng ngày hợp lệ'}</span>
+      <span>{period ? `${displayDate(period.from)} → ${displayDate(period.to)}` : 'Chọn khoảng ngày hợp lệ'}</span>
     </section>
     {invalid && <p className="reports-error" role="alert">Chọn cả hai ngày; ngày bắt đầu không được lớn hơn ngày kết thúc.</p>}
     {resource.error && <p className="reports-error" role="alert">{resource.error} <button onClick={resource.reload}>Thử lại</button></p>}
@@ -99,35 +116,20 @@ export default function SystemReports() {
     {resource.loading && !data && !invalid && <p className="empty" role="status">Đang tải báo cáo…</p>}
     {data && <>
       <section className="reports-kpis">
-        {Object.entries(metricNames).map(([key,label]) => <article className="is-clickable" role="button" tabIndex={0} key={key}
+        {Object.entries(chartNames).map(([key,label]) => <article className="is-clickable" role="button" tabIndex={0} key={key}
           onClick={() => setFeature(key)} onKeyDown={event => (event.key === 'Enter' || event.key === ' ') && setFeature(key)}>
           <i className="reports-kpi-icon">{key === 'new_users' ? '♙' : key === 'new_menus' ? '▤' : '♥'}</i>
-          <small>{label}</small><strong>{data.kpis[key] ?? '—'}</strong>
-          <Compare item={data.comparison_by_metric?.[key]}/>
+          <small>{label}</small><strong>{data.kpis[key === 'menu_trend' ? 'new_menus' : key] ?? '—'}</strong>
+          <Compare item={data.comparison_by_metric?.[key === 'menu_trend' ? 'new_menus' : key]}/>
         </article>)}
       </section>
-      <section className="reports-card reports-wide"><header><div><h2>{metricNames[feature]} theo ngày</h2></div>
-        <div className="report-tabs">{Object.entries(metricNames).map(([key,label]) =>
+      <section className="reports-card reports-wide"><header><div><h2>{chartNames[feature]} theo ngày</h2></div>
+        <div className="report-tabs">{Object.entries(chartNames).map(([key,label]) =>
           <button key={key} className={feature === key ? 'active' : ''} onClick={() => setFeature(key)}>{label}</button>)}</div>
-      </header><Trend data={data} metric={feature}/></section>
-      <section className="reports-card"><header><div><h2>Lượt món lên kế hoạch</h2></div></header>
-        <strong>{data.kpis.planned_items}</strong><Compare item={data.comparison_by_metric?.planned_items}/></section>
+      </header><Trend data={data} metric={feature === 'menu_trend' ? 'new_menus' : feature}/></section>
       <div className="reports-grid">
-        <section className="reports-card monitoring-card"><header><div><h2>Tình trạng dịch vụ</h2></div>
-          <button className="health-button" onClick={health.reload}>↻ Kiểm tra lại</button></header>
-          {health.error ? <p className="reports-error" role="alert">{health.error}</p> : health.loading && !health.data ? <p>Đang kiểm tra…</p> :
-            <><div className="monitor-row"><span>Backend API</span><b>{health.data?.backend || 'Chưa kiểm tra'}</b></div>
-              <div className="monitor-row"><span>SQL Server</span><b>{health.data?.database || 'Chưa kiểm tra'}</b></div>
-              <div className="monitor-row"><span>Phân phối ảnh Cloudinary</span><b>{health.data?.image_delivery || 'Chưa kiểm tra'}</b></div>
-              <div className="health-status"><strong>Kiểm tra hiện tại</strong><small>{health.data?.checked_at ? `Lúc ${health.data.checked_at}` : 'Chưa kiểm tra'}</small></div></>}
-        </section>
-        <section className="reports-card monitoring-card"><header><div><h2>Kiểm soát truy cập</h2></div></header>
-          {access.error ? <p className="reports-error" role="alert">{access.error}</p> : access.loading && !access.data ? <p>Đang tải…</p> :
-            <><div className="monitor-row"><span>Quản trị hệ thống</span><b>{access.data?.roles?.find(item => item.name === 'Quản trị hệ thống')?.count ?? 0} tài khoản</b></div>
-              <div className="monitor-row"><span>Quản trị nội dung</span><b>{access.data?.roles?.find(item => item.name === 'Quản trị nội dung')?.count ?? 0} tài khoản</b></div>
-              <div className="monitor-row"><span>Đang hoạt động</span><b>{access.data?.users?.active ?? '—'} tài khoản</b></div>
-              <div className="monitor-row"><span>Tạm khóa</span><b>{access.data?.users?.locked ?? '—'} tài khoản</b></div></>}
-        </section>
+        <DishRanking title="Món được lên thực đơn nhiều nhất" items={data.top_dishes}/>
+        <DishRanking title="Món được yêu thích nhiều nhất" items={data.top_favorites}/>
       </div>
     </>}
   </div>;

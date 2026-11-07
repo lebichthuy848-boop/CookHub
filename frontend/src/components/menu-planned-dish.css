@@ -1,0 +1,20 @@
+.menu-page .meal-dishes{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px;overflow:visible;min-width:0}
+.menu-planned-card{display:flex;flex-direction:column;gap:8px;flex:1 1 210px;max-width:330px;min-width:0;padding:9px;background:var(--color-bg-elevated,#fff);border:1px solid var(--color-border,#dce9df);border-radius:12px;box-shadow:0 3px 10px #174d3010}
+.menu-planned-card .menu-planned-link{display:flex!important;align-items:center;gap:10px;min-width:0;text-decoration:none;color:var(--color-text-primary,#28553f);visibility:visible!important;opacity:1!important}
+.menu-planned-card .menu-planned-link img{display:block!important;visibility:visible!important;opacity:1!important;flex:0 0 65px;width:65px;height:58px;border-radius:9px;object-fit:cover;margin:0;box-shadow:none}
+.menu-planned-info{display:grid!important;gap:5px;min-width:0;flex:1}.menu-planned-info strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px;line-height:1.45;font-weight:700;text-align:left;color:var(--color-text-primary,#28553f)}.menu-planned-info small{font-size:11px;color:var(--color-text-secondary,#7e9382);text-align:left}
+.menu-planned-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;border-top:1px solid var(--color-border,#edf2e9);padding-top:7px}.menu-planned-actions button{position:static!important;display:inline-flex!important;align-items:center;justify-content:center;cursor:pointer;line-height:1.3;border-radius:7px;height:27px!important;margin:0}
+.menu-planned-portions{background:#edf7ee;border:1px solid #d2e5d4;color:#297b4c;font-size:10px;font-weight:600;padding:4px 8px;width:auto!important}.menu-planned-remove{background:#fff8f6;border:1px solid #f0dcd5;color:#b47c6e;font-size:18px;width:27px!important;padding:0}.menu-planned-actions button:disabled{opacity:.5;cursor:not-allowed}
+.menu-page .meal-row{align-items:center}.menu-page .quick-add{align-self:center}
+@media(max-width:650px){.menu-planned-card{flex-basis:180px;max-width:none}.menu-planned-card .menu-planned-link img{width:60px;height:55px;flex-basis:60px}}
+
+/* Compact single-row card with stable image area and separate controls. */
+.menu-page .menu-planned-card{flex:0 1 285px;max-width:310px;padding:8px;gap:7px;flex-direction:row;align-items:center;border-radius:10px;box-shadow:none}
+.menu-page .menu-planned-link{flex:1;gap:8px!important;min-width:0}
+.menu-page .menu-planned-card .menu-planned-link img,.menu-planned-placeholder{width:50px;height:50px;flex:0 0 50px;border-radius:8px}
+.menu-planned-placeholder{display:grid;place-items:center;background:#edf5eb;color:#80a68a}
+.menu-page .menu-planned-info strong{font-size:12px;line-height:1.35}.menu-page .menu-planned-info small{font-size:10px}
+.menu-page .menu-planned-actions{flex:0 0 auto;flex-direction:column;gap:4px;padding:0;border:0;align-items:flex-end}
+.menu-page .menu-planned-portions{font-size:9px;max-width:90px;padding:3px 5px;height:23px!important}
+.menu-page .menu-planned-remove{width:21px!important;height:21px!important;font-size:15px}
+@media(max-width:650px){.menu-page .menu-planned-card{flex:1 1 235px;max-width:none}}

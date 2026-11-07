@@ -10,6 +10,7 @@ import '../category-studio.css';
 import '../category-theme.css';
 import '../video-studio.css';
 import '../admin-content-theme.css';
+import '../admin-distribution-compact.css';
 import ReviewStudio from './ReviewStudio';
 
 const titles={categories:'Quản lý danh mục',dishes:'Quản lý món ăn',recipes:'Quản lý công thức',videos:'Quản lý video',reviews:'Quản lý đánh giá',users:'Người dùng & phân quyền'};
@@ -268,8 +269,9 @@ function categoryColor(id, index){
   return `hsl(${Math.round(hue)} 68% 45%)`;
 }
 
-function AdminDonut({total=0,categories=[],dishes=[]}){
+export function AdminDonut({total=0,categories=[],dishes=[]}){
   const [activeCategory,setActiveCategory]=useState(null);
+  const [showAll,setShowAll]=useState(false);
   const liveCategories=useApi('/categories');
   const liveDishes=useApi('/admin/dishes');
   categories=liveCategories.data?.length ? liveCategories.data : categories;
@@ -278,9 +280,11 @@ function AdminDonut({total=0,categories=[],dishes=[]}){
   const actualTotal=counts.reduce((sum,item)=>sum+item.count,0);
   const segments=counts.filter(category=>category.count>0).map((category,index,items)=>({key:`category-${category.id}`,label:category.name,value:actualTotal?category.count/actualTotal*100:0,start:items.slice(0,index).reduce((sum,item)=>sum+(actualTotal?item.count/actualTotal*100:0),0),color:categoryColor(category.id,index)}));
   const legend=counts.map((category,index)=>({...category,percent:actualTotal?Math.round(category.count/actualTotal*100):0,color:categoryColor(category.id,index)}));
+  const ranked=[...legend].sort((a,b)=>b.count-a.count || a.name.localeCompare(b.name,'vi'));
+  const displayed=showAll?ranked:ranked.slice(0,6);
   const aria=legend.map(item=>`${item.name} ${item.percent}%`).join(', ');
-  return <div className="admin-donut" role="img" aria-label={`Phân bố ${actualTotal} món ăn theo ${counts.length} danh mục: ${aria}`}>
-    <svg viewBox="0 0 220 220" aria-hidden="true">
+  return <div className="admin-donut admin-donut-compact">
+    <svg viewBox="0 0 220 220" role="img" aria-label={`Phân bố ${actualTotal} món ăn theo ${counts.length} danh mục: ${aria}`}>
       <defs>
         <linearGradient id="donutEmerald" x1="25" y1="20" x2="190" y2="200"><stop stopColor="#32e7a1"/><stop offset=".48" stopColor="#08aa72"/><stop offset="1" stopColor="#057552"/></linearGradient>
         <linearGradient id="donutAmber" x1="35" y1="25" x2="190" y2="190"><stop stopColor="#ffe171"/><stop offset=".48" stopColor="#f9b92e"/><stop offset="1" stopColor="#dc8514"/></linearGradient>
@@ -306,7 +310,14 @@ function AdminDonut({total=0,categories=[],dishes=[]}){
       <text className="donut-total" x="110" y="108" textAnchor="middle">{actualTotal}</text>
       <text className="donut-label" x="110" y="130" textAnchor="middle">Món ăn</text>
     </svg>
-    <div className="donut-legend-live">{legend.map(item=>{const key=`category-${item.id}`;return <span style={{'--progress':`${item.percent}%`,'--category-color':item.color}} className={`${activeCategory===key?'is-active':''} ${activeCategory&&activeCategory!==key?'is-dimmed':''}`} onMouseEnter={()=>setActiveCategory(key)} onMouseLeave={()=>setActiveCategory(null)} key={item.id}><i/><label>{item.name}</label><b>{item.percent}%</b></span>})}</div>
+    <div className="compact-category-summary">
+      <div className="compact-category-toolbar"><span>{showAll?`Tất cả ${legend.length} danh mục`:'6 danh mục nhiều món nhất'}</span>{legend.length>6&&<button type="button" aria-expanded={showAll} aria-controls="dashboard-category-list" onClick={()=>{setShowAll(value=>!value);setActiveCategory(null);}}>{showAll?'Thu gọn ↑':`Xem tất cả (${legend.length}) ↓`}</button>}</div>
+      <div id="dashboard-category-list" className={'compact-category-list '+(showAll?'expanded':'')}>
+        {displayed.map(item=>{const key=`category-${item.id}`;return <div style={{'--category-color':item.color}} className={'compact-category-row '+(activeCategory===key?'is-active':'')} onMouseEnter={()=>setActiveCategory(key)} onMouseLeave={()=>setActiveCategory(null)} key={item.id}><i/><span title={item.name}>{item.name}</span><small>{item.count} món</small><b>{item.percent}%</b></div>})}
+      </div>
+      {!showAll&&legend.length>6&&<p className="compact-category-footnote">Còn {legend.length-6} danh mục khác · Biểu đồ vẫn tính toàn bộ món ăn.</p>}
+      {!legend.length&&<p className="compact-category-footnote">Chưa có dữ liệu danh mục.</p>}
+    </div>
   </div>;
 }
 

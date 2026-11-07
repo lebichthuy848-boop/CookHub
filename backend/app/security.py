@@ -2,7 +2,7 @@ import os, base64, hashlib, hmac, json, time
 from fastapi import Cookie, Depends, HTTPException, Response
 from pwdlib import PasswordHash
 from pwdlib.hashers.bcrypt import BcryptHasher
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from .config import settings
 from .database import get_db
 from .models import NguoiDung
@@ -55,7 +55,7 @@ def current_user(cookhub_session: str | None = Cookie(default=None), db: Session
         user_id = _read(cookhub_session)
     except (ValueError, KeyError):
         raise HTTPException(401, 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn.')
-    user = db.get(NguoiDung, user_id)
+    user = db.get(NguoiDung, user_id, options=[joinedload(NguoiDung.personalization)])
     if not user or user.trangThai != 'Đang hoạt động':
         raise HTTPException(401, 'Tài khoản không hoạt động.')
     return user

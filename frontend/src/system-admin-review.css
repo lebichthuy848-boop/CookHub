@@ -1,5 +1,9 @@
 .system-users-toolbar{grid-template-columns:repeat(3,minmax(0,1fr))}
-.system-users-card .system-users-toolbar{grid-template-columns:minmax(180px,1fr) minmax(130px,170px) minmax(130px,170px) minmax(130px,170px) 52px auto}
+.system-users-card .system-users-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.system-users-card .system-users-toolbar input{flex:1 1 240px;width:auto;grid-column:auto;min-width:180px}
+.system-users-card .system-users-toolbar select{flex:0 1 185px;width:185px;min-width:165px;padding-right:30px}
+.system-users-card .system-users-toolbar select[aria-label="Lọc trạng thái"]{flex:0 0 220px;width:220px;min-width:220px;padding-left:14px;padding-right:34px}
+.system-users-card .system-users-toolbar button{flex:0 0 auto;width:auto;grid-column:auto;white-space:nowrap}
 .system-users-card .system-users-toolbar .system-users-direction{width:52px;min-height:46px;padding:0;font-size:22px;line-height:1;white-space:nowrap}
 .system-users-toolbar input{min-width:0}
 .system-users-result-count{margin:0 0 10px;color:var(--color-text-secondary);font-size:12px}

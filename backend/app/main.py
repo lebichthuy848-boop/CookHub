@@ -10,6 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from .config import MEDIA_ROOT, settings
 from .routers import auth, catalog, personal, admin, uploads, preferences, backup
+from .household import router as household_router
 
 def document_client_header(client: str | None = Header(default=None, alias='X-CookHub-Client', description='Set to web for POST, PUT and DELETE requests.')):
     # Enforcement is centralized in protect_requests; this exposes it in Swagger.
@@ -42,6 +43,10 @@ async def database_error(request, exc):
                      number, getattr(orig, 'procedure', None), getattr(orig, 'line', None), message)
     if number in {201, 8144, 8145, 8146}:
         detail, status = 'Cấu hình Stored Procedure không đúng tham số.', 500
+    elif number == 701 or '(701)' in message:
+        detail, status = 'SQL Server đang thiếu bộ nhớ. Vui lòng thử lại sau.', 503
+    elif any(state in str(args) for state in ('08S01', '08001', 'HYT00', 'HYT01')):
+        detail, status = 'Kết nối cơ sở dữ liệu bị gián đoạn hoặc phản hồi quá lâu. Vui lòng thử lại.', 503
     elif number in {53, 11001, 18456, 4060}:
         detail, status = 'Không thể kết nối SQL Server.', 503
     elif number == 51031:
@@ -57,6 +62,7 @@ rate_lock = Lock()
 
 @app.middleware('http')
 async def protect_requests(request: Request, call_next):
+    started = monotonic()
     if request.method not in {'GET','HEAD','OPTIONS'} and request.url.path.startswith('/api/'):
         origin = request.headers.get('origin')
         # A mandatory non-simple header prevents cross-site forms from using the cookie.
@@ -82,6 +88,11 @@ async def protect_requests(request: Request, call_next):
     response = await call_next(request)
     if request.url.path.startswith('/api'):
         response.headers['Cache-Control'] = 'no-store'
+        elapsed_ms = (monotonic() - started) * 1000
+        response.headers['Server-Timing'] = f'app;dur={elapsed_ms:.1f}'
+        if elapsed_ms >= 1000:
+            logger.warning('Slow API: method=%s path=%s status=%s duration_ms=%.1f',
+                           request.method, request.url.path, response.status_code, elapsed_ms)
     response.headers['X-Content-Type-Options'] = 'nosniff'
     return response
 
@@ -89,7 +100,7 @@ app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins,
     allow_credentials=True, allow_methods=['GET','POST','PUT','DELETE','OPTIONS'],
     allow_headers=['Content-Type','X-CookHub-Client'])
 
-for router in (auth.router, catalog.router, personal.router, preferences.router, admin.router, uploads.router, backup.router):
+for router in (household_router, auth.router, catalog.router, personal.router, preferences.router, admin.router, uploads.router, backup.router):
     app.include_router(router, prefix='/api')
 
 @app.get('/api/health', tags=['Health'])

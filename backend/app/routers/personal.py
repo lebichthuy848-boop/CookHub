@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from .. import models as m, schemas as s
 from ..database import get_db
 from ..security import current_user, public_user
-from ..services import require, rows, new_id, allocate_code, resolve_ingredient, dish_data
+from ..services import require, rows, new_id, allocate_code, resolve_ingredient, dish_data, local_image
 from .auth import by_email
 from ..nutrition import menu_nutrition, dish_nutrition
 
@@ -320,11 +320,19 @@ def menu(start: date, end: date, user=Depends(current_user), db: Session = Depen
     if (end-start).days not in range(0, 367):
         raise HTTPException(422, 'Khoảng ngày phải từ 0 đến 366 ngày.')
     meal_labels = {'Bữa sáng': 'Sáng', 'Bữa trưa': 'Trưa', 'Bữa tối': 'Tối', 'Bữa phụ': 'Ăn nhẹ'}
-    return [dict(id=x.maChiTiet, dish_id=x.maMonAn, date=x.ngayDung, meal=meal_labels.get((x.buaAn or '').strip(), (x.buaAn or '').strip()), servings=x.soKhauPhan)
-            for x in db.scalars(select(m.ChiTietThucDon).join(m.ThucDon,
+    return [dict(id=x.maChiTiet, dish_id=x.maMonAn, date=x.ngayDung, meal=meal_labels.get((x.buaAn or '').strip(), (x.buaAn or '').strip()), servings=x.soKhauPhan, dish_name=dish.tenMonAn, dish_image=local_image(dish.duongDanAnh,dish.tenMonAn))
+            for x,dish in db.execute(select(m.ChiTietThucDon,m.MonAn).join(m.MonAn, m.MonAn.maMonAn == m.ChiTietThucDon.maMonAn).join(m.ThucDon,
                 m.ThucDon.maThucDon == m.ChiTietThucDon.maThucDon).where(
                 m.ThucDon.maNguoiDung == user.maNguoiDung, m.ChiTietThucDon.ngayDung >= start,
                 m.ChiTietThucDon.ngayDung <= end).order_by(m.ChiTietThucDon.ngayDung))]
+
+@router.get('/menu/dish-options')
+def menu_dish_options(user=Depends(current_user), db:Session=Depends(get_db)):
+    published = select(m.CongThuc.maCongThuc).where(
+        m.CongThuc.maMonAn==m.MonAn.maMonAn, m.CongThuc.daCongBo==1).exists()
+    return [dict(id=d.maMonAn.strip(),name=d.tenMonAn,
+                 image=local_image(d.duongDanAnh,d.tenMonAn),time=d.thoiGianCheBien or 0)
+            for d in db.scalars(select(m.MonAn).where(published).order_by(m.MonAn.tenMonAn))]
 
 @router.get('/menu/nutrition')
 def menu_nutrition_for_day(on: date, user=Depends(current_user), db: Session = Depends(get_db)):
@@ -367,9 +375,19 @@ def add_menu(data: s.MenuItem, user=Depends(current_user), db: Session = Depends
                 tenThucDon='Thực đơn của tôi', loaiThucDon='Ngày', ngayBatDau=data.date,
                 ngayKetThuc=data.date, trangThai='Đang dùng')
             db.add(plan); db.flush()
-        key = new_id('CTTD')
-        db.add(m.ChiTietThucDon(maChiTiet=key, maThucDon=plan.maThucDon, maMonAn=data.dish_id,
-            ngayDung=data.date, buaAn=meal, soKhauPhan=data.servings))
+        existing = db.scalar(select(m.ChiTietThucDon).where(
+            m.ChiTietThucDon.maThucDon == plan.maThucDon,
+            m.ChiTietThucDon.maMonAn == data.dish_id,
+            m.ChiTietThucDon.ngayDung == data.date,
+            m.ChiTietThucDon.buaAn == meal,
+        ))
+        if existing is not None:
+            existing.soKhauPhan = int(existing.soKhauPhan or 0) + data.servings
+            key = existing.maChiTiet
+        else:
+            key = new_id('CTTD')
+            db.add(m.ChiTietThucDon(maChiTiet=key, maThucDon=plan.maThucDon, maMonAn=data.dish_id,
+                ngayDung=data.date, buaAn=meal, soKhauPhan=data.servings))
         db.commit()
         return {'id': key}
 
@@ -417,10 +435,13 @@ def add_menu(data: s.MenuItem, user=Depends(current_user), db: Session = Depends
             m.ChiTietThucDon.maMonAn == data.dish_id,
             m.ChiTietThucDon.ngayDung == data.date,
         )).all()
-        if any((item.buaAn or '').strip() == meal for item in possible_duplicates):
-            raise HTTPException(409, 'Món này đã có trong bữa ăn đã chọn.')
-
-        item_id = _next_code(db, 'ChiTietThucDon')
+        duplicate = next((item for item in possible_duplicates if (item.buaAn or '').strip() == meal), None)
+        if duplicate is not None:
+            item_id = duplicate.maChiTiet
+            total_servings = int(duplicate.soKhauPhan or 0) + data.servings
+        else:
+            item_id = _next_code(db, 'ChiTietThucDon')
+            total_servings = data.servings
         db.execute(text("""
             DECLARE @meal NVARCHAR(30) = CASE :meal_code
                 WHEN 'breakfast' THEN NCHAR(66)+NCHAR(7919)+NCHAR(97)+NCHAR(32)+NCHAR(115)+NCHAR(225)+NCHAR(110)+NCHAR(103)
@@ -434,7 +455,7 @@ def add_menu(data: s.MenuItem, user=Depends(current_user), db: Session = Depends
                 @BuaAn=@meal, @SoKhauPhan=:servings,
                 @MaNguoiDung=:user_id
         """), {'item_id': item_id, 'plan_id': plan_id_value, 'dish_id': data.dish_id,
-               'used_on': data.date, 'meal_code': {'Bữa sáng':'breakfast','Bữa trưa':'lunch','Bữa tối':'dinner','Bữa phụ':'snack'}[meal], 'servings': data.servings,
+               'used_on': data.date, 'meal_code': {'Bữa sáng':'breakfast','Bữa trưa':'lunch','Bữa tối':'dinner','Bữa phụ':'snack'}[meal], 'servings': total_servings,
                'user_id': user.maNguoiDung})
         db.commit()
         return {'id': item_id}
