@@ -2,6 +2,17 @@
 .collection-detail-tools > span { padding: 7px 11px; border-radius: 999px; background: #eaf7ee; color: #287356; font-size: 11px; font-weight: 800; white-space: nowrap; }
 .collection-detail-tools > button { white-space: nowrap; }
 .collection-card-entry { position: relative; min-width: 0; }
+@media(min-width:768px) and (max-width:1199px){.search-hub .explore-dishes:not(.list-view){grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:767px){.search-hub .explore-dishes:not(.list-view){grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}.search-hub .explore-dishes>.dish-card{min-width:0}}
+.discover-pagination{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin:26px 0 12px}.discover-pagination>span{display:flex;align-items:center;gap:8px}.discover-pagination button{min-width:36px;padding:9px 12px;background:#fff;border-color:#cfe1d4;font-size:13px}.discover-pagination button[aria-current="page"]{background:#187b58;color:#fff;border-color:#187b58}.discover-pagination small{width:100%;text-align:center;margin-top:5px}
+@media(min-width:768px) and (max-width:1199px){.discover-page .discover-grid:not(.list-view){grid-template-columns:repeat(3,minmax(0,1fr))!important}}
+@media(max-width:767px){.discover-page .discover-grid:not(.list-view){grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}.discover-page .discover-grid>.dish-card{min-width:0}.discover-pagination{gap:5px}.discover-pagination button{padding:8px 10px}}
+@media(max-width:700px){
+  .favorites-library .collection-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;width:100%;min-width:0}
+  .favorites-library .collection-grid .collection-card{width:100%!important;min-width:0!important;height:auto!important;min-height:0!important;aspect-ratio:auto!important}
+  .favorites-library .collection-card>div.collection-card-cover{width:100%;height:auto!important;aspect-ratio:1/1;flex:0 0 auto!important}
+  .favorites-library .collection-card-cover img{width:100%;height:100%;object-fit:cover}
+}
 .collection-card-entry .dish-card { height: 100%; }
 .collection-remove-dish { position: absolute; z-index: 4; top: 11px; left: 11px; display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 1px solid #d8e3d2; border-radius: 50%; background: #fffffff0; color: #426a59; font-size: 25px; line-height: 1; }
 .collection-remove-dish:hover { background: #fcebea; color: #b33d3d; }
