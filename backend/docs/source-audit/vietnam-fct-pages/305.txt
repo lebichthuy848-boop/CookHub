@@ -1,0 +1,69 @@
+STT: 279
+M· sè: 7001
+Th¶i bá (%): 2.0
+Thμnh phÇn dinh d−ìng
+(Nutrients)
+ĐV
+(Unit)
+Hμm lượng
+(Value)
+TLTK
+(Source)
+Thμnh phÇn dinh d−ìng
+(Nutrients)
+ĐV
+(Unit)
+Hμm lượng
+(Value)
+TLTK
+(Source)
+Nước (Water ) g 72.8 1 Tổng số isoflavon (Total isoflavone) mg 03
+Năng lượng (Energy ) KCal 144 Daidzein mg 03
+KJ 600 Genistein mg 03
+Protein g 19.0 1 Glycetin mg 03
+Lipid (Fat) g 7.5 1 Tổng số acid béo no g 3.350 3
+Glucid (Carbohydrate) g 0.0 1 (Total saturated fatty acid)
+Celluloza (Fiber) g 0.0 1 Palmitic (C16:0) g 1.760 3
+Tro (Ash) g 0.7 1 Margaric (C17:0) g 0.000 3
+Đường tổng số (Sugar) g 03 Stearic (C18:0) g 1.100 3
+Galactoza (Galactose) g 03 Arachidic (C20:0) g 0.000 3
+Maltoza (Maltose) g 03 Behenic (22:0) g 0.000 3
+Lactoza (Lactose) g 03 Lignoceric (C24:0) g 0.000 3
+Fructoza (Fructose) g 03 TS acid béo không no 1 nối đôi g 3.040 3
+Glucoza (Glucose) g 03 (Total monounsaturated fatty acid)
+Sacaroza (Sucrose) g 03 Myristoleic (C14:1) g 0.000 3
+Calci (Calcium) mg 81 Palmitoleic (C16:1) g 0.350 3
+Sắt (Iron) mg 1.70 1 Oleic (C18:1) g 2.600 3
+Magiê (Magnesium) mg 24 3 TS acid béo không no nhiềun ối đôi g 0 510 3
+Tªn thùc phÈm (Vietnamese): ThÞt bª mì
+Tªn tiÕng Anh (English): Veal meat, lean and fat
+Thμnh phÇn dinh d−ìng trong 100g phÇn ¨n ®−îc (100 grams edible portion)
+Magiê (Magnesium) mg 24 3 TS acid béo không no nhiều nối đôi g 0.510 3
+Mangan (Manganese) mg 0.030 3 (Total polyunsaturated fatty acid)
+Phospho (Phosphorous) mg 188 1 Linoleic (C18:2 n6) g 0.390 3
+Kali (Potassium) mg 329 3 Linolenic (C18:2 n3) g 0.060 3
+Natri (Sodium) mg 76 3 Arachidonic (C20:4) g 0.060 3
+Kẽm  (Zinc) mg 2.55 3 Eicosapentaenoic  (C20:5 n3) g 0.000 3
+Đồng (Copper) μg 110 3 Docosahexaenoic (C22:6 n3) g 0.000 3
+Selen (Selenium) μg 8.5 3 TS acid béo trans (Total trans fatty acid) g -
+Vitamin C (Ascorbic acid) mg 21 Cholesterol mg 78 3
+Vitamin B1 (Thiamine) mg 0.23 1 Phytosterol mg -
+Vitamin B2 (Riboflavin) mg 0.25 1 Lysin mg 1544 1
+Vitamin PP (Niacin) mg 6.2 1 Methionin mg 473 1
+Vitamin B5 (Pantothenic acid) mg 1.36 3 Tryptophan mg 199 1
+Vitamin B6 (Pyridoxine) mg 0.49 3 Phenylalanin mg 756 1
+Folat (Folate) μg 13 3 Threonin mg 788 1
+Vitamin B9 (Folic acid) μg - Valin mg 977 1
+Vitamin H (Biotin ) μg 05 Leucin mg 1481 1
+Vitamin B12 (Cyanocobalamine) μg 1.27 3 Isoleucin mg 946 1
+Vitamin A (Retinol) μg 01 Arginin mg 1229 1
+Vitamin D (Calciferol ) μg - Histidin mg 630 1
+Vitamin E (Alpha-tocopherol) mg 0.25 3 Cystin mg 158 1
+Vitamin K (Phylloquinone) μg 4.6 3 Tyrosin mg 662 1
+Beta-caroten μg 03 Alanin mg 1135 1
+Alpha-caroten μg 03 Acid aspartic mg 1734 1
+Beta-cryptoxanthin μg 03 Acid glutamic mg 2648 1
+Lycopen μg 03 Glycin mg 1009 1
+Lutein + Zeaxanthin μg 03 Prolin mg 851 1
+Purin mg - Serin mg 788 1
+279

@@ -52,15 +52,21 @@ async function request(path, { method, body, signal }) {
 }
 export const money = amount => Number(amount || 0).toLocaleString('vi-VN') + ' đ';
 const DISH_IMAGE_VERSION = '20261006-1';
-export function media(path) {
-  if (/^https:\/\//i.test(path || '')) return path;
+function optimizedCloudinary(url, {width, height} = {}) {
+  if (!/^https:\/\/res\.cloudinary\.com\//i.test(url || '') || (!width && !height)) return url;
+  const size = [width && `w_${Math.round(width)}`, height && `h_${Math.round(height)}`].filter(Boolean);
+  if (width && height) size.push('c_fill');
+  return url.replace('/image/upload/', `/image/upload/f_auto,q_auto:eco,${size.join(',')}/`);
+}
+export function media(path, options) {
+  if (/^https:\/\//i.test(path || '')) return optimizedCloudinary(path, options);
   const cloudUrl = cloudinaryImages[(path || '').replace(/^\//, '')];
-  if (cloudUrl) return cloudUrl;
+  if (cloudUrl) return optimizedCloudinary(cloudUrl, options);
   if (/^(images|videos)\/[\w\-./]+$/.test(path || '') && !path.includes('..')) {
     const url = (path.startsWith('videos/') ? '/media/' : '/') + path;
     return path.startsWith('images/mon-an/') ? `${url}?v=${DISH_IMAGE_VERSION}` : url;
   }
-  return cloudinaryImages['images/logo.jpg'] || '/images/logo.jpg';
+  return optimizedCloudinary(cloudinaryImages['images/logo.jpg'], options) || '/images/logo.jpg';
 }
 export function today() {
   const now = new Date();

@@ -1,0 +1,412 @@
+{
+  "15": {
+    "code": "1002",
+    "printed_page": "2",
+    "energy": "346",
+    "protein": "8.4",
+    "carbs": "74.9",
+    "fat": "1.6",
+    "cellulose": "0.5",
+    "sodium": "3"
+  },
+  "17": {
+    "code": "1004",
+    "printed_page": "4",
+    "energy": "344",
+    "protein": "7.9",
+    "carbs": "75.9",
+    "fat": "1.0",
+    "cellulose": "0.4",
+    "sodium": "5"
+  },
+  "23": {
+    "code": "1010",
+    "printed_page": "10",
+    "energy": "333",
+    "protein": "4.0",
+    "carbs": "78.9",
+    "fat": "0.2",
+    "cellulose": "0.5",
+    "sodium": null
+  },
+  "29": {
+    "code": "1016",
+    "printed_page": "16",
+    "energy": "362",
+    "protein": "8.2",
+    "carbs": "78.8",
+    "fat": "1.6",
+    "cellulose": "0.6",
+    "sodium": "3"
+  },
+  "31": {
+    "code": "1018",
+    "printed_page": "18",
+    "energy": "346",
+    "protein": "10.3",
+    "carbs": "73.6",
+    "fat": "1.1",
+    "cellulose": "0.3",
+    "sodium": "4"
+  },
+  "33": {
+    "code": "1020",
+    "printed_page": "20",
+    "energy": "110",
+    "protein": "1.7",
+    "carbs": "25.7",
+    "fat": null,
+    "cellulose": "0.5",
+    "sodium": null
+  },
+  "51": {
+    "code": "2013",
+    "printed_page": "36",
+    "energy": "114",
+    "protein": "1.8",
+    "carbs": "26.5",
+    "fat": "0.1",
+    "cellulose": "1.2",
+    "sodium": "10"
+  },
+  "52": {
+    "code": "2014",
+    "printed_page": "37",
+    "energy": "93",
+    "protein": "2.0",
+    "carbs": "20.9",
+    "fat": "0.1",
+    "cellulose": "1.0",
+    "sodium": "7"
+  },
+  "58": {
+    "code": "2020",
+    "printed_page": "43",
+    "energy": "333",
+    "protein": "2.4",
+    "carbs": "79.6",
+    "fat": "0.5",
+    "cellulose": "2.2",
+    "sodium": null
+  },
+  "91": {
+    "code": "3025",
+    "printed_page": "74",
+    "energy": "95",
+    "protein": "10.9",
+    "carbs": "0.7",
+    "fat": "5.4",
+    "cellulose": "0.4",
+    "sodium": "7"
+  },
+  "123": {
+    "code": "4021",
+    "printed_page": "103",
+    "energy": "21",
+    "protein": "1.5",
+    "carbs": "3.6",
+    "fat": "0.1",
+    "cellulose": "1.5",
+    "sodium": "10"
+  },
+  "128": {
+    "code": "4026",
+    "printed_page": "108",
+    "energy": "5",
+    "protein": "0.4",
+    "carbs": "0.8",
+    "fat": null,
+    "cellulose": "2.0",
+    "sodium": null
+  },
+  "160": {
+    "code": "4058",
+    "printed_page": "140",
+    "energy": "40",
+    "protein": "2.2",
+    "carbs": "7.4",
+    "fat": "0.2",
+    "cellulose": "0.4",
+    "sodium": null
+  },
+  "161": {
+    "code": "4059",
+    "printed_page": "141",
+    "energy": "61",
+    "protein": "1.0",
+    "carbs": "13.9",
+    "fat": "0.1",
+    "cellulose": "1.2",
+    "sodium": "40"
+  },
+  "163": {
+    "code": "4061",
+    "printed_page": "143",
+    "energy": "23",
+    "protein": "1.0",
+    "carbs": "4.0",
+    "fat": "0.3",
+    "cellulose": "2.0",
+    "sodium": "2"
+  },
+  "173": {
+    "code": "4071",
+    "printed_page": "153",
+    "energy": "22",
+    "protein": "2.9",
+    "carbs": "2.7",
+    "fat": null,
+    "cellulose": "1.8",
+    "sodium": null
+  },
+  "184": {
+    "code": "4082",
+    "printed_page": "164",
+    "energy": "25",
+    "protein": "2.1",
+    "carbs": "2.4",
+    "fat": "0.8",
+    "cellulose": "1.6",
+    "sodium": "39"
+  },
+  "185": {
+    "code": "4083",
+    "printed_page": "165",
+    "energy": "25",
+    "protein": "3.2",
+    "carbs": "2.1",
+    "fat": "0.4",
+    "cellulose": "1.0",
+    "sodium": "37"
+  },
+  "187": {
+    "code": "4085",
+    "printed_page": "167",
+    "energy": "15",
+    "protein": "1.5",
+    "carbs": "2.3",
+    "fat": null,
+    "cellulose": "2.1",
+    "sodium": "5"
+  },
+  "192": {
+    "code": "4090",
+    "printed_page": "172",
+    "energy": "17",
+    "protein": "1.5",
+    "carbs": "1.8",
+    "fat": "0.4",
+    "cellulose": "0.5",
+    "sodium": "59"
+  },
+  "204": {
+    "code": "4102",
+    "printed_page": "184",
+    "energy": "25",
+    "protein": "2.9",
+    "carbs": "3.4",
+    "fat": null,
+    "cellulose": "3.6",
+    "sodium": "3"
+  },
+  "223": {
+    "code": "4121",
+    "printed_page": "203",
+    "energy": "304",
+    "protein": "10.6",
+    "carbs": "65.0",
+    "fat": "0.2",
+    "cellulose": "7.0",
+    "sodium": "70"
+  },
+  "227": {
+    "code": "4125",
+    "printed_page": "207",
+    "energy": "57",
+    "protein": "3.6",
+    "carbs": "3.4",
+    "fat": "3.2",
+    "cellulose": "1.1",
+    "sodium": null
+  },
+  "307": {
+    "code": "7003",
+    "printed_page": "281",
+    "energy": "118",
+    "protein": "21.0",
+    "carbs": "0.0",
+    "fat": "3.8",
+    "cellulose": "0.0",
+    "sodium": "83"
+  },
+  "317": {
+    "code": "7013",
+    "printed_page": "291",
+    "energy": "199",
+    "protein": "20.3",
+    "carbs": "0.0",
+    "fat": "13.1",
+    "cellulose": "0.0",
+    "sodium": "70"
+  },
+  "320": {
+    "code": "7016",
+    "printed_page": "294",
+    "energy": "394",
+    "protein": "14.5",
+    "carbs": "0.0",
+    "fat": "37.3",
+    "cellulose": "0.0",
+    "sodium": "42"
+  },
+  "321": {
+    "code": "7017",
+    "printed_page": "295",
+    "energy": "139",
+    "protein": "19.0",
+    "carbs": "0.0",
+    "fat": "7.0",
+    "cellulose": "0.0",
+    "sodium": "76"
+  },
+  "332": {
+    "code": "7028",
+    "printed_page": "306",
+    "energy": "267",
+    "protein": "17.8",
+    "carbs": "0.0",
+    "fat": "21.8",
+    "cellulose": "0.0",
+    "sodium": "63"
+  },
+  "336": {
+    "code": "7032",
+    "printed_page": "310",
+    "energy": "230",
+    "protein": "15.7",
+    "carbs": "0.0",
+    "fat": "18.6",
+    "cellulose": "0.0",
+    "sodium": "47"
+  },
+  "357": {
+    "code": "7053",
+    "printed_page": "331",
+    "energy": "187",
+    "protein": "17.9",
+    "carbs": "0.0",
+    "fat": "12.8",
+    "cellulose": "0.0",
+    "sodium": "60"
+  },
+  "367": {
+    "code": "7063",
+    "printed_page": "341",
+    "energy": "326",
+    "protein": "10.8",
+    "carbs": "15.4",
+    "fat": "24.6",
+    "cellulose": "0.0",
+    "sodium": null
+  },
+  "410": {
+    "code": "8022",
+    "printed_page": "382",
+    "energy": "97",
+    "protein": "18.2",
+    "carbs": "0.0",
+    "fat": "2.7",
+    "cellulose": "0.0",
+    "sodium": null
+  },
+  "422": {
+    "code": "8034",
+    "printed_page": "394",
+    "energy": "87",
+    "protein": "12.3",
+    "carbs": "2.0",
+    "fat": "3.3",
+    "cellulose": "0.0",
+    "sodium": "453"
+  },
+  "428": {
+    "code": "8040",
+    "printed_page": "400",
+    "energy": "73",
+    "protein": "16.3",
+    "carbs": "0.0",
+    "fat": "0.9",
+    "cellulose": "0.0",
+    "sodium": "44"
+  },
+  "431": {
+    "code": "8043",
+    "printed_page": "403",
+    "energy": "84",
+    "protein": "11.9",
+    "carbs": "7.6",
+    "fat": "0.7",
+    "cellulose": "0.0",
+    "sodium": null
+  },
+  "439": {
+    "code": "8051",
+    "printed_page": "411",
+    "energy": "82",
+    "protein": "17.6",
+    "carbs": "0.9",
+    "fat": "0.9",
+    "cellulose": "0.0",
+    "sodium": "148"
+  },
+  "440": {
+    "code": "8052",
+    "printed_page": "412",
+    "energy": "90",
+    "protein": "18.4",
+    "carbs": "0.0",
+    "fat": "1.8",
+    "cellulose": "0.0",
+    "sodium": "418"
+  },
+  "463": {
+    "code": "10001",
+    "printed_page": "431",
+    "energy": "74",
+    "protein": "3.9",
+    "carbs": "4.8",
+    "fat": "4.4",
+    "cellulose": "0.0",
+    "sodium": "380"
+  },
+  "468": {
+    "code": "10006",
+    "printed_page": "436",
+    "energy": "494",
+    "protein": "27.0",
+    "carbs": "38.0",
+    "fat": "26.0",
+    "cellulose": "0.0",
+    "sodium": "371"
+  },
+  "533": {
+    "code": "13008",
+    "printed_page": "495",
+    "energy": "227",
+    "protein": "15.6",
+    "carbs": "31.8",
+    "fat": "4.2",
+    "cellulose": "23.6",
+    "sodium": null
+  },
+  "534": {
+    "code": "13009",
+    "printed_page": "496",
+    "energy": "26",
+    "protein": "0.3",
+    "carbs": "2.5",
+    "fat": null,
+    "cellulose": "3.7",
+    "sodium": null
+  }
+}

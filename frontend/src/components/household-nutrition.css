@@ -13,3 +13,70 @@
 
 .portion-sum-note{display:block;margin-top:6px;font-size:12px;line-height:1.65;color:inherit;font-weight:400}
 .household-extra-macros{margin-top:14px;padding-top:0;border-top:0}
+.household-alert-box {
+  margin:14px 0;
+  padding:12px 14px;
+  border:1px solid #e7be72;
+  border-inline-start:4px solid #bb750b;
+  border-radius:10px;
+  color:#643900;
+  background:#fff3d9;
+  font-size:13px;
+}
+.household-alert-box.high {
+  color:#8b2027;
+  background:#fff0ee;
+  border-color:#db8a86;
+  border-inline-start-color:#bd3439;
+}
+.household-alert-box {
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:3px 7px;
+  border-inline-start-width:1px;
+}
+.household-alert-box.low {
+  background:#e7f1ff;
+  border-color:#b5cee9;
+  color:#234e83;
+}
+.household-alert-box strong { font-size:13px; }
+.household-alert-count { margin-inline-start:auto; font-size:11px; }
+.household-nutrition .household-nutrient-status {
+  display:inline-block;
+  margin-top:5px;
+  padding:3px 7px;
+  border-radius:5px;
+  background:#fff3d9;
+  color:#643900;
+}
+.household-nutrition [data-nutrition-status="high"] .household-nutrient-status { background:#fff0ee; color:#8b2027; }
+.household-nutrition [data-nutrition-status="low"] .household-nutrient-status { background:#e7f1ff; color:#234e83; }
+.household-nutrition [data-nutrition-status="pending"] .household-nutrient-status { background:transparent; color:inherit; padding-inline:0; }
+.household-nutrition [data-nutrition-status="high"] .household-track i { background:#bd3439; }
+.household-nutrition [data-nutrition-status="mild"] .household-track i { background:#bb750b; }
+.household-nutrition [data-nutrition-status="low"] .household-track i { background:#407bb7; }
+.household-nutrition .household-limit-label{color:#73877d;font-size:9px;font-weight:600}.household-nutrition .household-sodium-room{display:block;margin-top:4px;color:#27815f;font-size:9px;font-weight:700}
+.household-nutrition .household-card-heading,
+.household-nutrition .household-section { padding:13px 16px; }
+.household-nutrition .household-card-heading { flex-wrap:wrap; gap:4px 12px; }
+.household-nutrition .household-card-heading h3 { margin:0; font-size:18px; }
+.household-nutrition .household-card-heading p { white-space:nowrap; }
+.household-nutrition .household-section-title { margin-bottom:8px; }
+.household-member-details summary { cursor:pointer; font-size:13px; font-weight:600; padding:4px 0; }
+.household-member-details .household-chips { margin-top:7px; gap:5px; }
+.household-nutrition .household-view-label { margin-top:8px; gap:4px; }
+.household-nutrition .household-view-label select { height:36px; }
+.household-nutrition .household-energy { gap:12px; margin:10px 0; }
+.household-nutrition .household-energy strong { font-size:23px; }
+.household-nutrition .household-energy p { margin:4px 0; }
+.household-nutrition .household-ring { width:62px; height:62px; flex-basis:62px; }
+.household-nutrition .household-ring::before { inset:6px; }
+.household-nutrition .household-ring b { font-size:18px; }
+.household-nutrition .household-alert-box { margin:10px 0; padding:8px 10px; }
+.household-nutrition .household-macro-list { gap:9px; }
+.household-goal-warning { margin-top:10px; padding:10px 12px; border:1px solid #f2c581; border-left:4px solid #cd7908; border-radius:10px; background:#fff7e6; color:#804900; font-size:13px; line-height:1.5; }
+.household-goal-warning strong { display:block; font-size:13px; }
+.household-goal-warning p { margin:6px 0; }
+.household-goal-warning small { display:block; color:#804900; font-size:12px; }

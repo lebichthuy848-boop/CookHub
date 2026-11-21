@@ -1,0 +1,50 @@
+ 
+M· sè 
+BTP 
+ 2000 
+M· sè 
+BTP 
+2007 
+Tªn thùc phÈm Trang 
+M· sè 
+BTP 
+ 2000 
+M· sè 
+BTP 
+2007 
+Tªn thùc phÈm Trang 
+4066 4067 Rau c©u kh« 149 4096 4097 Su h μo kh« 179 
+4067 4068 Rau c©u t −¬i 150 4097 4098 Su su 180 
+4068 4069 Rau diÕp 151 4098 4099 Sóp l¬ tr¾ng 181 
+4069 4070 Rau ®ay 152  4100 Sóp l¬ xanh 182 
+4070 4071 Rau giÊp c¸, diÕp c¸ 153 4099 4101 Th×a l μ 183 
+4071 4072 Rau giÒn c¬m 154 4100 4102 TÝa t« 184 
+4072 4073 Rau giÒn ®á 155 4101 4103 Tái ta 185 
+4073 4074 Rau giÒn tr¾ng 156 4102 4104 Tái t©y (c¶ l¸) 186 
+4074 4075 Rau hóng 157 4103 4105 Tr¸m ®en chÝn 187 
+4075 4076 Rau khoai lang 158 4104 4106 Tr¸m xanh sèng, 
+tr¸m tr¾ng 
+188 
+4076 4077 Rau kinh giíi 159 4105 4107 X −¬ng s«ng 189 
+4077 4078 Rau m¸ rõng 160 4106 4108 C μ chua muèi 190 
+4078 4079 Rau m¸, m¸ m¬ 161 4107 4109 C μ muèi nÐn 191 
+4079 4080 Rau mång t¬i 162 4108 4110 C μ muèi sæi  192 
+4080 4081 Rau mïi 163 4109 4111 D −a c¶i b¾p 193 
+4081 4082 Rau mïi t μu 164 4110 4112 D −a c¶i bÑ 194 
+4082 4083 Rau muèng 165 4111 4113 D −a c¶i sen 195 
+4083 4084 Rau muèng kh« 166 4112 4114 D −a chuét muèi 196 
+4084 4085 Rau ngæ 167 4113 4115 D −a gi¸ (®Ëu xanh) 197 
+4085 4086 Rau ngãt 168 4114 4116 H μnh cñ muèi 198 
+4086 4087 Rau ngãt kh« 169 4115 4117 KiÖu muèi 199 
+4087 4088 Rau r¨m 170 4116 4118 Nhót (d −a muèi tõ 
+mÝt non,l¸ ®Ëu xanh 
+non...) 
+200 
+4088 4089 Rau rót 171 4117 4119 Men bia kh« 201 
+4089 4090 Rau s μ l¸ch 172 4118 4120 Men bia t −¬i 202 
+4090 4091 Rau sam 173 4119 4121 Méc nhÜ 203 
+4091 4092 Rau s¾ng  174 4120 4122 NÊm h −¬ng kh« 204 
+4092 4093 Rau t μu bay 175 4121 4123 NÊm h −¬ng t−¬i 205 
+4093 4094 Rau th¬m 176 4122 4124 NÊm mì (NÊm t©y) 206 
+4094 4095 SÊu xanh 177 4123 4125 NÊm r¬m 207 
+4095 4096 Su h μo 178 4124 4126 NÊm th −êng t−¬i 208 

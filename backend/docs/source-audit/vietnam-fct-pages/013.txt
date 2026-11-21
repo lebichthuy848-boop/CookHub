@@ -1,0 +1,30 @@
+   
+ 
+Các thực phẩm nhóm 1: Ngũ cốc và sản phẩm chế biến 
+M· sè BTP 
+ 2000 
+M· sè BTP 
+2007 Tªn thùc phÈm Trang 
+1001 1001 G¹o nÕp c¸i 1 
+1002 1002 G¹o nÕp m¸y(lo¹i th −êng) 2 
+1003 1003 G¹o tÎ gi· 3 
+1004 1004 G¹o tÎ m¸y 4 
+ 1005 G¹o løt 5 
+1005 1006 Kª 6 
+1006 1007 Ng« b¾p t −¬i 7 
+1007 1008 Ng« v μng h¹t kh« 8 
+1008 1009 B¸nh bao 9 
+1009 1010 B¸nh ®a nem 10 
+1010 1011 B¸nh ®óc 11 
+1011 1012 B¸nh mú  12 
+1012 1013 B¸nh phë 13 
+1013 1014 B¸nh quÈy 14 
+1014 1015 Báng ng« 15 
+1015 1016 Bét g¹o nÕp 16 
+1016 1017 Bét g¹o tÎ 17 
+1017 1018 Bét m×  18 
+1018 1019 Bét ng« v μng 19 
+1019 1020 Bón 20 
+1020 1021 Cèm 21 
+1021 1022 Mú sîi 22 
+1022 1023 Ng« nÕp luéc 23 

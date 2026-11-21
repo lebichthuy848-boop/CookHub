@@ -125,6 +125,9 @@ def test_avoided_ingredients_match_names_and_recipe_steps():
     assert not conflicts_with_avoid({'name': 'Món rau', 'recipe': {'ingredients': [], 'steps': ['Thêm nước mắm.']}}, ['shellfish'])
     assert conflicts_with_avoid({'name': 'Sữa chua', 'recipe': {'ingredients': [], 'steps': []}}, ['lactose'])
     assert not conflicts_with_avoid({'name': 'Sinh tố bơ quả', 'recipe': {'ingredients': [], 'steps': []}}, ['lactose'])
+    assert conflicts_with_avoid({'name': 'Bánh mì mè', 'recipe': {'ingredients': [], 'steps': []}}, ['wheat'])
+    assert conflicts_with_avoid({'name': 'Bánh mì mè', 'recipe': {'ingredients': [], 'steps': []}}, ['sesame'])
+    assert conflicts_with_avoid({'name': 'Trứng luộc', 'recipe': {'ingredients': [], 'steps': []}}, ['egg'])
 
 
 def test_avoidance_excludes_dish_from_preview_and_saved_recommendations(client, setup):

@@ -1,0 +1,56 @@
+Các thực phẩm nhóm 7: ThÞt vμ s¶n phÈm chÕ biÕn 
+M· sè 
+BTP 
+ 2000 
+M· sè 
+BTP 
+2007 
+Tªn thùc phÈm Trang
+M· sè 
+BTP 
+ 2000 
+M· sè 
+BTP 
+2007 
+Tªn thùc phÈm Trang 
+7001 7001 ThÞt bª mì 279 7039 7042 Gan vÞt 320 
+7002 7002 ThÞt bª n¹c 280 7040 7043 G©n ch©n bß 321 
+7003 7003 ThÞt bß lo¹i I 281 7041 7044 L −ìi bß 322 
+7004 7004 ThÞt bß lo¹i II 282 7042 7045 L −ìi lîn 323 
+7005 ThÞt bß, l −ng, n¹c 283 7043 7046 Lßng lîn (ruét gi μ) 324 
+7006 ThÞt bß, l −ng, n¹c vμ mì 284 7044 7047 Lßng lîn (ruét non) 325 
+7005 7007 ThÞt bå c©u ra r μng 285 7045 7048 MÒ g μ 326 
+7006 7008 ThÞt chã sÊn 286 7046 7049 Óc bß 327 
+7007 7009 ThÞt chã vai 287 7047 7050 Óc lîn 328 
+7008 7010 ThÞt cõu, n¹c 288 7048 7051 Phæi bß 329 
+7009 7011 ThÞt dª, n¹c 289 7049 7052 Phæi lîn 330 
+7010 7012 ThÞt g μ rõng 290 7050 7053 S −ên lîn (bá x−¬ng) 331 
+7011 7013 ThÞt g μ ta 291 7051 7054 Tai lîn 332 
+7012 7014 ThÞt g μ t©y 292 7052 7055 Tim bß 333 
+7013 7015 ThÞt h −¬u 293 7053 7056 Tim g μ 334 
+7014 7016 ThÞt lîn mì 294 7054 7057 Tim lîn 335 
+7015 7017 ThÞt lîn n¹c 295 7055 7058 TiÕt bß 336 
+7016 7018 ThÞt lîn nöa n¹c, nöa mì 296 7056 7059 TiÕt lîn luéc 337 
+7017 7019 ThÞt ngçng 297 7057 7060 TiÕt lîn sèng 338 
+7018 7020 ThÞt ngùa 298 7058 7061 Tñy x −¬ng bß 339 
+7019 7021 ThÞt thá nh μ 299 7059 7062 Tñy x −¬ng lîn 340 
+7020 7022 ThÞt thá rõng 300 7060 7063 Ba tª 341 
+7023 ThÞt tr©u 301 7061 7064 Ch¶ lîn 342 
+7021 7024 ThÞt tr©u b¾p 302 7062 7065 Ch¶ quÕ lîn 343 
+7022 7025 ThÞt tr©u cæ 303 7063 7066 D¨m b«ng lîn 344 
+7023 7026 ThÞt tr©u ®ïi 304 7064 7067 Dåi lîn 345 
+7024 7027 ThÞt tr©u th¨n 305 7065 7068 Giß bß 346 
+7025 7028 ThÞt vÞt 306 7066 7069 Giß lôa 347 
+7026 7029 BÇu dôc bß 307 7067 7070 Giß thñ lîn 348 
+7027 7030 BÇu dôc lîn 308 7068 7071 L¹p x −êng 349 
+7028 7031 B× lîn 309 7069 7072 Nem ch¹o 350 
+7029 7032 Ch©n giß lîn (bá x −¬ng) 310 7070 7073 Nem chua 351 
+7030 7033 D¹ d μy bß 311 7071 7074 Ruèc thÞt lîn 352 
+7031 7034 D¹ d μy lîn 312 7072 7075 ThÞt bß kh« 353 
+7032 7035 §Çu bß 313 7073 7076 ThÞt tr©u kh« 354 
+7033 7036 §Çu lîn 314 7074 7077 Xóc xÝch 355 
+7034 7037 §u«i bß 315 7075 7078 Bét cãc 356 
+7035 7038 §u«i lîn 316 7076 7079 Ch©u chÊu 357 
+7036 7039 Gan bß 317 7077 7080 Ếch (thÞt ®ïi) 358 
+7037 7040 Gan g μ 318 7078 7081 Nhéng 359 
+7038 7041 Gan lîn 319  7082 Lßng g μ (c¶ bé) 360 

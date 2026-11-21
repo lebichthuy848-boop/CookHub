@@ -1,0 +1,202 @@
+[
+  {
+    "MaThanhPhan": "TP21618",
+    "MaCongThuc": "CT216",
+    "MaNguyenLieu": "NL072",
+    "MaDonVi": "DVT003",
+    "SoLuong": "250.000",
+    "TenNguyenLieu": "Dầu ăn",
+    "LyDo": "Dầu chuẩn bị chiên hoành thánh, chưa có lượng dầu ăn vào.",
+    "NguonPhuongPhap": "https://www.fao.org/4/y4705e/y4705e23.htm"
+  },
+  {
+    "MaThanhPhan": "TP908",
+    "MaCongThuc": "CT901",
+    "MaNguyenLieu": "NL072",
+    "MaDonVi": "DVT003",
+    "SoLuong": "210.000",
+    "TenNguyenLieu": "Dầu ăn",
+    "LyDo": "Dầu dùng nhiều công đoạn của nem nướng, chưa tách dầu chiên dư.",
+    "NguonPhuongPhap": "https://www.fao.org/4/y4705e/y4705e23.htm"
+  },
+  {
+    "MaThanhPhan": "TP981",
+    "MaCongThuc": "CT907",
+    "MaNguyenLieu": "NL072",
+    "MaDonVi": "DVT003",
+    "SoLuong": "100.000",
+    "TenNguyenLieu": "Dầu ăn",
+    "LyDo": "Dầu chiên gà, chưa có lượng dầu hấp thụ.",
+    "NguonPhuongPhap": "https://www.fao.org/4/y4705e/y4705e23.htm"
+  },
+  {
+    "MaThanhPhan": "TP1053",
+    "MaCongThuc": "CT916",
+    "MaNguyenLieu": "NL072",
+    "MaDonVi": "DVT003",
+    "SoLuong": "400.000",
+    "TenNguyenLieu": "Dầu ăn",
+    "LyDo": "Dầu chiên đậu hũ, chưa có lượng dầu hấp thụ.",
+    "NguonPhuongPhap": "https://www.fao.org/4/y4705e/y4705e23.htm"
+  },
+  {
+    "MaThanhPhan": "TP1049",
+    "MaCongThuc": "CT916",
+    "MaNguyenLieu": "NL028",
+    "MaDonVi": "DVT005",
+    "SoLuong": "3.000",
+    "TenNguyenLieu": "Trứng gà",
+    "LyDo": "Trứng dùng áo đậu hũ, chưa xác định phần còn dư.",
+    "NguonPhuongPhap": "https://www.fao.org/4/y4705e/y4705e23.htm"
+  },
+  {
+    "MaThanhPhan": "TP1051",
+    "MaCongThuc": "CT916",
+    "MaNguyenLieu": "NL1051",
+    "MaDonVi": "DVT001",
+    "SoLuong": "500.000",
+    "TenNguyenLieu": "Bột chiên xù",
+    "LyDo": "Bột chiên xù dùng áo, chưa xác định phần bám và phần dư.",
+    "NguonPhuongPhap": "https://www.fao.org/4/y4705e/y4705e23.htm"
+  },
+  {
+    "MaThanhPhan": "TP1052",
+    "MaCongThuc": "CT916",
+    "MaNguyenLieu": "NL301",
+    "MaDonVi": "DVT001",
+    "SoLuong": "100.000",
+    "TenNguyenLieu": "Bột mì",
+    "LyDo": "Bột mì dùng áo đậu hũ, chưa xác định phần bám và phần dư.",
+    "NguonPhuongPhap": "https://www.fao.org/4/y4705e/y4705e23.htm"
+  },
+  {
+    "MaThanhPhan": "TP972",
+    "MaCongThuc": "CT907",
+    "MaNguyenLieu": "NL972",
+    "MaDonVi": "DVT001",
+    "SoLuong": "600.000",
+    "TenNguyenLieu": "Bột mì đa dụng",
+    "LyDo": "Bột mì gồm phần làm mì và phần áo gà, chưa xác định tổng lượng ăn vào.",
+    "NguonPhuongPhap": "https://www.fao.org/4/y4705e/y4705e23.htm"
+  },
+  {
+    "MaThanhPhan": "TP973",
+    "MaCongThuc": "CT907",
+    "MaNguyenLieu": "NL028",
+    "MaDonVi": "DVT005",
+    "SoLuong": "3.000",
+    "TenNguyenLieu": "Trứng gà",
+    "LyDo": "Trứng dùng làm mì và áo gà, chưa tách phần dư.",
+    "NguonPhuongPhap": "https://www.fao.org/4/y4705e/y4705e23.htm"
+  },
+  {
+    "MaThanhPhan": "TP979",
+    "MaCongThuc": "CT907",
+    "MaNguyenLieu": "NL146",
+    "MaDonVi": "DVT006",
+    "SoLuong": "6.000",
+    "TenNguyenLieu": "Bột năng",
+    "LyDo": "Bột dùng áo gà, chưa xác định phần bám và phần dư.",
+    "NguonPhuongPhap": "https://www.fao.org/4/y4705e/y4705e23.htm"
+  },
+  {
+    "MaThanhPhan": "TP1170",
+    "MaCongThuc": "CT926",
+    "MaNguyenLieu": "NL1156",
+    "MaDonVi": "DVT001",
+    "SoLuong": "500.000",
+    "TenNguyenLieu": "Xương ống",
+    "LyDo": "Xương nấu nước dùng, không áp hồ sơ chất béo cho toàn bộ xương.",
+    "NguonPhuongPhap": "https://www.fao.org/4/y4705e/y4705e23.htm"
+  },
+  {
+    "MaThanhPhan": "TP1211",
+    "MaCongThuc": "CT929",
+    "MaNguyenLieu": "NL232",
+    "MaDonVi": "DVT001",
+    "SoLuong": "500.000",
+    "TenNguyenLieu": "Xương heo",
+    "LyDo": "Xương nấu nước dùng, chưa có hồ sơ nước dùng tương ứng.",
+    "NguonPhuongPhap": "https://www.fao.org/4/y4705e/y4705e23.htm"
+  },
+  {
+    "MaThanhPhan": "TP23003",
+    "MaCongThuc": "CT230",
+    "MaNguyenLieu": "NL232",
+    "MaDonVi": "DVT001",
+    "SoLuong": "100.000",
+    "TenNguyenLieu": "Xương heo",
+    "LyDo": "Xương nấu phở, chưa có hồ sơ nước dùng tương ứng.",
+    "NguonPhuongPhap": "https://www.fao.org/4/y4705e/y4705e23.htm"
+  },
+  {
+    "MaThanhPhan": "TP1169",
+    "MaCongThuc": "CT926",
+    "MaNguyenLieu": "NL027",
+    "MaDonVi": "DVT002",
+    "SoLuong": "1.000",
+    "TenNguyenLieu": "Cua đồng",
+    "LyDo": "Cua đồng xay lọc bã, chưa có lượng thịt/gạch hòa vào nước dùng.",
+    "NguonPhuongPhap": "https://www.fao.org/4/y4705e/y4705e23.htm"
+  },
+  {
+    "MaThanhPhan": "TP1112",
+    "MaCongThuc": "CT920",
+    "MaNguyenLieu": "NL1112",
+    "MaDonVi": "DVT001",
+    "SoLuong": "500.000",
+    "TenNguyenLieu": "Muối hột",
+    "LyDo": "500 g muối hột lót nồi hấp gà, không phải lượng muối được ăn toàn bộ.",
+    "NguonPhuongPhap": "https://www.fao.org/4/y4705e/y4705e23.htm"
+  },
+  {
+    "MaThanhPhan": "TP93892",
+    "MaCongThuc": "CT946",
+    "MaNguyenLieu": "NL073",
+    "MaDonVi": "DVT006",
+    "SoLuong": "5.000",
+    "TenNguyenLieu": "Muối",
+    "LyDo": "Muối bóp rửa bạch tuộc rồi xả sạch, chưa có lượng natri còn lại.",
+    "NguonPhuongPhap": "https://www.fao.org/4/y4705e/y4705e23.htm"
+  },
+  {
+    "MaThanhPhan": "TP93885",
+    "MaCongThuc": "CT946",
+    "MaNguyenLieu": "NL952",
+    "MaDonVi": "DVT006",
+    "SoLuong": "3.000",
+    "TenNguyenLieu": "Giấm",
+    "LyDo": "Giấm bóp rửa bạch tuộc rồi xả sạch, không ăn toàn bộ lượng sơ chế.",
+    "NguonPhuongPhap": "https://www.fao.org/4/y4705e/y4705e23.htm"
+  },
+  {
+    "MaThanhPhan": "TP93909",
+    "MaCongThuc": "CT949",
+    "MaNguyenLieu": "NL073",
+    "MaDonVi": "DVT001",
+    "SoLuong": "60.000",
+    "TenNguyenLieu": "Muối",
+    "LyDo": "Muối trong nước ngâm dưa, chưa xác định lượng muối vào phần dưa ăn được.",
+    "NguonPhuongPhap": "https://www.fao.org/4/y4705e/y4705e23.htm"
+  },
+  {
+    "MaThanhPhan": "TP93910",
+    "MaCongThuc": "CT949",
+    "MaNguyenLieu": "NL074",
+    "MaDonVi": "DVT001",
+    "SoLuong": "20.000",
+    "TenNguyenLieu": "Đường",
+    "LyDo": "Đường trong nước ngâm dưa, chưa xác định lượng còn trong phần ăn được.",
+    "NguonPhuongPhap": "https://www.fao.org/4/y4705e/y4705e23.htm"
+  },
+  {
+    "MaThanhPhan": "TP93914",
+    "MaCongThuc": "CT949",
+    "MaNguyenLieu": "NL952",
+    "MaDonVi": "DVT007",
+    "SoLuong": "3.000",
+    "TenNguyenLieu": "Giấm",
+    "LyDo": "Giấm trong nước ngâm dưa, không ăn toàn bộ lượng nước ngâm.",
+    "NguonPhuongPhap": "https://www.fao.org/4/y4705e/y4705e23.htm"
+  }
+]

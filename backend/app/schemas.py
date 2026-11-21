@@ -100,6 +100,10 @@ class ReviewModeration(Input):
     status: Literal['Đã duyệt', 'Từ chối']
     note: str = Field(default='', max_length=500)
 
+class MenuItemUpdate(Input):
+    meal: Literal['Sáng', 'Trưa', 'Tối', 'Ăn nhẹ']
+    servings: int = Field(ge=1, le=1000)
+
 class MenuItem(Input):
     dish_id: str = Field(min_length=1, max_length=50)
     date: date
@@ -117,10 +121,10 @@ class Preferences(Input):
     occasions: Literal['balanced', 'low_carb', 'vegetarian', 'none']
     tastes: list[Literal['savory', 'spicy', 'sweet_sour', 'light', 'rich']] = Field(min_length=1, max_length=5)
     time: Literal['quick', 'medium', 'relaxed']
-    tools: list[Literal['stove', 'air_fryer', 'pressure_cooker', 'oven', 'no_cook']] = Field(min_length=1, max_length=5)
+    tools: list[Literal['stove', 'gas_stove', 'induction_stove', 'air_fryer', 'pressure_cooker', 'oven', 'no_cook']] = Field(min_length=1, max_length=6)
     dish_types: list[Literal['rice_noodles', 'soup', 'salad', 'snack', 'dessert']] = Field(default_factory=list, max_length=5)
-    avoid: list[Literal['none', 'fish', 'shellfish', 'peanut', 'soy', 'dairy', 'spicy_avoid', 'seafood_allergy', 'lactose']] = Field(default_factory=list, max_length=9)
-    method: Literal['', 'stir_fry', 'steam', 'grill', 'stew'] = ''
+    avoid: list[Literal['none', 'fish', 'shellfish', 'egg', 'peanut', 'tree_nuts', 'soy', 'dairy', 'wheat', 'sesame', 'spicy_avoid', 'seafood_allergy', 'lactose']] = Field(default_factory=list, max_length=13)
+    method: Literal['', 'stir_fry', 'pan_sear', 'steam', 'boil', 'grill', 'stew', 'braise'] = ''
     skill: Literal['', 'beginner', 'basic', 'chef'] = ''
     meals: list[Literal['breakfast', 'lunch', 'dinner', 'snack']] = Field(default_factory=list, max_length=4)
 

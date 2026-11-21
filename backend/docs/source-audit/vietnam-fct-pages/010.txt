@@ -1,0 +1,34 @@
+ix 
+ 
+Lipid: Được xác định bằng phương pháp chiết Soxhlet 
+Glucid tổng số: Được tính toán theo công th ức: Glucid = 100 – (n ước + protein + 
+lipid + x ơ + tro). Đối với các đồ uống chứa cồn, hàm l ượng glucid t ổng số được 
+xác định theo công th ức: Glucid = 100 – (n ước + protein + lipid + x ơ + tro + c ồn 
+ethanol) 
+Các đường đa và đường đơn: được xác định bằng phương pháp chuẩn độ 
+Celluloza: Được xác định bằng phương pháp khối lượng 
+Tro: Được xác định bằng phương pháp cân tro tr ắng còn l ại sau khi nung ở nhiệt 
+độ 500o – 550oC 
+Vitamin C: Được xác định bằng phương pháp hóa h ọc với thuốc thử Tilman k ết 
+hợp với chuẩn độ điện thế, phương pháp HPLC.  
+Vitamin B1, B2, niacin, B 5, B6, folat, acid folic, biotin và vitamin B12: Được xác 
+định bằng phương pháp sắc ký lỏng hiệu năng cao (HPLC) 
+Vitamin A (retinol): Được xác định bằng phương pháp sắc ký lỏng hiệu năng cao 
+(HPLC). Hàm lượng vitamin A và caroten được quy về: tương đương vitamin A ở 
+thực phẩm động vật và t ương đương β-caroten ở thực phẩm thực vật, và chuy ển 
+đổi như sau:  
+1 mcg retinol t ương đương v ới : 1mcg retinol, 12 mcg β-caroten, 24 mcg 
+carotenoid  
+1 mcg β-caroten tương đương với: 1 mcg β-caroten, 2 mcg carotenoid 
+Các vitamin  D ,  E ,  K )  v à  c a r o t e n o i d: Được xác định b ằng ph ương pháp s ắc ký 
+lỏng hiệu năng cao (HPLC) 
+Hàm l ượng khoáng và vi khoáng:  Được xác định b ằng ph ương pháp chu ẩn độ 
+hóa h ọc, ph ương pháp so màu và ph ương pháp quang ph ổ h ấp th ụ nguyên t ử 
+(AAS) 
+Hàm lượng purin: Được xác định bằng phương pháp s ắc ký l ỏng hiệu năng cao 
+(HPLC) 
+Hàm l ượng các isoflavon : Được xác định b ằng ph ương pháp s ắc ký l ỏng hi ệu 
+năng cao (HPLC) 
+Hàm lượng các acid béo: Được xác định bằng phương pháp sắc ký khí (GC) 
+Hàm l ượng các acid amin : Được xác định b ằng ph ương pháp s ắc ký l ỏng hi ệu 
+năng cao (HPLC) 

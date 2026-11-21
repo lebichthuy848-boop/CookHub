@@ -1,0 +1,69 @@
+STT: 308
+M· sè: 7030
+Th¶i bá (%): 2.0
+Thμnh phÇn dinh d−ìng
+(Nutrients)
+ĐV
+(Unit)
+Hμm lượng
+(Value)
+TLTK
+(Source)
+Thμnh phÇn dinh d−ìng
+(Nutrients)
+ĐV
+(Unit)
+Hμm lượng
+(Value)
+TLTK
+(Source)
+Nước (Water ) g 82.5 1 Tổng số isoflavon (Total isoflavone) mg 03
+Năng lượng (Energy ) KCal 81 Daidzein mg 03
+KJ 339 Genistein mg 03
+Protein g 13.0 1 Glycetin mg 03
+Lipid (Fat) g 3.1 1 Tổng số acid béo no g 1.040 3
+Glucid (Carbohydrate) g 0.3 1 (Total saturated fatty acid)
+Celluloza (Fiber) g 0.0 1 Palmitic (C16:0) g 0.580 3
+Tro (Ash) g 1.1 1 Margaric (C17:0) g 0.000 3
+Đường tổng số (Sugar) g 03 Stearic (C18:0) g 0.410 3
+Galactoza (Galactose) g 03 Arachidic (C20:0) g 0.000 3
+Maltoza (Maltose) g 03 Behenic (22:0) g 0.000 3
+Lactoza (Lactose) g 03 Lignoceric (C24:0) g 0.000 3
+Fructoza (Fructose) g 03 TS acid béo không no 1 nối đôi g 1.070 3
+Glucoza (Glucose) g 03 (Total monounsaturated fatty acid)
+Sacaroza (Sucrose) g 03 Myristoleic (C14:1) g 0.000 3
+Calci (Calcium) mg 81 Palmitoleic (C16:1) g 0.090 3
+Sắt (Iron) mg 8.00 1 Oleic (C18:1) g 0.970 3
+Magiê (Magnesium) mg 17 1 TS acid béo không no nhiềun ối đôi g 0 260 3
+Tªn thùc phÈm (Vietnamese): BÇu dôc lîn
+Tªn tiÕng Anh (English): Pork, kidney
+Thμnh phÇn dinh d−ìng trong 100g phÇn ¨n ®−îc (100 grams edible portion)
+Magiê (Magnesium) mg 17 1 TS acid béo không no nhiều nối đôi g 0.260 3
+Mangan (Manganese) mg 0.100 1 (Total polyunsaturated fatty acid)
+Phospho (Phosphorous) mg 223 1 Linoleic (C18:2 n6) g 0.170 3
+Kali (Potassium) mg 390 1 Linolenic (C18:2 n3) g 0.010 3
+Natri (Sodium) mg 121 3 Arachidonic (C20:4) g 0.080 3
+Kẽm  (Zinc) mg 2.75 3 Eicosapentaenoic  (C20:5 n3) g 0.000 3
+Đồng (Copper) μg 445 1 Docosahexaenoic (C22:6 n3) g 0.000 3
+Selen (Selenium) μg 190 3 TS acid béo trans (Total trans fatty acid) g -
+Vitamin C (Ascorbic acid) mg 51 Cholesterol mg 319 3
+Vitamin B1 (Thiamine) mg 0.38 1 Phytosterol mg -
+Vitamin B2 (Riboflavin) mg 1.12 1 Lysin mg 1330 1
+Vitamin PP (Niacin) mg 4.8 1 Methionin mg 339 1
+Vitamin B5 (Pantothenic acid) mg 3.13 3 Tryptophan mg 209 1
+Vitamin B6 (Pyridoxine) mg 0.44 3 Phenylalanin mg 548 1
+Folat (Folate) μg 42 3 Threonin mg 704 1
+Vitamin B9 (Folic acid) μg 03 Valin mg 913 1
+Vitamin H (Biotin ) μg - Leucin mg 1728 1
+Vitamin B12 (Cyanocobalamine) μg 8.49 3 Isoleucin mg 678 1
+Vitamin A (Retinol) μg 150 1 Arginin mg 913 1
+Vitamin D (Calciferol ) μg - Histidin mg 574 1
+Vitamin E (Alpha-tocopherol) mg - Cystin mg 235 1
+Vitamin K (Phylloquinone) μg - Tyrosin mg 522 1
+Beta-caroten μg 03 Alanin mg 861 1
+Alpha-caroten μg 03 Acid aspartic mg 1434 1
+Beta-cryptoxanthin μg 03 Acid glutamic mg 2008 1
+Lycopen μg 03 Glycin mg 965 1
+Lutein + Zeaxanthin μg 03 Prolin mg 913 1
+Purin mg 334 4 Serin mg 782 1
+308

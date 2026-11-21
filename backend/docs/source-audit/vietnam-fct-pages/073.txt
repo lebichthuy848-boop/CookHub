@@ -1,0 +1,69 @@
+STT: 56
+M· sè: 3007
+Th¶i bá (%): 2.0
+Thμnh phÇn dinh d−ìng
+(Nutrients)
+ĐV
+(Unit)
+Hμm lượng
+(Value)
+TLTK
+(Source)
+Thμnh phÇn dinh d−ìng
+(Nutrients)
+ĐV
+(Unit)
+Hμm lượng
+(Value)
+TLTK
+(Source)
+Nước (Water ) g 14.0 1 Tổng số isoflavon (Total isoflavone) mg 151.17 3
+Năng lượng (Energy ) KCal 400 Daidzein mg 67.79 3
+KJ 1674 Genistein mg 72.51 3
+Protein g 34.0 1 Glycetin mg 10.88 3
+Lipid (Fat) g 18.4 1 Tổng số acid béo no g 2.880 3
+Glucid (Carbohydrate) g 24.6 1 (Total saturated fatty acid)
+Celluloza (Fiber) g 4.5 1 Palmitic (C16:0) g 2.120 3
+Tro (Ash) g 4.5 1 Margaric (C17:0) g 0.000 3
+Đường tổng số (Sugar) g - Stearic (C18:0) g 0.710 3
+Galactoza (Galactose) g - Arachidic (C20:0) g 0.000 3
+Maltoza (Maltose) g - Behenic (22:0) g 0.000 3
+Lactoza (Lactose) g - Lignoceric (C24:0) g 0.000 3
+Fructoza (Fructose) g - TS acid béo không no 1 nối đôi g 4.400 3
+Glucoza (Glucose) g - (Total monounsaturated fatty acid)
+Sacaroza (Sucrose) g - Myristoleic (C14:1) g 0.000 3
+Calci (Calcium) mg 165 1 Palmitoleic (C16:1) g 0.060 3
+Sắt (Iron) mg 11.00 1 Oleic (C18:1) g 4.350 3
+Magiê (Magnesium) mg 236 1 TS acid béo không no nhiềun ối đôi g 11 260 3
+Tªn thùc phÈm (Vietnamese): §Ëu t−¬ng (®Ëu nμnh)
+Tªn tiÕng Anh (English): Yellow dried soybean seeds, dried
+Thμnh phÇn dinh d−ìng trong 100g phÇn ¨n ®−îc (100 grams edible portion)
+Magiê (Magnesium) mg 236 1 TS acid béo không no nhiều nối đôi g 11.260 3
+Mangan (Manganese) mg 1.200 1 (Total polyunsaturated fatty acid)
+Phospho (Phosphorous) mg 690 1 Linoleic (C18:2 n6) g 9.930 3
+Kali (Potassium) mg 1504 1 Linolenic (C18:2 n3) g 1.330 3
+Natri (Sodium) mg 23 Arachidonic (C20:4) g 0.000 3
+Kẽm  (Zinc) mg 3.80 1 Eicosapentaenoic  (C20:5 n3) g 0.000 3
+Đồng (Copper) μg 300 1 Docosahexaenoic (C22:6 n3) g 0.000 3
+Selen (Selenium) μg 1.5 1 TS acid béo trans (Total trans fatty acid) g -
+Vitamin C (Ascorbic acid) mg 41 Cholesterol mg 03
+Vitamin B1 (Thiamine) mg 0.54 1 Phytosterol mg 161
+Vitamin B2 (Riboflavin) mg 0.29 1 Lysin mg 1970 1
+Vitamin PP (Niacin) mg 2.3 1 Methionin mg 680 1
+Vitamin B5 (Pantothenic acid) mg 0.793 3 Tryptophan mg 480 1
+Vitamin B6 (Pyridoxine) mg 0.377 3 Phenylalanin mg 1800 1
+Folat (Folate) μg 375 3 Threonin mg 1600 1
+Vitamin B9 (Folic acid) μg 03 Valin mg 1430 1
+Vitamin H (Biotin ) μg 60 5 Leucin mg 2240 1
+Vitamin B12 (Cyanocobalamine) μg 03 Isoleucin mg 1670 1
+Vitamin A (Retinol) μg 01 Arginin mg 2410 1
+Vitamin D (Calciferol ) μg - Histidin mg 780 1
+Vitamin E (Alpha-tocopherol) mg 0.85 3 Cystin mg 485 1
+Vitamin K (Phylloquinone) μg 47 3 Tyrosin mg 988 1
+Beta-caroten μg 30 3 Alanin mg 1671 1
+Alpha-caroten μg - Acid aspartic mg 4361 1
+Beta-cryptoxanthin μg - Acid glutamic mg 7098 1
+Lycopen μg - Glycin mg 1551 1
+Lutein + Zeaxanthin μg - Prolin mg 1989 1
+Purin mg - Serin mg 1851 1
+56

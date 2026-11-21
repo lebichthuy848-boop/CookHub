@@ -1,0 +1,69 @@
+STT: 318
+M· sè: 7040
+Th¶i bá (%): 0.0
+Thμnh phÇn dinh d−ìng
+(Nutrients)
+ĐV
+(Unit)
+Hμm lượng
+(Value)
+TLTK
+(Source)
+Thμnh phÇn dinh d−ìng
+(Nutrients)
+ĐV
+(Unit)
+Hμm lượng
+(Value)
+TLTK
+(Source)
+Nước (Water ) g 75.0 1 Tổng số isoflavon (Total isoflavone) mg 03
+Năng lượng (Energy ) KCal 111 Daidzein mg 03
+KJ 466 Genistein mg 03
+Protein g 18.2 1 Glycetin mg 03
+Lipid (Fat) g 3.4 1 Tổng số acid béo no g 1.560 3
+Glucid (Carbohydrate) g 2.0 1 (Total saturated fatty acid)
+Celluloza (Fiber) g 0.0 1 Palmitic (C16:0) g 0.880 3
+Tro (Ash) g 1.4 1 Margaric (C17:0) g 0.000 3
+Đường tổng số (Sugar) g - Stearic (C18:0) g 0.660 3
+Galactoza (Galactose) g - Arachidic (C20:0) g 0.000 3
+Maltoza (Maltose) g - Behenic (22:0) g 0.010 3
+Lactoza (Lactose) g - Lignoceric (C24:0) g 0.000 3
+Fructoza (Fructose) g - TS acid béo không no 1 nối đôi g 1.250 3
+Glucoza (Glucose) g - (Total monounsaturated fatty acid)
+Sacaroza (Sucrose) g - Myristoleic (C14:1) g 0.000 3
+Calci (Calcium) mg 21 1 Palmitoleic (C16:1) g 0.110 3
+Sắt (Iron) mg 8.20 1 Oleic (C18:1) g 1.130 3
+Magiê (Magnesium) mg 17 1 TS acid béo không no nhiềun ối đôi g 0 820 3
+Tªn tiÕng Anh (English): Chicken liver
+Thμnh phÇn dinh d−ìng trong 100g phÇn ¨n ®−îc (100 grams edible portion)
+Tªn thùc phÈm (Vietnamese): Gan gμ
+Magiê (Magnesium) mg 17 1 TS acid béo không no nhiều nối đôi g 0.820 3
+Mangan (Manganese) mg 0.200 1 (Total polyunsaturated fatty acid)
+Phospho (Phosphorous) mg 260 1 Linoleic (C18:2 n6) g 0.480 3
+Kali (Potassium) mg 335 1 Linolenic (C18:2 n3) g 0.010 3
+Natri (Sodium) mg 71 3 Arachidonic (C20:4) g 0.330 3
+Kẽm  (Zinc) mg 2.67 3 Eicosapentaenoic  (C20:5 n3) g 0.000 3
+Đồng (Copper) μg 300 1 Docosahexaenoic (C22:6 n3) g 0.000 3
+Selen (Selenium) μg 54.6 3 TS acid béo trans (Total trans fatty acid) g 0.065 3
+Vitamin C (Ascorbic acid) mg 71 Cholesterol mg 345 3
+Vitamin B1 (Thiamine) mg 0.38 1 Phytosterol mg -
+Vitamin B2 (Riboflavin) mg 1.63 1 Lysin mg 1244 1
+Vitamin PP (Niacin) mg 10.4 1 Methionin mg 463 1
+Vitamin B5 (Pantothenic acid) mg 6.233 3 Tryptophan mg 179 1
+Vitamin B6 (Pyridoxine) mg 0.853 3 Phenylalanin mg 764 1
+Folat (Folate) μg 588 3 Threonin mg 676 1
+Vitamin B9 (Folic acid) μg 03 Valin mg 889 1
+Vitamin H (Biotin ) μg 210 5 Leucin mg 1633 1
+Vitamin B12 (Cyanocobalamine) μg 16.58 3 Isoleucin mg 1295 1
+Vitamin A (Retinol) μg 3290 3 Arginin mg 960 1
+Vitamin D (Calciferol ) μg - Histidin mg 338 1
+Vitamin E (Alpha-tocopherol) mg 0.7 3 Cystin mg 213 1
+Vitamin K (Phylloquinone) μg 03 Tyrosin mg 534 1
+Beta-caroten μg 56 3 Alanin mg 940 1
+Alpha-caroten μg 11 3 Acid aspartic mg 1437 1
+Beta-cryptoxanthin μg 11 3 Acid glutamic mg 2417 1
+Lycopen μg 40 3 Glycin mg 798 1
+Lutein + Zeaxanthin μg 03 Prolin mg 747 1
+Purin mg 243 4 Serin mg 710 1
+318

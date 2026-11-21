@@ -1,0 +1,312 @@
+[
+  {
+    "id": "NL1171",
+    "name": "Bánh phồng tôm chay",
+    "unit": "gói",
+    "grams": "200",
+    "apply": "0",
+    "notes": "Chỉ mẫu bánh phồng chay cà rốt Sa Giang 200 g, trước chiên; chưa xác nhận gói trong món của bạn cùng sản phẩm.",
+    "url": "https://cuahang.sagiang.com.vn/products/sa-giang-banh-phong-chay-ca-rot-200g",
+    "line": 34200
+  },
+  {
+    "id": "NL1172",
+    "name": "Bắp cải tím",
+    "unit": "cái",
+    "grams": "839",
+    "apply": "1",
+    "notes": "USDA 11112: bắp cải tím sống, đầu cỡ vừa đường kính 5 inch; nhỏ 567 g, lớn 1134 g. Chọn theo kích cỡ, phần ăn được.",
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "line": 34201
+  },
+  {
+    "id": "NL1233",
+    "name": "Bột rau câu dẻo",
+    "unit": "muỗng cà phê",
+    "grams": "2",
+    "apply": "1",
+    "notes": "Nguồn ghi 2 g (1m); chú thích m = muỗng cafe. Cần khớp sản phẩm bột rau câu dẻo, không thay bằng agar nguyên chất.",
+    "url": "https://monngonmoingay.com/blendy-matcha-sua-tao-pho/",
+    "line": 34202
+  },
+  {
+    "id": "NL1095",
+    "name": "Cơm nguội",
+    "unit": "chén",
+    "grams": "110",
+    "apply": "0",
+    "notes": "Nguồn ghi 220 g cơm nguội = 2 chén; suy ra 110 g/chén theo chén công thức này. USDA cup cơm chín 158 g là dụng cụ khác, không mâu thuẫn.",
+    "url": "https://monngonmoingay.com/com-chien-tom-bong-cai/",
+    "line": 34203
+  },
+  {
+    "id": "NL1186",
+    "name": "Cơm nóng",
+    "unit": "chén",
+    "grams": "158",
+    "apply": "0",
+    "notes": "USDA 20045: cơm trắng hạt dài đã nấu. Chưa có bằng chứng chén thực tế bằng cup của nguồn; không gán thẳng cho mọi chén.",
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "line": 34204
+  },
+  {
+    "id": "NL135",
+    "name": "Củ cải trắng",
+    "unit": "củ",
+    "grams": "338",
+    "apply": "1",
+    "notes": "USDA 11430: củ cải trắng oriental, dài 7 inch (~17,8 cm), phần ăn được.",
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "line": 34205
+  },
+  {
+    "id": "NL148",
+    "name": "Củ dền",
+    "unit": "quả",
+    "grams": "82",
+    "apply": "1",
+    "notes": "USDA 11080: củ dền sống đường kính 2 inch (~5 cm), phần ăn được.",
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "line": 34206
+  },
+  {
+    "id": "NL304",
+    "name": "Củ sắn",
+    "unit": "củ",
+    "grams": "659",
+    "apply": "1",
+    "notes": "USDA 11603: jicama/củ đậu/củ sắn cỡ vừa; nhỏ 365 g, lớn 1200 g. Không phải sắn mì/cassava.",
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "line": 34207
+  },
+  {
+    "id": "NL108",
+    "name": "Củ sen",
+    "unit": "củ",
+    "grams": "115",
+    "apply": "1",
+    "notes": "USDA 11254: củ sen sống dài 9,5 inch (~24 cm), phần ăn được; không đại diện mọi củ.",
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "line": 34208
+  },
+  {
+    "id": "NL045",
+    "name": "Đậu Hà Lan",
+    "unit": "chén",
+    "grams": "145",
+    "apply": "0",
+    "notes": "USDA 11304: đậu Hà Lan xanh sống. Chỉ dùng nếu chén đong tương đương cup nguồn; không áp cho hạt khô hoặc chín khác trạng thái.",
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "line": 34209
+  },
+  {
+    "id": "NL029",
+    "name": "Đậu hũ",
+    "unit": "miếng",
+    "grams": "150",
+    "apply": "1",
+    "notes": "Nguồn ghi 2 miếng đậu hũ trắng khoảng 300 g; suy ra 300/2. Cần khớp kích cỡ miếng.",
+    "url": "https://monngonmoingay.com/cach-lam-hoanh-thanh-chay/",
+    "line": 34210
+  },
+  {
+    "id": "NL1131",
+    "name": "Dừa (lấy nước)",
+    "unit": "quả",
+    "grams": "206",
+    "apply": "0",
+    "notes": "USDA 12119: lượng nước thu từ một quả dừa mẫu; không phải khối lượng cả quả. Chưa xác nhận đúng giống dừa xiêm và kích cỡ trong công thức.",
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "line": 34212
+  },
+  {
+    "id": "NL308",
+    "name": "Dưa lưới",
+    "unit": "quả",
+    "grams": "552",
+    "apply": "0",
+    "notes": "USDA 09181: cantaloupe cỡ vừa đường kính 5 inch, phần ăn được. Chỉ tham khảo khi đúng loại; tên dưa lưới/ruột vàng chưa xác nhận giống.",
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "line": 34213
+  },
+  {
+    "id": "NL309",
+    "name": "Dưa lưới ruột vàng",
+    "unit": "quả",
+    "grams": "552",
+    "apply": "0",
+    "notes": "USDA 09181: cantaloupe cỡ vừa đường kính 5 inch, phần ăn được. Chỉ tham khảo khi đúng loại; tên dưa lưới/ruột vàng chưa xác nhận giống.",
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "line": 34214
+  },
+  {
+    "id": "NL310",
+    "name": "Dưa lưới ruột xanh",
+    "unit": "quả",
+    "grams": "1000",
+    "apply": "0",
+    "notes": "USDA 09184: honeydew đường kính 5,25 inch, phần ăn được. Cần xác nhận dưa ruột xanh thực tế là honeydew.",
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "line": 34215
+  },
+  {
+    "id": "NL123",
+    "name": "Dừa xiêm",
+    "unit": "quả",
+    "grams": "206",
+    "apply": "0",
+    "notes": "USDA 12119: lượng nước thu từ một quả dừa mẫu; không phải khối lượng cả quả. Chưa xác nhận đúng giống dừa xiêm và kích cỡ trong công thức.",
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "line": 34216
+  },
+  {
+    "id": "NL1193",
+    "name": "Gạo dẻo",
+    "unit": "chén",
+    "grams": "200",
+    "apply": "0",
+    "notes": "USDA 20452: gạo trắng hạt ngắn sống; cần khớp giống gạo dẻo và dung tích chén.",
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "line": 34218
+  },
+  {
+    "id": "NL954",
+    "name": "Gạo tẻ",
+    "unit": "chén",
+    "grams": "185",
+    "apply": "0",
+    "notes": "USDA 20044/20444: gạo trắng hạt dài sống; không đồng nhất mọi chén gia đình với cup.",
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "line": 34219
+  },
+  {
+    "id": "NL952",
+    "name": "Giấm",
+    "unit": "muỗng canh",
+    "grams": "14.9",
+    "apply": "1",
+    "notes": "USDA 02053: giấm distilled; không áp cho giấm balsamic hoặc mọi hỗn hợp giấm đặc.",
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "line": 34220
+  },
+  {
+    "id": "NL314",
+    "name": "Múi mít Thái",
+    "unit": "múi",
+    "grams": "38",
+    "apply": "1",
+    "notes": "Bộ Y tế Malaysia: jackfruit (nangka), 5 miếng không hạt = 190 g; chia 190/5. Mẫu mít nói chung, chưa riêng giống mít Thái.",
+    "url": "https://hq.moh.gov.my/nutrition/wp-content/uploads/2024/08/01.Buku-MDGV-Web-_12.07.24.pdf#page=68",
+    "line": 34222
+  },
+  {
+    "id": "NL160",
+    "name": "Ngò rí",
+    "unit": "nhánh",
+    "grams": "2.222",
+    "apply": "1",
+    "notes": "USDA 11165: 9 nhánh ngò rí = 20 g; chia 20/9. Không áp cho rễ hoặc gốc ngò.",
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "line": 34224
+  },
+  {
+    "id": "NL1213",
+    "name": "Ngũ vị hương",
+    "unit": "gói",
+    "grams": "10",
+    "apply": "0",
+    "notes": "Chỉ đúng sản phẩm NATURAL Bột gia vị ngũ vị hương DH Foods 10 g.",
+    "url": "https://www.dhfoods.com.vn/vi/natural-bot-gia-vi-ngu-vi-huong",
+    "line": 34225
+  },
+  {
+    "id": "NL1224",
+    "name": "Nước cốt me",
+    "unit": "muỗng canh",
+    "grams": "16",
+    "apply": "0",
+    "notes": "Chỉ Roland Tamarind Concentrate, nhãn 1 Tbsp = 16 g; không áp cho nước cốt me pha loãng tự làm.",
+    "url": "https://products.rolandfoods.com/product/85810-tamarind-concentrate",
+    "line": 34226
+  },
+  {
+    "id": "NL1039",
+    "name": "Nước dừa",
+    "unit": "quả",
+    "grams": "206",
+    "apply": "0",
+    "notes": "USDA 12119: lượng nước thu từ một quả dừa mẫu; không phải khối lượng cả quả. Chưa xác nhận đúng giống dừa xiêm và kích cỡ trong công thức.",
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "line": 34227
+  },
+  {
+    "id": "NL1206",
+    "name": "Phô mai",
+    "unit": "miếng",
+    "grams": "15",
+    "apply": "0",
+    "notes": "Chỉ phô mai tam giác The Laughing Cow Original, đúng phiên bản nhãn ghi 15 g/portion.",
+    "url": "https://www.thelaughingcow.co.uk/products/cheese-spread/triangles/original/",
+    "line": 34228
+  },
+  {
+    "id": "NL165",
+    "name": "Sầu riêng",
+    "unit": "quả",
+    "grams": "602",
+    "apply": "1",
+    "notes": "USDA 09422: phần ăn được của quả mẫu. Không đồng nhất với quả nguyên vỏ 1,5 kg trong công thức; cần cân cơm sầu riêng nếu muốn chính xác.",
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "line": 34229
+  },
+  {
+    "id": "NL320",
+    "name": "Su hào",
+    "unit": "củ",
+    "grams": "200",
+    "apply": "1",
+    "notes": "Công thức ghi 1 củ (200 g), là mẫu theo công thức; không phải mọi kích cỡ.",
+    "url": "https://monngonmoingay.com/nom-luoi-lon-su-hao/",
+    "line": 34230
+  },
+  {
+    "id": "NL991",
+    "name": "Thơm",
+    "unit": "quả",
+    "grams": "905",
+    "apply": "1",
+    "notes": "USDA 09266: phần ăn được của một quả dứa mẫu, không gồm vỏ/lõi loại bỏ; kích cỡ thực tế thay đổi.",
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "line": 34231
+  },
+  {
+    "id": "NL1041",
+    "name": "Thơm (dứa)",
+    "unit": "quả",
+    "grams": "905",
+    "apply": "1",
+    "notes": "USDA 09266: phần ăn được của một quả dứa mẫu, không gồm vỏ/lõi loại bỏ; kích cỡ thực tế thay đổi.",
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "line": 34232
+  },
+  {
+    "id": "NL1229",
+    "name": "Trà túi lọc Lipton",
+    "unit": "gói",
+    "grams": "2",
+    "apply": "0",
+    "notes": "Lipton Yellow Label phiên bản 100 túi/200 g; chia 200/100. Là lượng trà khô, không gồm nước pha; cần kiểm tra đúng hộp.",
+    "url": "https://www.lipton.com/tr/caylarimiz/yellow-label-100-lu-bardak-cay/",
+    "line": 34233
+  },
+  {
+    "id": "NL1096",
+    "name": "Trứng gà (đánh tan cùng nước mắm)",
+    "unit": "quả",
+    "grams": "50",
+    "apply": "1",
+    "notes": "USDA 01123: trứng gà sống cỡ large, bỏ vỏ. Chỉ khối lượng trứng, không gồm nước mắm đánh cùng.",
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "line": 34234
+  }
+]

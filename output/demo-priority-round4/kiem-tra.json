@@ -1,0 +1,14 @@
+{
+  "full_profiles": 3,
+  "presumed_zero_fields": 12,
+  "processing_review_rules": 13,
+  "temporary_demo_exclusions": 22,
+  "priority_candidates": 20,
+  "database_executed": false,
+  "sql_parse_errors": 0,
+  "scope_checks_passed": true,
+  "source_files_sha256": {
+    "fao-data-checking.pdf": "7cc0e0a4a44ed4a2b82041450ea52a5ccaf505f454bf7ee49ae408f391c3d8cf",
+    "mext-perilla.html": "a117c18d44b7df611542ddea3840cdc546024134e73096d1657fbbe7ba7c91be"
+  }
+}

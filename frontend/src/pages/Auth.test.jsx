@@ -13,7 +13,7 @@ it('logs in through the API and updates authenticated state',async()=>{
   fireEvent.change(screen.getByLabelText('Mật khẩu'),{target:{value:'password'}});
   fireEvent.click(screen.getByRole('button',{name:'Đăng nhập'}));
   await waitFor(()=>expect(mocks.setUser).toHaveBeenCalledWith({id:'u',role:'NguoiDung'}));
-  expect(mocks.api).toHaveBeenCalledWith('/auth/login',{method:'POST',body:{email:'user@test.local',password:'password'}});
+  expect(mocks.api).toHaveBeenCalledWith('/auth/login',{method:'POST',body:{email:'user@test.local',password:'password'},timeoutMs:15000});
 });
 it('shows an actionable server error on reset',async()=>{
   mocks.api.mockRejectedValue(new Error('Chưa cấu hình email khôi phục.'));

@@ -19,8 +19,8 @@ it('shows a personal eating style before saving all ten answers', async () => {
   await screen.findByRole('dialog');
   const choices = [
     'Thịt gà', 'Cân bằng, đa dạng', 'Đậm đà / Mặn mà',
-    '15–30 phút', 'Bếp gas / Bếp từ', 'Cơm, cháo, món nước',
-    'Không kiêng', 'Xào / áp chảo', 'Dễ làm', 'Bữa sáng',
+    '15–30 phút', 'Bếp gas', 'Cơm, cháo, món nước',
+    'Không kiêng', 'Xào', 'Dễ làm', 'Bữa sáng',
   ];
   for (const [index, choice] of choices.entries()) {
     const option = await screen.findByRole('button', { name: choice });
@@ -39,7 +39,7 @@ it('shows a personal eating style before saving all ten answers', async () => {
     method: 'POST',
     body: {
       ingredients: ['chicken'], occasions: 'balanced', tastes: ['savory'],
-      time: 'medium', tools: ['stove'], dish_types: ['rice_noodles'], avoid: ['none'],
+      time: 'medium', tools: ['gas_stove'], dish_types: ['rice_noodles'], avoid: ['none'],
       method: 'stir_fry', skill: 'beginner', meals: ['breakfast'],
     },
   });
@@ -48,7 +48,7 @@ it('shows a personal eating style before saving all ten answers', async () => {
 it('draws a conclusion from combinations instead of listing every selected answer', () => {
   const style = describeEatingStyle({
     ingredients: ['pork', 'vegetables', 'beef'], occasions: 'none',
-    tastes: ['savory'], time: 'medium', tools: ['air_fryer', 'stove'],
+    tastes: ['savory'], time: 'medium', tools: ['air_fryer', 'gas_stove'],
     dish_types: ['soup'], avoid: ['fish'], method: 'grill',
     skill: 'basic', meals: ['lunch', 'dinner'],
   });

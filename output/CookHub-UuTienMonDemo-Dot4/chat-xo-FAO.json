@@ -1,0 +1,110 @@
+[
+  {
+    "id": "NL017",
+    "name": "Sườn heo",
+    "field": "ChatXo",
+    "value": 0,
+    "method": "PRESUMED_ZERO",
+    "source": "https://www.fao.org/fileadmin/templates/food_composition/documents/Guidelines_data_checking_02.pdf",
+    "note": "PRESUMED_ZERO theo FAO/INFOODS 2012: chất xơ bằng 0 ở thực phẩm động vật tự nhiên không pha nguyên liệu khác (trừ côn trùng). Đây là suy định sinh học có nguồn, KHÔNG phải số xét nghiệm của mẫu. Chỉ bổ sung ChatXo; không xác minh lại kcal, natri, các chất khác hoặc tỷ lệ xương/vỏ."
+  },
+  {
+    "id": "NL020",
+    "name": "Cá lóc",
+    "field": "ChatXo",
+    "value": 0,
+    "method": "PRESUMED_ZERO",
+    "source": "https://www.fao.org/fileadmin/templates/food_composition/documents/Guidelines_data_checking_02.pdf",
+    "note": "PRESUMED_ZERO theo FAO/INFOODS 2012: chất xơ bằng 0 ở thực phẩm động vật tự nhiên không pha nguyên liệu khác (trừ côn trùng). Đây là suy định sinh học có nguồn, KHÔNG phải số xét nghiệm của mẫu. Chỉ bổ sung ChatXo; không xác minh lại kcal, natri, các chất khác hoặc tỷ lệ xương/vỏ."
+  },
+  {
+    "id": "NL027",
+    "name": "Cua đồng",
+    "field": "ChatXo",
+    "value": 0,
+    "method": "PRESUMED_ZERO",
+    "source": "https://www.fao.org/fileadmin/templates/food_composition/documents/Guidelines_data_checking_02.pdf",
+    "note": "PRESUMED_ZERO theo FAO/INFOODS 2012: chất xơ bằng 0 ở thực phẩm động vật tự nhiên không pha nguyên liệu khác (trừ côn trùng). Đây là suy định sinh học có nguồn, KHÔNG phải số xét nghiệm của mẫu. Chỉ bổ sung ChatXo; không xác minh lại kcal, natri, các chất khác hoặc tỷ lệ xương/vỏ."
+  },
+  {
+    "id": "NL1037",
+    "name": "Cá lóc (khoảng 500gr)",
+    "field": "ChatXo",
+    "value": 0,
+    "method": "PRESUMED_ZERO",
+    "source": "https://www.fao.org/fileadmin/templates/food_composition/documents/Guidelines_data_checking_02.pdf",
+    "note": "PRESUMED_ZERO theo FAO/INFOODS 2012: chất xơ bằng 0 ở thực phẩm động vật tự nhiên không pha nguyên liệu khác (trừ côn trùng). Đây là suy định sinh học có nguồn, KHÔNG phải số xét nghiệm của mẫu. Chỉ bổ sung ChatXo; không xác minh lại kcal, natri, các chất khác hoặc tỷ lệ xương/vỏ."
+  },
+  {
+    "id": "NL106",
+    "name": "Gà ác",
+    "field": "ChatXo",
+    "value": 0,
+    "method": "PRESUMED_ZERO",
+    "source": "https://www.fao.org/fileadmin/templates/food_composition/documents/Guidelines_data_checking_02.pdf",
+    "note": "PRESUMED_ZERO theo FAO/INFOODS 2012: chất xơ bằng 0 ở thực phẩm động vật tự nhiên không pha nguyên liệu khác (trừ côn trùng). Đây là suy định sinh học có nguồn, KHÔNG phải số xét nghiệm của mẫu. Chỉ bổ sung ChatXo; không xác minh lại kcal, natri, các chất khác hoặc tỷ lệ xương/vỏ."
+  },
+  {
+    "id": "NL1136",
+    "name": "Cá lóc (1 con)",
+    "field": "ChatXo",
+    "value": 0,
+    "method": "PRESUMED_ZERO",
+    "source": "https://www.fao.org/fileadmin/templates/food_composition/documents/Guidelines_data_checking_02.pdf",
+    "note": "PRESUMED_ZERO theo FAO/INFOODS 2012: chất xơ bằng 0 ở thực phẩm động vật tự nhiên không pha nguyên liệu khác (trừ côn trùng). Đây là suy định sinh học có nguồn, KHÔNG phải số xét nghiệm của mẫu. Chỉ bổ sung ChatXo; không xác minh lại kcal, natri, các chất khác hoặc tỷ lệ xương/vỏ."
+  },
+  {
+    "id": "NL1162",
+    "name": "Vịt (khoảng 1.5kg)",
+    "field": "ChatXo",
+    "value": 0,
+    "method": "PRESUMED_ZERO",
+    "source": "https://www.fao.org/fileadmin/templates/food_composition/documents/Guidelines_data_checking_02.pdf",
+    "note": "PRESUMED_ZERO theo FAO/INFOODS 2012: chất xơ bằng 0 ở thực phẩm động vật tự nhiên không pha nguyên liệu khác (trừ côn trùng). Đây là suy định sinh học có nguồn, KHÔNG phải số xét nghiệm của mẫu. Chỉ bổ sung ChatXo; không xác minh lại kcal, natri, các chất khác hoặc tỷ lệ xương/vỏ."
+  },
+  {
+    "id": "NL1163",
+    "name": "Gà (1 con)",
+    "field": "ChatXo",
+    "value": 0,
+    "method": "PRESUMED_ZERO",
+    "source": "https://www.fao.org/fileadmin/templates/food_composition/documents/Guidelines_data_checking_02.pdf",
+    "note": "PRESUMED_ZERO theo FAO/INFOODS 2012: chất xơ bằng 0 ở thực phẩm động vật tự nhiên không pha nguyên liệu khác (trừ côn trùng). Đây là suy định sinh học có nguồn, KHÔNG phải số xét nghiệm của mẫu. Chỉ bổ sung ChatXo; không xác minh lại kcal, natri, các chất khác hoặc tỷ lệ xương/vỏ."
+  },
+  {
+    "id": "NL1169",
+    "name": "Mực",
+    "field": "ChatXo",
+    "value": 0,
+    "method": "PRESUMED_ZERO",
+    "source": "https://www.fao.org/fileadmin/templates/food_composition/documents/Guidelines_data_checking_02.pdf",
+    "note": "PRESUMED_ZERO theo FAO/INFOODS 2012: chất xơ bằng 0 ở thực phẩm động vật tự nhiên không pha nguyên liệu khác (trừ côn trùng). Đây là suy định sinh học có nguồn, KHÔNG phải số xét nghiệm của mẫu. Chỉ bổ sung ChatXo; không xác minh lại kcal, natri, các chất khác hoặc tỷ lệ xương/vỏ."
+  },
+  {
+    "id": "NL1211",
+    "name": "Thịt heo nạc",
+    "field": "ChatXo",
+    "value": 0,
+    "method": "PRESUMED_ZERO",
+    "source": "https://www.fao.org/fileadmin/templates/food_composition/documents/Guidelines_data_checking_02.pdf",
+    "note": "PRESUMED_ZERO theo FAO/INFOODS 2012: chất xơ bằng 0 ở thực phẩm động vật tự nhiên không pha nguyên liệu khác (trừ côn trùng). Đây là suy định sinh học có nguồn, KHÔNG phải số xét nghiệm của mẫu. Chỉ bổ sung ChatXo; không xác minh lại kcal, natri, các chất khác hoặc tỷ lệ xương/vỏ."
+  },
+  {
+    "id": "NL140",
+    "name": "Giò heo",
+    "field": "ChatXo",
+    "value": 0,
+    "method": "PRESUMED_ZERO",
+    "source": "https://www.fao.org/fileadmin/templates/food_composition/documents/Guidelines_data_checking_02.pdf",
+    "note": "PRESUMED_ZERO theo FAO/INFOODS 2012: chất xơ bằng 0 ở thực phẩm động vật tự nhiên không pha nguyên liệu khác (trừ côn trùng). Đây là suy định sinh học có nguồn, KHÔNG phải số xét nghiệm của mẫu. Chỉ bổ sung ChatXo; không xác minh lại kcal, natri, các chất khác hoặc tỷ lệ xương/vỏ."
+  },
+  {
+    "id": "NL916",
+    "name": "Gà",
+    "field": "ChatXo",
+    "value": 0,
+    "method": "PRESUMED_ZERO",
+    "source": "https://www.fao.org/fileadmin/templates/food_composition/documents/Guidelines_data_checking_02.pdf",
+    "note": "PRESUMED_ZERO theo FAO/INFOODS 2012: chất xơ bằng 0 ở thực phẩm động vật tự nhiên không pha nguyên liệu khác (trừ côn trùng). Đây là suy định sinh học có nguồn, KHÔNG phải số xét nghiệm của mẫu. Chỉ bổ sung ChatXo; không xác minh lại kcal, natri, các chất khác hoặc tỷ lệ xương/vỏ."
+  }
+]

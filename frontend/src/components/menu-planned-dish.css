@@ -1,4 +1,4 @@
-.menu-page .meal-dishes{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px;overflow:visible;min-width:0}
+.menu-page .meal-dishes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));container-type:inline-size;align-items:stretch;gap:10px;overflow:visible;min-width:0}
 .menu-planned-card{display:flex;flex-direction:column;gap:8px;flex:1 1 210px;max-width:330px;min-width:0;padding:9px;background:var(--color-bg-elevated,#fff);border:1px solid var(--color-border,#dce9df);border-radius:12px;box-shadow:0 3px 10px #174d3010}
 .menu-planned-card .menu-planned-link{display:flex!important;align-items:center;gap:10px;min-width:0;text-decoration:none;color:var(--color-text-primary,#28553f);visibility:visible!important;opacity:1!important}
 .menu-planned-card .menu-planned-link img{display:block!important;visibility:visible!important;opacity:1!important;flex:0 0 65px;width:65px;height:58px;border-radius:9px;object-fit:cover;margin:0;box-shadow:none}
@@ -18,3 +18,73 @@
 .menu-page .menu-planned-portions{font-size:9px;max-width:90px;padding:3px 5px;height:23px!important}
 .menu-page .menu-planned-remove{width:21px!important;height:21px!important;font-size:15px}
 @media(max-width:650px){.menu-page .menu-planned-card{flex:1 1 235px;max-width:none}}
+.menu-page .menu-planned-card-editing {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  flex:1 1 285px;
+  max-width:420px;
+  gap:12px;
+  padding:12px;
+  align-items:start;
+}
+.menu-page .menu-planned-card-editing { display:flex; flex-direction:row; align-items:center; cursor:grab; touch-action:none; user-select:none; }
+.menu-page .menu-card-movable { cursor:grab; touch-action:none; user-select:none; }
+.menu-page .menu-planned-card-editing:has(.menu-serving-error) {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+}
+.menu-page .menu-serving-error {
+  grid-column:1 / -1;
+  grid-row:2;
+  margin:0;
+  font-size:12px;
+  overflow-wrap:anywhere;
+}
+.menu-page .menu-card-dragging { opacity:.55; cursor:grabbing; outline:2px solid #36a678; }
+.menu-page .meal-drop-active { outline:2px dashed #23966c; background:#e7f6ee; }
+.menu-serving-stepper { display:flex; align-items:center; gap:6px; white-space:nowrap; }
+.menu-planned-info strong a { color:inherit; text-decoration:none; }
+.menu-serving-stepper button { flex-shrink:0; }
+.menu-page .menu-serving-stepper button { position:static; display:inline-flex; align-items:center; justify-content:center; width:25px; height:25px; padding:0; border:1px solid #c8dfd1; border-radius:7px; background:#edf7f0; color:#246e50; font-size:17px; }
+.menu-serving-stepper button:disabled { opacity:.45; cursor:not-allowed; }
+.menu-planned-card-editing .menu-planned-link { grid-column:1; grid-row:1; }
+.menu-page .menu-planned-card-editing .menu-planned-actions { grid-column:2; grid-row:1; }
+.menu-page .menu-planned-card-editing .menu-item-editor {
+  grid-column:1 / -1;
+  grid-row:2;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:10px;
+  width:100%;
+  min-width:0;
+  margin:0;
+  padding:12px 0 0;
+  border-top:1px solid var(--color-border,#dce9df);
+}
+.menu-page .menu-item-editor label { display:grid; gap:5px; min-width:0; font-size:12px; }
+.menu-page .menu-item-editor select,
+.menu-page .menu-item-editor input {
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+  height:38px;
+  padding:7px 9px;
+  border:1px solid #b7d7c7;
+  border-radius:8px;
+  font-size:13px;
+}
+.menu-page .menu-item-editor button { grid-column:1 / -1; position:static; width:100%; padding:9px 12px; border-radius:8px; font-size:13px; }
+.menu-page .meal-dishes > .menu-planned-card { width:100%; max-width:none; }
+.menu-page .menu-planned-card .menu-planned-share { width:27px!important; height:27px!important; padding:0; }
+.menu-page .menu-planned-card { position:relative; overflow:visible; }
+.menu-page .menu-planned-card .menu-planned-remove {
+  position:absolute!important;
+  top:3px;
+  right:3px;
+  transform:translate(50%,-50%);
+  z-index:1;
+}
+.menu-page .meal-dishes:empty::before { grid-column:1 / -1; justify-self:start; }
+@container (max-width: 459px) {
+  .menu-page .meal-dishes > .menu-planned-card { grid-column:1 / -1; }
+}

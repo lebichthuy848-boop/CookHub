@@ -23,8 +23,10 @@ def by_email(db, email):
 @router.post('/login')
 def login(data: s.Login, response: Response, db: Session = Depends(get_db)):
     user = by_email(db, data.email)
-    if not user or user.trangThai != 'Đang hoạt động' or not verify_password(data.password, user.matKhauBam):
+    if not user or not verify_password(data.password, user.matKhauBam):
         raise HTTPException(401, 'Email hoặc mật khẩu không đúng.')
+    if user.trangThai != 'Đang hoạt động':
+        raise HTTPException(403, 'Tài khoản đã bị khóa.')
     return create_session(db, user, response)
 
 @router.post('/register', status_code=201)

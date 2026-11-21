@@ -1,0 +1,132 @@
+[
+  {
+    "MaThanhPhan": "TP1073",
+    "MaCongThuc": "CT917",
+    "MaNguyenLieu": "NL072",
+    "MaDonVi": "DVT014",
+    "SoLuong": "1.000",
+    "reason": "Dầu dùng cả chiên ngập và làm sốt sụn gà; chưa tách lượng hấp thụ, không quy một bát dầu thành lượng ăn vào.",
+    "source": "https://www.fao.org/4/y4705e/y4705e23.htm",
+    "basis": "Đối chiếu trực tiếp bước chế biến hiện có trong DB; không phải đo lượng hấp thụ."
+  },
+  {
+    "MaThanhPhan": "TP1066",
+    "MaCongThuc": "CT917",
+    "MaNguyenLieu": "NL146",
+    "MaDonVi": "DVT001",
+    "SoLuong": "30.000",
+    "reason": "Bột áo sụn gà trước chiên, chưa có lượng bám thực sự ăn vào.",
+    "source": "https://www.fao.org/4/y4705e/y4705e23.htm",
+    "basis": "Đối chiếu trực tiếp bước chế biến hiện có trong DB; không phải đo lượng hấp thụ."
+  },
+  {
+    "MaThanhPhan": "TP1068",
+    "MaCongThuc": "CT917",
+    "MaNguyenLieu": "NL028",
+    "MaDonVi": "DVT005",
+    "SoLuong": "1.000",
+    "reason": "Trứng áo sụn gà trước chiên, chưa có lượng còn dư.",
+    "source": "https://www.fao.org/4/y4705e/y4705e23.htm",
+    "basis": "Đối chiếu trực tiếp bước chế biến hiện có trong DB; không phải đo lượng hấp thụ."
+  },
+  {
+    "MaThanhPhan": "TP1089",
+    "MaCongThuc": "CT918",
+    "MaNguyenLieu": "NL1089",
+    "MaDonVi": "DVT014",
+    "SoLuong": "1.000",
+    "reason": "Hỗn hợp gia vị chả giò có dầu chiên ngập, chưa tách tỷ lệ và lượng dầu ăn vào.",
+    "source": "https://www.fao.org/4/y4705e/y4705e23.htm",
+    "basis": "Đối chiếu trực tiếp bước chế biến hiện có trong DB; không phải đo lượng hấp thụ."
+  },
+  {
+    "MaThanhPhan": "TP93837",
+    "MaCongThuc": "CT942",
+    "MaNguyenLieu": "NL036",
+    "MaDonVi": "DVT010",
+    "SoLuong": "2.000",
+    "reason": "Cà rốt xay rồi lọc bỏ bã; chưa xác định thành phần dịch ép thu được, không cộng toàn bộ xơ của cà rốt vào nước ép.",
+    "source": "https://www.fao.org/4/y4705e/y4705e23.htm",
+    "basis": "Đối chiếu trực tiếp bước chế biến hiện có trong DB; không phải đo lượng hấp thụ."
+  },
+  {
+    "MaThanhPhan": "TP93827",
+    "MaCongThuc": "CT939",
+    "MaNguyenLieu": "NL301",
+    "MaDonVi": "DVT001",
+    "SoLuong": "30.000",
+    "reason": "Bột mì dùng ngâm rửa dâu rồi xả sạch; không tính toàn bộ bột rửa thành thức ăn.",
+    "source": "https://www.fao.org/4/y4705e/y4705e23.htm",
+    "basis": "Đối chiếu trực tiếp bước chế biến hiện có trong DB; không phải đo lượng hấp thụ."
+  },
+  {
+    "MaThanhPhan": "TP93826",
+    "MaCongThuc": "CT939",
+    "MaNguyenLieu": "NL074",
+    "MaDonVi": "DVT001",
+    "SoLuong": "300.000",
+    "reason": "Đường ngâm cả mẻ dâu nhưng đồ uống chỉ dùng 50 ml nước ngâm; chưa có thành phần phần dịch thực sự dùng.",
+    "source": "https://www.fao.org/4/y4705e/y4705e23.htm",
+    "basis": "Đối chiếu trực tiếp bước chế biến hiện có trong DB; không phải đo lượng hấp thụ."
+  },
+  {
+    "MaThanhPhan": "TP93842",
+    "MaCongThuc": "CT943",
+    "MaNguyenLieu": "NL074",
+    "MaDonVi": "DVT001",
+    "SoLuong": "400.000",
+    "reason": "Đường dùng ngâm kiệu; chưa xác định lượng đường vào phần kiệu thực sự ăn, không cộng cả nước ngâm.",
+    "source": "https://www.fao.org/4/y4705e/y4705e23.htm",
+    "basis": "Đối chiếu trực tiếp bước chế biến hiện có trong DB; không phải đo lượng hấp thụ."
+  },
+  {
+    "MaThanhPhan": "TP93843",
+    "MaCongThuc": "CT943",
+    "MaNguyenLieu": "NL952",
+    "MaDonVi": "DVT003",
+    "SoLuong": "500.000",
+    "reason": "Giấm ngâm kiệu; chưa xác định lượng vào phần kiệu ăn được.",
+    "source": "https://www.fao.org/4/y4705e/y4705e23.htm",
+    "basis": "Đối chiếu trực tiếp bước chế biến hiện có trong DB; không phải đo lượng hấp thụ."
+  },
+  {
+    "MaThanhPhan": "TP93844",
+    "MaCongThuc": "CT943",
+    "MaNguyenLieu": "NL1210",
+    "MaDonVi": "DVT007",
+    "SoLuong": "1.000",
+    "reason": "Phèn chua ngâm kiệu rồi rửa bỏ; chưa có lượng còn lại, không tính cả lượng sơ chế.",
+    "source": "https://www.fao.org/4/y4705e/y4705e23.htm",
+    "basis": "Đối chiếu trực tiếp bước chế biến hiện có trong DB; không phải đo lượng hấp thụ."
+  },
+  {
+    "MaThanhPhan": "TP93909",
+    "MaCongThuc": "CT949",
+    "MaNguyenLieu": "NL073",
+    "MaDonVi": "DVT001",
+    "SoLuong": "60.000",
+    "reason": "Muối trong nước ngâm dưa, chưa xác định lượng muối vào phần dưa ăn được.",
+    "source": "https://www.fao.org/4/y4705e/y4705e23.htm",
+    "basis": "Đối chiếu trực tiếp bước chế biến hiện có trong DB; không phải đo lượng hấp thụ."
+  },
+  {
+    "MaThanhPhan": "TP93910",
+    "MaCongThuc": "CT949",
+    "MaNguyenLieu": "NL074",
+    "MaDonVi": "DVT001",
+    "SoLuong": "20.000",
+    "reason": "Đường trong nước ngâm dưa, chưa xác định lượng còn trong phần ăn được.",
+    "source": "https://www.fao.org/4/y4705e/y4705e23.htm",
+    "basis": "Đối chiếu trực tiếp bước chế biến hiện có trong DB; không phải đo lượng hấp thụ."
+  },
+  {
+    "MaThanhPhan": "TP93914",
+    "MaCongThuc": "CT949",
+    "MaNguyenLieu": "NL952",
+    "MaDonVi": "DVT007",
+    "SoLuong": "3.000",
+    "reason": "Giấm trong nước ngâm dưa, không ăn toàn bộ lượng nước ngâm.",
+    "source": "https://www.fao.org/4/y4705e/y4705e23.htm",
+    "basis": "Đối chiếu trực tiếp bước chế biến hiện có trong DB; không phải đo lượng hấp thụ."
+  }
+]

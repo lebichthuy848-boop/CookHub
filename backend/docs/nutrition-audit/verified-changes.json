@@ -1,0 +1,93 @@
+[
+  {
+    "id": "TP10503",
+    "recipe": "CT105",
+    "oldIngredient": "NL125",
+    "oldUnit": "DVT023",
+    "oldQuantity": "50.000",
+    "newIngredient": "NL125",
+    "newUnit": "DVT001",
+    "newQuantity": 50,
+    "source": "https://www.dienmayxanh.com/vao-bep/cach-lam-kho-qua-nhoi-thit-am-nong-ngay-tet-00537",
+    "reason": "Nấm mèo: nguồn ghi 50 g, DB đang ghi 50 tai.",
+    "operation": "update"
+  },
+  {
+    "id": "TP20302",
+    "recipe": "CT203",
+    "oldIngredient": "NL028",
+    "oldUnit": "DVT005",
+    "oldQuantity": "6.000",
+    "newIngredient": "NL154",
+    "newUnit": "DVT005",
+    "newQuantity": 6,
+    "source": "https://www.dienmayxanh.com/vao-bep/cach-lam-creme-brulee-kem-chay-thom-ngon-chuan-phap-cuc-de-01964",
+    "reason": "Bước đánh trứng chỉ lấy 6 lòng đỏ; không tính cả 6 quả.",
+    "operation": "update"
+  },
+  {
+    "id": "TP20608",
+    "recipe": "CT206",
+    "oldIngredient": "NL067",
+    "oldUnit": "DVT015",
+    "oldQuantity": "2.000",
+    "newIngredient": "NL067",
+    "newUnit": "DVT003",
+    "newQuantity": 390,
+    "source": "https://www.dienmayxanh.com/vao-bep/cach-lam-banh-bao-nhan-thit-mien-thom-ngon-de-lam-05203",
+    "reason": "50 ml kích hoạt men + 340 ml trộn bột = 390 ml; không quy ước gói chung.",
+    "operation": "update"
+  },
+  {
+    "id": "TP20605",
+    "recipe": "CT206",
+    "oldIngredient": "NL097",
+    "oldUnit": "DVT014",
+    "oldQuantity": "1.000",
+    "newIngredient": "NL097",
+    "newUnit": "DVT006",
+    "newQuantity": 1.5,
+    "source": "https://www.dienmayxanh.com/vao-bep/cach-lam-banh-bao-nhan-thit-mien-thom-ngon-de-lam-05203",
+    "reason": "Bước làm nhân: 1,5 muỗng canh hạt nêm.",
+    "operation": "update"
+  },
+  {
+    "id": "TP20698",
+    "recipe": "CT206",
+    "oldIngredient": "NL240",
+    "oldUnit": "DVT014",
+    "oldQuantity": "1.000",
+    "newIngredient": "NL240",
+    "newUnit": "DVT007",
+    "newQuantity": 2,
+    "source": "https://www.dienmayxanh.com/vao-bep/cach-lam-banh-bao-nhan-thit-mien-thom-ngon-de-lam-05203",
+    "reason": "Bước làm nhân: 2 muỗng cà phê tiêu.",
+    "operation": "update"
+  },
+  {
+    "id": "TP93307",
+    "recipe": "CT933",
+    "oldIngredient": "NL1128",
+    "oldUnit": "DVT006",
+    "oldQuantity": "1.000",
+    "newIngredient": "NL1128",
+    "newUnit": "DVT007",
+    "newQuantity": 1,
+    "source": "https://www.dienmayxanh.com/vao-bep/cach-lam-com-than-bo-rong-bien-sot-tuong-don-gian-01392",
+    "reason": "Danh sách nguyên liệu và bước ướp bò ghi 1 muỗng cà phê tiêu.",
+    "operation": "update"
+  },
+  {
+    "id": "TP10605",
+    "recipe": "CT106",
+    "oldIngredient": null,
+    "oldUnit": null,
+    "oldQuantity": null,
+    "newIngredient": "NL034",
+    "newUnit": "DVT001",
+    "newQuantity": 50,
+    "source": "https://www.dienmayxanh.com/vao-bep/cach-lam-sup-hai-san-tuyet-yen-bo-duong-don-gian-ngay-tai-nha-16679",
+    "reason": "Danh sách nguồn có 50 g nấm đông cô/nấm hương tươi; DB đang thiếu dòng này.",
+    "operation": "insert"
+  }
+]

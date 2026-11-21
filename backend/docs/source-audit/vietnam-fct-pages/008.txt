@@ -1,0 +1,32 @@
+vii 
+ 
+BỐ CỤC, TRÌNH BÀY  
+1. Nội dung 
+Bảng thành ph ần th ực ph ẩm Vi ệt Nam bao g ồm 526 th ực ph ẩm được trình bày 
+theo 14 nhóm, cung cấp số liệu của 86 chất dinh dưỡng. 
+Nhóm 1.  Ng ũ cốc và sản phẩm chế biến: gồm 23 thực phẩm 
+Nhóm 2. Khoai c ủ và sản phẩm chế biến: gồm 26 thực phẩm 
+Nhóm 3. H ạt, quả, giàu protein, lipid và sản phẩm chế biến: gồm 33 
+thực phẩm 
+Nhóm 4. Rau, qu ả, củ dùng làm rau: gồm 126 thực phẩm 
+Nhóm 5. Qu ả chín: gồm 56 thực phẩm 
+Nhóm 6. D ầu, mỡ, bơ: gồm 14 thực phẩm 
+Nhóm 7. Th ịt và sản phẩm chế biến: gồm 82 thực phẩm 
+Nhóm 8. Th ủy sản và sản phẩm chế biến: gồm 59 thực phẩm  
+Nhóm 9. Tr ứng và sản phẩm chế biến: gồm 11 thực phẩm 
+Nhóm 10. S ữa và sản phẩm chế biến: gồm 9 thực phẩm 
+Nhóm 11. Đồ hộp: gồm 21 thực phẩm 
+Nhóm 12. Đồ ngọt (đường, bánh, mứt, kẹo): gồm 27 thực phẩm 
+Nhóm 13. Gia v ị, nước chấm: gồm 23 thực phẩm 
+Nhóm 14. N ước giải khát: gồm 16 thực phẩm 
+Mỗi thực phẩm được trình bày trong một trang giấy A4, gồm tên thực phẩm (tiếng 
+Việt và ti ếng Anh), s ố li ệu t ỷ l ệ th ải b ỏ và thành ph ần c ủa 86 ch ất dinh d ưỡng 
+trong 100 gam thực phẩm ăn được, được phân loại như sau: 
+- Các thành ph ần chính (proximate): n ước, protein, lipid, glucid, celluloza và 
+tro. 
+- Đường t ổng s ố và các đường đơn: galactoza, maltoza, lactoza, fructoza, 
+glucoza, sacaroza 
+- Các chất khoáng và vi khoáng: calci, s ắt, magie, mangan, phospho, kali, natri, 
+kẽm, đồng, selen 
+- Các vitamin tan trong nước: vitamin C, B1, B2, PP, B3, B6, folat, B9, H, B12 
+- Các vitamin tan trong dầu: vitamin A, D, E, K 

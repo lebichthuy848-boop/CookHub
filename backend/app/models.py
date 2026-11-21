@@ -127,11 +127,11 @@ class MonAn(Base):
     __tablename__ = "MonAn"
     maMonAn = Column(String(50), primary_key=True)
     maDanhMuc = Column(String(50), ForeignKey("DanhMucMonAn.maDanhMuc"), nullable=False)
-    tenMonAn = Column(String(200), nullable=True)
-    moTa = Column(Text, nullable=True)
+    tenMonAn = Column(Unicode(200), nullable=True)
+    moTa = Column(UnicodeText, nullable=True)
     thoiGianChuanBi = Column(Integer, nullable=True)
     thoiGianCheBien = Column(Integer, nullable=True)
-    doKho = Column(String(50), nullable=True)
+    doKho = Column(Unicode(50), nullable=True)
     duongDanAnh = Column("DuongDanAnh", String(500), nullable=True)
 
 
@@ -222,7 +222,7 @@ class ChiTietThucDon(Base):
     maThucDon = Column(String(50), ForeignKey("ThucDon.maThucDon"), nullable=False)
     maMonAn = Column(String(50), ForeignKey("MonAn.maMonAn"), nullable=False)
     ngayDung = Column(Date, nullable=True)
-    buaAn = Column(String(50), nullable=True)
+    buaAn = Column(Unicode(50), nullable=True)
     soKhauPhan = Column(Integer, nullable=True)
 
 

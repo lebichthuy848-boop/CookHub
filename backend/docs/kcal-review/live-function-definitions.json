@@ -1,0 +1,196 @@
+{
+  "FnTinhNguyenLieu": "\nCREATE   FUNCTION dbo.FnTinhNguyenLieu\n(\n    @MaNguyenLieu NVARCHAR(20),\n    @SoLuong DECIMAL(24,8),\n    @MaDonVi NVARCHAR(20),\n    @Ngay DATE,\n    @KhuVuc NVARCHAR(150)\n)\nRETURNS TABLE\nAS RETURN\nSELECT\n    dd.MaThongTin,\n    dd.KhoiLuongChuan,\n    dd.MaDonVi AS DonViDinhDuong,\n    gia.MaGia,\n    gia.NgayApDung,\n    gia.MaDonVi AS DonViGia,\n    gia.GiaThamKhao,\n    gia.KhuVuc,\n    f.HeSoDinhDuong,\n    gia.LuongTinhGia,\n    raw.NangLuong,\n    raw.ChatDam,\n    raw.ChatBotDuong,\n    raw.ChatBeo,\n    raw.ChatXo,\n    raw.Natri,\n    CASE\n        WHEN raw.ChiPhi > 0\n          OR @SoLuong = 0\n          OR gia.GiaThamKhao = 0\n        THEN raw.ChiPhi\n    END AS ChiPhi,\n    CAST(\n        CASE WHEN dd.MaThongTin IS NULL THEN 1 ELSE 0 END\n        AS BIT\n    ) AS ThieuDinhDuong,\n\n    -- Thiếu quy đổi dựa vào hệ số, không dựa vào kcal.\n    CAST(\n        CASE\n            WHEN dd.MaThongTin IS NOT NULL\n             AND f.HeSoDinhDuong IS NULL\n            THEN 1 ELSE 0\n        END AS BIT\n    ) AS ThieuQuyDoiDinhDuong,\n\n    CAST(\n        CASE\n            WHEN gia.MaGia IS NULL\n              OR raw.ChiPhi IS NULL\n              OR (\n                  @SoLuong > 0\n                  AND gia.GiaThamKhao > 0\n                  AND raw.ChiPhi = 0\n              )\n            THEN 1 ELSE 0\n        END AS BIT\n    ) AS ThieuGiaKhaDung\n\nFROM (VALUES (1)) anchor(n)\n\nLEFT JOIN dbo.ThongTinDinhDuong dd\n    ON dd.MaNguyenLieu = @MaNguyenLieu\n\nOUTER APPLY (\n    SELECT TRY_CONVERT(\n        DECIMAL(28,12),\n        dbo.FnQuyDoiSoLuong(\n            @MaNguyenLieu,\n            @SoLuong,\n            @MaDonVi,\n            dd.MaDonVi\n        ) / NULLIF(dd.KhoiLuongChuan, 0)\n    ) AS HeSo\n) h\n\nOUTER APPLY (\n    SELECT\n        CASE\n            WHEN h.HeSo > 0 OR @SoLuong = 0\n            THEN h.HeSo\n        END AS HeSoDinhDuong\n) f\n\nOUTER APPLY (\n    SELECT TOP (1)\n        g.MaGia,\n        g.MaDonVi,\n        g.GiaThamKhao,\n        g.NgayApDung,\n        g.KhuVuc,\n        q.LuongTinhGia\n    FROM dbo.GiaNguyenLieu g\n    CROSS APPLY (\n        SELECT dbo.FnQuyDoiSoLuong(\n            @MaNguyenLieu,\n            @SoLuong,\n            @MaDonVi,\n            g.MaDonVi\n        ) AS LuongTinhGia\n    ) q\n    WHERE g.MaNguyenLieu = @MaNguyenLieu\n      AND g.NgayApDung <= @Ngay\n      AND (\n          g.KhuVuc = @KhuVuc\n          OR (g.KhuVuc IS NULL AND @KhuVuc IS NULL)\n      )\n      AND q.LuongTinhGia IS NOT NULL\n    ORDER BY\n        g.NgayApDung DESC,\n        CASE WHEN g.MaDonVi = @MaDonVi THEN 0 ELSE 1 END,\n        g.MaGia\n) gia\n\nCROSS APPLY (\n    SELECT\n        TRY_CONVERT(DECIMAL(28,8),\n            f.HeSoDinhDuong * dd.NangLuong) AS NangLuong,\n        TRY_CONVERT(DECIMAL(28,8),\n            f.HeSoDinhDuong * dd.ChatDam) AS ChatDam,\n        TRY_CONVERT(DECIMAL(28,8),\n            f.HeSoDinhDuong * dd.ChatBotDuong) AS ChatBotDuong,\n        TRY_CONVERT(DECIMAL(28,8),\n            f.HeSoDinhDuong * dd.ChatBeo) AS ChatBeo,\n        TRY_CONVERT(DECIMAL(28,8),\n            f.HeSoDinhDuong * dd.ChatXo) AS ChatXo,\n        TRY_CONVERT(DECIMAL(28,8),\n            f.HeSoDinhDuong * dd.Natri) AS Natri,\n        TRY_CONVERT(DECIMAL(28,8),\n            gia.LuongTinhGia * gia.GiaThamKhao) AS ChiPhi\n) raw;\n",
+  "FnTinhMonAn": "\tCREATE   FUNCTION dbo.FnTinhMonAn\r\n\t(@MaMonAn NVARCHAR(20),@SoKhauPhan INT,@Ngay DATE,@KhuVuc NVARCHAR(150))\r\n\tRETURNS TABLE\r\n\tAS RETURN\r\n\t SELECT n.*,t.* FROM dbo.FnNhuCauNguyenLieuMon(@MaMonAn,@SoKhauPhan) n\r\n\t CROSS APPLY dbo.FnTinhNguyenLieu(n.MaNguyenLieu,n.SoLuongCan,n.MaDonVi,@Ngay,@KhuVuc) t;\r\n",
+  "FnTinhChiTietThucDon": "\tCREATE   FUNCTION dbo.FnTinhChiTietThucDon\r\n\t(@MaThucDon NVARCHAR(20),@KhuVuc NVARCHAR(150))\r\n\tRETURNS TABLE\r\n\tAS RETURN\r\n\t SELECT ct.MaChiTiet,ct.MaMonAn,ct.NgayDung,ct.BuaAn,ct.SoKhauPhan,\r\n\t  c.MaCongThuc,c.SoKhauPhanChuan,tp.MaThanhPhan,\r\n\t  tp.MaNguyenLieu AS MaNguyenLieuGoc,n.MaNguyenLieu,n.MaDonVi,n.SoLuongCan,\r\n\t  CAST(CASE WHEN tb.MaChiTiet IS NULL THEN 0 ELSE 1 END AS BIT) DaTuyBien,\r\n\t  t.*\r\n\t FROM dbo.ChiTietThucDon ct\r\n\t LEFT JOIN dbo.CongThuc c ON c.MaMonAn=ct.MaMonAn\r\n\t LEFT JOIN dbo.ThanhPhanCongThuc tp ON tp.MaCongThuc=c.MaCongThuc\r\n\t LEFT JOIN dbo.TuyBienNguyenLieuThucDon tb ON tb.MaChiTiet=ct.MaChiTiet AND tb.MaThanhPhan=tp.MaThanhPhan\r\n\t CROSS APPLY(SELECT COALESCE(tb.MaNguyenLieu,tp.MaNguyenLieu) MaNguyenLieu,\r\n\t   COALESCE(tb.MaDonVi,tp.MaDonVi) MaDonVi,\r\n\t   NULLIF(TRY_CONVERT(DECIMAL(24,8),CAST(COALESCE(tb.SoLuong,tp.SoLuong) AS DECIMAL(19,6))*ct.SoKhauPhan/NULLIF(c.SoKhauPhanChuan,0)),0) SoLuongCan) n\r\n\t CROSS APPLY dbo.FnTinhNguyenLieu(n.MaNguyenLieu,n.SoLuongCan,n.MaDonVi,ct.NgayDung,@KhuVuc) t\r\n\t WHERE ct.MaThucDon=@MaThucDon;\r\n",
+  "columns": [
+    {
+      "TABLE_NAME": "CongThuc",
+      "COLUMN_NAME": "MaCongThuc",
+      "DATA_TYPE": "nvarchar",
+      "CHARACTER_MAXIMUM_LENGTH": 20,
+      "IS_NULLABLE": "NO"
+    },
+    {
+      "TABLE_NAME": "CongThuc",
+      "COLUMN_NAME": "MaMonAn",
+      "DATA_TYPE": "nvarchar",
+      "CHARACTER_MAXIMUM_LENGTH": 20,
+      "IS_NULLABLE": "NO"
+    },
+    {
+      "TABLE_NAME": "CongThuc",
+      "COLUMN_NAME": "MoTa",
+      "DATA_TYPE": "nvarchar",
+      "CHARACTER_MAXIMUM_LENGTH": 1000,
+      "IS_NULLABLE": "YES"
+    },
+    {
+      "TABLE_NAME": "CongThuc",
+      "COLUMN_NAME": "SoKhauPhanChuan",
+      "DATA_TYPE": "int",
+      "CHARACTER_MAXIMUM_LENGTH": null,
+      "IS_NULLABLE": "NO"
+    },
+    {
+      "TABLE_NAME": "CongThuc",
+      "COLUMN_NAME": "DaCongBo",
+      "DATA_TYPE": "bit",
+      "CHARACTER_MAXIMUM_LENGTH": null,
+      "IS_NULLABLE": "NO"
+    },
+    {
+      "TABLE_NAME": "CongThuc",
+      "COLUMN_NAME": "NgayCapNhat",
+      "DATA_TYPE": "datetime2",
+      "CHARACTER_MAXIMUM_LENGTH": null,
+      "IS_NULLABLE": "NO"
+    },
+    {
+      "TABLE_NAME": "CongThuc",
+      "COLUMN_NAME": "DuongDanAnh",
+      "DATA_TYPE": "nvarchar",
+      "CHARACTER_MAXIMUM_LENGTH": 500,
+      "IS_NULLABLE": "YES"
+    },
+    {
+      "TABLE_NAME": "ThanhPhanCongThuc",
+      "COLUMN_NAME": "MaThanhPhan",
+      "DATA_TYPE": "nvarchar",
+      "CHARACTER_MAXIMUM_LENGTH": 20,
+      "IS_NULLABLE": "NO"
+    },
+    {
+      "TABLE_NAME": "ThanhPhanCongThuc",
+      "COLUMN_NAME": "MaCongThuc",
+      "DATA_TYPE": "nvarchar",
+      "CHARACTER_MAXIMUM_LENGTH": 20,
+      "IS_NULLABLE": "NO"
+    },
+    {
+      "TABLE_NAME": "ThanhPhanCongThuc",
+      "COLUMN_NAME": "MaNguyenLieu",
+      "DATA_TYPE": "nvarchar",
+      "CHARACTER_MAXIMUM_LENGTH": 20,
+      "IS_NULLABLE": "NO"
+    },
+    {
+      "TABLE_NAME": "ThanhPhanCongThuc",
+      "COLUMN_NAME": "MaDonVi",
+      "DATA_TYPE": "nvarchar",
+      "CHARACTER_MAXIMUM_LENGTH": 20,
+      "IS_NULLABLE": "NO"
+    },
+    {
+      "TABLE_NAME": "ThanhPhanCongThuc",
+      "COLUMN_NAME": "SoLuong",
+      "DATA_TYPE": "decimal",
+      "CHARACTER_MAXIMUM_LENGTH": null,
+      "IS_NULLABLE": "NO"
+    },
+    {
+      "TABLE_NAME": "ThongTinDinhDuong",
+      "COLUMN_NAME": "MaThongTin",
+      "DATA_TYPE": "nvarchar",
+      "CHARACTER_MAXIMUM_LENGTH": 20,
+      "IS_NULLABLE": "NO"
+    },
+    {
+      "TABLE_NAME": "ThongTinDinhDuong",
+      "COLUMN_NAME": "MaNguyenLieu",
+      "DATA_TYPE": "nvarchar",
+      "CHARACTER_MAXIMUM_LENGTH": 20,
+      "IS_NULLABLE": "NO"
+    },
+    {
+      "TABLE_NAME": "ThongTinDinhDuong",
+      "COLUMN_NAME": "KhoiLuongChuan",
+      "DATA_TYPE": "decimal",
+      "CHARACTER_MAXIMUM_LENGTH": null,
+      "IS_NULLABLE": "NO"
+    },
+    {
+      "TABLE_NAME": "ThongTinDinhDuong",
+      "COLUMN_NAME": "MaDonVi",
+      "DATA_TYPE": "nvarchar",
+      "CHARACTER_MAXIMUM_LENGTH": 20,
+      "IS_NULLABLE": "NO"
+    },
+    {
+      "TABLE_NAME": "ThongTinDinhDuong",
+      "COLUMN_NAME": "NangLuong",
+      "DATA_TYPE": "decimal",
+      "CHARACTER_MAXIMUM_LENGTH": null,
+      "IS_NULLABLE": "YES"
+    },
+    {
+      "TABLE_NAME": "ThongTinDinhDuong",
+      "COLUMN_NAME": "ChatDam",
+      "DATA_TYPE": "decimal",
+      "CHARACTER_MAXIMUM_LENGTH": null,
+      "IS_NULLABLE": "YES"
+    },
+    {
+      "TABLE_NAME": "ThongTinDinhDuong",
+      "COLUMN_NAME": "ChatBotDuong",
+      "DATA_TYPE": "decimal",
+      "CHARACTER_MAXIMUM_LENGTH": null,
+      "IS_NULLABLE": "YES"
+    },
+    {
+      "TABLE_NAME": "ThongTinDinhDuong",
+      "COLUMN_NAME": "ChatBeo",
+      "DATA_TYPE": "decimal",
+      "CHARACTER_MAXIMUM_LENGTH": null,
+      "IS_NULLABLE": "YES"
+    },
+    {
+      "TABLE_NAME": "ThongTinDinhDuong",
+      "COLUMN_NAME": "ChatXo",
+      "DATA_TYPE": "decimal",
+      "CHARACTER_MAXIMUM_LENGTH": null,
+      "IS_NULLABLE": "YES"
+    },
+    {
+      "TABLE_NAME": "ThongTinDinhDuong",
+      "COLUMN_NAME": "natri",
+      "DATA_TYPE": "decimal",
+      "CHARACTER_MAXIMUM_LENGTH": null,
+      "IS_NULLABLE": "YES"
+    },
+    {
+      "TABLE_NAME": "TuyBienNguyenLieuThucDon",
+      "COLUMN_NAME": "MaChiTiet",
+      "DATA_TYPE": "nvarchar",
+      "CHARACTER_MAXIMUM_LENGTH": 20,
+      "IS_NULLABLE": "NO"
+    },
+    {
+      "TABLE_NAME": "TuyBienNguyenLieuThucDon",
+      "COLUMN_NAME": "MaThanhPhan",
+      "DATA_TYPE": "nvarchar",
+      "CHARACTER_MAXIMUM_LENGTH": 20,
+      "IS_NULLABLE": "NO"
+    },
+    {
+      "TABLE_NAME": "TuyBienNguyenLieuThucDon",
+      "COLUMN_NAME": "MaNguyenLieu",
+      "DATA_TYPE": "nvarchar",
+      "CHARACTER_MAXIMUM_LENGTH": 20,
+      "IS_NULLABLE": "NO"
+    },
+    {
+      "TABLE_NAME": "TuyBienNguyenLieuThucDon",
+      "COLUMN_NAME": "MaDonVi",
+      "DATA_TYPE": "nvarchar",
+      "CHARACTER_MAXIMUM_LENGTH": 20,
+      "IS_NULLABLE": "NO"
+    },
+    {
+      "TABLE_NAME": "TuyBienNguyenLieuThucDon",
+      "COLUMN_NAME": "SoLuong",
+      "DATA_TYPE": "decimal",
+      "CHARACTER_MAXIMUM_LENGTH": null,
+      "IS_NULLABLE": "NO"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+ĐỢT 6 - NGUỒN MAHIDOL CHO BÚN TƯƠI VÀ RIỀNG
+Chưa chạy cập nhật DB. Đọc bảng đối chiếu rồi chạy toàn bộ 01-cap-nhat-dinh-duong-co-nguon.sql.
+
+NGUỒN GỐC
+Kunchit Judprasong et al. Institute of Nutrition, Mahidol University (2025).
+Thai Food Composition Database, Online version 3, August 2025, Thailand.
+https://inmu.mahidol.ac.th/thaifcd/home
+Vào Food Search by Food Name để tra tên/mã nếu link kết quả không mở trên trình duyệt.
+Các trang HTML gốc được lưu ở backend/docs/source-audit/round6; SHA256 và các ô gốc
+được lưu trong bang-chung-va-phep-tinh.json. Không dựa vào bảng chép lại của trang bán hàng.
+
+HỒ SƠ ĐƯỢC CHỌN
+NL003 Bún tươi, NL914 Bún ăn kèm:
+Mẫu tham khảo là bún gạo TƯƠI LÊN MEN kanom-jeen (Oryza sativa), mã A8, STD 166.
+Không áp cho bún khô, bún gạo lứt hoặc mọi hỗn hợp bún công nghiệp khác.
+Mỗi 100 g: 103 kcal, đạm 1.43 g, béo 0.31 g, xơ 0.3 g, natri 47 mg.
+Carbohydrate TỔNG 23.70 g được TÍNH theo chênh lệch:
+100 - nước 74.4 - đạm 1.43 - béo 0.31 - tro 0.16 = 23.70 g.
+Nguồn công bố carbohydrate khả dụng 23.42 g, không công bố carbohydrate tổng.
+Không dùng 23.42 thay cho tổng. Phép tính và đầu vào được lưu đầy đủ; đây không phải
+số xét nghiệm trực tiếp carbohydrate tổng. Không tính lại kcal bằng 4-4-9.
+Phương pháp: FAO/INFOODS 2012, trang PDF thứ 24, mục carbohydrate by difference.
+https://www.fao.org/fileadmin/templates/food_composition/documents/Guidelines_data_checking_02.pdf#page=24
+
+NL1199 Riềng:
+Mẫu tham khảo Alpinia galanga sống, N11, STD 232.
+Mỗi 100 g: 35 kcal, đạm 0.69 g, carbohydrate tổng 7.79 g, béo 0.17 g, natri 82 mg.
+Chất xơ không công bố: vẫn NULL. Chưa quy đổi một nhánh riềng thành gam.
+Không áp cho riềng non, bột riềng hoặc gừng; không dùng xơ riềng non để lấp.
+
+SQL cập nhật đồng bộ từng hồ sơ và lưu nguồn, không ghép một số của mẫu này vào macros
+của mẫu khác. Có kiểm tra dữ liệu cũ/đích và rollback khi lỗi. Không ghi mô tả dài vào MoTa.
+Không sửa công thức, số lượng hoặc định lượng gia vị của món cháo.
+Không đồng nghĩa đã đủ 20 món hoặc hoàn thành thực đơn tháng.
+
+HẠT NÊM VẪN CHƯA CHỐT
+Trang Knorr Việt Nam đang công bố bảng có dấu hiệu sai cơ sở/đơn vị và để trống xơ;
+không dùng để tự điền số. Các nhãn MAGGI/Tường An cũ đã tìm thấy cũng chưa giải quyết
+được việc đối chiếu đầy đủ. Không lấy số của cốt nước dùng gà/heo đậm đặc để thay hạt nêm.
+Quy đổi Abbott có loại muỗng và gạt/vun riêng; không chứng minh dụng cụ trong công thức
+Điện Máy Xanh giống như vậy, nên chưa tự sửa 15 g/muỗng thành một số khác.
+
+Các nguồn đã kiểm tra nhưng chưa áp: sen raw C132 có độ ẩm 10.8%, kcal 332 và tên khoa học
+Prunus dulcis không khớp tên sen; sen hấp C133 cũng thiếu natri/xơ. Hạt é C122 là
+Ocimum x citriodorum, chưa xác nhận cùng loài với nguyên liệu Việt Nam của DB.

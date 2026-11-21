@@ -1,0 +1,40 @@
+ĐỢT 5 - THỊT XAY CHO NHÓM CHÁO
+
+Chưa chạy vào DB. Chạy toàn bộ 01-thit-heo-xay-co-nguon.sql trong SSMS.
+SQL kiểm tra dữ liệu cũ, lưu nguồn, giữ mã DD956; dừng/rollback khi dữ liệu đã đổi.
+
+NL956 đang có tên chung "Thịt xay". Theo quyền chọn mẫu tham khảo người dùng đã giao,
+đợt này chọn THỊT HEO XAY SỐNG MEXT 11163, Sus scrofa. Ghi rõ lựa chọn vào MoTa.
+Không áp cho thịt bò/gà xay. Nếu nguyên liệu thực tế không phải thịt heo thì không chạy.
+Không đổi tên hay công thức của 80 món, không cập nhật DB trực tiếp từ assistant.
+
+MEXT 11163, mỗi 100 g phần ăn được:
+Năng lượng 209 kcal; protein 17.7 g; carbohydrate tổng 0.1 g; lipid 17.2 g;
+chất xơ (0) g; natri 57 mg.
+Chất xơ (0) là ước tính của nguồn. Không nói đây là sáu chỉ số đều đo trực tiếp.
+Thay toàn bộ hồ sơ đồng bộ, không trộn natri của một mẫu với macros của mẫu khác.
+https://fooddb.mext.go.jp/details/details.pl?ITEM_NO=11_11163_7
+
+ẢNH HƯỞNG
+NL956 có trong MA905 Cháo thịt bằm tía tô và MA921 Ốc nhồi hấp sả.
+Sửa được hồ sơ thịt thiếu natri, không có nghĩa hai món lập tức đủ dữ liệu.
+MA905 vẫn có nhóm gia vị một ít chưa tách theo các lượng đã ghi trong bước làm.
+MA921 còn nhiều nguyên liệu/đơn vị khác phải kiểm tra.
+
+KẾT QUẢ TÌM NGUỒN KHÁC - CHƯA ÁP DỤNG
+- Hạt nêm MAGGI: tìm được PDF Nestlé 2019 nhưng chưa tải/xem rõ bản gốc. Chỉ mục đọc
+  chất xơ 0.75 g với %GDA 38 có dấu hiệu nhầm dòng; không dùng số này cho NL097.
+  https://www.nestle.com.vn/sites/g/files/pydnoa216/files/2019-08/94-2019-RA-MIS-NVL-thay-doi-nhan-hat-nem-Maggi-gap-doi-thit-xuong-tuy.pdf
+- Tường An Unicook: trang nhà sản xuất ghi cơ sở khẩu phần 14 g nhưng các chỉ số lớn
+  hơn cả khối lượng khẩu phần (carbohydrate 33.56 g, natri 18.893 g). Chưa xác nhận cơ sở
+  100 g từ nhãn gốc, không tự sửa đơn vị để nhập.
+  https://www.tuongan.com.vn/vi/san-pham/hat-nem-ngon-ngot-tu-nhien-tu-suon-non-xuong-ong-nuoc-cot-thit-ham.html
+- Vedan Mommy 2026 có kcal/đạm/carbs/natri nhưng chưa có đủ béo/xơ trong bảng tìm thấy;
+  không gán các giá trị thiếu thành 0 hoặc ghép sang nhãn MAGGI.
+  https://vedan.com.vn/wp-content/uploads/2026/03/Quyet-dinh-cong-van-sua-doi-TCCS-27-VDN-2023-.pdf
+- Knorr Basic Stock Reduction có đủ sáu chỉ số nhưng là cốt cô đặc gà/heo/giăm bông,
+  không phải nước dùng xương heo tự nấu. Không gán vào NL126.
+  https://www.unileverfoodsolutions.com.sg/en/product/knorr-basic-stock-reduction-820g-1-EN-694001.html
+
+CHƯA CHỐT ĐỦ 20 MÓN. Các nguồn không khớp hoặc mâu thuẫn đều được giữ lại để đối chiếu,
+không đưa vào SQL chỉ để làm đủ số liệu. Không lấy dầu chuẩn bị chiên làm dầu hấp thụ.

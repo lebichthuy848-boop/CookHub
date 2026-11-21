@@ -1,0 +1,3757 @@
+[
+  {
+    "id": "NL139",
+    "name": "Bạc hà",
+    "unit": null,
+    "values": [
+      "5",
+      "0.4",
+      "0.8",
+      null,
+      null,
+      null
+    ],
+    "url": "https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf",
+    "notes": "Mục 4026, trang in 108: dọc mùng dùng nấu canh. Không phải mint. Celluloza 2 g không tự gán thành tổng chất xơ.",
+    "rest": [
+      "Chung",
+      "1"
+    ],
+    "line": 33532,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL1181",
+    "name": "Bột cà ri",
+    "unit": null,
+    "values": [
+      "325",
+      "14.29",
+      "55.83",
+      "14.01",
+      "53.2",
+      "52"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/Data/SR/SR28/reports/sr28fg02.pdf",
+    "notes": "USDA 02015: curry powder thông dụng, dữ liệu tham khảo cho hỗn hợp gia vị khô.",
+    "rest": [
+      "Chung",
+      "1"
+    ],
+    "line": 33533,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "02015",
+      "name": "Spices, curry powder",
+      "values": [
+        "325",
+        "14.29",
+        "55.83",
+        "14.01",
+        "53.2",
+        "52"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1232",
+    "name": "Bột matcha",
+    "unit": null,
+    "values": [
+      "237",
+      "29.6",
+      "39.5",
+      "5.3",
+      "38.5",
+      "6"
+    ],
+    "url": "https://fooddb.mext.go.jp/details/details.pl?ITEM_NO=16_16035_7",
+    "notes": "MEXT 16035: matcha nguyên chất, không đường, không phải bột latte pha sẵn. Carbs là carbohydrate tổng.",
+    "rest": [
+      "Chung",
+      "1"
+    ],
+    "line": 33534,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL096",
+    "name": "Bột ngọt",
+    "unit": null,
+    "values": [
+      "282",
+      "0",
+      null,
+      "0",
+      null,
+      "12300"
+    ],
+    "url": "https://ingredi.com/content/pdfs/MSG_Nutritional_Data.pdf",
+    "notes": "Tài liệu Ajinomoto North America, Form 5092 08/12: MSG nguyên chất. Carbs n.d. và xơ dấu gạch giữ NULL; không biến thành 0.",
+    "rest": [
+      "Chung",
+      "1"
+    ],
+    "line": 33535,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL099",
+    "name": "Bột tỏi",
+    "unit": null,
+    "values": [
+      "331",
+      "16.55",
+      "72.73",
+      "0.73",
+      "9",
+      "60"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/Data/SR/SR28/reports/sr28fg02.pdf",
+    "notes": "USDA 02020: bột tỏi nguyên chất, không phải muối tỏi.",
+    "rest": [
+      "Chung",
+      "1"
+    ],
+    "line": 33536,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "02020",
+      "name": "Spices, garlic powder",
+      "values": [
+        "331",
+        "16.55",
+        "72.73",
+        "0.73",
+        "9.0",
+        "60"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1228",
+    "name": "Cải bẹ xanh tươi",
+    "unit": null,
+    "values": [
+      "27",
+      "2.86",
+      "4.67",
+      "0.42",
+      "3.2",
+      "20"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/Data/SR/SR28/reports/sr28fg11.pdf",
+    "notes": "USDA 11270: mustard greens raw, phần ăn được, chưa muối chua.",
+    "rest": [
+      "Chung",
+      "1"
+    ],
+    "line": 33537,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "11270",
+      "name": "Mustard greens, raw",
+      "values": [
+        "27",
+        "2.86",
+        "4.67",
+        "0.42",
+        "3.2",
+        "20"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1095",
+    "name": "Cơm nguội",
+    "unit": null,
+    "values": [
+      "130",
+      "2.69",
+      "28.17",
+      "0.28",
+      "0.4",
+      "1"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/Data/SR/SR28/reports/sr28fg20.pdf",
+    "notes": "Tham khảo USDA 20045: cơm trắng chín không dầu/muối. Không phải kết quả đo riêng sau làm nguội; không tự trừ kcal do tinh bột kháng.",
+    "rest": [
+      "Chung",
+      "1"
+    ],
+    "line": 33538,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "20045",
+      "name": "Rice, white, long-grain, regular, enriched, cooked",
+      "values": [
+        "130",
+        "2.69",
+        "28.17",
+        "0.28",
+        "0.4",
+        "1"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1186",
+    "name": "Cơm nóng",
+    "unit": null,
+    "values": [
+      "130",
+      "2.69",
+      "28.17",
+      "0.28",
+      "0.4",
+      "1"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/Data/SR/SR28/reports/sr28fg20.pdf",
+    "notes": "USDA 20045: cơm trắng hạt dài đã nấu, không thêm dầu/muối.",
+    "rest": [
+      "Chung",
+      "1"
+    ],
+    "line": 33539,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "20045",
+      "name": "Rice, white, long-grain, regular, enriched, cooked",
+      "values": [
+        "130",
+        "2.69",
+        "28.17",
+        "0.28",
+        "0.4",
+        "1"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL148",
+    "name": "Củ dền",
+    "unit": null,
+    "values": [
+      "43",
+      "1.61",
+      "9.56",
+      "0.17",
+      "2.8",
+      "78"
+    ],
+    "url": "https://www.growables.org/informationVeg/documents/BeetRaw.pdf",
+    "notes": "USDA 11080: beets raw, phần ăn được; bản báo cáo USDA lưu tại Growables.",
+    "rest": [
+      "Chung",
+      "1"
+    ],
+    "line": 33540,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "11080",
+      "name": "Beets, raw",
+      "values": [
+        "43",
+        "1.61",
+        "9.56",
+        "0.17",
+        "2.8",
+        "78"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL304",
+    "name": "Củ sắn",
+    "unit": null,
+    "values": [
+      "38",
+      "0.72",
+      "8.82",
+      "0.09",
+      "4.9",
+      "4"
+    ],
+    "url": "https://www.cooks.com/rec/nutrition?nwal=11603",
+    "notes": "USDA 11603: yambean/jicama raw, được Cooks.com đăng lại. Củ sắn/củ đậu, không phải khoai mì/cassava.",
+    "rest": [
+      "Chung",
+      "1"
+    ],
+    "line": 33541,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "11603",
+      "name": "Yambean (jicama), raw",
+      "values": [
+        "38",
+        "0.72",
+        "8.82",
+        "0.09",
+        "4.9",
+        "4"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL910",
+    "name": "Bơ đậu phộng",
+    "unit": null,
+    "values": [
+      "598",
+      "22.21",
+      "22.31",
+      "51.36",
+      "5",
+      "426"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/Data/SR/SR28/reports/sr28fg16.pdf",
+    "notes": "USDA 16098: bơ đậu phộng mịn CÓ MUỐI. Chỉ bật nếu đúng loại muốn tham khảo.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33542,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "16098",
+      "name": "Peanut butter, smooth style, with salt",
+      "values": [
+        "598",
+        "22.21",
+        "22.31",
+        "51.36",
+        "5.0",
+        "426"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1083",
+    "name": "Bún tàu khô",
+    "unit": null,
+    "values": [
+      "351",
+      "0.16",
+      "86.09",
+      "0.06",
+      "0.5",
+      "10"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/Data/SR/SR28/reports/sr28fg16.pdf",
+    "notes": "USDA 16082: miến ĐẬU XANH KHÔ. Không áp cho miến đã ngâm/nấu hoặc sản phẩm tinh bột khác khi chưa đối chiếu.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33543,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "16082",
+      "name": "Noodles, chinese, cellophane or long rice (mung beans), dehydrated",
+      "values": [
+        "351",
+        "0.16",
+        "86.09",
+        "0.06",
+        "0.5",
+        "10"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL102",
+    "name": "Cá cơm khô",
+    "unit": null,
+    "values": [
+      "304",
+      "66.6",
+      "0.3",
+      "5.7",
+      "0",
+      "710"
+    ],
+    "url": "https://fooddb.mext.go.jp/details/details.pl?ITEM_NO=10_10046_7",
+    "notes": "MEXT 10046: cá cơm non khô Engraulis japonicus, tazukuri. Không dùng cho cá cơm rim/ướp gia vị; chất xơ (0) do nguồn ước tính.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33544,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL930",
+    "name": "Cá saba",
+    "unit": null,
+    "values": [
+      "211",
+      "20.6",
+      "0.3",
+      "16.8",
+      "0",
+      "110"
+    ],
+    "url": "https://fooddb.mext.go.jp/details/details.pl?ITEM_NO=10_10154_7",
+    "notes": "MEXT 10154: Scomber japonicus SỐNG, phần ăn được. Không phải saba Đại Tây Dương Scomber scombrus; xơ (0) do nguồn ước tính.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33545,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL1217",
+    "name": "Chuối chát",
+    "unit": null,
+    "values": [
+      "74",
+      "1.2",
+      "16.4",
+      "0.5",
+      null,
+      "13"
+    ],
+    "url": "https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf",
+    "notes": "Mục 4019, trang in 101: chuối xanh giống phổ biến, dùng làm THAM KHẢO cho chuối chát. Celluloza không gán vào tổng chất xơ.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33546,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL303",
+    "name": "Chuối sứ",
+    "unit": null,
+    "values": [
+      "56",
+      "0.9",
+      "12.4",
+      "0.3",
+      null,
+      "17"
+    ],
+    "url": "https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf",
+    "notes": "Mục 5006, trang in 214: chuối tây. Chỉ bật khi chấp nhận dùng dữ liệu chuối tây tham khảo cho chuối sứ; không khẳng định giống cây trùng hoàn toàn.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33547,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL1183",
+    "name": "Bột bò kho",
+    "unit": null,
+    "values": [
+      "369",
+      "8.96",
+      "73.2",
+      "4.51",
+      null,
+      "29.4"
+    ],
+    "url": "https://dhfoods.com.vn/vi/natural-gia-vi-nau-bo-kho",
+    "notes": "CHỈ cho Natural Gia Vị Nấu Bò Kho DH Foods, gói 10 g; không gán cho gói 25 g không rõ hãng. Nguồn chưa công bố chất xơ.",
+    "rest": [
+      "DHFoods",
+      "0"
+    ],
+    "line": 33548,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL093",
+    "name": "Bột nở",
+    "unit": null,
+    "values": [
+      null,
+      null,
+      "27.7",
+      null,
+      null,
+      null
+    ],
+    "url": "https://www.govinfo.gov/content/pkg/GOVPUB-A77-PURL-LPS86777/pdf/GOVPUB-A77-PURL-LPS86777.pdf",
+    "notes": "USDA 18369: double-acting sodium aluminum sulfate, bảng carbohydrate tổng 27.70 g/100 g. Chỉ bật nếu đúng loại bột nở. Không phải baking soda.",
+    "rest": [
+      "BotNo",
+      "0"
+    ],
+    "line": 33549,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "18369",
+      "name": "Leavening agents, baking powder, double-acting, sodium aluminum sulfate",
+      "values": [
+        "53",
+        "0.00",
+        "27.70",
+        "0.00",
+        "0.2",
+        "10600"
+      ]
+    },
+    "usda_matching_fields": [
+      2
+    ]
+  },
+  {
+    "id": "NL108",
+    "name": "Củ sen",
+    "unit": "g",
+    "values": [
+      "74",
+      "2.6",
+      "17.23",
+      "0.1",
+      "4.9",
+      "40"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/Data/SR/SR28/reports/sr28fg11.pdf",
+    "notes": "USDA 11254: lotus root raw, củ sen sống, phần ăn được.",
+    "rest": [
+      "ApDung",
+      "1"
+    ],
+    "line": 33679,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "11254",
+      "name": "Lotus root, raw",
+      "values": [
+        "74",
+        "2.60",
+        "17.23",
+        "0.10",
+        "4.9",
+        "40"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL142",
+    "name": "Đậu bắp",
+    "unit": "g",
+    "values": [
+      "33",
+      "1.93",
+      "7.45",
+      "0.19",
+      "3.2",
+      "7"
+    ],
+    "url": "https://www.growables.org/informationVeg/documents/OkraUSDANutrients.pdf",
+    "notes": "USDA: okra raw; bản báo cáo được Growables lưu lại. Đối chiếu UF/IFAS: https://blogs.ifas.ufl.edu/miamidadeco/2026/10/22/okra-spotlight/",
+    "rest": [
+      "ApDung",
+      "1"
+    ],
+    "line": 33680,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL176",
+    "name": "Đậu đỏ",
+    "unit": "g",
+    "values": [
+      "329",
+      "19.87",
+      "62.9",
+      "0.53",
+      "12.7",
+      "5"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/Data/SR/SR28/reports/sr28fg16.pdf",
+    "notes": "USDA 16001: đậu đỏ adzuki, hạt già KHÔ chưa nấu. Không áp cho đậu đỏ tươi hoặc đã luộc. Đối chiếu: https://www.cooks.com/rec/nutrition?nwal=16001",
+    "rest": [
+      "ApDung",
+      "1"
+    ],
+    "line": 33681,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "16001",
+      "name": "Beans, adzuki, mature seeds, raw",
+      "values": [
+        "329",
+        "19.87",
+        "62.90",
+        "0.53",
+        "12.7",
+        "5"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL177",
+    "name": "Đậu nành khô",
+    "unit": "g",
+    "values": [
+      "446",
+      "36.49",
+      "30.16",
+      "19.94",
+      "9.3",
+      "2"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/Data/SR/SR28/reports/sr28fg16.pdf",
+    "notes": "USDA 16108: soybeans mature seeds raw, hạt đậu nành khô, chưa ngâm/nấu. Bản đối chiếu: https://www.all-creatures.org/recipes/i-soybeans.html",
+    "rest": [
+      "ApDung",
+      "1"
+    ],
+    "line": 33682,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "16108",
+      "name": "Soybeans, mature seeds, raw",
+      "values": [
+        "446",
+        "36.49",
+        "30.16",
+        "19.94",
+        "9.3",
+        "2"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1173",
+    "name": "Đậu hũ chiên (1 bìa)",
+    "unit": "g",
+    "values": [
+      "270",
+      "18.82",
+      "8.86",
+      "20.18",
+      "3.9",
+      "16"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/Data/SR/SR28/reports/sr28fg16.pdf",
+    "notes": "USDA 16129: tofu fried, dữ liệu tham khảo đậu hũ chiên. Mức hút dầu thực tế có thể khác. Đây là 100 g, KHÔNG phải một bìa. Đối chiếu: https://whatyoueat.io/foods/172451",
+    "rest": [
+      "ApDung",
+      "1"
+    ],
+    "line": 33683,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "16129",
+      "name": "Tofu, fried",
+      "values": [
+        "270",
+        "18.82",
+        "8.86",
+        "20.18",
+        "3.9",
+        "16"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL936",
+    "name": "Đậu phộng rang",
+    "unit": "g",
+    "values": [
+      "587",
+      "24.35",
+      "21.26",
+      "49.66",
+      "8.4",
+      "6"
+    ],
+    "url": "https://growables.com/informationVeg/documents/PeanutDryRoast.pdf",
+    "notes": "USDA 16390: rang khô KHÔNG muối, không thêm dầu, đường hay lớp áo. Dùng cho đậu phộng rang thông thường trong công thức.",
+    "rest": [
+      "ApDung",
+      "1"
+    ],
+    "line": 33684,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "16390",
+      "name": "Peanuts, all types, dry-roasted, without salt",
+      "values": [
+        "587",
+        "24.35",
+        "21.26",
+        "49.66",
+        "8.4",
+        "6"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL306",
+    "name": "Dừa bào sợi",
+    "unit": "g",
+    "values": [
+      "354",
+      "3.33",
+      "15.23",
+      "33.49",
+      "9",
+      "20"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/Data/SR/SR28/reports/sr28fg12.pdf",
+    "notes": "USDA 12104: cơm dừa TƯƠI bào sợi, không đường. Không dùng cho dừa sấy khô hoặc mứt dừa.",
+    "rest": [
+      "ApDung",
+      "1"
+    ],
+    "line": 33685,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "12104",
+      "name": "Nuts, coconut meat, raw",
+      "values": [
+        "354",
+        "3.33",
+        "15.23",
+        "33.49",
+        "9.0",
+        "20"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL150",
+    "name": "Đường caramel",
+    "unit": "g",
+    "values": [
+      "377",
+      "0",
+      "97.33",
+      "0",
+      null,
+      null
+    ],
+    "url": "https://foods.fatsecret.com/calories-nutrition/generic/sugar-carmelized?frc=True&portionamount=100.000&portionid=55905",
+    "notes": "Nguồn thứ cấp Fatsecret: caramelized sugar, đường thắng caramel khô. Phù hợp tham khảo lớp đường caramel; không phải sốt caramel có sữa/bơ hoặc siro pha nước. Nguồn chỉ xác minh bốn chỉ số này.",
+    "rest": [
+      "ApDung",
+      "1"
+    ],
+    "line": 33686,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL106",
+    "name": "Gà ác",
+    "unit": "g",
+    "values": [
+      null,
+      "22.3",
+      null,
+      "2.3",
+      null,
+      null
+    ],
+    "url": "https://www.vinmec.com/vie/bai-viet/thit-ga-ac-co-bo-duong-khong-vi",
+    "notes": "Vinmec công bố trong 100 g THỊT gà ác: protein 22,3 g, lipid 2,3 g. Không tự tính kcal hoặc tự gán 0 cho chỉ số khác; không phải khối lượng cả con gồm xương.",
+    "rest": [
+      "ApDung",
+      "1"
+    ],
+    "line": 33687,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL1193",
+    "name": "Gạo dẻo",
+    "unit": "g",
+    "values": [
+      "358",
+      "6.5",
+      "79.15",
+      "0.52",
+      null,
+      "1"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/Data/SR/SR28/reports/sr28fg20.pdf",
+    "notes": "USDA 20452: gạo trắng hạt ngắn CHƯA NẤU, dùng THAM KHẢO cho gạo tẻ dẻo. Không khẳng định là giống gạo trong DB; không dùng cho gạo nếp hoặc cơm chín. Xơ chưa xác minh nên NULL.",
+    "rest": [
+      "ApDung",
+      "1"
+    ],
+    "line": 33688,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "20452",
+      "name": "Rice, white, short-grain, raw, unenriched",
+      "values": [
+        "358",
+        "6.50",
+        "79.15",
+        "0.52",
+        null,
+        "1"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL152",
+    "name": "Gelatin",
+    "unit": "g",
+    "values": [
+      "335",
+      "85.6",
+      "0",
+      "0.1",
+      "0",
+      "196"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/Data/SR/SR28/reports/sr28fg19.pdf",
+    "notes": "USDA 19177: gelatin KHÔ nguyên chất, không đường. Không dùng cho thạch gelatin pha sẵn hoặc đã ngâm nước. Có thể tham khảo gelatin nguyên chất dạng khô, không suy ra khối lượng một lá.",
+    "rest": [
+      "ApDung",
+      "1"
+    ],
+    "line": 33689,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "19177",
+      "name": "Gelatins, dry powder, unsweetened",
+      "values": [
+        "335",
+        "85.60",
+        "0.00",
+        "0.10",
+        "0.0",
+        "196"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL178",
+    "name": "Gelatine bột",
+    "unit": "g",
+    "values": [
+      "335",
+      "85.6",
+      "0",
+      "0.1",
+      "0",
+      "196"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/Data/SR/SR28/reports/sr28fg19.pdf",
+    "notes": "USDA 19177: gelatin bột KHÔ nguyên chất, không đường; không phải bột rau câu hay hỗn hợp jelly.",
+    "rest": [
+      "ApDung",
+      "1"
+    ],
+    "line": 33690,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "19177",
+      "name": "Gelatins, dry powder, unsweetened",
+      "values": [
+        "335",
+        "85.60",
+        "0.00",
+        "0.10",
+        "0.0",
+        "196"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1190",
+    "name": "Dầu hào chay",
+    "unit": "g",
+    "values": [
+      "141",
+      "3.53",
+      "31.3",
+      "0.22",
+      null,
+      "3800"
+    ],
+    "url": "https://cholimexfood.com.vn/wp-content/uploads/2025/20250827_CBTT/CV%20247_DHAO%20CHAY.pdf",
+    "notes": "CHỈ áp dụng nếu là dầu hào chay Cholimex đúng mẫu nhãn công bố. Dinh dưỡng trên 100 g; không có chất xơ công bố.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33691,
+    "matching_fields": [],
+    "matches_all_six": false
+  },
+  {
+    "id": "NL149",
+    "name": "Dầu màu điều",
+    "unit": "ml",
+    "values": [
+      "818",
+      "0",
+      "0",
+      "90.9",
+      null,
+      "0"
+    ],
+    "url": "https://dhfoods.com.vn/vi/dau-mau-dieu",
+    "notes": "CHỈ sản phẩm Dầu Màu Điều DH Foods: dữ liệu trên 100 ML, KHÔNG phải 100 g. Không tự giả định 1 ml = 1 g; không đổi quy ước đơn vị trong DB.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33692,
+    "matching_fields": [],
+    "matches_all_six": false
+  },
+  {
+    "id": "NL123",
+    "name": "Dừa xiêm",
+    "unit": "g",
+    "values": [
+      "19",
+      "0.72",
+      "3.71",
+      "0.2",
+      "1.1",
+      "105"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/Data/SR/SR28/reports/sr28fg12.pdf",
+    "notes": "USDA 12119: NƯỚC dừa, chỉ dùng nếu NL123 đại diện phần NƯỚC lấy từ dừa xiêm. Không áp cho cùi dừa hoặc cả quả. Dữ liệu tham khảo, không đo riêng giống xiêm. Đối chiếu: https://green-coco.com/wp-content/uploads/2015/07/2008_usda-national-nutrient-database-for-coconut-water.pdf",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33693,
+    "matching_fields": [],
+    "matches_all_six": false,
+    "usda_record": {
+      "code": "12119",
+      "name": "Nuts, coconut water (liquid from coconuts)",
+      "values": [
+        "19",
+        "0.72",
+        "3.71",
+        "0.20",
+        "1.1",
+        "105"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL151",
+    "name": "Đường thốt nốt",
+    "unit": "g",
+    "values": [
+      "365",
+      "0",
+      "91.1",
+      "0",
+      null,
+      "6.81"
+    ],
+    "url": "https://theoriginallife.vn/duong-thot-not-dang-vien-not-nam-tui-1kg",
+    "notes": "CHỈ sản phẩm Nốt Nam công bố: 69% đường thốt nốt thô, 30% đường tinh luyện; không phải đường thốt nốt nguyên chất mọi hãng. Nguồn không công bố xơ.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33694,
+    "matching_fields": [],
+    "matches_all_six": false
+  },
+  {
+    "id": "NL120",
+    "name": "Đỗ trọng",
+    "unit": "g",
+    "values": [
+      null,
+      "3.75",
+      null,
+      "13.18",
+      null,
+      null
+    ],
+    "url": "https://oak.jejunu.ac.kr/bitstream/2020.oak/20751/2/%EB%91%90%EC%B6%A9%20%EC%9E%8E%EA%B3%BC%20%EA%BB%8D%EC%A7%88%EC%9D%84%20%EC%B2%A8%EA%B0%80%ED%95%9C%20%EC%8A%A4%ED%8E%80%EC%A7%80%EC%BC%80%EC%9D%B4%ED%81%AC%EC%9D%98%20%ED%92%88%EC%A7%88%20%ED%8A%B9%EC%84%B1.pdf",
+    "notes": "NGHIÊN CỨU tham khảo, Table 3: BỘT VỎ ĐỖ TRỌNG ĐÃ RANG, protein thô 3,75 và lipid thô 13,18 g/100 g mẫu, độ ẩm mẫu 5,45%. Không phải lá hoặc dịch chiết. Không tự áp cho lát vỏ chưa rang.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33695,
+    "matching_fields": [],
+    "matches_all_six": false
+  },
+  {
+    "id": "NL1146",
+    "name": "Hành baro",
+    "unit": "g",
+    "values": [
+      "61",
+      "1.50",
+      "14.15",
+      "0.30",
+      "1.8",
+      "20"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 11246: Leeks, (bulb and lower leaf-portion), raw. Boa rô TƯƠI phần củ và lá dưới; cùng dữ liệu tham khảo nhưng giữ riêng hai mã DB.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 33833,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "11246",
+      "name": "Leeks, (bulb and lower leaf-portion), raw",
+      "values": [
+        "61",
+        "1.50",
+        "14.15",
+        "0.30",
+        "1.8",
+        "20"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL311",
+    "name": "Hành boa rô",
+    "unit": "g",
+    "values": [
+      "61",
+      "1.50",
+      "14.15",
+      "0.30",
+      "1.8",
+      "20"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 11246: Leeks, (bulb and lower leaf-portion), raw. Boa rô TƯƠI phần củ và lá dưới; cùng dữ liệu tham khảo nhưng giữ riêng hai mã DB.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 33834,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "11246",
+      "name": "Leeks, (bulb and lower leaf-portion), raw",
+      "values": [
+        "61",
+        "1.50",
+        "14.15",
+        "0.30",
+        "1.8",
+        "20"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL180",
+    "name": "Hạt é",
+    "unit": "g",
+    "values": [
+      "439",
+      "14.9",
+      "51.9",
+      "19.1",
+      null,
+      "4"
+    ],
+    "url": "https://basil-seed.com/basil-nutrition.php",
+    "notes": "Nhãn nhà sản xuất Wei Sheng/Jian Chang: hạt basil KHÔ nguyên chất, không phải chia, chưa ngâm nở. Không có số xơ định lượng trong nhãn nên để NULL. Giá trị tham khảo sản phẩm nhà sản xuất này.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 33835,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL312",
+    "name": "Hạt nêm chay",
+    "unit": "g",
+    "values": [
+      "188",
+      "14.4",
+      "28",
+      "2",
+      null,
+      "21200"
+    ],
+    "url": "https://www.maggi.com.vn/san-pham/nem-maggi-nam-huong/?page=8",
+    "notes": "CHỈ hạt nêm MAGGI Nấm Hương: nhãn cho khẩu phần 2.5 g = 4.7 kcal, đạm 0.36 g, carbs 0.70 g, béo 0.05 g, Na 530 mg; nhân 40 để ra 100 g. Không công bố xơ. Không thay cho mọi hãng hạt nêm chay.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33836,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL1195",
+    "name": "Hạt thì là",
+    "unit": "g",
+    "values": [
+      "305",
+      "15.98",
+      "55.17",
+      "14.54",
+      "21.1",
+      "20"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 02016: Spices, dill seed. CHỈ hạt dill Anethum graveolens khô. Tên hạt thì là trong món cà ri có thể là cumin/fennel: cần xác nhận, không tự đồng nhất.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33837,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "02016",
+      "name": "Spices, dill seed",
+      "values": [
+        "305",
+        "15.98",
+        "55.17",
+        "14.54",
+        "21.1",
+        "20"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1177",
+    "name": "Hàu sữa tươi",
+    "unit": "g",
+    "values": [
+      "81",
+      "9.45",
+      "4.95",
+      "2.30",
+      "0.0",
+      "106"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 15171: Mollusks, oyster, Pacific, raw. Thịt hàu Thái Bình Dương SỐNG, không vỏ. Cần xác nhận đúng loài Crassostrea gigas; không đại diện mọi loại hàu sữa.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33838,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "15171",
+      "name": "Mollusks, oyster, Pacific, raw",
+      "values": [
+        "81",
+        "9.45",
+        "4.95",
+        "2.30",
+        "0.0",
+        "106"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1147",
+    "name": "Hoa hẹ",
+    "unit": "g",
+    "values": [
+      "40",
+      "2.3",
+      "6.8",
+      "0.4",
+      "2.9",
+      "0"
+    ],
+    "url": "https://www.cfs.gov.hk/english/programme/programme_rafs/programme_rafs_n_01_04_01_fruit_veg_report.html",
+    "notes": "Hong Kong CFS, Report 28 (2007), Annex V: Chinese chive flower stalks, hoa/ngồng hẹ; không phải chỉ lá hẹ.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 33839,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL1148",
+    "name": "Hoa hồi",
+    "unit": "g",
+    "values": [
+      "244",
+      "4.9",
+      "76.2",
+      "3.9",
+      "55.8",
+      "19"
+    ],
+    "url": "https://data.fda.gov.tw/data/opendata/export/20/json",
+    "notes": "TFDA P0100101: 八角 / Star anise. Hoa hồi (star anise), không phải anise seed. Dùng năng lượng HIỆU CHỈNH 修正熱量 244 kcal; total carbs gồm xơ.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 33840,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL1167",
+    "name": "Kim chi Hàn Quốc",
+    "unit": "g",
+    "values": [
+      "15",
+      "1.10",
+      "2.40",
+      "0.50",
+      "1.6",
+      "498"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 11118: Cabbage, kimchi. Kim chi cải thảo tham khảo chung; công thức và độ mặn từng hãng có thể khác.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 33841,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "11118",
+      "name": "Cabbage, kimchi",
+      "values": [
+        "15",
+        "1.10",
+        "2.40",
+        "0.50",
+        "1.6",
+        "498"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL116",
+    "name": "Kỷ tử",
+    "unit": "g",
+    "values": [
+      "349",
+      "14.26",
+      "77.06",
+      "0.39",
+      "13.0",
+      "298"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 09110: Goji berries, dried. Kỷ tử KHÔ, không đường; không áp cho quả tươi hoặc nước ngâm.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 33842,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "09110",
+      "name": "Goji berries, dried",
+      "values": [
+        "349",
+        "14.26",
+        "77.06",
+        "0.39",
+        "13.0",
+        "298"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1178",
+    "name": "Lá húng lủi",
+    "unit": "g",
+    "values": [
+      "44",
+      "3.29",
+      "8.41",
+      "0.73",
+      "6.8",
+      "30"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 02065: Spearmint, fresh. Spearmint TƯƠI (Mentha spicata), lá húng lủi; không phải húng quế.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 33843,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "02065",
+      "name": "Spearmint, fresh",
+      "values": [
+        "44",
+        "3.29",
+        "8.41",
+        "0.73",
+        "6.8",
+        "30"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1226",
+    "name": "Lòng đỏ trứng muối",
+    "unit": "g",
+    "values": [
+      "528",
+      "23.6",
+      "1.3",
+      "47.6",
+      null,
+      "397"
+    ],
+    "url": "https://data.fda.gov.tw/data/opendata/export/20/json",
+    "notes": "TFDA K0214801: 鴨鹹蛋黃 / Duck's  egg yolk: salted. Lòng đỏ trứng VỊT MUỐI ĐÃ NẤU CHÍN; xơ không công bố. Cần xác nhận đúng trứng vịt và trạng thái, không áp cho lòng đỏ tươi.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33844,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL982",
+    "name": "Mè rang",
+    "unit": "g",
+    "values": [
+      "565",
+      "16.96",
+      "25.74",
+      "48.00",
+      "14.0",
+      "11"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 12024: Seeds, sesame seeds, whole, roasted and toasted. Mè nguyên hạt còn vỏ đã rang, KHÔNG muối; không dùng cho mè bóc vỏ hay hỗn hợp muối mè.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 33845,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "12024",
+      "name": "Seeds, sesame seeds, whole, roasted and toasted",
+      "values": [
+        "565",
+        "16.96",
+        "25.74",
+        "48.00",
+        "14.0",
+        "11"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL156",
+    "name": "Men nở",
+    "unit": "g",
+    "values": [
+      "325",
+      "40.44",
+      "41.22",
+      "7.61",
+      "26.9",
+      "51"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 18375: Leavening agents, yeast, baker's, active dry. Chỉ MEN BÁNH MÌ KHÔ active dry; không phải men tươi, baking powder hay men rượu. Cần xác nhận loại.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33846,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "18375",
+      "name": "Leavening agents, yeast, baker's, active dry",
+      "values": [
+        "325",
+        "40.44",
+        "41.22",
+        "7.61",
+        "26.9",
+        "51"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL204",
+    "name": "Miến",
+    "unit": "g",
+    "values": [
+      "351",
+      "0.16",
+      "86.09",
+      "0.06",
+      "0.5",
+      "10"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 16082: Noodles, chinese, cellophane or long rice (mung beans), dehydrated. Chỉ MIẾN ĐẬU XANH KHÔ; cần xác nhận tinh bột và trạng thái, không dùng cho miến dong/miến chín.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33847,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "16082",
+      "name": "Noodles, chinese, cellophane or long rice (mung beans), dehydrated",
+      "values": [
+        "351",
+        "0.16",
+        "86.09",
+        "0.06",
+        "0.5",
+        "10"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1212",
+    "name": "Mỡ bò",
+    "unit": "g",
+    "values": [
+      "902",
+      "0.00",
+      "0.00",
+      "100.00",
+      "0.0",
+      "0"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 04001: Fat, beef tallow. Chỉ mỡ bò ĐÃ THẮNG LỌC (tallow). Không gán cho miếng mô mỡ bò sống trong công thức.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33848,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "04001",
+      "name": "Fat, beef tallow",
+      "values": [
+        "902",
+        "0.00",
+        "0.00",
+        "100.00",
+        "0.0",
+        "0"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL314",
+    "name": "Múi mít Thái",
+    "unit": "g",
+    "values": [
+      "95",
+      "1.72",
+      "23.25",
+      "0.64",
+      "1.5",
+      "2"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 09144: Jackfruit, raw. Múi mít chín TƯƠI bỏ hạt/vỏ. Tham khảo mít nói chung, không đo riêng giống mít Thái.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 33849,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "09144",
+      "name": "Jackfruit, raw",
+      "values": [
+        "95",
+        "1.72",
+        "23.25",
+        "0.64",
+        "1.5",
+        "2"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL158",
+    "name": "Muối nở",
+    "unit": "g",
+    "values": [
+      "0",
+      "0.00",
+      "0.00",
+      "0.00",
+      "0.0",
+      "27360"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 18372: Leavening agents, baking soda. Baking soda NaHCO3, KHÔNG phải bột nở. Natri 27360 mg/100 g là giá trị nguồn.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 33850,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "18372",
+      "name": "Leavening agents, baking soda",
+      "values": [
+        "0",
+        "0.00",
+        "0.00",
+        "0.00",
+        "0.0",
+        "27360"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1223",
+    "name": "Muối tôm",
+    "unit": "g",
+    "values": [
+      "253",
+      "12",
+      "42.2",
+      "3.26",
+      null,
+      "15700"
+    ],
+    "url": "https://www.dhfoods.com.vn/vi/muoi-tom-tay-ninh",
+    "notes": "CHỈ Muối Tôm Tây Ninh DH Foods đúng nhãn trên trang, không dùng cho mọi hãng/phiên bản muối tôm. Xơ chưa công bố.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33851,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL989",
+    "name": "Nấm bào ngư",
+    "unit": "g",
+    "values": [
+      "33",
+      "3.31",
+      "6.09",
+      "0.41",
+      "2.3",
+      "18"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 11987: Mushrooms, oyster, raw. Nấm bào ngư TƯƠI sống, phần ăn được; không dùng cho loại khô.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 33852,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "11987",
+      "name": "Mushrooms, oyster, raw",
+      "values": [
+        "33",
+        "3.31",
+        "6.09",
+        "0.41",
+        "2.3",
+        "18"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL987",
+    "name": "Nấm đông cô tươi",
+    "unit": "g",
+    "values": [
+      "34",
+      "2.24",
+      "6.79",
+      "0.49",
+      "2.5",
+      "9"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 11238: Mushrooms, shiitake, raw. Nấm đông cô TƯƠI sống; khác nấm hương khô.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 33853,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "11238",
+      "name": "Mushrooms, shiitake, raw",
+      "values": [
+        "34",
+        "2.24",
+        "6.79",
+        "0.49",
+        "2.5",
+        "9"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL205",
+    "name": "Nấm hương khô",
+    "unit": "g",
+    "values": [
+      "296",
+      "9.58",
+      "75.37",
+      "0.99",
+      "11.5",
+      "13"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 11268: Mushrooms, shiitake, dried. Nấm hương KHÔ trước ngâm; không dùng khối lượng đã ngâm với bảng khô.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 33854,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "11268",
+      "name": "Mushrooms, shiitake, dried",
+      "values": [
+        "296",
+        "9.58",
+        "75.37",
+        "0.99",
+        "11.5",
+        "13"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL985",
+    "name": "Nấm linh chi nâu",
+    "unit": "g",
+    "values": [
+      "26",
+      "2.7",
+      "4.8",
+      "0.5",
+      "3",
+      "2"
+    ],
+    "url": "https://fooddb.mext.go.jp/details/details.pl?ITEM_NO=8_08016_7",
+    "notes": "MEXT 2023, 08016: beech mushroom TƯƠI Hypsizygus marmoreus (bunashimeji). Chỉ áp nếu nấm linh chi ở đây là nấm ăn shimeji; KHÔNG linh chi dược liệu Ganoderma. Bảng chung loài, không phân tích riêng hai màu.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33855,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL986",
+    "name": "Nấm linh chi trắng",
+    "unit": "g",
+    "values": [
+      "26",
+      "2.7",
+      "4.8",
+      "0.5",
+      "3",
+      "2"
+    ],
+    "url": "https://fooddb.mext.go.jp/details/details.pl?ITEM_NO=8_08016_7",
+    "notes": "MEXT 2023, 08016: beech mushroom TƯƠI Hypsizygus marmoreus (bunashimeji). Chỉ áp nếu nấm linh chi ở đây là nấm ăn shimeji; KHÔNG linh chi dược liệu Ganoderma. Bảng chung loài, không phân tích riêng hai màu.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33856,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL1213",
+    "name": "Ngũ vị hương",
+    "unit": "g",
+    "values": [
+      "391",
+      "10.5",
+      "67.4",
+      "8.81",
+      null,
+      "53.3"
+    ],
+    "url": "https://www.dhfoods.com.vn/vi/natural-bot-gia-vi-ngu-vi-huong",
+    "notes": "CHỈ Natural Bột Gia Vị Ngũ Vị Hương DH Foods, nhãn trên 100 g. Tỷ lệ phối trộn hãng khác có thể khác; xơ chưa công bố.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33857,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL161",
+    "name": "Nho khô",
+    "unit": "g",
+    "values": [
+      "299",
+      "3.07",
+      "79.18",
+      "0.46",
+      "3.7",
+      "11"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 09298: Raisins, seedless. Nho khô không hạt tham khảo chung; không đại diện loại tẩm đường/dầu riêng.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 33858,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "09298",
+      "name": "Raisins, seedless",
+      "values": [
+        "299",
+        "3.07",
+        "79.18",
+        "0.46",
+        "3.7",
+        "11"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1231",
+    "name": "Nước đá",
+    "unit": "g",
+    "values": [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      null
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA 14411: nước uống không phụ gia. Chỉ dùng cho nước lọc/nước đá nguyên chất, CHƯA pha đường. Năm chỉ số đại lượng bằng 0 theo nước; áp cho đá là suy luận đóng băng nước không thêm chất. Không lấy natri mẫu nước Mỹ gán cho nước tại VN: natri NULL.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 33859,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "14411",
+      "name": "Beverages, water, tap, drinking",
+      "values": [
+        "0",
+        "0.00",
+        "0.00",
+        "0.00",
+        "0.0",
+        "4"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  {
+    "id": "NL184",
+    "name": "Nước để nấu nước đường",
+    "unit": "g",
+    "values": [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      null
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA 14411: nước uống không phụ gia. Chỉ dùng cho nước lọc/nước đá nguyên chất, CHƯA pha đường. Năm chỉ số đại lượng bằng 0 theo nước; áp cho đá là suy luận đóng băng nước không thêm chất. Không lấy natri mẫu nước Mỹ gán cho nước tại VN: natri NULL.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 33860,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "14411",
+      "name": "Beverages, water, tap, drinking",
+      "values": [
+        "0",
+        "0.00",
+        "0.00",
+        "0.00",
+        "0.0",
+        "4"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  {
+    "id": "NL105",
+    "name": "Nước dùng gà",
+    "unit": "g",
+    "values": [
+      "36",
+      "2.52",
+      "3.53",
+      "1.20",
+      "0.0",
+      "143"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 06172: Soup, stock, chicken, home-prepared. Nước dùng gà homemade tham khảo; độ cô đặc, lượng thịt và muối thực tế chưa rõ nên chưa áp dụng.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33861,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "06172",
+      "name": "Soup, stock, chicken, home-prepared",
+      "values": [
+        "36",
+        "2.52",
+        "3.53",
+        "1.20",
+        "0.0",
+        "143"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL126",
+    "name": "Nước dùng xương heo",
+    "unit": "g",
+    "values": [
+      "8",
+      "0.9",
+      "0.0",
+      "0.4",
+      null,
+      "15"
+    ],
+    "url": "https://data.fda.gov.tw/data/opendata/export/20/json",
+    "notes": "TFDA I03214: 豬骨湯平均值 / None. Nước dùng xương heo trung bình theo phương pháp TFDA; chưa biết nồng độ và muối của công thức đang dùng nên chưa áp dụng.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33862,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL1175",
+    "name": "Nước mắm chay",
+    "unit": "ml",
+    "values": [
+      "18",
+      "1.99",
+      "2.42",
+      "0",
+      null,
+      "7360"
+    ],
+    "url": "https://cholimexfood.com.vn/wp-content/uploads/2025/20250830/57_NMC_2025.pdf",
+    "notes": "CHỈ nước mắm chay Cholimex đúng hồ sơ công bố 57/NMC/2025. Dữ liệu trên 100 ML, không tự đổi thành 100 g; xơ chưa công bố.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33863,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL994",
+    "name": "Ớt chuông đỏ",
+    "unit": "g",
+    "values": [
+      "31",
+      "0.99",
+      "6.03",
+      "0.30",
+      "2.1",
+      "4"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 11821: Peppers, sweet, red, raw. Ớt chuông ĐỎ TƯƠI sống, phần ăn được.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 33864,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "11821",
+      "name": "Peppers, sweet, red, raw",
+      "values": [
+        "31",
+        "0.99",
+        "6.03",
+        "0.30",
+        "2.1",
+        "4"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL993",
+    "name": "Ớt chuông vàng",
+    "unit": "g",
+    "values": [
+      "27",
+      "1.00",
+      "6.32",
+      "0.21",
+      "0.9",
+      "2"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 11951: Peppers, sweet, yellow, raw. Ớt chuông VÀNG TƯƠI sống, phần ăn được.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 33865,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "11951",
+      "name": "Peppers, sweet, yellow, raw",
+      "values": [
+        "27",
+        "1.00",
+        "6.32",
+        "0.21",
+        "0.9",
+        "2"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1149",
+    "name": "Quế cây",
+    "unit": "g",
+    "values": [
+      "247",
+      "3.99",
+      "80.59",
+      "1.24",
+      "53.1",
+      "10"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 02010: Spices, cinnamon, ground. Vỏ quế KHÔ XAY; chỉ tham khảo nếu chấp nhận dữ liệu quế khô cho nguyên liệu ăn vào. Không coi cả thanh quế bỏ đi là đã ăn hoặc coi nước ngâm có dinh dưỡng bằng vỏ quế.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 33866,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "02010",
+      "name": "Spices, cinnamon, ground",
+      "values": [
+        "247",
+        "3.99",
+        "80.59",
+        "1.24",
+        "53.1",
+        "10"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1227",
+    "name": "Rau ngót",
+    "unit": "g",
+    "values": [
+      "45",
+      "5.3",
+      "5.9",
+      null,
+      "2.5",
+      "24.5"
+    ],
+    "url": "https://viendinhduong.vn/api/fe/foodNatunal/getPageFoodData?name=Rau%20ng%C3%B3t%2C%20t%C6%B0%C6%A1i",
+    "notes": "Viện Dinh dưỡng, mã 4086: Rau ngót, tươi. Rau ngót TƯƠI phần ăn được. Nguồn không công bố béo trong bản ghi nên giữ NULL; có natri 24.5 mg.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 34020,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL164",
+    "name": "Rượu rum",
+    "unit": "g",
+    "values": [
+      "231",
+      "0.00",
+      "0.00",
+      "0.00",
+      "0.0",
+      "1"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 14050: Alcoholic beverage, distilled, rum, 80 proof. Chỉ RUM 80 proof = 40% cồn, không đường/hương thêm. Năng lượng có từ cồn dù carbs bằng 0. Bảng theo 100 g, không tự coi 100 ml bằng 100 g; chưa xác nhận nồng độ rum đang dùng.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 34021,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "14050",
+      "name": "Alcoholic beverage, distilled, rum, 80 proof",
+      "values": [
+        "231",
+        "0.00",
+        "0.00",
+        "0.00",
+        "0.0",
+        "1"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1222",
+    "name": "Sa tế",
+    "unit": "g",
+    "values": [
+      "532",
+      "6.08",
+      "21.3",
+      "46.9",
+      null,
+      "1270"
+    ],
+    "url": "https://www.dhfoods.com.vn/vi/sa-te-tom",
+    "notes": "CHỈ Sa Tế Tôm DH Foods đúng nhãn: 100 g sản phẩm chưa pha. Không dùng cho sa tế chay hoặc sa tế tự làm; xơ không công bố.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 34022,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL1134",
+    "name": "Sốt lẩu Thái (khoảng 1/2 chai)",
+    "unit": "g",
+    "values": [
+      "169",
+      "1.31",
+      "27.5",
+      "5.98",
+      null,
+      "4000"
+    ],
+    "url": "https://cholimexfood.com.vn/wp-content/uploads/2025/20250807_CBTT/24.XOTLAUTHAI.2025.pdf",
+    "notes": "CHỈ Xốt Lẩu Thái Cholimex hồ sơ 24/2025, nhãn chai 280 g trang 7. 100 g XỐT CHƯA PHA, không phải 100 g nước lẩu. Xơ không công bố. Không sửa quy ước nửa chai.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 34023,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL206",
+    "name": "Sữa bột nguyên kem",
+    "unit": "g",
+    "values": [
+      "494",
+      "27",
+      "38",
+      "26",
+      null,
+      "371"
+    ],
+    "url": "https://viendinhduong.vn/api/fe/foodNatunal/getPageFoodData?name=S%E1%BB%AFa%20b%E1%BB%99t%20to%C3%A0n%20ph%E1%BA%A7n",
+    "notes": "Viện Dinh dưỡng, mã 10006: Sữa bột toàn phần. Sữa bột TOÀN PHẦN nguyên chất, CHƯA pha nước. Không áp cho sữa công thức, bột béo hay sữa bột tách béo.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 34024,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL1063",
+    "name": "Sụn gà",
+    "unit": "g",
+    "values": [
+      "54",
+      "12.5",
+      "0.4",
+      "0.4",
+      "0",
+      "390"
+    ],
+    "url": "https://fooddb.mext.go.jp/details/details.pl?ITEM_NO=11_11236_7&MODE=0",
+    "notes": "MEXT 2023, 11236: SỤN ỨC GÀ SỐNG, không phải sụn gối kèm thịt/mỡ hay sụn chiên. Xơ (0) là giá trị ước tính được nguồn ghi trong ngoặc. Chưa rõ phần sụn thực tế nên chưa áp dụng.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 34025,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL1219",
+    "name": "Tắc",
+    "unit": "g",
+    "values": [
+      "42",
+      "0.9",
+      "9.6",
+      null,
+      "4.1",
+      null
+    ],
+    "url": "https://viendinhduong.vn/api/fe/foodNatunal/getPageFoodData?name=Qu%E1%BA%A5t%20ch%C3%ADn%2C%20t%C6%B0%C6%A1i",
+    "notes": "Viện Dinh dưỡng, mã 5046: Quất chín, tươi. Quất chín tươi, không phải nước cốt đã lọc. Tên tiếng Anh trong cổng nguồn ghi Mandarin có điểm không thống nhất với tên Việt; cần xác nhận nguyên liệu/dạng ăn được, không tự áp cho nước tắc.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 34026,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL1150",
+    "name": "Thăn bò",
+    "unit": "g",
+    "values": [
+      "139",
+      "21.94",
+      "0.00",
+      "5.74",
+      "0.0",
+      "44"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 23372: Beef, loin, tenderloin steak, boneless, separable lean only, trimmed to 0\" fat, all grades, raw. Thăn nội bò SỐNG chỉ phần nạc ăn được, lọc mỡ ngoài; tham khảo chung. Giữ hai mã DB riêng, không gộp nguyên liệu.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 34027,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "23372",
+      "name": "Beef, loin, tenderloin steak, boneless, separable lean only, trimmed to 0\" fat, all grades, raw",
+      "values": [
+        "139",
+        "21.94",
+        "0.00",
+        "5.74",
+        "0.0",
+        "44"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1054",
+    "name": "Thịt ba rọi (thịt ba chỉ)",
+    "unit": "g",
+    "values": [
+      "518",
+      "9.34",
+      "0.00",
+      "53.01",
+      "0.0",
+      "32"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 10005: Pork, fresh, belly, raw. Ba chỉ heo SỐNG, mẫu belly có tỷ lệ mỡ cao; số tham khảo phụ thuộc phần nạc/mỡ thực tế, không phải ba chỉ luộc.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 34028,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "10005",
+      "name": "Pork, fresh, belly, raw",
+      "values": [
+        "518",
+        "9.34",
+        "0.00",
+        "53.01",
+        "0.0",
+        "32"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1211",
+    "name": "Thịt heo nạc",
+    "unit": "g",
+    "values": [
+      "139",
+      "19",
+      null,
+      "7",
+      null,
+      "76"
+    ],
+    "url": "https://viendinhduong.vn/api/fe/foodNatunal/getPageFoodData?name=Th%E1%BB%8Bt%20l%E1%BB%A3n%2C%20n%E1%BA%A1c%2C%20t%C6%B0%C6%A1i",
+    "notes": "Viện Dinh dưỡng, mã 7017: Thịt lợn, nạc, tươi. Thịt heo NẠC TƯƠI tham khảo chung; không lấy nạc thăn thay cho mọi thịt nạc. Không tự gán carbs/xơ bằng 0 khi nguồn bỏ trống.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 34029,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL207",
+    "name": "Thịt nạc dăm",
+    "unit": "g",
+    "values": [
+      "236",
+      "17.18",
+      "0.00",
+      "17.99",
+      "0.0",
+      "65"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 10070: Pork, fresh, shoulder, whole, separable lean and fat, raw. Thịt vai heo SỐNG gồm nạc và mỡ, chỉ dùng nếu chấp nhận mẫu vai này cho nạc dăm. Chưa rõ tỷ lệ mỡ nên chưa áp dụng; không coi nạc dăm là nạc thăn.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 34030,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "10070",
+      "name": "Pork, fresh, shoulder, whole, separable lean and fat, raw",
+      "values": [
+        "236",
+        "17.18",
+        "0.00",
+        "17.99",
+        "0.0",
+        "65"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1184",
+    "name": "Thịt thăn bò",
+    "unit": "g",
+    "values": [
+      "139",
+      "21.94",
+      "0.00",
+      "5.74",
+      "0.0",
+      "44"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 23372: Beef, loin, tenderloin steak, boneless, separable lean only, trimmed to 0\" fat, all grades, raw. Thăn nội bò SỐNG chỉ phần nạc ăn được, lọc mỡ ngoài; tham khảo chung. Giữ hai mã DB riêng, không gộp nguyên liệu.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 34031,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "23372",
+      "name": "Beef, loin, tenderloin steak, boneless, separable lean only, trimmed to 0\" fat, all grades, raw",
+      "values": [
+        "139",
+        "21.94",
+        "0.00",
+        "5.74",
+        "0.0",
+        "44"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1201",
+    "name": "Tiêu sọ",
+    "unit": "g",
+    "values": [
+      "296",
+      "10.40",
+      "68.61",
+      "2.12",
+      "26.2",
+      "5"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 02032: Spices, pepper, white. Tiêu trắng/tiêu sọ KHÔ nguyên chất, không muối hoặc bột độn. Không phải tiêu đen.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 34032,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "02032",
+      "name": "Spices, pepper, white",
+      "values": [
+        "296",
+        "10.40",
+        "68.61",
+        "2.12",
+        "26.2",
+        "5"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1009",
+    "name": "Tóp mỡ",
+    "unit": "g",
+    "values": [
+      null,
+      "17.4",
+      null,
+      null,
+      null,
+      "153"
+    ],
+    "url": "https://data.fda.gov.tw/data/opendata/export/20/json",
+    "notes": "TFDA I0321301 豬油渣: tóp mỡ từ mỡ dưới da heo thắng bằng bếp gas. Chỉ chép đạm/Na được công bố. Bộ thành phần mẫu có tổng nước+tro+đạm+béo 103.5 g/100 g nên KHÔNG chép kcal/béo và CHƯA bật áp dụng. Không thay bằng snack da heo chiên.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 34033,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL208",
+    "name": "Trứng",
+    "unit": "g",
+    "values": [
+      "143",
+      "12.56",
+      "0.72",
+      "9.51",
+      "0.0",
+      "142"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 01123: Egg, whole, raw, fresh. CHỈ TRỨNG GÀ SỐNG nguyên lòng đỏ + lòng trắng, bỏ vỏ; không dùng cho trứng vịt/cút/muối. Tên DB chỉ ghi Trứng nên cần xác nhận loài.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 34034,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "01123",
+      "name": "Egg, whole, raw, fresh",
+      "values": [
+        "143",
+        "12.56",
+        "0.72",
+        "9.51",
+        "0.0",
+        "142"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL953",
+    "name": "Tương cà",
+    "unit": "g",
+    "values": [
+      "101",
+      "1.04",
+      "27.40",
+      "0.10",
+      "0.3",
+      "907"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 11935: Catsup. Tomato ketchup tham khảo chung; không phải sốt cà chua cô đặc hoặc cà chua nghiền. Cần chấp nhận đúng loại ketchup hoặc thay bằng nhãn thực tế trước khi bật.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 34035,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "11935",
+      "name": "Catsup",
+      "values": [
+        "101",
+        "1.04",
+        "27.40",
+        "0.10",
+        "0.3",
+        "907"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1202",
+    "name": "Tương ớt chay",
+    "unit": "g",
+    "values": [
+      "41",
+      "0.5",
+      "8.5",
+      "0.5",
+      "0.9",
+      "25"
+    ],
+    "url": "https://viendinhduong.vn/api/fe/foodNatunal/getPageFoodData?name=T%C6%B0%C6%A1ng%20%E1%BB%9Bt",
+    "notes": "Viện Dinh dưỡng, mã 13021: Tương ớt. Nguồn là tương ớt nói chung, KHÔNG chứng minh công thức tương ớt chay hay hãng trong DB. Chỉ dùng như giá trị tham khảo khi xác nhận thành phần sản phẩm phù hợp; không khẳng định mẫu này là nhãn chay.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 34036,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL999",
+    "name": "Tương xí muội",
+    "unit": "g",
+    "values": [
+      "119",
+      "0.18",
+      "29.2",
+      "0.13",
+      null,
+      "804"
+    ],
+    "url": "https://cholimexfood.com.vn/wp-content/uploads/2025/20250123_CBTT/T%C6%AF%C6%A0NG%20%E1%BB%9AT%20X%C3%8D%20MU%E1%BB%98I___40-2025___TCB%20SCAN.pdf",
+    "notes": "CHỈ TƯƠNG ỚT XÍ MUỘI Cholimex hồ sơ 40/2025, nhãn trang 12. Không áp cho sốt mận/xí muội hãng khác. Carbs nhãn 29.2 g; xơ không công bố.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 34037,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL170",
+    "name": "Vani",
+    "unit": "g",
+    "values": [
+      "288",
+      "0.06",
+      "12.65",
+      "0.06",
+      "0.0",
+      "9"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 02050: Vanilla extract. CHỈ tinh chất vanilla extract lỏng có cồn. Không dùng cho vanillin bột, đường vani hoặc hương vani không cồn; tên DB chưa rõ loại nên chưa áp dụng.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 34038,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "02050",
+      "name": "Vanilla extract",
+      "values": [
+        "288",
+        "0.06",
+        "12.65",
+        "0.06",
+        "0.0",
+        "9"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1203",
+    "name": "Vỏ chanh",
+    "unit": "g",
+    "values": [
+      "47",
+      "1.50",
+      "16.00",
+      "0.30",
+      "10.6",
+      "6"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 09156: Lemon peel, raw. CHỈ vỏ chanh VÀNG lemon tươi, không tẩm đường; chưa xác nhận lemon hay chanh xanh lime trong công thức. Không coi vỏ bị bỏ đi là đã ăn.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 34039,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "09156",
+      "name": "Lemon peel, raw",
+      "values": [
+        "47",
+        "1.50",
+        "16.00",
+        "0.30",
+        "10.6",
+        "6"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL324",
+    "name": "Vỏ hoành thánh",
+    "unit": "g",
+    "values": [
+      "268",
+      "8.3",
+      "58.2",
+      "0.5",
+      "1.5",
+      "501"
+    ],
+    "url": "https://data.fda.gov.tw/data/opendata/export/20/json",
+    "notes": "TFDA R1800301: 餛飩皮. Vỏ hoành thánh CHƯA NẤU, chưa nhân. Dùng năng lượng hiệu chỉnh 268 kcal (修正熱量); không thay bằng bánh hoành thánh chiên hoặc đã có nhân.",
+    "rest": [
+      "ThamKhaoChung",
+      "1"
+    ],
+    "line": 34040,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL171",
+    "name": "Whipping cream",
+    "unit": "g",
+    "values": [
+      "340",
+      "2.84",
+      "2.74",
+      "36.08",
+      "0.0",
+      "27"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 01053: Cream, fluid, heavy whipping. CHỈ kem sữa động vật heavy whipping khoảng 36% béo, chưa đánh, không đường. Không dùng cho topping thực vật/kem pha sẵn hoặc tự áp cho mọi loại 30-35%; cần xác nhận hàm lượng béo.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 34041,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "01053",
+      "name": "Cream, fluid, heavy whipping",
+      "values": [
+        "340",
+        "2.84",
+        "2.74",
+        "36.08",
+        "0.0",
+        "27"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  {
+    "id": "NL1182",
+    "name": "Xốt bò kho",
+    "unit": "g",
+    "values": [
+      "203",
+      "3.79",
+      "21.5",
+      "11.3",
+      null,
+      "5480"
+    ],
+    "url": "https://cholimexfood.com.vn/wp-content/uploads/2025/20250816_CBTT/49.%20XO%CC%82%CC%81T%20BO%CC%80%20KHO%20%28XO%CC%82%CC%81T%20VANG%29%20.%202025.pdf",
+    "notes": "CHỈ Xốt Bò Kho (Xốt Vang) Cholimex hồ sơ 49/2025, nhãn trang 9. 100 g XỐT CHƯA PHA, không phải món bò kho hoàn chỉnh. Không công bố xơ.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 34042,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true
+  },
+  {
+    "id": "NL1215",
+    "name": "Xúc xích",
+    "unit": "g",
+    "values": [
+      "309",
+      "11.98",
+      "0.94",
+      "28.23",
+      "0.0",
+      "827"
+    ],
+    "url": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+    "notes": "USDA SR28, NDB 07074: Smoked link sausage, pork. CHỈ xúc xích heo dạng smoked link sausage theo mẫu USDA. Không đại diện xúc xích gà/bò, tiệt trùng, phô mai hoặc mọi hãng Việt Nam; chưa rõ loại nên chưa áp dụng.",
+    "rest": [
+      "CanXacNhan",
+      "0"
+    ],
+    "line": 34043,
+    "matching_fields": [
+      "NangLuong",
+      "ChatDam",
+      "ChatBotDuong",
+      "ChatBeo",
+      "ChatXo",
+      "natri"
+    ],
+    "matches_all_six": true,
+    "usda_record": {
+      "code": "07074",
+      "name": "Smoked link sausage, pork",
+      "values": [
+        "309",
+        "11.98",
+        "0.94",
+        "28.23",
+        "0.0",
+        "827"
+      ]
+    },
+    "usda_matching_fields": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  }
+]

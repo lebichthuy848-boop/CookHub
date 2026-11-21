@@ -3,32 +3,42 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { api, media } from '../api';
 import { useAuth } from '../auth';
 import { useApi } from '../hooks';
-import { Notice, MatchProgress } from './Common';
+import { Notice } from './Common';
 import './Personalization.css';
 
+export const surveySources = {
+  moh2030: 'Bộ Y tế – Mười lời khuyên dinh dưỡng hợp lý đến năm 2030',
+  faoDiversity: 'FAO – Guidelines for measuring household and individual dietary diversity',
+  whoHealthyDiet: 'WHO – Healthy diet',
+  foodChoice: 'Steptoe, Pollard & Wardle (1995) – Food Choice Questionnaire',
+  fdaAllergens: 'FDA – Major Food Allergens',
+};
 export const questions = [
-  {key:'ingredients', title:'Món bạn thích ăn là gì?', options:[['chicken','🍗','Thịt gà'],['pork','🥩','Thịt heo'],['seafood','🐟','Hải sản & Cá'],['beef','🥩','Thịt bò'],['vegetables','🥦','Món chay / Rau củ'],['eggs','🥚','Trứng'],['tofu','🫘','Đậu hũ']]},
-  {key:'occasions', title:'Bạn muốn ưu tiên kiểu ăn uống nào?', single:true, options:[['balanced','🥗','Cân bằng, đa dạng'],['low_carb','🥑','Ít tinh bột'],['vegetarian','🌱','Ăn chay'],['none','🍽️','Không theo chế độ riêng']]},
-  {key:'tastes', title:'Khẩu vị nào khiến bạn thích mê?', options:[['savory','🧂','Đậm đà / Mặn mà'],['spicy','🌶️','Cay nồng bùng vị'],['sweet_sour','🍋','Chua ngọt hài hòa'],['light','🌿','Thanh nhẹ / Nguyên bản'],['rich','🥥','Béo ngậy / Cốt dừa']]},
-  {key:'time', title:'Bạn muốn dành tối đa bao lâu để nấu?', single:true, options:[['quick','⚡','Dưới 15 phút'],['medium','⏱️','15–30 phút'],['relaxed','🍳','Trên 30 phút']]},
-  {key:'tools', title:'Trong bếp của bạn có những dụng cụ nào?', options:[['stove','🍳','Bếp gas / Bếp từ'],['air_fryer','🍟','Nồi chiên không dầu'],['pressure_cooker','🍲','Nồi áp suất / Nồi hầm'],['oven','🍞','Lò nướng'],['no_cook','🥗','Không cần nấu']]},
-  {key:'dish_types', title:'Bạn thường muốn ăn nhóm món nào?', options:[['rice_noodles','🍚','Cơm, cháo, món nước'],['soup','🍲','Canh, súp, lẩu'],['salad','🥗','Gỏi, salad, món cuốn'],['snack','🥟','Bánh, ăn vặt'],['dessert','🍧','Chè, kem, tráng miệng']]},
-  {key:'avoid', title:'Bạn cần tránh thành phần nào?', options:[['none','👍','Không kiêng'],['fish','🐟','Cá / Nước mắm'],['shellfish','🦐','Tôm, cua, mực'],['peanut','🥜','Lạc / Đậu phộng'],['soy','🫘','Đậu nành'],['dairy','🥛','Sữa và chế phẩm sữa'],['spicy_avoid','🌶️','Đồ cay']]},
-  {key:'method', title:'Bạn thích cách chế biến nào?', single:true, options:[['stir_fry','🍳','Xào / áp chảo'],['steam','♨️','Hấp / luộc'],['grill','🔥','Nướng'],['stew','🍲','Hầm / kho']]},
-  {key:'skill', title:'Bạn muốn công thức ở mức độ nào?', single:true, options:[['beginner','🐣','Dễ làm'],['basic','🍳','Vừa phải'],['chef','🧑‍🍳','Thử thách']]},
-  {key:'meals', title:'Bạn đang tìm món cho bữa nào?', options:[['breakfast','🌅','Bữa sáng'],['lunch','🍱','Bữa trưa'],['dinner','🌙','Bữa tối'],['snack','🍰','Bữa phụ / Tráng miệng']]},
+  {key:'ingredients', title:'Bạn muốn CookHub ưu tiên những nhóm thực phẩm nào?', sources:['moh2030','faoDiversity'], options:[['chicken','🍗','Thịt gà'],['pork','🥩','Thịt heo'],['seafood','🐟','Hải sản & Cá'],['beef','🥩','Thịt bò'],['vegetables','🥦','Món chay / Rau củ'],['eggs','🥚','Trứng'],['tofu','🫘','Đậu hũ']]},
+  {key:'occasions', title:'Bạn muốn món gợi ý theo định hướng ăn uống nào?', sources:['moh2030','whoHealthyDiet'], single:true, options:[['balanced','🥗','Cân bằng, đa dạng'],['low_carb','🥑','Ít tinh bột'],['vegetarian','🌱','Ăn chay'],['none','🍽️','Không theo chế độ riêng']]},
+  {key:'tastes', title:'Bạn thường ưu tiên những hương vị nào?', sources:['foodChoice'], options:[['savory','🧂','Đậm đà / Mặn mà'],['spicy','🌶️','Cay nồng bùng vị'],['sweet_sour','🍋','Chua ngọt hài hòa'],['light','🌿','Thanh nhẹ / Nguyên bản'],['rich','🥥','Béo ngậy / Cốt dừa']]},
+  {key:'time', title:'Bạn thường có bao nhiêu thời gian để chuẩn bị một món?', sources:['foodChoice'], single:true, options:[['quick','⚡','Dưới 15 phút'],['medium','⏱️','15–30 phút'],['relaxed','🍳','Trên 30 phút']]},
+  {key:'tools', title:'Bạn có thể sử dụng những thiết bị nấu nào?', sources:['foodChoice'], options:[['gas_stove','🔥','Bếp gas'],['induction_stove','⚡','Bếp từ'],['air_fryer','🍟','Nồi chiên không dầu'],['pressure_cooker','🍲','Nồi áp suất / Nồi hầm'],['oven','🍞','Lò nướng'],['no_cook','🥗','Không cần nấu']]},
+  {key:'dish_types', title:'Bạn muốn CookHub ưu tiên những dạng món nào?', sources:['faoDiversity','foodChoice'], options:[['rice_noodles','🍚','Cơm, cháo, món nước'],['soup','🍲','Canh, súp, lẩu'],['salad','🥗','Gỏi, salad, món cuốn'],['snack','🥟','Bánh, ăn vặt'],['dessert','🍧','Chè, kem, tráng miệng']]},
+  {key:'avoid', title:'Có thành phần nào cần loại khỏi gợi ý không?', sources:['fdaAllergens'], options:[['none','👍','Không kiêng'],['fish','🐟','Cá / Nước mắm'],['shellfish','🦐','Tôm, cua, mực'],['egg','🥚','Trứng'],['peanut','🥜','Lạc / Đậu phộng'],['tree_nuts','🌰','Hạt cây'],['soy','🫘','Đậu nành'],['dairy','🥛','Sữa và chế phẩm sữa'],['wheat','🌾','Lúa mì'],['sesame','🫓','Mè / Vừng'],['spicy_avoid','🌶️','Đồ cay']]},
+  {key:'method', title:'Bạn muốn ưu tiên phương pháp chế biến nào?', sources:['whoHealthyDiet','moh2030'], single:true, options:[['stir_fry','🍳','Xào'],['pan_sear','🥘','Áp chảo'],['steam','♨️','Hấp'],['boil','💧','Luộc'],['grill','🔥','Nướng'],['stew','🍲','Hầm'],['braise','🫕','Kho']]},
+  {key:'skill', title:'Bạn muốn công thức có mức độ khó nào?', sources:['foodChoice'], single:true, options:[['beginner','🐣','Dễ làm'],['basic','🍳','Vừa phải'],['chef','🧑‍🍳','Thử thách']]},
+  {key:'meals', title:'Bạn muốn lập món cho những bữa nào?', sources:['moh2030','faoDiversity'], options:[['breakfast','🌅','Bữa sáng'],['lunch','🍱','Bữa trưa'],['dinner','🌙','Bữa tối'],['snack','🍰','Bữa phụ / Tráng miệng']]},
 ];
 export const emptyAnswers = () => ({ingredients:[], occasions:'', tastes:[], time:'', tools:[], dish_types:[], avoid:[], method:'', skill:'', meals:[]});
 const upgradeAnswers = answers => {
   const migrated = {...emptyAnswers(), ...Object.fromEntries(Object.keys(emptyAnswers()).filter(key => key in (answers || {})).map(key => [key, answers[key]]))};
   migrated.ingredients = (answers?.ingredients || []).flatMap(value => value === 'eggs_tofu' ? ['eggs','tofu'] : [value]);
+  // Dữ liệu cũ gộp bếp gas và bếp từ thành "stove" nên giữ cả hai khi nâng cấp;
+  // người dùng có thể bỏ chọn đúng loại bếp mình không sử dụng khi chỉnh hồ sơ.
+  migrated.tools = [...new Set((answers?.tools || []).flatMap(value => value === 'stove' ? ['gas_stove','induction_stove'] : [value]))];
   const legacy = Array.isArray(answers?.occasions);
   migrated.avoid = [...new Set((answers?.avoid || []).flatMap(value => value === 'seafood_allergy' ? ['fish','shellfish'] : value === 'lactose' ? ['dairy'] : legacy && value === 'peanut' ? ['peanut','soy'] : value))];
   const diet = Array.isArray(answers?.occasions) ? answers.occasions.find(value => ['healthy','low_carb','vegetarian'].includes(value)) : answers?.occasions;
   migrated.occasions = diet === 'healthy' ? 'balanced' : ['balanced','low_carb','vegetarian','none'].includes(diet) ? diet : '';
   return migrated;
 };
-const avoidLabels = {fish:'cá và nước mắm', shellfish:'tôm, cua, mực', peanut:'lạc', soy:'đậu nành', dairy:'sữa', spicy_avoid:'món cay'};
+const avoidLabels = {fish:'cá và nước mắm', shellfish:'tôm, cua, mực', egg:'trứng', peanut:'lạc', tree_nuts:'hạt cây', soy:'đậu nành', dairy:'sữa', wheat:'lúa mì', sesame:'mè/vừng', spicy_avoid:'món cay'};
 const listed = (values, names) => (values || []).map(value => names[value]).filter(Boolean).join(', ');
 export function describeEatingStyle(answers) {
   const has = (key, value) => (answers[key] || []).includes(value);
@@ -60,7 +70,7 @@ export function describeEatingStyle(answers) {
     conclusion = `Điểm chung trong lựa chọn của bạn là hương vị ${taste}${quick ? ' và thời gian chuẩn bị ngắn' : ''}. Hãy bắt đầu từ những công thức có vị rõ ràng, rồi điều chỉnh nguyên liệu cho bữa ăn bạn quan tâm.`;
   }
   let cooking = has('tools', 'no_cook') ? 'Món salad hoặc món không cần nấu sẽ hợp với nhịp chuẩn bị của bạn.' :
-    has('tools', 'air_fryer') && has('tools', 'stove') ? 'Bạn có thể xoay giữa món xào trên bếp và món làm bằng nồi chiên không dầu để đổi cách ăn mà không tăng nhiều thao tác.' :
+    has('tools', 'air_fryer') && (has('tools', 'gas_stove') || has('tools', 'induction_stove')) ? 'Bạn có thể xoay giữa món xào trên bếp và món làm bằng nồi chiên không dầu để đổi cách ăn mà không tăng nhiều thao tác.' :
     has('tools', 'air_fryer') ? 'Món làm bằng nồi chiên không dầu là hướng thử phù hợp.' :
     has('tools', 'oven') ? 'Bạn có thể thử các món nướng ít bước.' :
     has('tools', 'pressure_cooker') ? 'Nồi áp suất phù hợp với các món cần làm mềm nguyên liệu.' :
@@ -69,7 +79,7 @@ export function describeEatingStyle(answers) {
   if (has('dish_types', 'soup') && answers.method === 'stew') cooking += ' Bạn cũng có thể thử món canh hoặc súp nấu chậm.';
   const constraints = [];
   if (avoid) constraints.push(`Khi chọn công thức, hãy kiểm tra nguyên liệu cần tránh: ${avoid}.`);
-  const methodLabel = {stir_fry:'món xào hoặc áp chảo',steam:'món hấp hoặc luộc',grill:'món nướng',stew:'món hầm hoặc kho'}[answers.method];
+  const methodLabel = {stir_fry:'món xào',pan_sear:'món áp chảo',steam:'món hấp',boil:'món luộc',grill:'món nướng',stew:'món hầm',braise:'món kho'}[answers.method];
   if (methodLabel) constraints.push(`Cách chế biến hợp gu: ${methodLabel}.`);
   return {
     title,
@@ -124,7 +134,7 @@ function SurveyDialog({onComplete, onDismiss, onFavorites}) {
     catch(err) {setError(err.message);} finally {setBusy(false);}
   }
   return <motion.div className="survey-backdrop" initial={{opacity:0}} animate={{opacity:1}} exit={{opacity:0}}><motion.section ref={dialog} tabIndex={-1} onKeyDown={trap} role="dialog" aria-modal="true" aria-labelledby="survey-title" className="survey-glass" initial={reduced?false:{y:30,scale:.96}} animate={{y:0,scale:1}} exit={{y:15,opacity:0}}><button type="button" className="survey-close" disabled={busy || !!savingId} aria-label="Đóng khảo sát, chỉnh sửa sau trong hồ sơ" onClick={onDismiss}>×</button><div className="survey-eyebrow">✦ GÓC BẾP MANG DẤU ẤN CỦA BẠN</div><div className="survey-progress" role="progressbar" aria-label="Tiến trình khảo sát" aria-valuemin={0} aria-valuemax={10} aria-valuenow={Math.min(step+1,10)}><span style={{width:`${Math.min(step+1,10)*10}%`}}/></div><Notice error={error || favorites.error}/><AnimatePresence mode="wait"><motion.div key={step} className="survey-step" aria-live="polite" initial={reduced?false:{opacity:0,x:24}} animate={{opacity:1,x:0}} exit={{opacity:0,x:-24}} transition={{duration:.2}}>
-    {step < 10 ? <><p className="survey-counter">Câu {step+1} / 10 · {questions[step].single?'Chọn một':'Có thể chọn nhiều'}</p><h2 id="survey-title">{questions[step].title}</h2><p>{questions[step].key === 'avoid' ? 'Ứng dụng chỉ dò thành phần ghi trong công thức; hãy kiểm tra nhãn thực phẩm và nguy cơ tiếp xúc chéo nếu bạn bị dị ứng.' : 'Chọn đáp án gần với bạn nhất để nhận gợi ý món.'}</p><BubbleChoices question={questions[step]} answers={answers} setAnswers={setAnswers} floating disabled={busy}/></> : <><p className="survey-counter">✨ Góc bếp của bạn đã sẵn sàng</p><h2 id="survey-title">Phong cách ăn uống của bạn</h2><div className="eating-style-card"><h3>{eatingStyle.title}</h3>{eatingStyle.details.map((detail,index)=><p key={index}>{detail}</p>)}<small>Nhận định được rút ra từ cách bạn kết hợp các lựa chọn; có thể chỉnh lại trong Hồ sơ.</small></div><h3 className="survey-preview-title">Món hợp gu để bạn thử</h3><p>{matches?.length || 0} món được xếp theo các tiêu chí gợi ý hiện có. Vuốt ngang để khám phá.</p><small>Điểm Hợp vị chỉ cho biết mức khớp lựa chọn. Chế độ ăn, dụng cụ và loại bữa có thể được suy luận từ công thức.</small><div className="quick-match-grid">{matches?.map(dish => <article className="quick-match-card" key={dish.id}><img src={media(dish.image)} alt={dish.name}/><span className="match-score" title={dish.match_reasons.join(' · ') || 'Chưa khớp tiêu chí'}>{dish.match_percent}% Hợp vị</span><h3>{dish.name}</h3><small>{dish.time} phút · {dish.difficulty}</small><button disabled={!!savingId || busy} type="button" aria-label={'Yêu thích '+dish.name} aria-pressed={favoriteIds.includes(dish.id)} className={favoriteIds.includes(dish.id)?'heart picked':'heart'} onClick={()=>favorite(dish.id)}>{favoriteIds.includes(dish.id)?'♥':'♡'}{favoriteIds.includes(dish.id)&&<i aria-hidden="true">✦</i>}</button></article>)}</div>{!matches?.length && <p>Chưa có món phù hợp để xem trước. Bạn vẫn có thể lưu sở thích.</p>}</>}
+    {step < 10 ? <><p className="survey-counter">Câu {step+1} / 10 · {questions[step].single?'Chọn một':'Có thể chọn nhiều'}</p><h2 id="survey-title">{questions[step].title}</h2><p>{questions[step].key === 'avoid' ? 'Ứng dụng chỉ dò thành phần ghi trong công thức; hãy kiểm tra nhãn thực phẩm và nguy cơ tiếp xúc chéo nếu bạn bị dị ứng.' : 'Chọn đáp án gần với bạn nhất để nhận gợi ý món.'}</p><BubbleChoices question={questions[step]} answers={answers} setAnswers={setAnswers} floating disabled={busy}/></> : <><p className="survey-counter">✨ Góc bếp của bạn đã sẵn sàng</p><h2 id="survey-title">Phong cách ăn uống của bạn</h2><div className="eating-style-card"><h3>{eatingStyle.title}</h3>{eatingStyle.details.map((detail,index)=><p key={index}>{detail}</p>)}<small>Nhận định được rút ra từ cách bạn kết hợp các lựa chọn; có thể chỉnh lại trong Hồ sơ.</small></div><h3 className="survey-preview-title">Món hợp gu để bạn thử</h3><p>{matches?.length || 0} món được xếp theo các tiêu chí gợi ý hiện có. Vuốt ngang để khám phá.</p><div className="quick-match-grid">{matches?.map(dish => <article className="quick-match-card" key={dish.id}><img src={media(dish.image)} alt={dish.name}/><h3>{dish.name}</h3><small>{dish.time} phút · {dish.difficulty}</small><button disabled={!!savingId || busy} type="button" aria-label={'Yêu thích '+dish.name} aria-pressed={favoriteIds.includes(dish.id)} className={favoriteIds.includes(dish.id)?'heart picked':'heart'} onClick={()=>favorite(dish.id)}>{favoriteIds.includes(dish.id)?'♥':'♡'}{favoriteIds.includes(dish.id)&&<i aria-hidden="true">✦</i>}</button></article>)}</div>{!matches?.length && <p>Chưa có món phù hợp để xem trước. Bạn vẫn có thể lưu sở thích.</p>}</>}
     </motion.div></AnimatePresence><footer className="survey-footer"><button type="button" disabled={busy || !!savingId} onClick={step>0?()=>{setError('');setStep(step-1);}:onDismiss}>{step>0?'← Quay lại':'Để sau'}</button>{step<10?<button type="button" className="survey-cta" disabled={busy || !hasAnswer(answers,questions[step])} onClick={advance}>{busy?'Đang ghép món…':step===9?'Xem nhận định & món gợi ý ✦':'Tiếp theo →'}</button>:<button type="button" className="survey-cta" disabled={busy || !!savingId} onClick={finish}>{busy?'Đang lưu…':'Lưu sở thích & bắt đầu khám phá ✦'}</button>}</footer><p className="survey-note">Bạn có thể thay đổi sở thích bất cứ lúc nào trong Hồ sơ cá nhân.</p></motion.section></motion.div>;
 }
 export function OnboardingSurvey({onComplete, onFavorites}) {

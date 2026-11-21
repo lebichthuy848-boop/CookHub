@@ -5,6 +5,7 @@ from time import monotonic
 from urllib.parse import urlparse
 from fastapi import FastAPI, Request, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
@@ -99,6 +100,7 @@ async def protect_requests(request: Request, call_next):
 app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins,
     allow_credentials=True, allow_methods=['GET','POST','PUT','DELETE','OPTIONS'],
     allow_headers=['Content-Type','X-CookHub-Client'])
+app.add_middleware(GZipMiddleware, minimum_size=1000, compresslevel=5)
 
 for router in (household_router, auth.router, catalog.router, personal.router, preferences.router, admin.router, uploads.router, backup.router):
     app.include_router(router, prefix='/api')

@@ -1,0 +1,69 @@
+STT: 89
+M· sè: 4007
+Th¶i bá (%): 10.5
+Thμnh phÇn dinh d−ìng
+(Nutrients)
+ĐV
+(Unit)
+Hμm lượng
+(Value)
+TLTK
+(Source)
+Thμnh phÇn dinh d−ìng
+(Nutrients)
+ĐV
+(Unit)
+Hμm lượng
+(Value)
+TLTK
+(Source)
+Nước (Water ) g 88.5 1 Tổng số isoflavon (Total isoflavone) mg -
+Năng lượng (Energy ) KCal 39 Daidzein mg -
+KJ 164 Genistein mg -
+Protein g 1.5 1 Glycetin mg -
+Lipid (Fat) g 0.2 3 Tổng số acid béo no g 0.040 3
+Glucid (Carbohydrate) g 7.8 1 (Total saturated fatty acid)
+Celluloza (Fiber) g 1.2 1 Palmitic (C16:0) g 0.040 3
+Tro (Ash) g 0.8 1 Margaric (C17:0) g 0.000 3
+Đường tổng số (Sugar) g 4.54 3 Stearic (C18:0) g 0.000 3
+Galactoza (Galactose) g 03 Arachidic (C20:0) g 0.000 3
+Maltoza (Maltose) g 03 Behenic (22:0) g 0.000 3
+Lactoza (Lactose) g 03 Lignoceric (C24:0) g 0.000 3
+Fructoza (Fructose) g 0.55 3 TS acid béo không no 1 nối đôi g 0.010 3
+Glucoza (Glucose) g 0.59 3 (Total monounsaturated fatty acid)
+Sacaroza (Sucrose) g 3.59 3 Myristoleic (C14:1) g 0.000 3
+Calci (Calcium) mg 43 1 Palmitoleic (C16:1) g 0.000 3
+Sắt (Iron) mg 0.80 1 Oleic (C18:1) g 0.010 3
+Magiê (Magnesium) mg 12 3 TS acid béo không no nhiềun ối đôi g 0 120 3
+Tªn thùc phÈm (Vietnamese): Cμ rèt (cñ ®á, vμng)
+Tªn tiÕng Anh (English): Carrots
+Thμnh phÇn dinh d−ìng trong 100g phÇn ¨n ®−îc (100 grams edible portion)
+Magiê (Magnesium) mg 12 3 TS acid béo không no nhiều nối đôi g 0.120 3
+Mangan (Manganese) mg 0.230 1 (Total polyunsaturated fatty acid)
+Phospho (Phosphorous) mg 39 1 Linoleic (C18:2 n6) g 0.120 3
+Kali (Potassium) mg 266 1 Linolenic (C18:2 n3) g 0.000 3
+Natri (Sodium) mg 52 1 Arachidonic (C20:4) g 0.000 3
+Kẽm  (Zinc) mg 1.11 1 Eicosapentaenoic  (C20:5 n3) g 0.000 3
+Đồng (Copper) μg 150 1 Docosahexaenoic (C22:6 n3) g 0.000 3
+Selen (Selenium) μg 0.1 3 TS acid béo trans (Total trans fatty acid) g -
+Vitamin C (Ascorbic acid) mg 81 Cholesterol mg 01
+Vitamin B1 (Thiamine) mg 0.06 1 Phytosterol mg -
+Vitamin B2 (Riboflavin) mg 0.06 1 Lysin mg 39 1
+Vitamin PP (Niacin) mg 0.4 1 Methionin mg 12 1
+Vitamin B5 (Pantothenic acid) mg 0.273 3 Tryptophan mg 71
+Vitamin B6 (Pyridoxine) mg 0.138 3 Phenylalanin mg 27 1
+Folat (Folate) μg 19 3 Threonin mg 29 1
+Vitamin B9 (Folic acid) μg 03 Valin mg 44 1
+Vitamin H (Biotin ) μg 3.4 5 Leucin mg 44 1
+Vitamin B12 (Cyanocobalamine) μg 03 Isoleucin mg 30 1
+Vitamin A (Retinol) μg 01 Arginin mg 44 1
+Vitamin D (Calciferol ) μg - Histidin mg 14 1
+Vitamin E (Alpha-tocopherol) mg - Cystin mg 10 1
+Vitamin K (Phylloquinone) μg - Tyrosin mg 22 1
+Beta-caroten μg 8285 3 Alanin mg 48 1
+Alpha-caroten μg 3477 3 Acid aspartic mg 117 1
+Beta-cryptoxanthin μg 125 3 Acid glutamic mg 194 1
+Lycopen μg 13 Glycin mg 29 1
+Lutein + Zeaxanthin μg 256 3 Prolin mg 28 1
+Purin mg 17 4 Serin mg 32 1
+89

@@ -1,0 +1,68 @@
+DOT 4 - UU TIEN MON CO LUONG AN VAO XAC DINH DUOC
+Ngày 20/11/2026. SQL CHƯA ĐƯỢC THỰC THI VÀO DB.
+
+CHẠY TRONG SSMS THEO THỨ TỰ
+01-ho-so-nguyen-lieu.sql
+02-chat-xo-theo-quy-tac-FAO.sql
+03-khong-tinh-nham-luong-so-che.sql
+04-kiem-tra-va-loc-demo.sql
+Mỗi file cập nhật là một giao dịch độc lập, có kiểm tra dữ liệu cũ và rollback khi lỗi.
+Nếu có lỗi, dừng và giữ nguyên điều kiện kiểm tra; không chạy tiếp bằng cách xóa THROW.
+04 chỉ SELECT để kiểm tra. Không chạy lại các gói đợt trước sau gói này vì dữ liệu đã thay đổi.
+
+NỘI DUNG THỰC SỰ ĐƯỢC CẬP NHẬT
+- 3 hồ sơ: khoai tây sống đã gọt vỏ USDA 11353; đậu hũ thường calcium sulfate USDA 16427;
+  lá tía tô sống Perilla frutescens var. crispa MEXT 06095.
+- Chỉ bổ sung ChatXo=0 còn thiếu cho 12 nguyên liệu động vật tự nhiên theo nguyên tắc
+  FAO/INFOODS. Đây là PRESUMED_ZERO có căn cứ sinh học, KHÔNG phải số xét nghiệm.
+  Không thay các chỉ số khác, không tự coi nước dùng hoặc hạt nêm là không có xơ.
+- Thêm 13 quy tắc nhận diện lượng ăn vào chưa rõ: dầu/bột áo sụn gà; hỗn hợp dầu chiên
+  chả giò; cà rốt lọc bã; bột rửa dâu; dịch đường ngâm dâu; nước ngâm kiệu/dưa.
+  GramAnDuocMoiMe giữ NULL, không tự ước tính tỷ lệ hấp thu hay tự điền 0.
+  Các quy tắc dùng cơ chế xử lý đã có của ứng dụng. Kcal đầy đủ có thể bị đánh dấu chưa
+  biết thay vì tiếp tục cộng lượng sơ chế không ăn vào. Đây là sửa sai cách diễn giải,
+  không phải làm đủ dữ liệu bằng cách bỏ nguyên liệu.
+
+NGUỒN
+USDA SR28 bản 05/2016, NUT_DATA.txt và FOOD_DES.txt trong ZIP chính thức:
+https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip
+MEXT 06095, bảng Nhật 2023:
+https://fooddb.mext.go.jp/details/details.pl?ITEM_NO=6_06095_7
+FAO/INFOODS 2012, trang PDF thứ 28, mục Absence of components in specific food groups:
+https://www.fao.org/fileadmin/templates/food_composition/documents/Guidelines_data_checking_02.pdf#page=28
+Phương pháp tính công thức, phần ăn được, thay đổi khi chế biến:
+https://www.fao.org/4/y4705e/y4705e23.htm
+Các món cụ thể được đối chiếu trực tiếp với bước chế biến đang lưu trong DB, không gán
+cho FAO là tác giả của những công thức đó. File co-xu-ly-che-bien.json ghi mã thành phần,
+đơn vị, số lượng và lý do để đối chiếu lại snapshot.
+
+PHÂN LOẠI DEMO
+phan-loai-80-mon-demo.csv có đủ 80 món:
+- 22 món tạm loại khỏi nhóm kiểm chứng dinh dưỡng demo do chiên ngập, lọc, ngâm, nước dùng,
+  phần sốt chỉ dùng một phần hoặc lượng ăn vào chưa xác định.
+- 20 món là hàng đợi ƯU TIÊN HOÀN THIỆN; KHÔNG phải 20 món đã hoàn chỉnh.
+- Các món khác chưa ưu tiên, không có nghĩa công thức bị xóa.
+Không xóa bất kỳ món hoặc thực đơn đang lưu. Danh sách tạm loại là tài liệu chọn món
+và kết quả SELECT của 04, không tự ẩn 22 món trên giao diện web.
+Món hấp, luộc, nướng cũng không mặc nhiên chính xác: cần phần thịt ăn được, nước bỏ đi,
+sốt thực sự dùng, đủ gia vị và khẩu phần chuẩn. Không dùng toàn bộ khối lượng xương.
+
+GIỚI HẠN VÀ CÁC ĐIỂM CHƯA CHỐT
+- Đủ 6 cột số không chứng nhận đã nhập đủ thành phần. Ví dụ MA215 còn thiếu gia vị ghi
+  trong bước làm; MA105 thiếu đường/tiêu/hạt nêm so với bước chế biến.
+- Không lấy carbohydrate khả dụng của MEXT làm tổng carbohydrate; không nhầm số đạm
+  theo amino acid với đạm thông thường. MEXT tía tô có tổng carbohydrate 7.5 g, xơ 7.3 g.
+- MEXT 05023 có bảng hạt sen tươi, nhưng mô tả chỉ xác nhận loại vỏ/áo, chưa xác nhận
+  bỏ tâm như công thức cháo. Chưa tự áp cho món cháo và chưa tuyên bố món đó hoàn tất.
+- PhilFCT G081 có thông tin cá lóc đúng loài, nhưng PDF chính thức lỗi HTTP khi tải;
+  chỉ ghi đầu mối tìm kiếm, chưa đưa vào SQL. Không coi chỉ mục tìm kiếm là kiểm chứng PDF.
+- Chất xơ được suy định theo FAO là dữ liệu có phương pháp, khác với đo trực tiếp.
+  Nếu chỉ chấp nhận số đo cho mọi chỉ số thì không chạy 02; các ô đó tiếp tục để thiếu.
+- Chưa khẳng định đủ 20 món hoặc xây xong thực đơn tháng. Cần kết quả 04 sau chạy SQL
+  và xác nhận định lượng thực tế của các mục thiếu trước khi chốt danh sách.
+
+TRUY VẾT
+01 lưu nguồn vào NguonDinhDuongDaDoiChieu.
+02 lưu nguồn THEO TỪNG CHỈ SỐ vào NguonDinhDuongChiSo và không thay giá trị xơ khác 0.
+03 không ghi đè lượng ăn được đã đo, không đổi số lượng nguyên liệu của công thức.
+Tất cả hồ sơ là tham khảo theo bảng thực phẩm, không phải xét nghiệm món sau nấu.

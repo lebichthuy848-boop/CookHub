@@ -1,0 +1,69 @@
+STT: 300
+M· sè: 7022
+Th¶i bá (%): 45.0
+Thμnh phÇn dinh d−ìng
+(Nutrients)
+ĐV
+(Unit)
+Hμm lượng
+(Value)
+TLTK
+(Source)
+Thμnh phÇn dinh d−ìng
+(Nutrients)
+ĐV
+(Unit)
+Hμm lượng
+(Value)
+TLTK
+(Source)
+Nước (Water ) g 74.3 1 Tổng số isoflavon (Total isoflavone) mg 03
+Năng lượng (Energy ) KCal 103 Daidzein mg 03
+KJ 431 Genistein mg 03
+Protein g 23.5 1 Glycetin mg 03
+Lipid (Fat) g 1.0 1 Tổng số acid béo no g 0.690 3
+Glucid (Carbohydrate) g 0.0 1 (Total saturated fatty acid)
+Celluloza (Fiber) g 0.0 1 Palmitic (C16:0) g 0.520 3
+Tro (Ash) g 1.2 1 Margaric (C17:0) g 0.000 3
+Đường tổng số (Sugar) g - Stearic (C18:0) g 0.110 3
+Galactoza (Galactose) g - Arachidic (C20:0) g 0.000 3
+Maltoza (Maltose) g - Behenic (22:0) g 0.000 3
+Lactoza (Lactose) g - Lignoceric (C24:0) g 0.000 3
+Fructoza (Fructose) g - TS acid béo không no 1 nối đôi g 0.630 3
+Glucoza (Glucose) g - (Total monounsaturated fatty acid)
+Sacaroza (Sucrose) g - Myristoleic (C14:1) g 0.000 3
+Calci (Calcium) mg 17 1 Palmitoleic (C16:1) g 0.080 3
+Sắt (Iron) mg 4.80 1 Oleic (C18:1) g 0.540 3
+Magiê (Magnesium) mg 29 3 TS acid béo không no nhiềun ối đôi g 0 450 3
+Tªn thùc phÈm (Vietnamese): ThÞt thá rõng
+Tªn tiÕng Anh (English): Hare rabbit (field or wild)
+Thμnh phÇn dinh d−ìng trong 100g phÇn ¨n ®−îc (100 grams edible portion)
+Magiê (Magnesium) mg 29 3 TS acid béo không no nhiều nối đôi g 0.450 3
+Mangan (Manganese) mg - (Total polyunsaturated fatty acid)
+Phospho (Phosphorous) mg 226 1 Linoleic (C18:2 n6) g 0.360 3
+Kali (Potassium) mg 378 3 Linolenic (C18:2 n3) g 0.090 3
+Natri (Sodium) mg 50 3 Arachidonic (C20:4) g 0.000 3
+Kẽm  (Zinc) mg - Eicosapentaenoic  (C20:5 n3) g 0.000 3
+Đồng (Copper) μg - Docosahexaenoic (C22:6 n3) g 0.000 3
+Selen (Selenium) μg 9.4 3 TS acid béo trans (Total trans fatty acid) g -
+Vitamin C (Ascorbic acid) mg - Cholesterol mg 81 3
+Vitamin B1 (Thiamine) mg 0.09 1 Phytosterol mg -
+Vitamin B2 (Riboflavin) mg 0.06 1 Lysin mg 1908 3
+Vitamin PP (Niacin) mg 8.1 1 Methionin mg 545 3
+Vitamin B5 (Pantothenic acid) mg - Tryptophan mg 288 3
+Vitamin B6 (Pyridoxine) mg - Phenylalanin mg 895 3
+Folat (Folate) μg - Threonin mg 975 3
+Vitamin B9 (Folic acid) μg - Valin mg 1108 3
+Vitamin H (Biotin ) μg - Leucin mg 1698 3
+Vitamin B12 (Cyanocobalamine) μg - Isoleucin mg 1034 3
+Vitamin A (Retinol) μg - Arginin mg 1346 3
+Vitamin D (Calciferol ) μg - Histidin mg 611 3
+Vitamin E (Alpha-tocopherol) mg - Cystin mg 274 3
+Vitamin K (Phylloquinone) μg - Tyrosin mg 776 3
+Beta-caroten μg 03 Alanin mg 1315 3
+Alpha-caroten μg 03 Acid aspartic mg 2129 3
+Beta-cryptoxanthin μg 03 Acid glutamic mg 3496 3
+Lycopen μg 03 Glycin mg 1183 3
+Lutein + Zeaxanthin μg 03 Prolin mg 1065 3
+Purin mg - Serin mg 966 3
+300

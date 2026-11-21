@@ -1,0 +1,50 @@
+[
+  {
+    "id": "NL003",
+    "name": "Bún tươi",
+    "source": "https://inmu.mahidol.ac.th/thaifcd/foodsearch/food_name_result?selected_id=166&selected_dbcode=STD&selected_name=%E0%B8%82%E0%B8%99%E0%B8%A1%E0%B8%88%E0%B8%B5%E0%B8%99&food_name=%E0%B8%82%E0%B8%99%E0%B8%A1%E0%B8%88%E0%B8%B5%E0%B8%99&mode=food_group_result",
+    "code": "Thai FCD A8 / STD 166",
+    "description": "Noodles, rice, fermented (kanom-jeen), Oryza sativa",
+    "values": [
+      "103",
+      "1.43",
+      "23.70",
+      "0.31",
+      "0.3",
+      "47"
+    ],
+    "note": "Chọn mẫu bún GẠO TƯƠI LÊN MEN kanom-jeen, không phải bún khô/bún gạo lứt; 100 g phần ăn được. Thai FCD A8, độ ẩm 74.4%. Kcal/đạm/béo/xơ/natri lấy cùng hồ sơ. Carbohydrate TỔNG 23.70 g được TÍNH theo chênh lệch: 100-74.4 nước-1.43 đạm-0.31 béo-0.16 tro. Không chép 23.42 g carbohydrate KHẢ DỤNG thành tổng. Có sai khác làm tròn giữa các giá trị trung bình nguồn. Đây là hồ sơ tham chiếu theo loại bún đã chọn, không phải kiểm nghiệm mọi loại bún Việt Nam; không tự coi bún không lên men là cùng mẫu."
+  },
+  {
+    "id": "NL914",
+    "name": "Bún ăn kèm",
+    "source": "https://inmu.mahidol.ac.th/thaifcd/foodsearch/food_name_result?selected_id=166&selected_dbcode=STD&selected_name=%E0%B8%82%E0%B8%99%E0%B8%A1%E0%B8%88%E0%B8%B5%E0%B8%99&food_name=%E0%B8%82%E0%B8%99%E0%B8%A1%E0%B8%88%E0%B8%B5%E0%B8%99&mode=food_group_result",
+    "code": "Thai FCD A8 / STD 166",
+    "description": "Noodles, rice, fermented (kanom-jeen), Oryza sativa",
+    "values": [
+      "103",
+      "1.43",
+      "23.70",
+      "0.31",
+      "0.3",
+      "47"
+    ],
+    "note": "Chọn mẫu bún GẠO TƯƠI LÊN MEN kanom-jeen, không phải bún khô/bún gạo lứt; 100 g phần ăn được. Thai FCD A8, độ ẩm 74.4%. Kcal/đạm/béo/xơ/natri lấy cùng hồ sơ. Carbohydrate TỔNG 23.70 g được TÍNH theo chênh lệch: 100-74.4 nước-1.43 đạm-0.31 béo-0.16 tro. Không chép 23.42 g carbohydrate KHẢ DỤNG thành tổng. Có sai khác làm tròn giữa các giá trị trung bình nguồn. Đây là hồ sơ tham chiếu theo loại bún đã chọn, không phải kiểm nghiệm mọi loại bún Việt Nam; không tự coi bún không lên men là cùng mẫu."
+  },
+  {
+    "id": "NL1199",
+    "name": "Riềng",
+    "source": "https://inmu.mahidol.ac.th/thaifcd/foodsearch/food_name_result?selected_id=232&selected_dbcode=STD&selected_name=galanga&food_name=galanga&mode=food_group_result",
+    "code": "Thai FCD N11 / STD 232",
+    "description": "Galanga / Alpinia galanga",
+    "values": [
+      "35",
+      "0.69",
+      "7.79",
+      "0.17",
+      null,
+      "82"
+    ],
+    "note": "Chọn riềng Alpinia galanga sống làm mẫu tham khảo, 100 g phần ăn được. Không áp cho gừng hoặc riềng khô/bột. Nguồn không công bố chất xơ: giữ NULL. Chưa giải quyết khối lượng của một nhánh riềng; không mượn xơ của riềng NON để lấp."
+  }
+]

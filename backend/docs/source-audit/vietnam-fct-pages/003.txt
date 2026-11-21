@@ -1,0 +1,23 @@
+ii 
+ 
+MỤC LỤC 
+ 
+Lời mở đầu iii 
+Giới thiệu Bảng thành phần thực phẩm Việt Nam iv 
+Một số nguyên tắc xây dựng Bảng thành phần thực phẩm vi 
+THÀNH PHẦN CÁC CHẤT DINH DƯỠNG  
+Nhóm 1: Ngũ cốc và sản phẩm chế biến 1 
+Nhóm 2: Khoai củ và sản phẩm chế biến  24 
+Nhóm 3: Hạt, quả giàu đạm, béo và sản phẩm chế biến 50 
+Nhóm 4: Rau, quả, củ dùng làm rau 83 
+Nhóm 5: Quả chín 209 
+Nhóm 6: Dầu, mỡ, bơ 265 
+Nhóm 7: Thịt và sản phẩm chế biến 279 
+Nhóm 8: Thủy sản và sản phẩm chế biến 361 
+Nhóm 9: Trứng và sản phẩm chế biến 420 
+Nhóm 10: Sữa và sản phẩm chế biến 431 
+Nhóm 11: Đồ hộp 440 
+Nhóm 12: Đồ ngọt (đường, bánh, mứt, kẹo) 461 
+Nhóm 13: Gia vị, nước chấm 488 
+Nhóm 14: Nước giải khát, bia, rượu 511 
+ 

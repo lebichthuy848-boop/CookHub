@@ -30,6 +30,7 @@ it('restricts media URLs',()=>{
   expect(media('javascript:alert(1)')).toBe(media('images/logo.jpg'));
   expect(media('images/../secret')).toBe(media('images/logo.jpg'));
   expect(media('images/mon-an/ca-hoi-ap-chao.jpg')).toMatch(/^https:\/\/res\.cloudinary\.com\//);
+  expect(media('images/mon-an/ca-hoi-ap-chao.jpg',{width:100,height:100})).toContain('/image/upload/f_auto,q_auto:eco,w_100,h_100,c_fill/');
   expect(media('images/mon-an/test.jpg')).toMatch(/^\/images\/mon-an\/test\.jpg\?v=\d{8}-\d+$/);
   expect(media('videos/uploads/test.mp4')).toBe('/media/videos/uploads/test.mp4');
 });

@@ -1,0 +1,7174 @@
+{
+  "summary": [
+    {
+      "id": "MA946",
+      "name": "Bạch tuộc trộn khế sốt Thái",
+      "sodium_known_mg": 11249.44,
+      "missing_rows": 10
+    },
+    {
+      "id": "MA209",
+      "name": "Bánh bao đào tiên",
+      "sodium_known_mg": 300.4,
+      "missing_rows": 3
+    },
+    {
+      "id": "MA206",
+      "name": "Bánh bao nhân thịt trứng",
+      "sodium_known_mg": 658.65,
+      "missing_rows": 4
+    },
+    {
+      "id": "MA205",
+      "name": "Bánh bò thốt nốt nướng",
+      "sodium_known_mg": 401.25,
+      "missing_rows": 4
+    },
+    {
+      "id": "MA204",
+      "name": "Bánh bông lan bơ nho",
+      "sodium_known_mg": 310.95,
+      "missing_rows": 2
+    },
+    {
+      "id": "MA201",
+      "name": "Bánh bột lọc nhân tôm thịt bằng bánh tráng",
+      "sodium_known_mg": 1572.66,
+      "missing_rows": 5
+    },
+    {
+      "id": "MA202",
+      "name": "Bánh mochi nhân kem sầu riêng",
+      "sodium_known_mg": 280.59,
+      "missing_rows": 2
+    },
+    {
+      "id": "MA948",
+      "name": "Bánh tét trứng muối",
+      "sodium_known_mg": 2911.7,
+      "missing_rows": 1
+    },
+    {
+      "id": "MA947",
+      "name": "Bánh tro",
+      "sodium_known_mg": 310.82,
+      "missing_rows": 1
+    },
+    {
+      "id": "MA219",
+      "name": "Bingsu trái cây",
+      "sodium_known_mg": 509.67,
+      "missing_rows": 2
+    },
+    {
+      "id": "MA935",
+      "name": "Bò kho miền Nam",
+      "sodium_known_mg": 236.31,
+      "missing_rows": 5
+    },
+    {
+      "id": "MA923",
+      "name": "Cá lóc hấp tương",
+      "sodium_known_mg": 44.23,
+      "missing_rows": 4
+    },
+    {
+      "id": "MA913",
+      "name": "Cá lóc kho tộ",
+      "sodium_known_mg": 17.0,
+      "missing_rows": 2
+    },
+    {
+      "id": "MA934",
+      "name": "Cà ri bò",
+      "sodium_known_mg": 254.2,
+      "missing_rows": 2
+    },
+    {
+      "id": "MA938",
+      "name": "Cà ri xanh chay",
+      "sodium_known_mg": 3225.58,
+      "missing_rows": 10
+    },
+    {
+      "id": "MA903",
+      "name": "Cá saba nướng mỡ hành",
+      "sodium_known_mg": 1184.61,
+      "missing_rows": 3
+    },
+    {
+      "id": "MA911",
+      "name": "Cà tím xào tỏi ớt",
+      "sodium_known_mg": 256.68,
+      "missing_rows": 3
+    },
+    {
+      "id": "MA104",
+      "name": "Canh chua cá lóc",
+      "sodium_known_mg": 364.2,
+      "missing_rows": 4
+    },
+    {
+      "id": "MA105",
+      "name": "Canh khổ qua nhồi thịt",
+      "sodium_known_mg": 795.3,
+      "missing_rows": 0
+    },
+    {
+      "id": "MA101",
+      "name": "Canh kim chi thịt bò",
+      "sodium_known_mg": 1130.83,
+      "missing_rows": 3
+    },
+    {
+      "id": "MA109",
+      "name": "Canh sườn hầm hạt sen",
+      "sodium_known_mg": 2184.32,
+      "missing_rows": 2
+    },
+    {
+      "id": "MA108",
+      "name": "Canh tôm mọc hạt sen",
+      "sodium_known_mg": 2718.19,
+      "missing_rows": 0
+    },
+    {
+      "id": "MA918",
+      "name": "Chả giò miền Nam",
+      "sodium_known_mg": 18.21,
+      "missing_rows": 2
+    },
+    {
+      "id": "MA905",
+      "name": "Cháo thịt bằm tía tô",
+      "sodium_known_mg": 317.35,
+      "missing_rows": 2
+    },
+    {
+      "id": "MA906",
+      "name": "Cháo tôm bí đỏ bằng máy xay nấu đa năng",
+      "sodium_known_mg": 143.84,
+      "missing_rows": 0
+    },
+    {
+      "id": "MA214",
+      "name": "Chè đậu đỏ bột lọc",
+      "sodium_known_mg": 39.42,
+      "missing_rows": 5
+    },
+    {
+      "id": "MA213",
+      "name": "Chè khúc bạch",
+      "sodium_known_mg": 143.86,
+      "missing_rows": 0
+    },
+    {
+      "id": "MA210",
+      "name": "Chè trái lê táo đỏ",
+      "sodium_known_mg": 34.63,
+      "missing_rows": 2
+    },
+    {
+      "id": "MA937",
+      "name": "Cơm chay lá sen",
+      "sodium_known_mg": 711.11,
+      "missing_rows": 4
+    },
+    {
+      "id": "MA919",
+      "name": "Cơm chiên dứa",
+      "sodium_known_mg": 822.38,
+      "missing_rows": 2
+    },
+    {
+      "id": "MA933",
+      "name": "Cơm thăn bò rong biển",
+      "sodium_known_mg": 422.75,
+      "missing_rows": 2
+    },
+    {
+      "id": "MA945",
+      "name": "Cơm trộn bằng nồi cơm điện",
+      "sodium_known_mg": 3869.78,
+      "missing_rows": 3
+    },
+    {
+      "id": "MA203",
+      "name": "Cream brulee",
+      "sodium_known_mg": 362.85,
+      "missing_rows": 1
+    },
+    {
+      "id": "MA943",
+      "name": "Củ kiệu chua ngọt",
+      "sodium_known_mg": 49.0,
+      "missing_rows": 2
+    },
+    {
+      "id": "MA916",
+      "name": "Đậu hũ non chiên xù",
+      "sodium_known_mg": 7.0,
+      "missing_rows": 4
+    },
+    {
+      "id": "MA949",
+      "name": "Dưa cải muối",
+      "sodium_known_mg": 4697.35,
+      "missing_rows": 1
+    },
+    {
+      "id": "MA941",
+      "name": "Dưa hấu chanh tuyết",
+      "sodium_known_mg": 11.63,
+      "missing_rows": 1
+    },
+    {
+      "id": "MA102",
+      "name": "Gà ác hầm sâm",
+      "sodium_known_mg": 344.86,
+      "missing_rows": 3
+    },
+    {
+      "id": "MA920",
+      "name": "Gà hấp muối sả",
+      "sodium_known_mg": 48754.11,
+      "missing_rows": 5
+    },
+    {
+      "id": "MA902",
+      "name": "Gà nướng muối sả",
+      "sodium_known_mg": 3228.15,
+      "missing_rows": 3
+    },
+    {
+      "id": "MA103",
+      "name": "Gà tiềm thuốc bắc",
+      "sodium_known_mg": 9.0,
+      "missing_rows": 10
+    },
+    {
+      "id": "MA107",
+      "name": "Giò heo hầm đậu nành",
+      "sodium_known_mg": 1856.95,
+      "missing_rows": 3
+    },
+    {
+      "id": "MA930",
+      "name": "Gỏi hàu sốt Thái",
+      "sodium_known_mg": 983.48,
+      "missing_rows": 3
+    },
+    {
+      "id": "MA931",
+      "name": "Gỏi ngó sen chay",
+      "sodium_known_mg": 939.99,
+      "missing_rows": 3
+    },
+    {
+      "id": "MA932",
+      "name": "Hải sản sốt Thái",
+      "sodium_known_mg": 1582.71,
+      "missing_rows": 3
+    },
+    {
+      "id": "MA217",
+      "name": "Kem chuối que",
+      "sodium_known_mg": 151.34,
+      "missing_rows": 2
+    },
+    {
+      "id": "MA218",
+      "name": "Kem trái cây nước dừa",
+      "sodium_known_mg": 1.36,
+      "missing_rows": 1
+    },
+    {
+      "id": "MA944",
+      "name": "Khô heo tẩm vị xé sợi",
+      "sodium_known_mg": 4363.75,
+      "missing_rows": 7
+    },
+    {
+      "id": "MA924",
+      "name": "Lẩu bò Mông Cổ",
+      "sodium_known_mg": 60.27,
+      "missing_rows": 10
+    },
+    {
+      "id": "MA925",
+      "name": "Lẩu bò nhúng giấm (dấm)",
+      "sodium_known_mg": 212.33,
+      "missing_rows": 4
+    },
+    {
+      "id": "MA926",
+      "name": "Lẩu cua đồng",
+      "sodium_known_mg": 73.08,
+      "missing_rows": 5
+    },
+    {
+      "id": "MA928",
+      "name": "Lẩu gà ớt hiểm",
+      "sodium_known_mg": 2268.76,
+      "missing_rows": 2
+    },
+    {
+      "id": "MA929",
+      "name": "Lẩu kim chi Hàn Quốc",
+      "sodium_known_mg": 646.5,
+      "missing_rows": 1
+    },
+    {
+      "id": "MA951",
+      "name": "Matcha latte thạch trà xanh",
+      "sodium_known_mg": 54.38,
+      "missing_rows": 2
+    },
+    {
+      "id": "MA907",
+      "name": "Mì Ý gà giòn sốt kem",
+      "sodium_known_mg": 624.55,
+      "missing_rows": 7
+    },
+    {
+      "id": "MA908",
+      "name": "Nấm xào chua ngọt chay",
+      "sodium_known_mg": 167.18,
+      "missing_rows": 1
+    },
+    {
+      "id": "MA901",
+      "name": "Nem nướng Ninh Hòa",
+      "sodium_known_mg": 1214.32,
+      "missing_rows": 7
+    },
+    {
+      "id": "MA922",
+      "name": "Nghêu hấp Thái",
+      "sodium_known_mg": 1699.19,
+      "missing_rows": 3
+    },
+    {
+      "id": "MA942",
+      "name": "Nước ép cà rốt bằng máy xay sinh tố",
+      "sodium_known_mg": 62.12,
+      "missing_rows": 1
+    },
+    {
+      "id": "MA912",
+      "name": "Ốc móng tay xào bơ tỏi",
+      "sodium_known_mg": 256.11,
+      "missing_rows": 5
+    },
+    {
+      "id": "MA921",
+      "name": "Ốc nhồi hấp sả",
+      "sodium_known_mg": 2.49,
+      "missing_rows": 6
+    },
+    {
+      "id": "MA230",
+      "name": "Phở bò",
+      "sodium_known_mg": 326.95,
+      "missing_rows": 4
+    },
+    {
+      "id": "MA936",
+      "name": "Phở cuốn chay",
+      "sodium_known_mg": 912.59,
+      "missing_rows": 6
+    },
+    {
+      "id": "MA208",
+      "name": "Pudding xoài",
+      "sodium_known_mg": 86.39,
+      "missing_rows": 0
+    },
+    {
+      "id": "MA909",
+      "name": "Răng mực xào bơ tỏi",
+      "sodium_known_mg": 745.55,
+      "missing_rows": 1
+    },
+    {
+      "id": "MA215",
+      "name": "Sủi cảo",
+      "sodium_known_mg": 154.27,
+      "missing_rows": 0
+    },
+    {
+      "id": "MA917",
+      "name": "Sụn gà chiên nước mắm",
+      "sodium_known_mg": 2360.2,
+      "missing_rows": 4
+    },
+    {
+      "id": "MA110",
+      "name": "Sườn cay khổng lồ kiểu Thái",
+      "sodium_known_mg": 2477.61,
+      "missing_rows": 1
+    },
+    {
+      "id": "MA904",
+      "name": "Sườn đút lò",
+      "sodium_known_mg": 1546.54,
+      "missing_rows": 2
+    },
+    {
+      "id": "MA914",
+      "name": "Sườn kho thơm (dứa)",
+      "sodium_known_mg": 1288.54,
+      "missing_rows": 2
+    },
+    {
+      "id": "MA212",
+      "name": "Sương sáo nước cốt dừa",
+      "sodium_known_mg": 47.67,
+      "missing_rows": 3
+    },
+    {
+      "id": "MA106",
+      "name": "Súp hải sản tuyết yến",
+      "sodium_known_mg": 1432.16,
+      "missing_rows": 5
+    },
+    {
+      "id": "MA216",
+      "name": "Súp hoành thánh chiên nhân chay",
+      "sodium_known_mg": 1659.39,
+      "missing_rows": 6
+    },
+    {
+      "id": "MA211",
+      "name": "Tàu hủ nước đường bằng máy xay sinh tố",
+      "sodium_known_mg": 4.68,
+      "missing_rows": 4
+    },
+    {
+      "id": "MA915",
+      "name": "Thịt kho tàu bằng nồi áp suất",
+      "sodium_known_mg": 830.95,
+      "missing_rows": 2
+    },
+    {
+      "id": "MA910",
+      "name": "Tôm sốt phô mai",
+      "sodium_known_mg": 1257.57,
+      "missing_rows": 4
+    },
+    {
+      "id": "MA939",
+      "name": "Trà dâu ngâm",
+      "sodium_known_mg": 1.8,
+      "missing_rows": 3
+    },
+    {
+      "id": "MA950",
+      "name": "Trà sữa trân châu",
+      "sodium_known_mg": 32.7,
+      "missing_rows": 3
+    },
+    {
+      "id": "MA940",
+      "name": "Trân châu phô mai",
+      "sodium_known_mg": 0.23,
+      "missing_rows": 2
+    },
+    {
+      "id": "MA927",
+      "name": "Vịt nấu chao",
+      "sodium_known_mg": 72.44,
+      "missing_rows": 9
+    }
+  ],
+  "ingredients": [
+    {
+      "MaMonAn": "MA946",
+      "TenMonAn": "Bạch tuộc trộn khế sốt Thái",
+      "MaThanhPhan": "TP93877",
+      "MaNguyenLieu": "NL050",
+      "TenNguyenLieu": "Hành lá",
+      "Natri": "2.40000000"
+    },
+    {
+      "MaMonAn": "MA946",
+      "TenMonAn": "Bạch tuộc trộn khế sốt Thái",
+      "MaThanhPhan": "TP93876",
+      "MaNguyenLieu": "NL052",
+      "TenNguyenLieu": "Gừng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA946",
+      "TenMonAn": "Bạch tuộc trộn khế sốt Thái",
+      "MaThanhPhan": "TP93888",
+      "MaNguyenLieu": "NL070",
+      "TenNguyenLieu": "Nước mắm",
+      "Natri": "785.10000393"
+    },
+    {
+      "MaMonAn": "MA946",
+      "TenMonAn": "Bạch tuộc trộn khế sốt Thái",
+      "MaThanhPhan": "TP93889",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA946",
+      "TenMonAn": "Bạch tuộc trộn khế sốt Thái",
+      "MaThanhPhan": "TP93892",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": "9689.50001938"
+    },
+    {
+      "MaMonAn": "MA946",
+      "TenMonAn": "Bạch tuộc trộn khế sốt Thái",
+      "MaThanhPhan": "TP93891",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.20000000"
+    },
+    {
+      "MaMonAn": "MA946",
+      "TenMonAn": "Bạch tuộc trộn khế sốt Thái",
+      "MaThanhPhan": "TP93882",
+      "MaNguyenLieu": "NL1058",
+      "TenNguyenLieu": "Hành tím băm",
+      "Natri": "0.59999999"
+    },
+    {
+      "MaMonAn": "MA946",
+      "TenMonAn": "Bạch tuộc trộn khế sốt Thái",
+      "MaThanhPhan": "TP93872",
+      "MaNguyenLieu": "NL1179",
+      "TenNguyenLieu": "Bạch tuộc",
+      "Natri": "766.66665900"
+    },
+    {
+      "MaMonAn": "MA946",
+      "TenMonAn": "Bạch tuộc trộn khế sốt Thái",
+      "MaThanhPhan": "TP93873",
+      "MaNguyenLieu": "NL1216",
+      "TenNguyenLieu": "Khế",
+      "Natri": "0.82666666"
+    },
+    {
+      "MaMonAn": "MA946",
+      "TenMonAn": "Bạch tuộc trộn khế sốt Thái",
+      "MaThanhPhan": "TP93874",
+      "MaNguyenLieu": "NL1217",
+      "TenNguyenLieu": "Chuối chát",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA946",
+      "TenMonAn": "Bạch tuộc trộn khế sốt Thái",
+      "MaThanhPhan": "TP93875",
+      "MaNguyenLieu": "NL1218",
+      "TenNguyenLieu": "Ớt sừng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA946",
+      "TenMonAn": "Bạch tuộc trộn khế sốt Thái",
+      "MaThanhPhan": "TP93878",
+      "MaNguyenLieu": "NL1219",
+      "TenNguyenLieu": "Tắc",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA946",
+      "TenMonAn": "Bạch tuộc trộn khế sốt Thái",
+      "MaThanhPhan": "TP93880",
+      "MaNguyenLieu": "NL1220",
+      "TenNguyenLieu": "Rau thơm",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA946",
+      "TenMonAn": "Bạch tuộc trộn khế sốt Thái",
+      "MaThanhPhan": "TP93881",
+      "MaNguyenLieu": "NL1221",
+      "TenNguyenLieu": "Bột ớt Hàn Quốc",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA946",
+      "TenMonAn": "Bạch tuộc trộn khế sốt Thái",
+      "MaThanhPhan": "TP93883",
+      "MaNguyenLieu": "NL1222",
+      "TenNguyenLieu": "Sa tế",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA946",
+      "TenMonAn": "Bạch tuộc trộn khế sốt Thái",
+      "MaThanhPhan": "TP93884",
+      "MaNguyenLieu": "NL1223",
+      "TenNguyenLieu": "Muối tôm",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA946",
+      "TenMonAn": "Bạch tuộc trộn khế sốt Thái",
+      "MaThanhPhan": "TP93887",
+      "MaNguyenLieu": "NL1224",
+      "TenNguyenLieu": "Nước cốt me",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA946",
+      "TenMonAn": "Bạch tuộc trộn khế sốt Thái",
+      "MaThanhPhan": "TP93890",
+      "MaNguyenLieu": "NL151",
+      "TenNguyenLieu": "Đường thốt nốt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA946",
+      "TenMonAn": "Bạch tuộc trộn khế sốt Thái",
+      "MaThanhPhan": "TP93879",
+      "MaNguyenLieu": "NL907",
+      "TenNguyenLieu": "Tỏi băm",
+      "Natri": "0.89999999"
+    },
+    {
+      "MaMonAn": "MA946",
+      "TenMonAn": "Bạch tuộc trộn khế sốt Thái",
+      "MaThanhPhan": "TP93885",
+      "MaNguyenLieu": "NL952",
+      "TenNguyenLieu": "Giấm",
+      "Natri": "0.74500000"
+    },
+    {
+      "MaMonAn": "MA946",
+      "TenMonAn": "Bạch tuộc trộn khế sốt Thái",
+      "MaThanhPhan": "TP93886",
+      "MaNguyenLieu": "NL997",
+      "TenNguyenLieu": "Tương ớt",
+      "Natri": "2.50000001"
+    },
+    {
+      "MaMonAn": "MA209",
+      "TenMonAn": "Bánh bao đào tiên",
+      "MaThanhPhan": "TP20908",
+      "MaNguyenLieu": "NL067",
+      "TenNguyenLieu": "Sữa tươi không đường",
+      "Natri": "1.34375000"
+    },
+    {
+      "MaMonAn": "MA209",
+      "TenMonAn": "Bánh bao đào tiên",
+      "MaThanhPhan": "TP20903",
+      "MaNguyenLieu": "NL068",
+      "TenNguyenLieu": "Nước cốt dừa",
+      "Natri": "1.31250000"
+    },
+    {
+      "MaMonAn": "MA209",
+      "TenMonAn": "Bánh bao đào tiên",
+      "MaThanhPhan": "TP20905",
+      "MaNguyenLieu": "NL069",
+      "TenNguyenLieu": "Bơ lạt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA209",
+      "TenMonAn": "Bánh bao đào tiên",
+      "MaThanhPhan": "TP20911",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": "218.01375000"
+    },
+    {
+      "MaMonAn": "MA209",
+      "TenMonAn": "Bánh bao đào tiên",
+      "MaThanhPhan": "TP20910",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.09375000"
+    },
+    {
+      "MaMonAn": "MA209",
+      "TenMonAn": "Bánh bao đào tiên",
+      "MaThanhPhan": "TP20902",
+      "MaNguyenLieu": "NL079",
+      "TenNguyenLieu": "Bột bắp",
+      "Natri": "0.22500000"
+    },
+    {
+      "MaMonAn": "MA209",
+      "TenMonAn": "Bánh bao đào tiên",
+      "MaThanhPhan": "TP20912",
+      "MaNguyenLieu": "NL093",
+      "TenNguyenLieu": "Bột nở",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA209",
+      "TenMonAn": "Bánh bao đào tiên",
+      "MaThanhPhan": "TP20907",
+      "MaNguyenLieu": "NL145",
+      "TenNguyenLieu": "Bột mì số 8",
+      "Natri": "1.45000000"
+    },
+    {
+      "MaMonAn": "MA209",
+      "TenMonAn": "Bánh bao đào tiên",
+      "MaThanhPhan": "TP20916",
+      "MaNguyenLieu": "NL148",
+      "TenNguyenLieu": "Củ dền",
+      "Natri": "3.99750000"
+    },
+    {
+      "MaMonAn": "MA209",
+      "TenMonAn": "Bánh bao đào tiên",
+      "MaThanhPhan": "TP20901",
+      "MaNguyenLieu": "NL154",
+      "TenNguyenLieu": "Lòng đỏ trứng gà",
+      "Natri": "5.40000000"
+    },
+    {
+      "MaMonAn": "MA209",
+      "TenMonAn": "Bánh bao đào tiên",
+      "MaThanhPhan": "TP20914",
+      "MaNguyenLieu": "NL155",
+      "TenNguyenLieu": "Lòng trắng trứng",
+      "Natri": "8.86875000"
+    },
+    {
+      "MaMonAn": "MA209",
+      "TenMonAn": "Bánh bao đào tiên",
+      "MaThanhPhan": "TP20909",
+      "MaNguyenLieu": "NL156",
+      "TenNguyenLieu": "Men nở",
+      "Natri": "0.19125000"
+    },
+    {
+      "MaMonAn": "MA209",
+      "TenMonAn": "Bánh bao đào tiên",
+      "MaThanhPhan": "TP20915",
+      "MaNguyenLieu": "NL167",
+      "TenNguyenLieu": "Tangzhong",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA209",
+      "TenMonAn": "Bánh bao đào tiên",
+      "MaThanhPhan": "TP20904",
+      "MaNguyenLieu": "NL170",
+      "TenNguyenLieu": "Vani",
+      "Natri": "0.02812500"
+    },
+    {
+      "MaMonAn": "MA209",
+      "TenMonAn": "Bánh bao đào tiên",
+      "MaThanhPhan": "TP20913",
+      "MaNguyenLieu": "NL171",
+      "TenNguyenLieu": "Whipping cream",
+      "Natri": "2.19375000"
+    },
+    {
+      "MaMonAn": "MA209",
+      "TenMonAn": "Bánh bao đào tiên",
+      "MaThanhPhan": "TP20906",
+      "MaNguyenLieu": "NL321",
+      "TenNguyenLieu": "Sữa tươi",
+      "Natri": "57.28125000"
+    },
+    {
+      "MaMonAn": "MA206",
+      "TenMonAn": "Bánh bao nhân thịt trứng",
+      "MaThanhPhan": "TP20609",
+      "MaNguyenLieu": "NL016",
+      "TenNguyenLieu": "Thịt heo xay",
+      "Natri": "34.00000000"
+    },
+    {
+      "MaMonAn": "MA206",
+      "TenMonAn": "Bánh bao nhân thịt trứng",
+      "MaThanhPhan": "TP20604",
+      "MaNguyenLieu": "NL049",
+      "TenNguyenLieu": "Hành tím",
+      "Natri": "1.50000000"
+    },
+    {
+      "MaMonAn": "MA206",
+      "TenMonAn": "Bánh bao nhân thịt trứng",
+      "MaThanhPhan": "TP20608",
+      "MaNguyenLieu": "NL067",
+      "TenNguyenLieu": "Sữa tươi không đường",
+      "Natri": "16.77000000"
+    },
+    {
+      "MaMonAn": "MA206",
+      "TenMonAn": "Bánh bao nhân thịt trứng",
+      "MaThanhPhan": "TP20602",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA206",
+      "TenMonAn": "Bánh bao nhân thịt trứng",
+      "MaThanhPhan": "TP20605",
+      "MaNguyenLieu": "NL097",
+      "TenNguyenLieu": "Hạt nêm",
+      "Natri": "490.90725000"
+    },
+    {
+      "MaMonAn": "MA206",
+      "TenMonAn": "Bánh bao nhân thịt trứng",
+      "MaThanhPhan": "TP20610",
+      "MaNguyenLieu": "NL111",
+      "TenNguyenLieu": "Trứng cút",
+      "Natri": "14.10000000"
+    },
+    {
+      "MaMonAn": "MA206",
+      "TenMonAn": "Bánh bao nhân thịt trứng",
+      "MaThanhPhan": "TP20606",
+      "MaNguyenLieu": "NL125",
+      "TenNguyenLieu": "Nấm mèo",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA206",
+      "TenMonAn": "Bánh bao nhân thịt trứng",
+      "MaThanhPhan": "TP20603",
+      "MaNguyenLieu": "NL132",
+      "TenNguyenLieu": "Dầu hào",
+      "Natri": "101.37000000"
+    },
+    {
+      "MaMonAn": "MA206",
+      "TenMonAn": "Bánh bao nhân thịt trứng",
+      "MaThanhPhan": "TP20601",
+      "MaNguyenLieu": "NL144",
+      "TenNguyenLieu": "Bột bánh bao pha sẵn",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA206",
+      "TenMonAn": "Bánh bao nhân thịt trứng",
+      "MaThanhPhan": "TP20607",
+      "MaNguyenLieu": "NL160",
+      "TenNguyenLieu": "Ngò rí",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA206",
+      "TenMonAn": "Bánh bao nhân thịt trứng",
+      "MaThanhPhan": "TP20698",
+      "MaNguyenLieu": "NL240",
+      "TenNguyenLieu": "Hạt tiêu xay",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA205",
+      "TenMonAn": "Bánh bò thốt nốt nướng",
+      "MaThanhPhan": "TP20504",
+      "MaNguyenLieu": "NL007",
+      "TenNguyenLieu": "Bột gạo",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA205",
+      "TenMonAn": "Bánh bò thốt nốt nướng",
+      "MaThanhPhan": "TP20505",
+      "MaNguyenLieu": "NL028",
+      "TenNguyenLieu": "Trứng gà",
+      "Natri": "53.25000000"
+    },
+    {
+      "MaMonAn": "MA205",
+      "TenMonAn": "Bánh bò thốt nốt nướng",
+      "MaThanhPhan": "TP20502",
+      "MaNguyenLieu": "NL068",
+      "TenNguyenLieu": "Nước cốt dừa",
+      "Natri": "6.00000000"
+    },
+    {
+      "MaMonAn": "MA205",
+      "TenMonAn": "Bánh bò thốt nốt nướng",
+      "MaThanhPhan": "TP20507",
+      "MaNguyenLieu": "NL069",
+      "TenNguyenLieu": "Bơ lạt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA205",
+      "TenMonAn": "Bánh bò thốt nốt nướng",
+      "MaThanhPhan": "TP20506",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA205",
+      "TenMonAn": "Bánh bò thốt nốt nướng",
+      "MaThanhPhan": "TP20508",
+      "MaNguyenLieu": "NL093",
+      "TenNguyenLieu": "Bột nở",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA205",
+      "TenMonAn": "Bánh bò thốt nốt nướng",
+      "MaThanhPhan": "TP20503",
+      "MaNguyenLieu": "NL146",
+      "TenNguyenLieu": "Bột năng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA205",
+      "TenMonAn": "Bánh bò thốt nốt nướng",
+      "MaThanhPhan": "TP20501",
+      "MaNguyenLieu": "NL151",
+      "TenNguyenLieu": "Đường thốt nốt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA205",
+      "TenMonAn": "Bánh bò thốt nốt nướng",
+      "MaThanhPhan": "TP20509",
+      "MaNguyenLieu": "NL158",
+      "TenNguyenLieu": "Muối nở",
+      "Natri": "342.00000000"
+    },
+    {
+      "MaMonAn": "MA204",
+      "TenMonAn": "Bánh bông lan bơ nho",
+      "MaThanhPhan": "TP20407",
+      "MaNguyenLieu": "NL028",
+      "TenNguyenLieu": "Trứng gà",
+      "Natri": "53.25000000"
+    },
+    {
+      "MaMonAn": "MA204",
+      "TenMonAn": "Bánh bông lan bơ nho",
+      "MaThanhPhan": "TP20406",
+      "MaNguyenLieu": "NL067",
+      "TenNguyenLieu": "Sữa tươi không đường",
+      "Natri": "4.30000000"
+    },
+    {
+      "MaMonAn": "MA204",
+      "TenMonAn": "Bánh bông lan bơ nho",
+      "MaThanhPhan": "TP20402",
+      "MaNguyenLieu": "NL069",
+      "TenNguyenLieu": "Bơ lạt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA204",
+      "TenMonAn": "Bánh bông lan bơ nho",
+      "MaThanhPhan": "TP20410",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": "242.23750000"
+    },
+    {
+      "MaMonAn": "MA204",
+      "TenMonAn": "Bánh bông lan bơ nho",
+      "MaThanhPhan": "TP20411",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.32500000"
+    },
+    {
+      "MaMonAn": "MA204",
+      "TenMonAn": "Bánh bông lan bơ nho",
+      "MaThanhPhan": "TP20403",
+      "MaNguyenLieu": "NL093",
+      "TenNguyenLieu": "Bột nở",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA204",
+      "TenMonAn": "Bánh bông lan bơ nho",
+      "MaThanhPhan": "TP20401",
+      "MaNguyenLieu": "NL145",
+      "TenNguyenLieu": "Bột mì số 8",
+      "Natri": "1.50000000"
+    },
+    {
+      "MaMonAn": "MA204",
+      "TenMonAn": "Bánh bông lan bơ nho",
+      "MaThanhPhan": "TP20405",
+      "MaNguyenLieu": "NL153",
+      "TenNguyenLieu": "Hạnh nhân cắt lát",
+      "Natri": "8.47500000"
+    },
+    {
+      "MaMonAn": "MA204",
+      "TenMonAn": "Bánh bông lan bơ nho",
+      "MaThanhPhan": "TP20404",
+      "MaNguyenLieu": "NL161",
+      "TenNguyenLieu": "Nho khô",
+      "Natri": "0.68750000"
+    },
+    {
+      "MaMonAn": "MA204",
+      "TenMonAn": "Bánh bông lan bơ nho",
+      "MaThanhPhan": "TP20409",
+      "MaNguyenLieu": "NL164",
+      "TenNguyenLieu": "Rượu rum",
+      "Natri": "0.06250000"
+    },
+    {
+      "MaMonAn": "MA204",
+      "TenMonAn": "Bánh bông lan bơ nho",
+      "MaThanhPhan": "TP20408",
+      "MaNguyenLieu": "NL170",
+      "TenNguyenLieu": "Vani",
+      "Natri": "0.11250000"
+    },
+    {
+      "MaMonAn": "MA201",
+      "TenMonAn": "Bánh bột lọc nhân tôm thịt bằng bánh tráng",
+      "MaThanhPhan": "TP20101",
+      "MaNguyenLieu": "NL008",
+      "TenNguyenLieu": "Bánh tráng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA201",
+      "TenMonAn": "Bánh bột lọc nhân tôm thịt bằng bánh tráng",
+      "MaThanhPhan": "TP20103",
+      "MaNguyenLieu": "NL018",
+      "TenNguyenLieu": "Thịt ba chỉ",
+      "Natri": "16.00000000"
+    },
+    {
+      "MaMonAn": "MA201",
+      "TenMonAn": "Bánh bột lọc nhân tôm thịt bằng bánh tráng",
+      "MaThanhPhan": "TP20102",
+      "MaNguyenLieu": "NL026",
+      "TenNguyenLieu": "Tôm",
+      "Natri": "83.25000000"
+    },
+    {
+      "MaMonAn": "MA201",
+      "TenMonAn": "Bánh bột lọc nhân tôm thịt bằng bánh tráng",
+      "MaThanhPhan": "TP20105",
+      "MaNguyenLieu": "NL050",
+      "TenNguyenLieu": "Hành lá",
+      "Natri": "1.20000000"
+    },
+    {
+      "MaMonAn": "MA201",
+      "TenMonAn": "Bánh bột lọc nhân tôm thịt bằng bánh tráng",
+      "MaThanhPhan": "TP20104",
+      "MaNguyenLieu": "NL051",
+      "TenNguyenLieu": "Tỏi",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA201",
+      "TenMonAn": "Bánh bột lọc nhân tôm thịt bằng bánh tráng",
+      "MaThanhPhan": "TP20107",
+      "MaNguyenLieu": "NL054",
+      "TenNguyenLieu": "Ớt tươi",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA201",
+      "TenMonAn": "Bánh bột lọc nhân tôm thịt bằng bánh tráng",
+      "MaThanhPhan": "TP20110",
+      "MaNguyenLieu": "NL070",
+      "TenNguyenLieu": "Nước mắm",
+      "Natri": "1472.06250000"
+    },
+    {
+      "MaMonAn": "MA201",
+      "TenMonAn": "Bánh bột lọc nhân tôm thịt bằng bánh tráng",
+      "MaThanhPhan": "TP20108",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA201",
+      "TenMonAn": "Bánh bột lọc nhân tôm thịt bằng bánh tráng",
+      "MaThanhPhan": "TP20106",
+      "MaNguyenLieu": "NL1058",
+      "TenNguyenLieu": "Hành tím băm",
+      "Natri": "0.15000000"
+    },
+    {
+      "MaMonAn": "MA201",
+      "TenMonAn": "Bánh bột lọc nhân tôm thịt bằng bánh tráng",
+      "MaThanhPhan": "TP20109",
+      "MaNguyenLieu": "NL149",
+      "TenNguyenLieu": "Dầu màu điều",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA201",
+      "TenMonAn": "Bánh bột lọc nhân tôm thịt bằng bánh tráng",
+      "MaThanhPhan": "TP20111",
+      "MaNguyenLieu": "NL239",
+      "TenNguyenLieu": "Gia vị thông dụng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA202",
+      "TenMonAn": "Bánh mochi nhân kem sầu riêng",
+      "MaThanhPhan": "TP20203",
+      "MaNguyenLieu": "NL067",
+      "TenNguyenLieu": "Sữa tươi không đường",
+      "Natri": "21.50000000"
+    },
+    {
+      "MaMonAn": "MA202",
+      "TenMonAn": "Bánh mochi nhân kem sầu riêng",
+      "MaThanhPhan": "TP20207",
+      "MaNguyenLieu": "NL069",
+      "TenNguyenLieu": "Bơ lạt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA202",
+      "TenMonAn": "Bánh mochi nhân kem sầu riêng",
+      "MaThanhPhan": "TP20209",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": "242.23750000"
+    },
+    {
+      "MaMonAn": "MA202",
+      "TenMonAn": "Bánh mochi nhân kem sầu riêng",
+      "MaThanhPhan": "TP20208",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.16250000"
+    },
+    {
+      "MaMonAn": "MA202",
+      "TenMonAn": "Bánh mochi nhân kem sầu riêng",
+      "MaThanhPhan": "TP20206",
+      "MaNguyenLieu": "NL079",
+      "TenNguyenLieu": "Bột bắp",
+      "Natri": "0.67500000"
+    },
+    {
+      "MaMonAn": "MA202",
+      "TenMonAn": "Bánh mochi nhân kem sầu riêng",
+      "MaThanhPhan": "TP20205",
+      "MaNguyenLieu": "NL147",
+      "TenNguyenLieu": "Bột nếp",
+      "Natri": "1.00750000"
+    },
+    {
+      "MaMonAn": "MA202",
+      "TenMonAn": "Bánh mochi nhân kem sầu riêng",
+      "MaThanhPhan": "TP20204",
+      "MaNguyenLieu": "NL163",
+      "TenNguyenLieu": "Nước cốt dành dành",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA202",
+      "TenMonAn": "Bánh mochi nhân kem sầu riêng",
+      "MaThanhPhan": "TP20201",
+      "MaNguyenLieu": "NL165",
+      "TenNguyenLieu": "Sầu riêng",
+      "Natri": "1.50500000"
+    },
+    {
+      "MaMonAn": "MA202",
+      "TenMonAn": "Bánh mochi nhân kem sầu riêng",
+      "MaThanhPhan": "TP20202",
+      "MaNguyenLieu": "NL171",
+      "TenNguyenLieu": "Whipping cream",
+      "Natri": "13.50000000"
+    },
+    {
+      "MaMonAn": "MA948",
+      "TenMonAn": "Bánh tét trứng muối",
+      "MaThanhPhan": "TP93898",
+      "MaNguyenLieu": "NL018",
+      "TenNguyenLieu": "Thịt ba chỉ",
+      "Natri": "40.00000000"
+    },
+    {
+      "MaMonAn": "MA948",
+      "TenMonAn": "Bánh tét trứng muối",
+      "MaThanhPhan": "TP93903",
+      "MaNguyenLieu": "NL049",
+      "TenNguyenLieu": "Hành tím",
+      "Natri": "0.60000000"
+    },
+    {
+      "MaMonAn": "MA948",
+      "TenMonAn": "Bánh tét trứng muối",
+      "MaThanhPhan": "TP93904",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": "1211.18750000"
+    },
+    {
+      "MaMonAn": "MA948",
+      "TenMonAn": "Bánh tét trứng muối",
+      "MaThanhPhan": "TP93907",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.07500000"
+    },
+    {
+      "MaMonAn": "MA948",
+      "TenMonAn": "Bánh tét trứng muối",
+      "MaThanhPhan": "TP93906",
+      "MaNguyenLieu": "NL097",
+      "TenNguyenLieu": "Hạt nêm",
+      "Natri": "1636.35750000"
+    },
+    {
+      "MaMonAn": "MA948",
+      "TenMonAn": "Bánh tét trứng muối",
+      "MaThanhPhan": "TP93905",
+      "MaNguyenLieu": "NL1128",
+      "TenNguyenLieu": "Tiêu xay",
+      "Natri": "0.75000000"
+    },
+    {
+      "MaMonAn": "MA948",
+      "TenMonAn": "Bánh tét trứng muối",
+      "MaThanhPhan": "TP93901",
+      "MaNguyenLieu": "NL1226",
+      "TenNguyenLieu": "Lòng đỏ trứng muối",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA948",
+      "TenMonAn": "Bánh tét trứng muối",
+      "MaThanhPhan": "TP93902",
+      "MaNguyenLieu": "NL1227",
+      "TenNguyenLieu": "Rau ngót",
+      "Natri": "1.22500000"
+    },
+    {
+      "MaMonAn": "MA948",
+      "TenMonAn": "Bánh tét trứng muối",
+      "MaThanhPhan": "TP93900",
+      "MaNguyenLieu": "NL305",
+      "TenNguyenLieu": "Đậu xanh đãi vỏ",
+      "Natri": "6.00000000"
+    },
+    {
+      "MaMonAn": "MA948",
+      "TenMonAn": "Bánh tét trứng muối",
+      "MaThanhPhan": "TP93899",
+      "MaNguyenLieu": "NL955",
+      "TenNguyenLieu": "Gạo nếp",
+      "Natri": "15.50000000"
+    },
+    {
+      "MaMonAn": "MA947",
+      "TenMonAn": "Bánh tro",
+      "MaThanhPhan": "TP93896",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": "310.06400000"
+    },
+    {
+      "MaMonAn": "MA947",
+      "TenMonAn": "Bánh tro",
+      "MaThanhPhan": "TP93895",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.01200000"
+    },
+    {
+      "MaMonAn": "MA947",
+      "TenMonAn": "Bánh tro",
+      "MaThanhPhan": "TP93897",
+      "MaNguyenLieu": "NL1225",
+      "TenNguyenLieu": "Nước tro tàu",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA947",
+      "TenMonAn": "Bánh tro",
+      "MaThanhPhan": "TP93894",
+      "MaNguyenLieu": "NL305",
+      "TenNguyenLieu": "Đậu xanh đãi vỏ",
+      "Natri": "0.12000000"
+    },
+    {
+      "MaMonAn": "MA947",
+      "TenMonAn": "Bánh tro",
+      "MaThanhPhan": "TP93893",
+      "MaNguyenLieu": "NL955",
+      "TenNguyenLieu": "Gạo nếp",
+      "Natri": "0.62000000"
+    },
+    {
+      "MaMonAn": "MA219",
+      "TenMonAn": "Bingsu trái cây",
+      "MaThanhPhan": "TP21904",
+      "MaNguyenLieu": "NL171",
+      "TenNguyenLieu": "Whipping cream",
+      "Natri": "10.12500000"
+    },
+    {
+      "MaMonAn": "MA219",
+      "TenMonAn": "Bingsu trái cây",
+      "MaThanhPhan": "TP21906",
+      "MaNguyenLieu": "NL187",
+      "TenNguyenLieu": "Sữa đặc",
+      "Natri": "47.62500000"
+    },
+    {
+      "MaMonAn": "MA219",
+      "TenMonAn": "Bingsu trái cây",
+      "MaThanhPhan": "TP21901",
+      "MaNguyenLieu": "NL307",
+      "TenNguyenLieu": "Dưa hấu",
+      "Natri": "11.29500000"
+    },
+    {
+      "MaMonAn": "MA219",
+      "TenMonAn": "Bingsu trái cây",
+      "MaThanhPhan": "TP21902",
+      "MaNguyenLieu": "NL309",
+      "TenNguyenLieu": "Dưa lưới ruột vàng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA219",
+      "TenMonAn": "Bingsu trái cây",
+      "MaThanhPhan": "TP21903",
+      "MaNguyenLieu": "NL310",
+      "TenNguyenLieu": "Dưa lưới ruột xanh",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA219",
+      "TenMonAn": "Bingsu trái cây",
+      "MaThanhPhan": "TP21905",
+      "MaNguyenLieu": "NL321",
+      "TenNguyenLieu": "Sữa tươi",
+      "Natri": "440.62500000"
+    },
+    {
+      "MaMonAn": "MA935",
+      "TenMonAn": "Bò kho miền Nam",
+      "MaThanhPhan": "TP93501",
+      "MaNguyenLieu": "NL011",
+      "TenNguyenLieu": "Thịt bò",
+      "Natri": "180.00000000"
+    },
+    {
+      "MaMonAn": "MA935",
+      "TenMonAn": "Bò kho miền Nam",
+      "MaThanhPhan": "TP93503",
+      "MaNguyenLieu": "NL036",
+      "TenNguyenLieu": "Cà rốt",
+      "Natri": "48.07500000"
+    },
+    {
+      "MaMonAn": "MA935",
+      "TenMonAn": "Bò kho miền Nam",
+      "MaThanhPhan": "TP93508",
+      "MaNguyenLieu": "NL049",
+      "TenNguyenLieu": "Hành tím",
+      "Natri": "0.45000000"
+    },
+    {
+      "MaMonAn": "MA935",
+      "TenMonAn": "Bò kho miền Nam",
+      "MaThanhPhan": "TP93507",
+      "MaNguyenLieu": "NL051",
+      "TenNguyenLieu": "Tỏi",
+      "Natri": "0.63750000"
+    },
+    {
+      "MaMonAn": "MA935",
+      "TenMonAn": "Bò kho miền Nam",
+      "MaThanhPhan": "TP93509",
+      "MaNguyenLieu": "NL053",
+      "TenNguyenLieu": "Sả",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA935",
+      "TenMonAn": "Bò kho miền Nam",
+      "MaThanhPhan": "TP93511",
+      "MaNguyenLieu": "NL1141",
+      "TenNguyenLieu": "Rượu trắng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA935",
+      "TenMonAn": "Bò kho miền Nam",
+      "MaThanhPhan": "TP93505",
+      "MaNguyenLieu": "NL1182",
+      "TenNguyenLieu": "Xốt bò kho",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA935",
+      "TenMonAn": "Bò kho miền Nam",
+      "MaThanhPhan": "TP93506",
+      "MaNguyenLieu": "NL1183",
+      "TenNguyenLieu": "Bột bò kho",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA935",
+      "TenMonAn": "Bò kho miền Nam",
+      "MaThanhPhan": "TP93504",
+      "MaNguyenLieu": "NL187",
+      "TenNguyenLieu": "Sữa đặc",
+      "Natri": "7.14375000"
+    },
+    {
+      "MaMonAn": "MA935",
+      "TenMonAn": "Bò kho miền Nam",
+      "MaThanhPhan": "TP93510",
+      "MaNguyenLieu": "NL239",
+      "TenNguyenLieu": "Gia vị thông dụng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA935",
+      "TenMonAn": "Bò kho miền Nam",
+      "MaThanhPhan": "TP93502",
+      "MaNguyenLieu": "NL318",
+      "TenNguyenLieu": "Nước dừa tươi",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA923",
+      "TenMonAn": "Cá lóc hấp tương",
+      "MaThanhPhan": "TP1126",
+      "MaNguyenLieu": "NL018",
+      "TenNguyenLieu": "Thịt ba chỉ",
+      "Natri": "24.00000000"
+    },
+    {
+      "MaMonAn": "MA923",
+      "TenMonAn": "Cá lóc hấp tương",
+      "MaThanhPhan": "TP1129",
+      "MaNguyenLieu": "NL048",
+      "TenNguyenLieu": "Hành tây",
+      "Natri": "1.50000000"
+    },
+    {
+      "MaMonAn": "MA923",
+      "TenMonAn": "Cá lóc hấp tương",
+      "MaThanhPhan": "TP1130",
+      "MaNguyenLieu": "NL050",
+      "TenNguyenLieu": "Hành lá",
+      "Natri": "0.60000000"
+    },
+    {
+      "MaMonAn": "MA923",
+      "TenMonAn": "Cá lóc hấp tương",
+      "MaThanhPhan": "TP1134",
+      "MaNguyenLieu": "NL1058",
+      "TenNguyenLieu": "Hành tím băm",
+      "Natri": "0.30000000"
+    },
+    {
+      "MaMonAn": "MA923",
+      "TenMonAn": "Cá lóc hấp tương",
+      "MaThanhPhan": "TP1132",
+      "MaNguyenLieu": "NL1135",
+      "TenNguyenLieu": "Bún tàu",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA923",
+      "TenMonAn": "Cá lóc hấp tương",
+      "MaThanhPhan": "TP1125",
+      "MaNguyenLieu": "NL1136",
+      "TenNguyenLieu": "Cá lóc (1 con)",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA923",
+      "TenMonAn": "Cá lóc hấp tương",
+      "MaThanhPhan": "TP1128",
+      "MaNguyenLieu": "NL1137",
+      "TenNguyenLieu": "Cà rốt (1/2 củ)",
+      "Natri": "13.00000000"
+    },
+    {
+      "MaMonAn": "MA923",
+      "TenMonAn": "Cá lóc hấp tương",
+      "MaThanhPhan": "TP1137",
+      "MaNguyenLieu": "NL1138",
+      "TenNguyenLieu": "Gia vị thông dụng (Muối/ Đường/ Tiêu xay)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA923",
+      "TenMonAn": "Cá lóc hấp tương",
+      "MaThanhPhan": "TP1133",
+      "MaNguyenLieu": "NL1139",
+      "TenNguyenLieu": "Gừng (2 củ)",
+      "Natri": "1.75000000"
+    },
+    {
+      "MaMonAn": "MA923",
+      "TenMonAn": "Cá lóc hấp tương",
+      "MaThanhPhan": "TP1131",
+      "MaNguyenLieu": "NL1140",
+      "TenNguyenLieu": "Nấm mèo (1 tai)",
+      "Natri": "2.62500000"
+    },
+    {
+      "MaMonAn": "MA923",
+      "TenMonAn": "Cá lóc hấp tương",
+      "MaThanhPhan": "TP1136",
+      "MaNguyenLieu": "NL1141",
+      "TenNguyenLieu": "Rượu trắng",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA923",
+      "TenMonAn": "Cá lóc hấp tương",
+      "MaThanhPhan": "TP1127",
+      "MaNguyenLieu": "NL1142",
+      "TenNguyenLieu": "Tương hột",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA923",
+      "TenMonAn": "Cá lóc hấp tương",
+      "MaThanhPhan": "TP1138",
+      "MaNguyenLieu": "NL183",
+      "TenNguyenLieu": "Nước",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA923",
+      "TenMonAn": "Cá lóc hấp tương",
+      "MaThanhPhan": "TP1135",
+      "MaNguyenLieu": "NL907",
+      "TenNguyenLieu": "Tỏi băm",
+      "Natri": "0.45000000"
+    },
+    {
+      "MaMonAn": "MA913",
+      "TenMonAn": "Cá lóc kho tộ",
+      "MaThanhPhan": "TP1038",
+      "MaNguyenLieu": "NL016",
+      "TenNguyenLieu": "Thịt heo xay",
+      "Natri": "17.00000000"
+    },
+    {
+      "MaMonAn": "MA913",
+      "TenMonAn": "Cá lóc kho tộ",
+      "MaThanhPhan": "TP1037",
+      "MaNguyenLieu": "NL1037",
+      "TenNguyenLieu": "Cá lóc (khoảng 500gr)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA913",
+      "TenMonAn": "Cá lóc kho tộ",
+      "MaThanhPhan": "TP1039",
+      "MaNguyenLieu": "NL1039",
+      "TenNguyenLieu": "Nước dừa",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA934",
+      "TenMonAn": "Cà ri bò",
+      "MaThanhPhan": "TP93403",
+      "MaNguyenLieu": "NL009",
+      "TenNguyenLieu": "Khoai lang",
+      "Natri": "35.75000000"
+    },
+    {
+      "MaMonAn": "MA934",
+      "TenMonAn": "Cà ri bò",
+      "MaThanhPhan": "TP93401",
+      "MaNguyenLieu": "NL011",
+      "TenNguyenLieu": "Thịt bò",
+      "Natri": "180.00000000"
+    },
+    {
+      "MaMonAn": "MA934",
+      "TenMonAn": "Cà ri bò",
+      "MaThanhPhan": "TP93402",
+      "MaNguyenLieu": "NL036",
+      "TenNguyenLieu": "Cà rốt",
+      "Natri": "15.38400000"
+    },
+    {
+      "MaMonAn": "MA934",
+      "TenMonAn": "Cà ri bò",
+      "MaThanhPhan": "TP93405",
+      "MaNguyenLieu": "NL048",
+      "TenNguyenLieu": "Hành tây",
+      "Natri": "1.50000000"
+    },
+    {
+      "MaMonAn": "MA934",
+      "TenMonAn": "Cà ri bò",
+      "MaThanhPhan": "TP93407",
+      "MaNguyenLieu": "NL053",
+      "TenNguyenLieu": "Sả",
+      "Natri": "0.60000000"
+    },
+    {
+      "MaMonAn": "MA934",
+      "TenMonAn": "Cà ri bò",
+      "MaThanhPhan": "TP93406",
+      "MaNguyenLieu": "NL068",
+      "TenNguyenLieu": "Nước cốt dừa",
+      "Natri": "11.25000000"
+    },
+    {
+      "MaMonAn": "MA934",
+      "TenMonAn": "Cà ri bò",
+      "MaThanhPhan": "TP93408",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA934",
+      "TenMonAn": "Cà ri bò",
+      "MaThanhPhan": "TP93409",
+      "MaNguyenLieu": "NL1180",
+      "TenNguyenLieu": "Dầu cà ri",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA934",
+      "TenMonAn": "Cà ri bò",
+      "MaThanhPhan": "TP93410",
+      "MaNguyenLieu": "NL1181",
+      "TenNguyenLieu": "Bột cà ri",
+      "Natri": "1.95000000"
+    },
+    {
+      "MaMonAn": "MA934",
+      "TenMonAn": "Cà ri bò",
+      "MaThanhPhan": "TP93411",
+      "MaNguyenLieu": "NL239",
+      "TenNguyenLieu": "Gia vị thông dụng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA934",
+      "TenMonAn": "Cà ri bò",
+      "MaThanhPhan": "TP93404",
+      "MaNguyenLieu": "NL958",
+      "TenNguyenLieu": "Khoai tây",
+      "Natri": "7.77000000"
+    },
+    {
+      "MaMonAn": "MA938",
+      "TenMonAn": "Cà ri xanh chay",
+      "MaThanhPhan": "TP93806",
+      "MaNguyenLieu": "NL034",
+      "TenNguyenLieu": "Nấm hương",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA938",
+      "TenMonAn": "Cà ri xanh chay",
+      "MaThanhPhan": "TP93805",
+      "MaNguyenLieu": "NL047",
+      "TenNguyenLieu": "Bông cải xanh",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA938",
+      "TenMonAn": "Cà ri xanh chay",
+      "MaThanhPhan": "TP93816",
+      "MaNguyenLieu": "NL049",
+      "TenNguyenLieu": "Hành tím",
+      "Natri": "2.25000000"
+    },
+    {
+      "MaMonAn": "MA938",
+      "TenMonAn": "Cà ri xanh chay",
+      "MaThanhPhan": "TP93815",
+      "MaNguyenLieu": "NL051",
+      "TenNguyenLieu": "Tỏi",
+      "Natri": "1.06250000"
+    },
+    {
+      "MaMonAn": "MA938",
+      "TenMonAn": "Cà ri xanh chay",
+      "MaThanhPhan": "TP93808",
+      "MaNguyenLieu": "NL053",
+      "TenNguyenLieu": "Sả",
+      "Natri": "0.60000000"
+    },
+    {
+      "MaMonAn": "MA938",
+      "TenMonAn": "Cà ri xanh chay",
+      "MaThanhPhan": "TP93801",
+      "MaNguyenLieu": "NL068",
+      "TenNguyenLieu": "Nước cốt dừa",
+      "Natri": "37.50000000"
+    },
+    {
+      "MaMonAn": "MA938",
+      "TenMonAn": "Cà ri xanh chay",
+      "MaThanhPhan": "TP93819",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA938",
+      "TenMonAn": "Cà ri xanh chay",
+      "MaThanhPhan": "TP93822",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA938",
+      "TenMonAn": "Cà ri xanh chay",
+      "MaThanhPhan": "TP93804",
+      "MaNguyenLieu": "NL1021",
+      "TenNguyenLieu": "Cà tím",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA938",
+      "TenMonAn": "Cà ri xanh chay",
+      "MaThanhPhan": "TP93803",
+      "MaNguyenLieu": "NL1187",
+      "TenNguyenLieu": "Bắp non",
+      "Natri": "1.12500000"
+    },
+    {
+      "MaMonAn": "MA938",
+      "TenMonAn": "Cà ri xanh chay",
+      "MaThanhPhan": "TP93802",
+      "MaNguyenLieu": "NL1192",
+      "TenNguyenLieu": "Gà lát chay",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA938",
+      "TenMonAn": "Cà ri xanh chay",
+      "MaThanhPhan": "TP93810",
+      "MaNguyenLieu": "NL1194",
+      "TenNguyenLieu": "Hạt ngò",
+      "Natri": "0.57500000"
+    },
+    {
+      "MaMonAn": "MA938",
+      "TenMonAn": "Cà ri xanh chay",
+      "MaThanhPhan": "TP93811",
+      "MaNguyenLieu": "NL1195",
+      "TenNguyenLieu": "Hạt thì là",
+      "Natri": "0.25000000"
+    },
+    {
+      "MaMonAn": "MA938",
+      "TenMonAn": "Cà ri xanh chay",
+      "MaThanhPhan": "TP93807",
+      "MaNguyenLieu": "NL1197",
+      "TenNguyenLieu": "Ớt sừng xanh",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA938",
+      "TenMonAn": "Cà ri xanh chay",
+      "MaThanhPhan": "TP93809",
+      "MaNguyenLieu": "NL1199",
+      "TenNguyenLieu": "Riềng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA938",
+      "TenMonAn": "Cà ri xanh chay",
+      "MaThanhPhan": "TP93812",
+      "MaNguyenLieu": "NL1201",
+      "TenNguyenLieu": "Tiêu sọ",
+      "Natri": "0.18750000"
+    },
+    {
+      "MaMonAn": "MA938",
+      "TenMonAn": "Cà ri xanh chay",
+      "MaThanhPhan": "TP93817",
+      "MaNguyenLieu": "NL1203",
+      "TenNguyenLieu": "Vỏ chanh",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA938",
+      "TenMonAn": "Cà ri xanh chay",
+      "MaThanhPhan": "TP93820",
+      "MaNguyenLieu": "NL131",
+      "TenNguyenLieu": "Đường phèn",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA938",
+      "TenMonAn": "Cà ri xanh chay",
+      "MaThanhPhan": "TP93813",
+      "MaNguyenLieu": "NL160",
+      "TenNguyenLieu": "Ngò rí",
+      "Natri": "1.27765000"
+    },
+    {
+      "MaMonAn": "MA938",
+      "TenMonAn": "Cà ri xanh chay",
+      "MaThanhPhan": "TP93818",
+      "MaNguyenLieu": "NL311",
+      "TenNguyenLieu": "Hành boa rô",
+      "Natri": "0.75000000"
+    },
+    {
+      "MaMonAn": "MA938",
+      "TenMonAn": "Cà ri xanh chay",
+      "MaThanhPhan": "TP93821",
+      "MaNguyenLieu": "NL312",
+      "TenNguyenLieu": "Hạt nêm chay",
+      "Natri": "3180.00000000"
+    },
+    {
+      "MaMonAn": "MA938",
+      "TenMonAn": "Cà ri xanh chay",
+      "MaThanhPhan": "TP93814",
+      "MaNguyenLieu": "NL319",
+      "TenNguyenLieu": "Rễ ngò",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA903",
+      "TenMonAn": "Cá saba nướng mỡ hành",
+      "MaThanhPhan": "TP933",
+      "MaNguyenLieu": "NL049",
+      "TenNguyenLieu": "Hành tím",
+      "Natri": "1.50000000"
+    },
+    {
+      "MaMonAn": "MA903",
+      "TenMonAn": "Cá saba nướng mỡ hành",
+      "MaThanhPhan": "TP931",
+      "MaNguyenLieu": "NL050",
+      "TenNguyenLieu": "Hành lá",
+      "Natri": "3.00000000"
+    },
+    {
+      "MaMonAn": "MA903",
+      "TenMonAn": "Cá saba nướng mỡ hành",
+      "MaThanhPhan": "TP932",
+      "MaNguyenLieu": "NL051",
+      "TenNguyenLieu": "Tỏi",
+      "Natri": "1.06250000"
+    },
+    {
+      "MaMonAn": "MA903",
+      "TenMonAn": "Cá saba nướng mỡ hành",
+      "MaThanhPhan": "TP935",
+      "MaNguyenLieu": "NL062",
+      "TenNguyenLieu": "Chanh",
+      "Natri": "0.35000000"
+    },
+    {
+      "MaMonAn": "MA903",
+      "TenMonAn": "Cá saba nướng mỡ hành",
+      "MaThanhPhan": "TP938",
+      "MaNguyenLieu": "NL070",
+      "TenNguyenLieu": "Nước mắm",
+      "Natri": "1177.65000000"
+    },
+    {
+      "MaMonAn": "MA903",
+      "TenMonAn": "Cá saba nướng mỡ hành",
+      "MaThanhPhan": "TP939",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA903",
+      "TenMonAn": "Cá saba nướng mỡ hành",
+      "MaThanhPhan": "TP937",
+      "MaNguyenLieu": "NL099",
+      "TenNguyenLieu": "Bột tỏi",
+      "Natri": "0.75000000"
+    },
+    {
+      "MaMonAn": "MA903",
+      "TenMonAn": "Cá saba nướng mỡ hành",
+      "MaThanhPhan": "TP930",
+      "MaNguyenLieu": "NL930",
+      "TenNguyenLieu": "Cá saba",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA903",
+      "TenMonAn": "Cá saba nướng mỡ hành",
+      "MaThanhPhan": "TP934",
+      "MaNguyenLieu": "NL934",
+      "TenNguyenLieu": "Ớt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA903",
+      "TenMonAn": "Cá saba nướng mỡ hành",
+      "MaThanhPhan": "TP936",
+      "MaNguyenLieu": "NL936",
+      "TenNguyenLieu": "Đậu phộng rang",
+      "Natri": "0.30000000"
+    },
+    {
+      "MaMonAn": "MA903",
+      "TenMonAn": "Cá saba nướng mỡ hành",
+      "MaThanhPhan": "TP940",
+      "MaNguyenLieu": "NL940",
+      "TenNguyenLieu": "Gia vị thông dụng (muối/đường/hạt nêm/tiêu)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA911",
+      "TenMonAn": "Cà tím xào tỏi ớt",
+      "MaThanhPhan": "TP1024",
+      "MaNguyenLieu": "NL050",
+      "TenNguyenLieu": "Hành lá",
+      "Natri": "2.40000000"
+    },
+    {
+      "MaMonAn": "MA911",
+      "TenMonAn": "Cà tím xào tỏi ớt",
+      "MaThanhPhan": "TP1023",
+      "MaNguyenLieu": "NL051",
+      "TenNguyenLieu": "Tỏi",
+      "Natri": "0.85000000"
+    },
+    {
+      "MaMonAn": "MA911",
+      "TenMonAn": "Cà tím xào tỏi ớt",
+      "MaThanhPhan": "TP1026",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA911",
+      "TenMonAn": "Cà tím xào tỏi ớt",
+      "MaThanhPhan": "TP1021",
+      "MaNguyenLieu": "NL1021",
+      "TenNguyenLieu": "Cà tím",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA911",
+      "TenMonAn": "Cà tím xào tỏi ớt",
+      "MaThanhPhan": "TP1027",
+      "MaNguyenLieu": "NL1027",
+      "TenNguyenLieu": "Gia vị thông dụng (muối/đường/hạt nêm/tiêu xay)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA911",
+      "TenMonAn": "Cà tím xào tỏi ớt",
+      "MaThanhPhan": "TP1025",
+      "MaNguyenLieu": "NL132",
+      "TenNguyenLieu": "Dầu hào",
+      "Natri": "253.42500000"
+    },
+    {
+      "MaMonAn": "MA911",
+      "TenMonAn": "Cà tím xào tỏi ớt",
+      "MaThanhPhan": "TP1022",
+      "MaNguyenLieu": "NL934",
+      "TenNguyenLieu": "Ớt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA104",
+      "TenMonAn": "Canh chua cá lóc",
+      "MaThanhPhan": "TP10401",
+      "MaNguyenLieu": "NL020",
+      "TenNguyenLieu": "Cá lóc",
+      "Natri": "62.50000000"
+    },
+    {
+      "MaMonAn": "MA104",
+      "TenMonAn": "Canh chua cá lóc",
+      "MaThanhPhan": "TP10403",
+      "MaNguyenLieu": "NL035",
+      "TenNguyenLieu": "Cà chua",
+      "Natri": "3.70000000"
+    },
+    {
+      "MaMonAn": "MA104",
+      "TenMonAn": "Canh chua cá lóc",
+      "MaThanhPhan": "TP10407",
+      "MaNguyenLieu": "NL041",
+      "TenNguyenLieu": "Giá đỗ",
+      "Natri": "0.75000000"
+    },
+    {
+      "MaMonAn": "MA104",
+      "TenMonAn": "Canh chua cá lóc",
+      "MaThanhPhan": "TP10402",
+      "MaNguyenLieu": "NL061",
+      "TenNguyenLieu": "Dứa",
+      "Natri": "0.56250000"
+    },
+    {
+      "MaMonAn": "MA104",
+      "TenMonAn": "Canh chua cá lóc",
+      "MaThanhPhan": "TP10410",
+      "MaNguyenLieu": "NL070",
+      "TenNguyenLieu": "Nước mắm",
+      "Natri": "294.41250000"
+    },
+    {
+      "MaMonAn": "MA104",
+      "TenMonAn": "Canh chua cá lóc",
+      "MaThanhPhan": "TP10406",
+      "MaNguyenLieu": "NL077",
+      "TenNguyenLieu": "Me chua",
+      "Natri": "1.40000000"
+    },
+    {
+      "MaMonAn": "MA104",
+      "TenMonAn": "Canh chua cá lóc",
+      "MaThanhPhan": "TP10408",
+      "MaNguyenLieu": "NL137",
+      "TenNguyenLieu": "Ngò gai",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA104",
+      "TenMonAn": "Canh chua cá lóc",
+      "MaThanhPhan": "TP10409",
+      "MaNguyenLieu": "NL138",
+      "TenNguyenLieu": "Rau ngổ",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA104",
+      "TenMonAn": "Canh chua cá lóc",
+      "MaThanhPhan": "TP10405",
+      "MaNguyenLieu": "NL139",
+      "TenNguyenLieu": "Bạc hà",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA104",
+      "TenMonAn": "Canh chua cá lóc",
+      "MaThanhPhan": "TP10404",
+      "MaNguyenLieu": "NL142",
+      "TenNguyenLieu": "Đậu bắp",
+      "Natri": "0.87500000"
+    },
+    {
+      "MaMonAn": "MA104",
+      "TenMonAn": "Canh chua cá lóc",
+      "MaThanhPhan": "TP10413",
+      "MaNguyenLieu": "NL239",
+      "TenNguyenLieu": "Gia vị thông dụng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA105",
+      "TenMonAn": "Canh khổ qua nhồi thịt",
+      "MaThanhPhan": "TP10502",
+      "MaNguyenLieu": "NL016",
+      "TenNguyenLieu": "Thịt heo xay",
+      "Natri": "45.33333334"
+    },
+    {
+      "MaMonAn": "MA105",
+      "TenMonAn": "Canh khổ qua nhồi thịt",
+      "MaThanhPhan": "TP10506",
+      "MaNguyenLieu": "NL049",
+      "TenNguyenLieu": "Hành tím",
+      "Natri": "0.99999999"
+    },
+    {
+      "MaMonAn": "MA105",
+      "TenMonAn": "Canh khổ qua nhồi thịt",
+      "MaThanhPhan": "TP10507",
+      "MaNguyenLieu": "NL051",
+      "TenNguyenLieu": "Tỏi",
+      "Natri": "0.56666667"
+    },
+    {
+      "MaMonAn": "MA105",
+      "TenMonAn": "Canh khổ qua nhồi thịt",
+      "MaThanhPhan": "TP10508",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": "645.96666021"
+    },
+    {
+      "MaMonAn": "MA105",
+      "TenMonAn": "Canh khổ qua nhồi thịt",
+      "MaThanhPhan": "TP10501",
+      "MaNguyenLieu": "NL124",
+      "TenNguyenLieu": "Khổ qua",
+      "Natri": "6.20000000"
+    },
+    {
+      "MaMonAn": "MA105",
+      "TenMonAn": "Canh khổ qua nhồi thịt",
+      "MaThanhPhan": "TP10503",
+      "MaNguyenLieu": "NL125",
+      "TenNguyenLieu": "Nấm mèo",
+      "Natri": "11.66666667"
+    },
+    {
+      "MaMonAn": "MA105",
+      "TenMonAn": "Canh khổ qua nhồi thịt",
+      "MaThanhPhan": "TP10505",
+      "MaNguyenLieu": "NL126",
+      "TenNguyenLieu": "Nước dùng xương heo",
+      "Natri": "40.00000000"
+    },
+    {
+      "MaMonAn": "MA105",
+      "TenMonAn": "Canh khổ qua nhồi thịt",
+      "MaThanhPhan": "TP10504",
+      "MaNguyenLieu": "NL143",
+      "TenNguyenLieu": "Trứng vịt",
+      "Natri": "44.56666622"
+    },
+    {
+      "MaMonAn": "MA101",
+      "TenMonAn": "Canh kim chi thịt bò",
+      "MaThanhPhan": "TP10101",
+      "MaNguyenLieu": "NL011",
+      "TenNguyenLieu": "Thịt bò",
+      "Natri": "108.00000000"
+    },
+    {
+      "MaMonAn": "MA101",
+      "TenMonAn": "Canh kim chi thịt bò",
+      "MaThanhPhan": "TP10103",
+      "MaNguyenLieu": "NL029",
+      "TenNguyenLieu": "Đậu hũ",
+      "Natri": "10.50000000"
+    },
+    {
+      "MaMonAn": "MA101",
+      "TenMonAn": "Canh kim chi thịt bò",
+      "MaThanhPhan": "TP10106",
+      "MaNguyenLieu": "NL048",
+      "TenNguyenLieu": "Hành tây",
+      "Natri": "3.00000000"
+    },
+    {
+      "MaMonAn": "MA101",
+      "TenMonAn": "Canh kim chi thịt bò",
+      "MaThanhPhan": "TP10107",
+      "MaNguyenLieu": "NL050",
+      "TenNguyenLieu": "Hành lá",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA101",
+      "TenMonAn": "Canh kim chi thịt bò",
+      "MaThanhPhan": "TP10109",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA101",
+      "TenMonAn": "Canh kim chi thịt bò",
+      "MaThanhPhan": "TP10111",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": "968.95000000"
+    },
+    {
+      "MaMonAn": "MA101",
+      "TenMonAn": "Canh kim chi thịt bò",
+      "MaThanhPhan": "TP10110",
+      "MaNguyenLieu": "NL080",
+      "TenNguyenLieu": "Nước lọc",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA101",
+      "TenMonAn": "Canh kim chi thịt bò",
+      "MaThanhPhan": "TP10104",
+      "MaNguyenLieu": "NL101",
+      "TenNguyenLieu": "Kim chi cải thảo",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA101",
+      "TenMonAn": "Canh kim chi thịt bò",
+      "MaThanhPhan": "TP10102",
+      "MaNguyenLieu": "NL102",
+      "TenNguyenLieu": "Cá cơm khô",
+      "Natri": "35.50000000"
+    },
+    {
+      "MaMonAn": "MA101",
+      "TenMonAn": "Canh kim chi thịt bò",
+      "MaThanhPhan": "TP10105",
+      "MaNguyenLieu": "NL103",
+      "TenNguyenLieu": "Nấm kim châm",
+      "Natri": "3.00000000"
+    },
+    {
+      "MaMonAn": "MA101",
+      "TenMonAn": "Canh kim chi thịt bò",
+      "MaThanhPhan": "TP10108",
+      "MaNguyenLieu": "NL104",
+      "TenNguyenLieu": "Tương ớt Hàn Quốc",
+      "Natri": "1.87500000"
+    },
+    {
+      "MaMonAn": "MA109",
+      "TenMonAn": "Canh sườn hầm hạt sen",
+      "MaThanhPhan": "TP10901",
+      "MaNguyenLieu": "NL017",
+      "TenNguyenLieu": "Sườn heo",
+      "Natri": "46.50000000"
+    },
+    {
+      "MaMonAn": "MA109",
+      "TenMonAn": "Canh sườn hầm hạt sen",
+      "MaThanhPhan": "TP10903",
+      "MaNguyenLieu": "NL036",
+      "TenNguyenLieu": "Cà rốt",
+      "Natri": "14.99940000"
+    },
+    {
+      "MaMonAn": "MA109",
+      "TenMonAn": "Canh sườn hầm hạt sen",
+      "MaThanhPhan": "TP10904",
+      "MaNguyenLieu": "NL047",
+      "TenNguyenLieu": "Bông cải xanh",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA109",
+      "TenMonAn": "Canh sườn hầm hạt sen",
+      "MaThanhPhan": "TP10906",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": "484.47500000"
+    },
+    {
+      "MaMonAn": "MA109",
+      "TenMonAn": "Canh sườn hầm hạt sen",
+      "MaThanhPhan": "TP10907",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.01250000"
+    },
+    {
+      "MaMonAn": "MA109",
+      "TenMonAn": "Canh sườn hầm hạt sen",
+      "MaThanhPhan": "TP10908",
+      "MaNguyenLieu": "NL080",
+      "TenNguyenLieu": "Nước lọc",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA109",
+      "TenMonAn": "Canh sườn hầm hạt sen",
+      "MaThanhPhan": "TP10909",
+      "MaNguyenLieu": "NL097",
+      "TenNguyenLieu": "Hạt nêm",
+      "Natri": "1636.35750000"
+    },
+    {
+      "MaMonAn": "MA109",
+      "TenMonAn": "Canh sườn hầm hạt sen",
+      "MaThanhPhan": "TP10902",
+      "MaNguyenLieu": "NL109",
+      "TenNguyenLieu": "Hạt sen",
+      "Natri": "0.25000000"
+    },
+    {
+      "MaMonAn": "MA109",
+      "TenMonAn": "Canh sườn hầm hạt sen",
+      "MaThanhPhan": "TP10905",
+      "MaNguyenLieu": "NL134",
+      "TenNguyenLieu": "Gốc ngò rí",
+      "Natri": "1.72500000"
+    },
+    {
+      "MaMonAn": "MA108",
+      "TenMonAn": "Canh tôm mọc hạt sen",
+      "MaThanhPhan": "TP10806",
+      "MaNguyenLieu": "NL026",
+      "TenNguyenLieu": "Tôm",
+      "Natri": "55.50000000"
+    },
+    {
+      "MaMonAn": "MA108",
+      "TenMonAn": "Canh tôm mọc hạt sen",
+      "MaThanhPhan": "TP10803",
+      "MaNguyenLieu": "NL033",
+      "TenNguyenLieu": "Nấm rơm",
+      "Natri": "1.25000000"
+    },
+    {
+      "MaMonAn": "MA108",
+      "TenMonAn": "Canh tôm mọc hạt sen",
+      "MaThanhPhan": "TP10802",
+      "MaNguyenLieu": "NL036",
+      "TenNguyenLieu": "Cà rốt",
+      "Natri": "14.99940000"
+    },
+    {
+      "MaMonAn": "MA108",
+      "TenMonAn": "Canh tôm mọc hạt sen",
+      "MaThanhPhan": "TP10804",
+      "MaNguyenLieu": "NL048",
+      "TenNguyenLieu": "Hành tây",
+      "Natri": "1.50000000"
+    },
+    {
+      "MaMonAn": "MA108",
+      "TenMonAn": "Canh tôm mọc hạt sen",
+      "MaThanhPhan": "TP10807",
+      "MaNguyenLieu": "NL049",
+      "TenNguyenLieu": "Hành tím",
+      "Natri": "0.45000000"
+    },
+    {
+      "MaMonAn": "MA108",
+      "TenMonAn": "Canh tôm mọc hạt sen",
+      "MaThanhPhan": "TP10809",
+      "MaNguyenLieu": "NL055",
+      "TenNguyenLieu": "Rau mùi",
+      "Natri": "1.72500000"
+    },
+    {
+      "MaMonAn": "MA108",
+      "TenMonAn": "Canh tôm mọc hạt sen",
+      "MaThanhPhan": "TP10810",
+      "MaNguyenLieu": "NL070",
+      "TenNguyenLieu": "Nước mắm",
+      "Natri": "294.41250000"
+    },
+    {
+      "MaMonAn": "MA108",
+      "TenMonAn": "Canh tôm mọc hạt sen",
+      "MaThanhPhan": "TP10812",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": "1453.42500000"
+    },
+    {
+      "MaMonAn": "MA108",
+      "TenMonAn": "Canh tôm mọc hạt sen",
+      "MaThanhPhan": "TP10808",
+      "MaNguyenLieu": "NL075",
+      "TenNguyenLieu": "Tiêu đen",
+      "Natri": "0.37500000"
+    },
+    {
+      "MaMonAn": "MA108",
+      "TenMonAn": "Canh tôm mọc hạt sen",
+      "MaThanhPhan": "TP10814",
+      "MaNguyenLieu": "NL096",
+      "TenNguyenLieu": "Bột ngọt",
+      "Natri": "461.25000000"
+    },
+    {
+      "MaMonAn": "MA108",
+      "TenMonAn": "Canh tôm mọc hạt sen",
+      "MaThanhPhan": "TP10813",
+      "MaNguyenLieu": "NL097",
+      "TenNguyenLieu": "Hạt nêm",
+      "Natri": "409.08937500"
+    },
+    {
+      "MaMonAn": "MA108",
+      "TenMonAn": "Canh tôm mọc hạt sen",
+      "MaThanhPhan": "TP10801",
+      "MaNguyenLieu": "NL109",
+      "TenNguyenLieu": "Hạt sen",
+      "Natri": "0.37500000"
+    },
+    {
+      "MaMonAn": "MA108",
+      "TenMonAn": "Canh tôm mọc hạt sen",
+      "MaThanhPhan": "TP10811",
+      "MaNguyenLieu": "NL136",
+      "TenNguyenLieu": "Ớt hiểm",
+      "Natri": "0.33750000"
+    },
+    {
+      "MaMonAn": "MA108",
+      "TenMonAn": "Canh tôm mọc hạt sen",
+      "MaThanhPhan": "TP10805",
+      "MaNguyenLieu": "NL902",
+      "TenNguyenLieu": "Giò sống",
+      "Natri": "23.50000000"
+    },
+    {
+      "MaMonAn": "MA918",
+      "TenMonAn": "Chả giò miền Nam",
+      "MaThanhPhan": "TP1081",
+      "MaNguyenLieu": "NL036",
+      "TenNguyenLieu": "Cà rốt",
+      "Natri": "2.30760000"
+    },
+    {
+      "MaMonAn": "MA918",
+      "TenMonAn": "Chả giò miền Nam",
+      "MaThanhPhan": "TP1084",
+      "MaNguyenLieu": "NL049",
+      "TenNguyenLieu": "Hành tím",
+      "Natri": "0.12000000"
+    },
+    {
+      "MaMonAn": "MA918",
+      "TenMonAn": "Chả giò miền Nam",
+      "MaThanhPhan": "TP1086",
+      "MaNguyenLieu": "NL050",
+      "TenNguyenLieu": "Hành lá",
+      "Natri": "0.09600000"
+    },
+    {
+      "MaMonAn": "MA918",
+      "TenMonAn": "Chả giò miền Nam",
+      "MaThanhPhan": "TP1085",
+      "MaNguyenLieu": "NL051",
+      "TenNguyenLieu": "Tỏi",
+      "Natri": "0.06800000"
+    },
+    {
+      "MaMonAn": "MA918",
+      "TenMonAn": "Chả giò miền Nam",
+      "MaThanhPhan": "TP1078",
+      "MaNguyenLieu": "NL1078",
+      "TenNguyenLieu": "Thịt heo",
+      "Natri": "5.50000000"
+    },
+    {
+      "MaMonAn": "MA918",
+      "TenMonAn": "Chả giò miền Nam",
+      "MaThanhPhan": "TP1082",
+      "MaNguyenLieu": "NL1082",
+      "TenNguyenLieu": "Nấm mèo (đã ngâm nở)",
+      "Natri": "1.12000000"
+    },
+    {
+      "MaMonAn": "MA918",
+      "TenMonAn": "Chả giò miền Nam",
+      "MaThanhPhan": "TP1083",
+      "MaNguyenLieu": "NL1083",
+      "TenNguyenLieu": "Bún tàu khô",
+      "Natri": "0.12000000"
+    },
+    {
+      "MaMonAn": "MA918",
+      "TenMonAn": "Chả giò miền Nam",
+      "MaThanhPhan": "TP1087",
+      "MaNguyenLieu": "NL1087",
+      "TenNguyenLieu": "Bịch bánh cuốn chả giò (loại bánh tráng dẻo)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA918",
+      "TenMonAn": "Chả giò miền Nam",
+      "MaThanhPhan": "TP1089",
+      "MaNguyenLieu": "NL1089",
+      "TenNguyenLieu": "Gia vị thông dụng (bột nêm/muối/tiêu/dầu ăn/giấm)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA918",
+      "TenMonAn": "Chả giò miền Nam",
+      "MaThanhPhan": "TP1088",
+      "MaNguyenLieu": "NL301",
+      "TenNguyenLieu": "Bột mì",
+      "Natri": "0.00240000"
+    },
+    {
+      "MaMonAn": "MA918",
+      "TenMonAn": "Chả giò miền Nam",
+      "MaThanhPhan": "TP1080",
+      "MaNguyenLieu": "NL313",
+      "TenNguyenLieu": "Khoai môn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA918",
+      "TenMonAn": "Chả giò miền Nam",
+      "MaThanhPhan": "TP1079",
+      "MaNguyenLieu": "NL966",
+      "TenNguyenLieu": "Tôm tươi",
+      "Natri": "8.88000000"
+    },
+    {
+      "MaMonAn": "MA905",
+      "TenMonAn": "Cháo thịt bằm tía tô",
+      "MaThanhPhan": "TP957",
+      "MaNguyenLieu": "NL036",
+      "TenNguyenLieu": "Cà rốt",
+      "Natri": "15.38400000"
+    },
+    {
+      "MaMonAn": "MA905",
+      "TenMonAn": "Cháo thịt bằm tía tô",
+      "MaThanhPhan": "TP961",
+      "MaNguyenLieu": "NL050",
+      "TenNguyenLieu": "Hành lá",
+      "Natri": "2.40000000"
+    },
+    {
+      "MaMonAn": "MA905",
+      "TenMonAn": "Cháo thịt bằm tía tô",
+      "MaThanhPhan": "TP959",
+      "MaNguyenLieu": "NL052",
+      "TenNguyenLieu": "Gừng",
+      "Natri": "0.81250000"
+    },
+    {
+      "MaMonAn": "MA905",
+      "TenMonAn": "Cháo thịt bằm tía tô",
+      "MaThanhPhan": "TP962",
+      "MaNguyenLieu": "NL070",
+      "TenNguyenLieu": "Nước mắm",
+      "Natri": "294.41250000"
+    },
+    {
+      "MaMonAn": "MA905",
+      "TenMonAn": "Cháo thịt bằm tía tô",
+      "MaThanhPhan": "TP954",
+      "MaNguyenLieu": "NL954",
+      "TenNguyenLieu": "Gạo tẻ",
+      "Natri": "1.25000000"
+    },
+    {
+      "MaMonAn": "MA905",
+      "TenMonAn": "Cháo thịt bằm tía tô",
+      "MaThanhPhan": "TP955",
+      "MaNguyenLieu": "NL955",
+      "TenNguyenLieu": "Gạo nếp",
+      "Natri": "0.15500000"
+    },
+    {
+      "MaMonAn": "MA905",
+      "TenMonAn": "Cháo thịt bằm tía tô",
+      "MaThanhPhan": "TP956",
+      "MaNguyenLieu": "NL956",
+      "TenNguyenLieu": "Thịt xay",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA905",
+      "TenMonAn": "Cháo thịt bằm tía tô",
+      "MaThanhPhan": "TP958",
+      "MaNguyenLieu": "NL958",
+      "TenNguyenLieu": "Khoai tây",
+      "Natri": "2.59000000"
+    },
+    {
+      "MaMonAn": "MA905",
+      "TenMonAn": "Cháo thịt bằm tía tô",
+      "MaThanhPhan": "TP960",
+      "MaNguyenLieu": "NL960",
+      "TenNguyenLieu": "Tía tô",
+      "Natri": "0.35000000"
+    },
+    {
+      "MaMonAn": "MA905",
+      "TenMonAn": "Cháo thịt bằm tía tô",
+      "MaThanhPhan": "TP963",
+      "MaNguyenLieu": "NL963",
+      "TenNguyenLieu": "Gia vị thông dụng (muối/hạt nêm/tiêu xay)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA906",
+      "TenMonAn": "Cháo tôm bí đỏ bằng máy xay nấu đa năng",
+      "MaThanhPhan": "TP968",
+      "MaNguyenLieu": "NL036",
+      "TenNguyenLieu": "Cà rốt",
+      "Natri": "10.25600021"
+    },
+    {
+      "MaMonAn": "MA906",
+      "TenMonAn": "Cháo tôm bí đỏ bằng máy xay nấu đa năng",
+      "MaThanhPhan": "TP967",
+      "MaNguyenLieu": "NL039",
+      "TenNguyenLieu": "Bí đỏ",
+      "Natri": "0.33333333"
+    },
+    {
+      "MaMonAn": "MA906",
+      "TenMonAn": "Cháo tôm bí đỏ bằng máy xay nấu đa năng",
+      "MaThanhPhan": "TP970",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": "80.74583979"
+    },
+    {
+      "MaMonAn": "MA906",
+      "TenMonAn": "Cháo tôm bí đỏ bằng máy xay nấu đa năng",
+      "MaThanhPhan": "TP964",
+      "MaNguyenLieu": "NL964",
+      "TenNguyenLieu": "Gạo tẻ (1 cốc)",
+      "Natri": "1.50000000"
+    },
+    {
+      "MaMonAn": "MA906",
+      "TenMonAn": "Cháo tôm bí đỏ bằng máy xay nấu đa năng",
+      "MaThanhPhan": "TP965",
+      "MaNguyenLieu": "NL965",
+      "TenNguyenLieu": "Gạo nếp (1 cốc)",
+      "Natri": "1.50000000"
+    },
+    {
+      "MaMonAn": "MA906",
+      "TenMonAn": "Cháo tôm bí đỏ bằng máy xay nấu đa năng",
+      "MaThanhPhan": "TP966",
+      "MaNguyenLieu": "NL966",
+      "TenNguyenLieu": "Tôm tươi",
+      "Natri": "49.33333333"
+    },
+    {
+      "MaMonAn": "MA906",
+      "TenMonAn": "Cháo tôm bí đỏ bằng máy xay nấu đa năng",
+      "MaThanhPhan": "TP969",
+      "MaNguyenLieu": "NL969",
+      "TenNguyenLieu": "Hạt sen tươi",
+      "Natri": "0.16666667"
+    },
+    {
+      "MaMonAn": "MA214",
+      "TenMonAn": "Chè đậu đỏ bột lọc",
+      "MaThanhPhan": "TP21408",
+      "MaNguyenLieu": "NL067",
+      "TenNguyenLieu": "Sữa tươi không đường",
+      "Natri": "18.92000000"
+    },
+    {
+      "MaMonAn": "MA214",
+      "TenMonAn": "Chè đậu đỏ bột lọc",
+      "MaThanhPhan": "TP21409",
+      "MaNguyenLieu": "NL068",
+      "TenNguyenLieu": "Nước cốt dừa",
+      "Natri": "3.00000000"
+    },
+    {
+      "MaMonAn": "MA214",
+      "TenMonAn": "Chè đậu đỏ bột lọc",
+      "MaThanhPhan": "TP21402",
+      "MaNguyenLieu": "NL131",
+      "TenNguyenLieu": "Đường phèn",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA214",
+      "TenMonAn": "Chè đậu đỏ bột lọc",
+      "MaThanhPhan": "TP21407",
+      "MaNguyenLieu": "NL146",
+      "TenNguyenLieu": "Bột năng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA214",
+      "TenMonAn": "Chè đậu đỏ bột lọc",
+      "MaThanhPhan": "TP21404",
+      "MaNguyenLieu": "NL175",
+      "TenNguyenLieu": "Cùi dừa",
+      "Natri": "2.80000000"
+    },
+    {
+      "MaMonAn": "MA214",
+      "TenMonAn": "Chè đậu đỏ bột lọc",
+      "MaThanhPhan": "TP21401",
+      "MaNguyenLieu": "NL176",
+      "TenNguyenLieu": "Đậu đỏ",
+      "Natri": "2.00000000"
+    },
+    {
+      "MaMonAn": "MA214",
+      "TenMonAn": "Chè đậu đỏ bột lọc",
+      "MaThanhPhan": "TP21403",
+      "MaNguyenLieu": "NL181",
+      "TenNguyenLieu": "Lá dứa",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA214",
+      "TenMonAn": "Chè đậu đỏ bột lọc",
+      "MaThanhPhan": "TP21405",
+      "MaNguyenLieu": "NL185",
+      "TenNguyenLieu": "Nước dền",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA214",
+      "TenMonAn": "Chè đậu đỏ bột lọc",
+      "MaThanhPhan": "TP21406",
+      "MaNguyenLieu": "NL186",
+      "TenNguyenLieu": "Nước lá dứa",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA214",
+      "TenMonAn": "Chè đậu đỏ bột lọc",
+      "MaThanhPhan": "TP21410",
+      "MaNguyenLieu": "NL187",
+      "TenNguyenLieu": "Sữa đặc",
+      "Natri": "12.70000000"
+    },
+    {
+      "MaMonAn": "MA213",
+      "TenMonAn": "Chè khúc bạch",
+      "MaThanhPhan": "TP21303",
+      "MaNguyenLieu": "NL067",
+      "TenNguyenLieu": "Sữa tươi không đường",
+      "Natri": "18.92000000"
+    },
+    {
+      "MaMonAn": "MA213",
+      "TenMonAn": "Chè khúc bạch",
+      "MaThanhPhan": "TP21306",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.60000000"
+    },
+    {
+      "MaMonAn": "MA213",
+      "TenMonAn": "Chè khúc bạch",
+      "MaThanhPhan": "TP21304",
+      "MaNguyenLieu": "NL089",
+      "TenNguyenLieu": "Kem tươi",
+      "Natri": "16.72000000"
+    },
+    {
+      "MaMonAn": "MA213",
+      "TenMonAn": "Chè khúc bạch",
+      "MaThanhPhan": "TP21302",
+      "MaNguyenLieu": "NL152",
+      "TenNguyenLieu": "Gelatin",
+      "Natri": "3.92000000"
+    },
+    {
+      "MaMonAn": "MA213",
+      "TenMonAn": "Chè khúc bạch",
+      "MaThanhPhan": "TP21305",
+      "MaNguyenLieu": "NL179",
+      "TenNguyenLieu": "Hạnh nhân lát",
+      "Natri": "101.70000000"
+    },
+    {
+      "MaMonAn": "MA213",
+      "TenMonAn": "Chè khúc bạch",
+      "MaThanhPhan": "TP21301",
+      "MaNguyenLieu": "NL189",
+      "TenNguyenLieu": "Vải",
+      "Natri": "2.00000000"
+    },
+    {
+      "MaMonAn": "MA210",
+      "TenMonAn": "Chè trái lê táo đỏ",
+      "MaThanhPhan": "TP21005",
+      "MaNguyenLieu": "NL080",
+      "TenNguyenLieu": "Nước lọc",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA210",
+      "TenMonAn": "Chè trái lê táo đỏ",
+      "MaThanhPhan": "TP21003",
+      "MaNguyenLieu": "NL116",
+      "TenNguyenLieu": "Kỷ tử",
+      "Natri": "24.83333332"
+    },
+    {
+      "MaMonAn": "MA210",
+      "TenMonAn": "Chè trái lê táo đỏ",
+      "MaThanhPhan": "TP21004",
+      "MaNguyenLieu": "NL131",
+      "TenNguyenLieu": "Đường phèn",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA210",
+      "TenMonAn": "Chè trái lê táo đỏ",
+      "MaThanhPhan": "TP21001",
+      "MaNguyenLieu": "NL182",
+      "TenNguyenLieu": "Lê",
+      "Natri": "8.30000000"
+    },
+    {
+      "MaMonAn": "MA210",
+      "TenMonAn": "Chè trái lê táo đỏ",
+      "MaThanhPhan": "TP21002",
+      "MaNguyenLieu": "NL188",
+      "TenNguyenLieu": "Táo đỏ",
+      "Natri": "1.50000000"
+    },
+    {
+      "MaMonAn": "MA937",
+      "TenMonAn": "Cơm chay lá sen",
+      "MaThanhPhan": "TP93705",
+      "MaNguyenLieu": "NL036",
+      "TenNguyenLieu": "Cà rốt",
+      "Natri": "19.23000000"
+    },
+    {
+      "MaMonAn": "MA937",
+      "TenMonAn": "Cơm chay lá sen",
+      "MaThanhPhan": "TP93710",
+      "MaNguyenLieu": "NL071",
+      "TenNguyenLieu": "Nước tương",
+      "Natri": "137.32500000"
+    },
+    {
+      "MaMonAn": "MA937",
+      "TenMonAn": "Cơm chay lá sen",
+      "MaThanhPhan": "TP93708",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.02500000"
+    },
+    {
+      "MaMonAn": "MA937",
+      "TenMonAn": "Cơm chay lá sen",
+      "MaThanhPhan": "TP93703",
+      "MaNguyenLieu": "NL1189",
+      "TenNguyenLieu": "Chả chay",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA937",
+      "TenMonAn": "Cơm chay lá sen",
+      "MaThanhPhan": "TP93711",
+      "MaNguyenLieu": "NL1190",
+      "TenNguyenLieu": "Dầu hào chay",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA937",
+      "TenMonAn": "Cơm chay lá sen",
+      "MaThanhPhan": "TP93706",
+      "MaNguyenLieu": "NL1191",
+      "TenNguyenLieu": "Đậu que",
+      "Natri": "23.92500000"
+    },
+    {
+      "MaMonAn": "MA937",
+      "TenMonAn": "Cơm chay lá sen",
+      "MaThanhPhan": "TP93701",
+      "MaNguyenLieu": "NL1193",
+      "TenNguyenLieu": "Gạo dẻo",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA937",
+      "TenMonAn": "Cơm chay lá sen",
+      "MaThanhPhan": "TP93707",
+      "MaNguyenLieu": "NL1196",
+      "TenNguyenLieu": "Lá sen",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA937",
+      "TenMonAn": "Cơm chay lá sen",
+      "MaThanhPhan": "TP93702",
+      "MaNguyenLieu": "NL1200",
+      "TenNguyenLieu": "Sen tươi",
+      "Natri": "0.37500000"
+    },
+    {
+      "MaMonAn": "MA937",
+      "TenMonAn": "Cơm chay lá sen",
+      "MaThanhPhan": "TP93709",
+      "MaNguyenLieu": "NL312",
+      "TenNguyenLieu": "Hạt nêm chay",
+      "Natri": "530.00000000"
+    },
+    {
+      "MaMonAn": "MA937",
+      "TenMonAn": "Cơm chay lá sen",
+      "MaThanhPhan": "TP93704",
+      "MaNguyenLieu": "NL987",
+      "TenNguyenLieu": "Nấm đông cô tươi",
+      "Natri": "0.22500000"
+    },
+    {
+      "MaMonAn": "MA919",
+      "TenMonAn": "Cơm chiên dứa",
+      "MaThanhPhan": "TP1099",
+      "MaNguyenLieu": "NL026",
+      "TenNguyenLieu": "Tôm",
+      "Natri": "55.50000000"
+    },
+    {
+      "MaMonAn": "MA919",
+      "TenMonAn": "Cơm chiên dứa",
+      "MaThanhPhan": "TP1091",
+      "MaNguyenLieu": "NL045",
+      "TenNguyenLieu": "Đậu Hà Lan",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA919",
+      "TenMonAn": "Cơm chiên dứa",
+      "MaThanhPhan": "TP1100",
+      "MaNguyenLieu": "NL070",
+      "TenNguyenLieu": "Nước mắm",
+      "Natri": "588.82500000"
+    },
+    {
+      "MaMonAn": "MA919",
+      "TenMonAn": "Cơm chiên dứa",
+      "MaThanhPhan": "TP1092",
+      "MaNguyenLieu": "NL1092",
+      "TenNguyenLieu": "Cà rốt cắt nhỏ",
+      "Natri": "36.92000000"
+    },
+    {
+      "MaMonAn": "MA919",
+      "TenMonAn": "Cơm chiên dứa",
+      "MaThanhPhan": "TP1093",
+      "MaNguyenLieu": "NL1093",
+      "TenNguyenLieu": "Bắp hạt",
+      "Natri": "2.47500000"
+    },
+    {
+      "MaMonAn": "MA919",
+      "TenMonAn": "Cơm chiên dứa",
+      "MaThanhPhan": "TP1095",
+      "MaNguyenLieu": "NL1095",
+      "TenNguyenLieu": "Cơm nguội",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA919",
+      "TenMonAn": "Cơm chiên dứa",
+      "MaThanhPhan": "TP1096",
+      "MaNguyenLieu": "NL1096",
+      "TenNguyenLieu": "Trứng gà (đánh tan cùng nước mắm)",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA919",
+      "TenMonAn": "Cơm chiên dứa",
+      "MaThanhPhan": "TP1097",
+      "MaNguyenLieu": "NL1097",
+      "TenNguyenLieu": "Hạt điều",
+      "Natri": "6.78000000"
+    },
+    {
+      "MaMonAn": "MA919",
+      "TenMonAn": "Cơm chiên dứa",
+      "MaThanhPhan": "TP1098",
+      "MaNguyenLieu": "NL1098",
+      "TenNguyenLieu": "Thơm cắt hạt lựu",
+      "Natri": "20.57000000"
+    },
+    {
+      "MaMonAn": "MA919",
+      "TenMonAn": "Cơm chiên dứa",
+      "MaThanhPhan": "TP1094",
+      "MaNguyenLieu": "NL907",
+      "TenNguyenLieu": "Tỏi băm",
+      "Natri": "1.80000000"
+    },
+    {
+      "MaMonAn": "MA919",
+      "TenMonAn": "Cơm chiên dứa",
+      "MaThanhPhan": "TP1090",
+      "MaNguyenLieu": "NL991",
+      "TenNguyenLieu": "Thơm",
+      "Natri": "109.50500000"
+    },
+    {
+      "MaMonAn": "MA933",
+      "TenMonAn": "Cơm thăn bò rong biển",
+      "MaThanhPhan": "TP93302",
+      "MaNguyenLieu": "NL051",
+      "TenNguyenLieu": "Tỏi",
+      "Natri": "0.63750000"
+    },
+    {
+      "MaMonAn": "MA933",
+      "TenMonAn": "Cơm thăn bò rong biển",
+      "MaThanhPhan": "TP93306",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA933",
+      "TenMonAn": "Cơm thăn bò rong biển",
+      "MaThanhPhan": "TP93307",
+      "MaNguyenLieu": "NL1128",
+      "TenNguyenLieu": "Tiêu xay",
+      "Natri": "0.11500000"
+    },
+    {
+      "MaMonAn": "MA933",
+      "TenMonAn": "Cơm thăn bò rong biển",
+      "MaThanhPhan": "TP93303",
+      "MaNguyenLieu": "NL1141",
+      "TenNguyenLieu": "Rượu trắng",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA933",
+      "TenMonAn": "Cơm thăn bò rong biển",
+      "MaThanhPhan": "TP93301",
+      "MaNguyenLieu": "NL1184",
+      "TenNguyenLieu": "Thịt thăn bò",
+      "Natri": "22.00000000"
+    },
+    {
+      "MaMonAn": "MA933",
+      "TenMonAn": "Cơm thăn bò rong biển",
+      "MaThanhPhan": "TP93304",
+      "MaNguyenLieu": "NL1185",
+      "TenNguyenLieu": "Rong biển cháy tỏi",
+      "Natri": "400.00000000"
+    },
+    {
+      "MaMonAn": "MA933",
+      "TenMonAn": "Cơm thăn bò rong biển",
+      "MaThanhPhan": "TP93305",
+      "MaNguyenLieu": "NL1186",
+      "TenNguyenLieu": "Cơm nóng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA933",
+      "TenMonAn": "Cơm thăn bò rong biển",
+      "MaThanhPhan": "TP93308",
+      "MaNguyenLieu": "NL239",
+      "TenNguyenLieu": "Gia vị thông dụng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA945",
+      "TenMonAn": "Cơm trộn bằng nồi cơm điện",
+      "MaThanhPhan": "TP93861",
+      "MaNguyenLieu": "NL010",
+      "TenNguyenLieu": "Bắp ngọt",
+      "Natri": "6.75000000"
+    },
+    {
+      "MaMonAn": "MA945",
+      "TenMonAn": "Cơm trộn bằng nồi cơm điện",
+      "MaThanhPhan": "TP93862",
+      "MaNguyenLieu": "NL036",
+      "TenNguyenLieu": "Cà rốt",
+      "Natri": "30.76800000"
+    },
+    {
+      "MaMonAn": "MA945",
+      "TenMonAn": "Cơm trộn bằng nồi cơm điện",
+      "MaThanhPhan": "TP93866",
+      "MaNguyenLieu": "NL071",
+      "TenNguyenLieu": "Nước tương",
+      "Natri": "1373.25000000"
+    },
+    {
+      "MaMonAn": "MA945",
+      "TenMonAn": "Cơm trộn bằng nồi cơm điện",
+      "MaThanhPhan": "TP93865",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA945",
+      "TenMonAn": "Cơm trộn bằng nồi cơm điện",
+      "MaThanhPhan": "TP93869",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": "726.71250000"
+    },
+    {
+      "MaMonAn": "MA945",
+      "TenMonAn": "Cơm trộn bằng nồi cơm điện",
+      "MaThanhPhan": "TP93868",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.12500000"
+    },
+    {
+      "MaMonAn": "MA945",
+      "TenMonAn": "Cơm trộn bằng nồi cơm điện",
+      "MaThanhPhan": "TP93870",
+      "MaNguyenLieu": "NL097",
+      "TenNguyenLieu": "Hạt nêm",
+      "Natri": "1636.35750000"
+    },
+    {
+      "MaMonAn": "MA945",
+      "TenMonAn": "Cơm trộn bằng nồi cơm điện",
+      "MaThanhPhan": "TP93871",
+      "MaNguyenLieu": "NL1128",
+      "TenNguyenLieu": "Tiêu xay",
+      "Natri": "0.11500000"
+    },
+    {
+      "MaMonAn": "MA945",
+      "TenMonAn": "Cơm trộn bằng nồi cơm điện",
+      "MaThanhPhan": "TP93863",
+      "MaNguyenLieu": "NL1191",
+      "TenNguyenLieu": "Đậu que",
+      "Natri": "95.70000000"
+    },
+    {
+      "MaMonAn": "MA945",
+      "TenMonAn": "Cơm trộn bằng nồi cơm điện",
+      "MaThanhPhan": "TP93864",
+      "MaNguyenLieu": "NL1215",
+      "TenNguyenLieu": "Xúc xích",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA945",
+      "TenMonAn": "Cơm trộn bằng nồi cơm điện",
+      "MaThanhPhan": "TP93867",
+      "MaNguyenLieu": "NL943",
+      "TenNguyenLieu": "Ớt bột",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA945",
+      "TenMonAn": "Cơm trộn bằng nồi cơm điện",
+      "MaThanhPhan": "TP93860",
+      "MaNguyenLieu": "NL954",
+      "TenNguyenLieu": "Gạo tẻ",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA203",
+      "TenMonAn": "Cream brulee",
+      "MaThanhPhan": "TP20304",
+      "MaNguyenLieu": "NL065",
+      "TenNguyenLieu": "Dâu tây",
+      "Natri": "0.16000000"
+    },
+    {
+      "MaMonAn": "MA203",
+      "TenMonAn": "Cream brulee",
+      "MaThanhPhan": "TP20307",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": "322.98333979"
+    },
+    {
+      "MaMonAn": "MA203",
+      "TenMonAn": "Cream brulee",
+      "MaThanhPhan": "TP20303",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.06666667"
+    },
+    {
+      "MaMonAn": "MA203",
+      "TenMonAn": "Cream brulee",
+      "MaThanhPhan": "TP20305",
+      "MaNguyenLieu": "NL150",
+      "TenNguyenLieu": "Đường caramel",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA203",
+      "TenMonAn": "Cream brulee",
+      "MaThanhPhan": "TP20302",
+      "MaNguyenLieu": "NL154",
+      "TenNguyenLieu": "Lòng đỏ trứng gà",
+      "Natri": "21.60000000"
+    },
+    {
+      "MaMonAn": "MA203",
+      "TenMonAn": "Cream brulee",
+      "MaThanhPhan": "TP20306",
+      "MaNguyenLieu": "NL170",
+      "TenNguyenLieu": "Vani",
+      "Natri": "0.03750000"
+    },
+    {
+      "MaMonAn": "MA203",
+      "TenMonAn": "Cream brulee",
+      "MaThanhPhan": "TP20301",
+      "MaNguyenLieu": "NL171",
+      "TenNguyenLieu": "Whipping cream",
+      "Natri": "18.00000000"
+    },
+    {
+      "MaMonAn": "MA943",
+      "TenMonAn": "Củ kiệu chua ngọt",
+      "MaThanhPhan": "TP93845",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA943",
+      "TenMonAn": "Củ kiệu chua ngọt",
+      "MaThanhPhan": "TP93842",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "4.00000000"
+    },
+    {
+      "MaMonAn": "MA943",
+      "TenMonAn": "Củ kiệu chua ngọt",
+      "MaThanhPhan": "TP93841",
+      "MaNguyenLieu": "NL1209",
+      "TenNguyenLieu": "Củ kiệu",
+      "Natri": "20.00000000"
+    },
+    {
+      "MaMonAn": "MA943",
+      "TenMonAn": "Củ kiệu chua ngọt",
+      "MaThanhPhan": "TP93844",
+      "MaNguyenLieu": "NL1210",
+      "TenNguyenLieu": "Phèn chua",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA943",
+      "TenMonAn": "Củ kiệu chua ngọt",
+      "MaThanhPhan": "TP93843",
+      "MaNguyenLieu": "NL952",
+      "TenNguyenLieu": "Giấm",
+      "Natri": "25.00000000"
+    },
+    {
+      "MaMonAn": "MA916",
+      "TenMonAn": "Đậu hũ non chiên xù",
+      "MaThanhPhan": "TP1049",
+      "MaNguyenLieu": "NL028",
+      "TenNguyenLieu": "Trứng gà",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA916",
+      "TenMonAn": "Đậu hũ non chiên xù",
+      "MaThanhPhan": "TP1053",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA916",
+      "TenMonAn": "Đậu hũ non chiên xù",
+      "MaThanhPhan": "TP1050",
+      "MaNguyenLieu": "NL1050",
+      "TenNguyenLieu": "Đậu hũ non",
+      "Natri": "7.00000000"
+    },
+    {
+      "MaMonAn": "MA916",
+      "TenMonAn": "Đậu hũ non chiên xù",
+      "MaThanhPhan": "TP1051",
+      "MaNguyenLieu": "NL1051",
+      "TenNguyenLieu": "Bột chiên xù",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA916",
+      "TenMonAn": "Đậu hũ non chiên xù",
+      "MaThanhPhan": "TP1052",
+      "MaNguyenLieu": "NL301",
+      "TenNguyenLieu": "Bột mì",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA949",
+      "TenMonAn": "Dưa cải muối",
+      "MaThanhPhan": "TP93911",
+      "MaNguyenLieu": "NL049",
+      "TenNguyenLieu": "Hành tím",
+      "Natri": "3.00000000"
+    },
+    {
+      "MaMonAn": "MA949",
+      "TenMonAn": "Dưa cải muối",
+      "MaThanhPhan": "TP93912",
+      "MaNguyenLieu": "NL050",
+      "TenNguyenLieu": "Hành lá",
+      "Natri": "3.20000000"
+    },
+    {
+      "MaMonAn": "MA949",
+      "TenMonAn": "Dưa cải muối",
+      "MaThanhPhan": "TP93909",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": "4650.96000000"
+    },
+    {
+      "MaMonAn": "MA949",
+      "TenMonAn": "Dưa cải muối",
+      "MaThanhPhan": "TP93910",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.04000000"
+    },
+    {
+      "MaMonAn": "MA949",
+      "TenMonAn": "Dưa cải muối",
+      "MaThanhPhan": "TP93908",
+      "MaNguyenLieu": "NL1228",
+      "TenNguyenLieu": "Cải bẹ xanh tươi",
+      "Natri": "40.00000000"
+    },
+    {
+      "MaMonAn": "MA949",
+      "TenMonAn": "Dưa cải muối",
+      "MaThanhPhan": "TP93913",
+      "MaNguyenLieu": "NL934",
+      "TenNguyenLieu": "Ớt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA949",
+      "TenMonAn": "Dưa cải muối",
+      "MaThanhPhan": "TP93914",
+      "MaNguyenLieu": "NL952",
+      "TenNguyenLieu": "Giấm",
+      "Natri": "0.15000000"
+    },
+    {
+      "MaMonAn": "MA941",
+      "TenMonAn": "Dưa hấu chanh tuyết",
+      "MaThanhPhan": "TP93834",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.11250000"
+    },
+    {
+      "MaMonAn": "MA941",
+      "TenMonAn": "Dưa hấu chanh tuyết",
+      "MaThanhPhan": "TP93835",
+      "MaNguyenLieu": "NL1123",
+      "TenNguyenLieu": "Nước cốt chanh",
+      "Natri": "0.22500000"
+    },
+    {
+      "MaMonAn": "MA941",
+      "TenMonAn": "Dưa hấu chanh tuyết",
+      "MaThanhPhan": "TP93836",
+      "MaNguyenLieu": "NL1203",
+      "TenNguyenLieu": "Vỏ chanh",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA941",
+      "TenMonAn": "Dưa hấu chanh tuyết",
+      "MaThanhPhan": "TP93833",
+      "MaNguyenLieu": "NL307",
+      "TenNguyenLieu": "Dưa hấu",
+      "Natri": "11.29500000"
+    },
+    {
+      "MaMonAn": "MA102",
+      "TenMonAn": "Gà ác hầm sâm",
+      "MaThanhPhan": "TP10207",
+      "MaNguyenLieu": "NL036",
+      "TenNguyenLieu": "Cà rốt",
+      "Natri": "10.25600021"
+    },
+    {
+      "MaMonAn": "MA102",
+      "TenMonAn": "Gà ác hầm sâm",
+      "MaThanhPhan": "TP10209",
+      "MaNguyenLieu": "NL049",
+      "TenNguyenLieu": "Hành tím",
+      "Natri": "2.00000001"
+    },
+    {
+      "MaMonAn": "MA102",
+      "TenMonAn": "Gà ác hầm sâm",
+      "MaThanhPhan": "TP10208",
+      "MaNguyenLieu": "NL052",
+      "TenNguyenLieu": "Gừng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA102",
+      "TenMonAn": "Gà ác hầm sâm",
+      "MaThanhPhan": "TP10211",
+      "MaNguyenLieu": "NL071",
+      "TenNguyenLieu": "Nước tương",
+      "Natri": "183.10000092"
+    },
+    {
+      "MaMonAn": "MA102",
+      "TenMonAn": "Gà ác hầm sâm",
+      "MaThanhPhan": "TP10201",
+      "MaNguyenLieu": "NL106",
+      "TenNguyenLieu": "Gà ác",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA102",
+      "TenMonAn": "Gà ác hầm sâm",
+      "MaThanhPhan": "TP10212",
+      "MaNguyenLieu": "NL1060",
+      "TenNguyenLieu": "Rượu",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA102",
+      "TenMonAn": "Gà ác hầm sâm",
+      "MaThanhPhan": "TP10203",
+      "MaNguyenLieu": "NL108",
+      "TenNguyenLieu": "Củ sen",
+      "Natri": "7.66666682"
+    },
+    {
+      "MaMonAn": "MA102",
+      "TenMonAn": "Gà ác hầm sâm",
+      "MaThanhPhan": "TP10204",
+      "MaNguyenLieu": "NL109",
+      "TenNguyenLieu": "Hạt sen",
+      "Natri": "0.16666667"
+    },
+    {
+      "MaMonAn": "MA102",
+      "TenMonAn": "Gà ác hầm sâm",
+      "MaThanhPhan": "TP10205",
+      "MaNguyenLieu": "NL110",
+      "TenNguyenLieu": "Gạo lứt rang",
+      "Natri": "0.83333333"
+    },
+    {
+      "MaMonAn": "MA102",
+      "TenMonAn": "Gà ác hầm sâm",
+      "MaThanhPhan": "TP10206",
+      "MaNguyenLieu": "NL111",
+      "TenNguyenLieu": "Trứng cút",
+      "Natri": "28.20000000"
+    },
+    {
+      "MaMonAn": "MA102",
+      "TenMonAn": "Gà ác hầm sâm",
+      "MaThanhPhan": "TP10210",
+      "MaNguyenLieu": "NL132",
+      "TenNguyenLieu": "Dầu hào",
+      "Natri": "112.63333390"
+    },
+    {
+      "MaMonAn": "MA102",
+      "TenMonAn": "Gà ác hầm sâm",
+      "MaThanhPhan": "TP10213",
+      "MaNguyenLieu": "NL239",
+      "TenNguyenLieu": "Gia vị thông dụng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA920",
+      "TenMonAn": "Gà hấp muối sả",
+      "MaThanhPhan": "TP1105",
+      "MaNguyenLieu": "NL049",
+      "TenNguyenLieu": "Hành tím",
+      "Natri": "1.50000000"
+    },
+    {
+      "MaMonAn": "MA920",
+      "TenMonAn": "Gà hấp muối sả",
+      "MaThanhPhan": "TP1106",
+      "MaNguyenLieu": "NL051",
+      "TenNguyenLieu": "Tỏi",
+      "Natri": "0.63750000"
+    },
+    {
+      "MaMonAn": "MA920",
+      "TenMonAn": "Gà hấp muối sả",
+      "MaThanhPhan": "TP1102",
+      "MaNguyenLieu": "NL052",
+      "TenNguyenLieu": "Gừng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA920",
+      "TenMonAn": "Gà hấp muối sả",
+      "MaThanhPhan": "TP1104",
+      "MaNguyenLieu": "NL053",
+      "TenNguyenLieu": "Sả",
+      "Natri": "2.40000000"
+    },
+    {
+      "MaMonAn": "MA920",
+      "TenMonAn": "Gà hấp muối sả",
+      "MaThanhPhan": "TP1108",
+      "MaNguyenLieu": "NL062",
+      "TenNguyenLieu": "Chanh",
+      "Natri": "0.17500000"
+    },
+    {
+      "MaMonAn": "MA920",
+      "TenMonAn": "Gà hấp muối sả",
+      "MaThanhPhan": "TP1111",
+      "MaNguyenLieu": "NL070",
+      "TenNguyenLieu": "Nước mắm",
+      "Natri": "294.41250000"
+    },
+    {
+      "MaMonAn": "MA920",
+      "TenMonAn": "Gà hấp muối sả",
+      "MaThanhPhan": "TP1109",
+      "MaNguyenLieu": "NL085",
+      "TenNguyenLieu": "Bột nghệ",
+      "Natri": "0.47500000"
+    },
+    {
+      "MaMonAn": "MA920",
+      "TenMonAn": "Gà hấp muối sả",
+      "MaThanhPhan": "TP1110",
+      "MaNguyenLieu": "NL099",
+      "TenNguyenLieu": "Bột tỏi",
+      "Natri": "2.25000000"
+    },
+    {
+      "MaMonAn": "MA920",
+      "TenMonAn": "Gà hấp muối sả",
+      "MaThanhPhan": "TP1107",
+      "MaNguyenLieu": "NL1107",
+      "TenNguyenLieu": "Lá chanh",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA920",
+      "TenMonAn": "Gà hấp muối sả",
+      "MaThanhPhan": "TP1112",
+      "MaNguyenLieu": "NL1112",
+      "TenNguyenLieu": "Muối hột",
+      "Natri": "48447.50000000"
+    },
+    {
+      "MaMonAn": "MA920",
+      "TenMonAn": "Gà hấp muối sả",
+      "MaThanhPhan": "TP1113",
+      "MaNguyenLieu": "NL1113",
+      "TenNguyenLieu": "Gia vị thông dụng (Muối/ đường/ hạt nêm/ tiêu xay)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA920",
+      "TenMonAn": "Gà hấp muối sả",
+      "MaThanhPhan": "TP1114",
+      "MaNguyenLieu": "NL187",
+      "TenNguyenLieu": "Sữa đặc",
+      "Natri": "4.76250000"
+    },
+    {
+      "MaMonAn": "MA920",
+      "TenMonAn": "Gà hấp muối sả",
+      "MaThanhPhan": "TP1101",
+      "MaNguyenLieu": "NL916",
+      "TenNguyenLieu": "Gà",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA920",
+      "TenMonAn": "Gà hấp muối sả",
+      "MaThanhPhan": "TP1103",
+      "MaNguyenLieu": "NL934",
+      "TenNguyenLieu": "Ớt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA902",
+      "TenMonAn": "Gà nướng muối sả",
+      "MaThanhPhan": "TP924",
+      "MaNguyenLieu": "NL050",
+      "TenNguyenLieu": "Hành lá",
+      "Natri": "4.80000000"
+    },
+    {
+      "MaMonAn": "MA902",
+      "TenMonAn": "Gà nướng muối sả",
+      "MaThanhPhan": "TP926",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA902",
+      "TenMonAn": "Gà nướng muối sả",
+      "MaThanhPhan": "TP921",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": "2906.85000000"
+    },
+    {
+      "MaMonAn": "MA902",
+      "TenMonAn": "Gà nướng muối sả",
+      "MaThanhPhan": "TP922",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.30000000"
+    },
+    {
+      "MaMonAn": "MA902",
+      "TenMonAn": "Gà nướng muối sả",
+      "MaThanhPhan": "TP925",
+      "MaNguyenLieu": "NL091",
+      "TenNguyenLieu": "Dầu mè",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA902",
+      "TenMonAn": "Gà nướng muối sả",
+      "MaThanhPhan": "TP923",
+      "MaNguyenLieu": "NL096",
+      "TenNguyenLieu": "Bột ngọt",
+      "Natri": "307.50000000"
+    },
+    {
+      "MaMonAn": "MA902",
+      "TenMonAn": "Gà nướng muối sả",
+      "MaThanhPhan": "TP917",
+      "MaNguyenLieu": "NL907",
+      "TenNguyenLieu": "Tỏi băm",
+      "Natri": "4.50000000"
+    },
+    {
+      "MaMonAn": "MA902",
+      "TenMonAn": "Gà nướng muối sả",
+      "MaThanhPhan": "TP916",
+      "MaNguyenLieu": "NL916",
+      "TenNguyenLieu": "Gà",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA902",
+      "TenMonAn": "Gà nướng muối sả",
+      "MaThanhPhan": "TP918",
+      "MaNguyenLieu": "NL918",
+      "TenNguyenLieu": "Sả băm",
+      "Natri": "1.50000000"
+    },
+    {
+      "MaMonAn": "MA902",
+      "TenMonAn": "Gà nướng muối sả",
+      "MaThanhPhan": "TP919",
+      "MaNguyenLieu": "NL919",
+      "TenNguyenLieu": "Ớt băm",
+      "Natri": "2.70000000"
+    },
+    {
+      "MaMonAn": "MA902",
+      "TenMonAn": "Gà nướng muối sả",
+      "MaThanhPhan": "TP920",
+      "MaNguyenLieu": "NL920",
+      "TenNguyenLieu": "Lá giang",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA103",
+      "TenMonAn": "Gà tiềm thuốc bắc",
+      "MaThanhPhan": "TP10310",
+      "MaNguyenLieu": "NL034",
+      "TenNguyenLieu": "Nấm hương",
+      "Natri": "0.22500000"
+    },
+    {
+      "MaMonAn": "MA103",
+      "TenMonAn": "Gà tiềm thuốc bắc",
+      "MaThanhPhan": "TP10301",
+      "MaNguyenLieu": "NL106",
+      "TenNguyenLieu": "Gà ác",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA103",
+      "TenMonAn": "Gà tiềm thuốc bắc",
+      "MaThanhPhan": "TP10302",
+      "MaNguyenLieu": "NL112",
+      "TenNguyenLieu": "Hoài sơn",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA103",
+      "TenMonAn": "Gà tiềm thuốc bắc",
+      "MaThanhPhan": "TP10303",
+      "MaNguyenLieu": "NL113",
+      "TenNguyenLieu": "Sinh địa",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA103",
+      "TenMonAn": "Gà tiềm thuốc bắc",
+      "MaThanhPhan": "TP10304",
+      "MaNguyenLieu": "NL114",
+      "TenNguyenLieu": "Đẳng sâm",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA103",
+      "TenMonAn": "Gà tiềm thuốc bắc",
+      "MaThanhPhan": "TP10305",
+      "MaNguyenLieu": "NL115",
+      "TenNguyenLieu": "Đương quy",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA103",
+      "TenMonAn": "Gà tiềm thuốc bắc",
+      "MaThanhPhan": "TP10306",
+      "MaNguyenLieu": "NL116",
+      "TenNguyenLieu": "Kỷ tử",
+      "Natri": "7.45000000"
+    },
+    {
+      "MaMonAn": "MA103",
+      "TenMonAn": "Gà tiềm thuốc bắc",
+      "MaThanhPhan": "TP10307",
+      "MaNguyenLieu": "NL117",
+      "TenNguyenLieu": "Táo tàu",
+      "Natri": "0.12500000"
+    },
+    {
+      "MaMonAn": "MA103",
+      "TenMonAn": "Gà tiềm thuốc bắc",
+      "MaThanhPhan": "TP10308",
+      "MaNguyenLieu": "NL118",
+      "TenNguyenLieu": "Ngọc trúc",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA103",
+      "TenMonAn": "Gà tiềm thuốc bắc",
+      "MaThanhPhan": "TP10309",
+      "MaNguyenLieu": "NL119",
+      "TenNguyenLieu": "Xuyên khung",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA103",
+      "TenMonAn": "Gà tiềm thuốc bắc",
+      "MaThanhPhan": "TP10311",
+      "MaNguyenLieu": "NL120",
+      "TenNguyenLieu": "Đỗ trọng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA103",
+      "TenMonAn": "Gà tiềm thuốc bắc",
+      "MaThanhPhan": "TP10312",
+      "MaNguyenLieu": "NL121",
+      "TenNguyenLieu": "Bạch chỉ",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA103",
+      "TenMonAn": "Gà tiềm thuốc bắc",
+      "MaThanhPhan": "TP10313",
+      "MaNguyenLieu": "NL122",
+      "TenNguyenLieu": "Nhãn nhục",
+      "Natri": "1.20000000"
+    },
+    {
+      "MaMonAn": "MA103",
+      "TenMonAn": "Gà tiềm thuốc bắc",
+      "MaThanhPhan": "TP10314",
+      "MaNguyenLieu": "NL123",
+      "TenNguyenLieu": "Dừa xiêm",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA107",
+      "TenMonAn": "Giò heo hầm đậu nành",
+      "MaThanhPhan": "TP10704",
+      "MaNguyenLieu": "NL034",
+      "TenNguyenLieu": "Nấm hương",
+      "Natri": "0.90000000"
+    },
+    {
+      "MaMonAn": "MA107",
+      "TenMonAn": "Giò heo hầm đậu nành",
+      "MaThanhPhan": "TP10703",
+      "MaNguyenLieu": "NL036",
+      "TenNguyenLieu": "Cà rốt",
+      "Natri": "20.51199979"
+    },
+    {
+      "MaMonAn": "MA107",
+      "TenMonAn": "Giò heo hầm đậu nành",
+      "MaThanhPhan": "TP10707",
+      "MaNguyenLieu": "NL049",
+      "TenNguyenLieu": "Hành tím",
+      "Natri": "2.00000000"
+    },
+    {
+      "MaMonAn": "MA107",
+      "TenMonAn": "Giò heo hầm đậu nành",
+      "MaThanhPhan": "TP10708",
+      "MaNguyenLieu": "NL052",
+      "TenNguyenLieu": "Gừng",
+      "Natri": "2.16666665"
+    },
+    {
+      "MaMonAn": "MA107",
+      "TenMonAn": "Giò heo hầm đậu nành",
+      "MaThanhPhan": "TP10712",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA107",
+      "TenMonAn": "Giò heo hầm đậu nành",
+      "MaThanhPhan": "TP10711",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": "645.96666021"
+    },
+    {
+      "MaMonAn": "MA107",
+      "TenMonAn": "Giò heo hầm đậu nành",
+      "MaThanhPhan": "TP10710",
+      "MaNguyenLieu": "NL097",
+      "TenNguyenLieu": "Hạt nêm",
+      "Natri": "1090.90498909"
+    },
+    {
+      "MaMonAn": "MA107",
+      "TenMonAn": "Giò heo hầm đậu nành",
+      "MaThanhPhan": "TP10705",
+      "MaNguyenLieu": "NL117",
+      "TenNguyenLieu": "Táo tàu",
+      "Natri": "0.50000000"
+    },
+    {
+      "MaMonAn": "MA107",
+      "TenMonAn": "Giò heo hầm đậu nành",
+      "MaThanhPhan": "TP10702",
+      "MaNguyenLieu": "NL133",
+      "TenNguyenLieu": "Đậu nành",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA107",
+      "TenMonAn": "Giò heo hầm đậu nành",
+      "MaThanhPhan": "TP10706",
+      "MaNguyenLieu": "NL134",
+      "TenNguyenLieu": "Gốc ngò rí",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA107",
+      "TenMonAn": "Giò heo hầm đậu nành",
+      "MaThanhPhan": "TP10701",
+      "MaNguyenLieu": "NL140",
+      "TenNguyenLieu": "Giò heo",
+      "Natri": "94.00000000"
+    },
+    {
+      "MaMonAn": "MA107",
+      "TenMonAn": "Giò heo hầm đậu nành",
+      "MaThanhPhan": "TP10709",
+      "MaNguyenLieu": "NL141",
+      "TenNguyenLieu": "Rượu nấu ăn",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA930",
+      "TenMonAn": "Gỏi hàu sốt Thái",
+      "MaThanhPhan": "TP1224",
+      "MaNguyenLieu": "NL049",
+      "TenNguyenLieu": "Hành tím",
+      "Natri": "12.00000000"
+    },
+    {
+      "MaMonAn": "MA930",
+      "TenMonAn": "Gỏi hàu sốt Thái",
+      "MaThanhPhan": "TP1225",
+      "MaNguyenLieu": "NL051",
+      "TenNguyenLieu": "Tỏi",
+      "Natri": "0.56666667"
+    },
+    {
+      "MaMonAn": "MA930",
+      "TenMonAn": "Gỏi hàu sốt Thái",
+      "MaThanhPhan": "TP1226",
+      "MaNguyenLieu": "NL052",
+      "TenNguyenLieu": "Gừng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA930",
+      "TenMonAn": "Gỏi hàu sốt Thái",
+      "MaThanhPhan": "TP1223",
+      "MaNguyenLieu": "NL053",
+      "TenNguyenLieu": "Sả",
+      "Natri": "4.00000000"
+    },
+    {
+      "MaMonAn": "MA930",
+      "TenMonAn": "Gỏi hàu sốt Thái",
+      "MaThanhPhan": "TP1230",
+      "MaNguyenLieu": "NL070",
+      "TenNguyenLieu": "Nước mắm",
+      "Natri": "785.10000393"
+    },
+    {
+      "MaMonAn": "MA930",
+      "TenMonAn": "Gỏi hàu sốt Thái",
+      "MaThanhPhan": "TP1228",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.10000000"
+    },
+    {
+      "MaMonAn": "MA930",
+      "TenMonAn": "Gỏi hàu sốt Thái",
+      "MaThanhPhan": "TP1229",
+      "MaNguyenLieu": "NL1123",
+      "TenNguyenLieu": "Nước cốt chanh",
+      "Natri": "0.30000000"
+    },
+    {
+      "MaMonAn": "MA930",
+      "TenMonAn": "Gỏi hàu sốt Thái",
+      "MaThanhPhan": "TP1234",
+      "MaNguyenLieu": "NL1176",
+      "TenNguyenLieu": "Hành tây nhỏ",
+      "Natri": "1.74999998"
+    },
+    {
+      "MaMonAn": "MA930",
+      "TenMonAn": "Gỏi hàu sốt Thái",
+      "MaThanhPhan": "TP1222",
+      "MaNguyenLieu": "NL1177",
+      "TenNguyenLieu": "Hàu sữa tươi",
+      "Natri": "176.66666667"
+    },
+    {
+      "MaMonAn": "MA930",
+      "TenMonAn": "Gỏi hàu sốt Thái",
+      "MaThanhPhan": "TP1233",
+      "MaNguyenLieu": "NL1178",
+      "TenNguyenLieu": "Lá húng lủi",
+      "Natri": "0.50000000"
+    },
+    {
+      "MaMonAn": "MA930",
+      "TenMonAn": "Gỏi hàu sốt Thái",
+      "MaThanhPhan": "TP1227",
+      "MaNguyenLieu": "NL934",
+      "TenNguyenLieu": "Ớt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA930",
+      "TenMonAn": "Gỏi hàu sốt Thái",
+      "MaThanhPhan": "TP1231",
+      "MaNguyenLieu": "NL943",
+      "TenNguyenLieu": "Ớt bột",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA930",
+      "TenMonAn": "Gỏi hàu sốt Thái",
+      "MaThanhPhan": "TP1232",
+      "MaNguyenLieu": "NL997",
+      "TenNguyenLieu": "Tương ớt",
+      "Natri": "2.50000001"
+    },
+    {
+      "MaMonAn": "MA931",
+      "TenMonAn": "Gỏi ngó sen chay",
+      "MaThanhPhan": "TP1236",
+      "MaNguyenLieu": "NL036",
+      "TenNguyenLieu": "Cà rốt",
+      "Natri": "15.38400000"
+    },
+    {
+      "MaMonAn": "MA931",
+      "TenMonAn": "Gỏi ngó sen chay",
+      "MaThanhPhan": "TP1237",
+      "MaNguyenLieu": "NL042",
+      "TenNguyenLieu": "Dưa leo",
+      "Natri": "1.00500000"
+    },
+    {
+      "MaMonAn": "MA931",
+      "TenMonAn": "Gỏi ngó sen chay",
+      "MaThanhPhan": "TP1242",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.15000000"
+    },
+    {
+      "MaMonAn": "MA931",
+      "TenMonAn": "Gỏi ngó sen chay",
+      "MaThanhPhan": "TP1245",
+      "MaNguyenLieu": "NL082",
+      "TenNguyenLieu": "Đậu phộng",
+      "Natri": "4.50000000"
+    },
+    {
+      "MaMonAn": "MA931",
+      "TenMonAn": "Gỏi ngó sen chay",
+      "MaThanhPhan": "TP1243",
+      "MaNguyenLieu": "NL1123",
+      "TenNguyenLieu": "Nước cốt chanh",
+      "Natri": "0.33750000"
+    },
+    {
+      "MaMonAn": "MA931",
+      "TenMonAn": "Gỏi ngó sen chay",
+      "MaThanhPhan": "TP1239",
+      "MaNguyenLieu": "NL1171",
+      "TenNguyenLieu": "Bánh phồng tôm chay",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA931",
+      "TenMonAn": "Gỏi ngó sen chay",
+      "MaThanhPhan": "TP1238",
+      "MaNguyenLieu": "NL1172",
+      "TenNguyenLieu": "Bắp cải tím",
+      "Natri": "59.35925000"
+    },
+    {
+      "MaMonAn": "MA931",
+      "TenMonAn": "Gỏi ngó sen chay",
+      "MaThanhPhan": "TP1240",
+      "MaNguyenLieu": "NL1173",
+      "TenNguyenLieu": "Đậu hũ chiên (1 bìa)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA931",
+      "TenMonAn": "Gỏi ngó sen chay",
+      "MaThanhPhan": "TP1235",
+      "MaNguyenLieu": "NL1174",
+      "TenNguyenLieu": "Ngó sen",
+      "Natri": "30.00000000"
+    },
+    {
+      "MaMonAn": "MA931",
+      "TenMonAn": "Gỏi ngó sen chay",
+      "MaThanhPhan": "TP1241",
+      "MaNguyenLieu": "NL1175",
+      "TenNguyenLieu": "Nước mắm chay",
+      "Natri": "828.00000000"
+    },
+    {
+      "MaMonAn": "MA931",
+      "TenMonAn": "Gỏi ngó sen chay",
+      "MaThanhPhan": "TP1246",
+      "MaNguyenLieu": "NL934",
+      "TenNguyenLieu": "Ớt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA931",
+      "TenMonAn": "Gỏi ngó sen chay",
+      "MaThanhPhan": "TP1244",
+      "MaNguyenLieu": "NL952",
+      "TenNguyenLieu": "Giấm",
+      "Natri": "1.25000000"
+    },
+    {
+      "MaMonAn": "MA932",
+      "TenMonAn": "Hải sản sốt Thái",
+      "MaThanhPhan": "TP93208",
+      "MaNguyenLieu": "NL049",
+      "TenNguyenLieu": "Hành tím",
+      "Natri": "3.75000000"
+    },
+    {
+      "MaMonAn": "MA932",
+      "TenMonAn": "Hải sản sốt Thái",
+      "MaThanhPhan": "TP93204",
+      "MaNguyenLieu": "NL051",
+      "TenNguyenLieu": "Tỏi",
+      "Natri": "0.63750000"
+    },
+    {
+      "MaMonAn": "MA932",
+      "TenMonAn": "Hải sản sốt Thái",
+      "MaThanhPhan": "TP93207",
+      "MaNguyenLieu": "NL053",
+      "TenNguyenLieu": "Sả",
+      "Natri": "0.90000000"
+    },
+    {
+      "MaMonAn": "MA932",
+      "TenMonAn": "Hải sản sốt Thái",
+      "MaThanhPhan": "TP93213",
+      "MaNguyenLieu": "NL070",
+      "TenNguyenLieu": "Nước mắm",
+      "Natri": "1177.65000000"
+    },
+    {
+      "MaMonAn": "MA932",
+      "TenMonAn": "Hải sản sốt Thái",
+      "MaThanhPhan": "TP93214",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.11250000"
+    },
+    {
+      "MaMonAn": "MA932",
+      "TenMonAn": "Hải sản sốt Thái",
+      "MaThanhPhan": "TP93212",
+      "MaNguyenLieu": "NL1123",
+      "TenNguyenLieu": "Nước cốt chanh",
+      "Natri": "0.22500000"
+    },
+    {
+      "MaMonAn": "MA932",
+      "TenMonAn": "Hải sản sốt Thái",
+      "MaThanhPhan": "TP93203",
+      "MaNguyenLieu": "NL1133",
+      "TenNguyenLieu": "Nghêu",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA932",
+      "TenMonAn": "Hải sản sốt Thái",
+      "MaThanhPhan": "TP93211",
+      "MaNguyenLieu": "NL1141",
+      "TenNguyenLieu": "Rượu trắng",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA932",
+      "TenMonAn": "Hải sản sốt Thái",
+      "MaThanhPhan": "TP93202",
+      "MaNguyenLieu": "NL1179",
+      "TenNguyenLieu": "Bạch tuộc",
+      "Natri": "287.50000000"
+    },
+    {
+      "MaMonAn": "MA932",
+      "TenMonAn": "Hải sản sốt Thái",
+      "MaThanhPhan": "TP93209",
+      "MaNguyenLieu": "NL137",
+      "TenNguyenLieu": "Ngò gai",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA932",
+      "TenMonAn": "Hải sản sốt Thái",
+      "MaThanhPhan": "TP93205",
+      "MaNguyenLieu": "NL934",
+      "TenNguyenLieu": "Ớt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA932",
+      "TenMonAn": "Hải sản sốt Thái",
+      "MaThanhPhan": "TP93206",
+      "MaNguyenLieu": "NL943",
+      "TenNguyenLieu": "Ớt bột",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA932",
+      "TenMonAn": "Hải sản sốt Thái",
+      "MaThanhPhan": "TP93201",
+      "MaNguyenLieu": "NL966",
+      "TenNguyenLieu": "Tôm tươi",
+      "Natri": "111.00000000"
+    },
+    {
+      "MaMonAn": "MA932",
+      "TenMonAn": "Hải sản sốt Thái",
+      "MaThanhPhan": "TP93210",
+      "MaNguyenLieu": "NL997",
+      "TenNguyenLieu": "Tương ớt",
+      "Natri": "0.93750000"
+    },
+    {
+      "MaMonAn": "MA217",
+      "TenMonAn": "Kem chuối que",
+      "MaThanhPhan": "TP21702",
+      "MaNguyenLieu": "NL068",
+      "TenNguyenLieu": "Nước cốt dừa",
+      "Natri": "9.37500000"
+    },
+    {
+      "MaMonAn": "MA217",
+      "TenMonAn": "Kem chuối que",
+      "MaThanhPhan": "TP21707",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": "121.11875000"
+    },
+    {
+      "MaMonAn": "MA217",
+      "TenMonAn": "Kem chuối que",
+      "MaThanhPhan": "TP21705",
+      "MaNguyenLieu": "NL082",
+      "TenNguyenLieu": "Đậu phộng",
+      "Natri": "4.50000000"
+    },
+    {
+      "MaMonAn": "MA217",
+      "TenMonAn": "Kem chuối que",
+      "MaThanhPhan": "TP21703",
+      "MaNguyenLieu": "NL146",
+      "TenNguyenLieu": "Bột năng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA217",
+      "TenMonAn": "Kem chuối que",
+      "MaThanhPhan": "TP21706",
+      "MaNguyenLieu": "NL187",
+      "TenNguyenLieu": "Sữa đặc",
+      "Natri": "6.35000000"
+    },
+    {
+      "MaMonAn": "MA217",
+      "TenMonAn": "Kem chuối que",
+      "MaThanhPhan": "TP21701",
+      "MaNguyenLieu": "NL303",
+      "TenNguyenLieu": "Chuối sứ",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA217",
+      "TenMonAn": "Kem chuối que",
+      "MaThanhPhan": "TP21704",
+      "MaNguyenLieu": "NL306",
+      "TenNguyenLieu": "Dừa bào sợi",
+      "Natri": "10.00000000"
+    },
+    {
+      "MaMonAn": "MA218",
+      "TenMonAn": "Kem trái cây nước dừa",
+      "MaThanhPhan": "TP21802",
+      "MaNguyenLieu": "NL065",
+      "TenNguyenLieu": "Dâu tây",
+      "Natri": "0.14400000"
+    },
+    {
+      "MaMonAn": "MA218",
+      "TenMonAn": "Kem trái cây nước dừa",
+      "MaThanhPhan": "TP21807",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.20000000"
+    },
+    {
+      "MaMonAn": "MA218",
+      "TenMonAn": "Kem trái cây nước dừa",
+      "MaThanhPhan": "TP21806",
+      "MaNguyenLieu": "NL076",
+      "TenNguyenLieu": "Mật ong",
+      "Natri": "0.05680000"
+    },
+    {
+      "MaMonAn": "MA218",
+      "TenMonAn": "Kem trái cây nước dừa",
+      "MaThanhPhan": "TP21804",
+      "MaNguyenLieu": "NL308",
+      "TenNguyenLieu": "Dưa lưới",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA218",
+      "TenMonAn": "Kem trái cây nước dừa",
+      "MaThanhPhan": "TP21803",
+      "MaNguyenLieu": "NL314",
+      "TenNguyenLieu": "Múi mít Thái",
+      "Natri": "0.76000000"
+    },
+    {
+      "MaMonAn": "MA218",
+      "TenMonAn": "Kem trái cây nước dừa",
+      "MaThanhPhan": "TP21805",
+      "MaNguyenLieu": "NL317",
+      "TenNguyenLieu": "Nho",
+      "Natri": "0.20000000"
+    },
+    {
+      "MaMonAn": "MA218",
+      "TenMonAn": "Kem trái cây nước dừa",
+      "MaThanhPhan": "TP21801",
+      "MaNguyenLieu": "NL318",
+      "TenNguyenLieu": "Nước dừa tươi",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA944",
+      "TenMonAn": "Khô heo tẩm vị xé sợi",
+      "MaThanhPhan": "TP93849",
+      "MaNguyenLieu": "NL052",
+      "TenNguyenLieu": "Gừng",
+      "Natri": "3.25000000"
+    },
+    {
+      "MaMonAn": "MA944",
+      "TenMonAn": "Khô heo tẩm vị xé sợi",
+      "MaThanhPhan": "TP93848",
+      "MaNguyenLieu": "NL053",
+      "TenNguyenLieu": "Sả",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA944",
+      "TenMonAn": "Khô heo tẩm vị xé sợi",
+      "MaThanhPhan": "TP93850",
+      "MaNguyenLieu": "NL054",
+      "TenNguyenLieu": "Ớt tươi",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA944",
+      "TenMonAn": "Khô heo tẩm vị xé sợi",
+      "MaThanhPhan": "TP93859",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": "1453.42500000"
+    },
+    {
+      "MaMonAn": "MA944",
+      "TenMonAn": "Khô heo tẩm vị xé sợi",
+      "MaThanhPhan": "TP93857",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.30000000"
+    },
+    {
+      "MaMonAn": "MA944",
+      "TenMonAn": "Khô heo tẩm vị xé sợi",
+      "MaThanhPhan": "TP93852",
+      "MaNguyenLieu": "NL085",
+      "TenNguyenLieu": "Bột nghệ",
+      "Natri": "3.57200000"
+    },
+    {
+      "MaMonAn": "MA944",
+      "TenMonAn": "Khô heo tẩm vị xé sợi",
+      "MaThanhPhan": "TP93858",
+      "MaNguyenLieu": "NL097",
+      "TenNguyenLieu": "Hạt nêm",
+      "Natri": "1636.35750000"
+    },
+    {
+      "MaMonAn": "MA944",
+      "TenMonAn": "Khô heo tẩm vị xé sợi",
+      "MaThanhPhan": "TP93846",
+      "MaNguyenLieu": "NL1211",
+      "TenNguyenLieu": "Thịt heo nạc",
+      "Natri": "760.00000000"
+    },
+    {
+      "MaMonAn": "MA944",
+      "TenMonAn": "Khô heo tẩm vị xé sợi",
+      "MaThanhPhan": "TP93847",
+      "MaNguyenLieu": "NL1212",
+      "TenNguyenLieu": "Mỡ bò",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA944",
+      "TenMonAn": "Khô heo tẩm vị xé sợi",
+      "MaThanhPhan": "TP93853",
+      "MaNguyenLieu": "NL1213",
+      "TenNguyenLieu": "Ngũ vị hương",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA944",
+      "TenMonAn": "Khô heo tẩm vị xé sợi",
+      "MaThanhPhan": "TP93856",
+      "MaNguyenLieu": "NL1214",
+      "TenNguyenLieu": "Nước luộc thịt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA944",
+      "TenMonAn": "Khô heo tẩm vị xé sợi",
+      "MaThanhPhan": "TP93855",
+      "MaNguyenLieu": "NL132",
+      "TenNguyenLieu": "Dầu hào",
+      "Natri": "506.85000000"
+    },
+    {
+      "MaMonAn": "MA944",
+      "TenMonAn": "Khô heo tẩm vị xé sợi",
+      "MaThanhPhan": "TP93854",
+      "MaNguyenLieu": "NL149",
+      "TenNguyenLieu": "Dầu màu điều",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA944",
+      "TenMonAn": "Khô heo tẩm vị xé sợi",
+      "MaThanhPhan": "TP93851",
+      "MaNguyenLieu": "NL943",
+      "TenNguyenLieu": "Ớt bột",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA924",
+      "TenMonAn": "Lẩu bò Mông Cổ",
+      "MaThanhPhan": "TP1155",
+      "MaNguyenLieu": "NL034",
+      "TenNguyenLieu": "Nấm hương",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA924",
+      "TenMonAn": "Lẩu bò Mông Cổ",
+      "MaThanhPhan": "TP1147",
+      "MaNguyenLieu": "NL048",
+      "TenNguyenLieu": "Hành tây",
+      "Natri": "3.00000000"
+    },
+    {
+      "MaMonAn": "MA924",
+      "TenMonAn": "Lẩu bò Mông Cổ",
+      "MaThanhPhan": "TP1152",
+      "MaNguyenLieu": "NL051",
+      "TenNguyenLieu": "Tỏi",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA924",
+      "TenMonAn": "Lẩu bò Mông Cổ",
+      "MaThanhPhan": "TP1141",
+      "MaNguyenLieu": "NL052",
+      "TenNguyenLieu": "Gừng",
+      "Natri": "0.65000000"
+    },
+    {
+      "MaMonAn": "MA924",
+      "TenMonAn": "Lẩu bò Mông Cổ",
+      "MaThanhPhan": "TP1151",
+      "MaNguyenLieu": "NL053",
+      "TenNguyenLieu": "Sả",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA924",
+      "TenMonAn": "Lẩu bò Mông Cổ",
+      "MaThanhPhan": "TP1149",
+      "MaNguyenLieu": "NL064",
+      "TenNguyenLieu": "Táo",
+      "Natri": "0.12500000"
+    },
+    {
+      "MaMonAn": "MA924",
+      "TenMonAn": "Lẩu bò Mông Cổ",
+      "MaThanhPhan": "TP1139",
+      "MaNguyenLieu": "NL1143",
+      "TenNguyenLieu": "Bao tử dê",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA924",
+      "TenMonAn": "Lẩu bò Mông Cổ",
+      "MaThanhPhan": "TP1146",
+      "MaNguyenLieu": "NL1144",
+      "TenNguyenLieu": "Đông trùng hạ thảo",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA924",
+      "TenMonAn": "Lẩu bò Mông Cổ",
+      "MaThanhPhan": "TP1150",
+      "MaNguyenLieu": "NL1145",
+      "TenNguyenLieu": "Gia vị thông dụng (Đường/ Hạt nêm/ Dầu hào/ Muối hạt/ Đường phèn/ Tiêu xay/ Rượu trắng)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA924",
+      "TenMonAn": "Lẩu bò Mông Cổ",
+      "MaThanhPhan": "TP1142",
+      "MaNguyenLieu": "NL1146",
+      "TenNguyenLieu": "Hành baro",
+      "Natri": "1.50000000"
+    },
+    {
+      "MaMonAn": "MA924",
+      "TenMonAn": "Lẩu bò Mông Cổ",
+      "MaThanhPhan": "TP1148",
+      "MaNguyenLieu": "NL1147",
+      "TenNguyenLieu": "Hoa hẹ",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA924",
+      "TenMonAn": "Lẩu bò Mông Cổ",
+      "MaThanhPhan": "TP1144",
+      "MaNguyenLieu": "NL1148",
+      "TenNguyenLieu": "Hoa hồi",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA924",
+      "TenMonAn": "Lẩu bò Mông Cổ",
+      "MaThanhPhan": "TP1143",
+      "MaNguyenLieu": "NL1149",
+      "TenNguyenLieu": "Quế cây",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA924",
+      "TenMonAn": "Lẩu bò Mông Cổ",
+      "MaThanhPhan": "TP1140",
+      "MaNguyenLieu": "NL1150",
+      "TenNguyenLieu": "Thăn bò",
+      "Natri": "55.00000000"
+    },
+    {
+      "MaMonAn": "MA924",
+      "TenMonAn": "Lẩu bò Mông Cổ",
+      "MaThanhPhan": "TP1145",
+      "MaNguyenLieu": "NL188",
+      "TenNguyenLieu": "Táo đỏ",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA924",
+      "TenMonAn": "Lẩu bò Mông Cổ",
+      "MaThanhPhan": "TP1154",
+      "MaNguyenLieu": "NL318",
+      "TenNguyenLieu": "Nước dừa tươi",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA924",
+      "TenMonAn": "Lẩu bò Mông Cổ",
+      "MaThanhPhan": "TP1153",
+      "MaNguyenLieu": "NL934",
+      "TenNguyenLieu": "Ớt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA925",
+      "TenMonAn": "Lẩu bò nhúng giấm (dấm)",
+      "MaThanhPhan": "TP1156",
+      "MaNguyenLieu": "NL011",
+      "TenNguyenLieu": "Thịt bò",
+      "Natri": "180.00000000"
+    },
+    {
+      "MaMonAn": "MA925",
+      "TenMonAn": "Lẩu bò nhúng giấm (dấm)",
+      "MaThanhPhan": "TP1158",
+      "MaNguyenLieu": "NL048",
+      "TenNguyenLieu": "Hành tây",
+      "Natri": "1.50000000"
+    },
+    {
+      "MaMonAn": "MA925",
+      "TenMonAn": "Lẩu bò nhúng giấm (dấm)",
+      "MaThanhPhan": "TP1160",
+      "MaNguyenLieu": "NL049",
+      "TenNguyenLieu": "Hành tím",
+      "Natri": "0.75000000"
+    },
+    {
+      "MaMonAn": "MA925",
+      "TenMonAn": "Lẩu bò nhúng giấm (dấm)",
+      "MaThanhPhan": "TP1159",
+      "MaNguyenLieu": "NL051",
+      "TenNguyenLieu": "Tỏi",
+      "Natri": "0.85000000"
+    },
+    {
+      "MaMonAn": "MA925",
+      "TenMonAn": "Lẩu bò nhúng giấm (dấm)",
+      "MaThanhPhan": "TP1161",
+      "MaNguyenLieu": "NL053",
+      "TenNguyenLieu": "Sả",
+      "Natri": "0.60000000"
+    },
+    {
+      "MaMonAn": "MA925",
+      "TenMonAn": "Lẩu bò nhúng giấm (dấm)",
+      "MaThanhPhan": "TP1167",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA925",
+      "TenMonAn": "Lẩu bò nhúng giấm (dấm)",
+      "MaThanhPhan": "TP1157",
+      "MaNguyenLieu": "NL1041",
+      "TenNguyenLieu": "Thơm (dứa)",
+      "Natri": "27.37625000"
+    },
+    {
+      "MaMonAn": "MA925",
+      "TenMonAn": "Lẩu bò nhúng giấm (dấm)",
+      "MaThanhPhan": "TP1164",
+      "MaNguyenLieu": "NL1151",
+      "TenNguyenLieu": "Giấm (dấm)",
+      "Natri": "1.25000000"
+    },
+    {
+      "MaMonAn": "MA925",
+      "TenMonAn": "Lẩu bò nhúng giấm (dấm)",
+      "MaThanhPhan": "TP1166",
+      "MaNguyenLieu": "NL1152",
+      "TenNguyenLieu": "Mắm nêm",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA925",
+      "TenMonAn": "Lẩu bò nhúng giấm (dấm)",
+      "MaThanhPhan": "TP1168",
+      "MaNguyenLieu": "NL1153",
+      "TenNguyenLieu": "Muối/ đường",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA925",
+      "TenMonAn": "Lẩu bò nhúng giấm (dấm)",
+      "MaThanhPhan": "TP1165",
+      "MaNguyenLieu": "NL131",
+      "TenNguyenLieu": "Đường phèn",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA925",
+      "TenMonAn": "Lẩu bò nhúng giấm (dấm)",
+      "MaThanhPhan": "TP1162",
+      "MaNguyenLieu": "NL136",
+      "TenNguyenLieu": "Ớt hiểm",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA925",
+      "TenMonAn": "Lẩu bò nhúng giấm (dấm)",
+      "MaThanhPhan": "TP1163",
+      "MaNguyenLieu": "NL318",
+      "TenNguyenLieu": "Nước dừa tươi",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA926",
+      "TenMonAn": "Lẩu cua đồng",
+      "MaThanhPhan": "TP1173",
+      "MaNguyenLieu": "NL003",
+      "TenNguyenLieu": "Bún tươi",
+      "Natri": "30.00000000"
+    },
+    {
+      "MaMonAn": "MA926",
+      "TenMonAn": "Lẩu cua đồng",
+      "MaThanhPhan": "TP1171",
+      "MaNguyenLieu": "NL011",
+      "TenNguyenLieu": "Thịt bò",
+      "Natri": "28.80000000"
+    },
+    {
+      "MaMonAn": "MA926",
+      "TenMonAn": "Lẩu cua đồng",
+      "MaThanhPhan": "TP1169",
+      "MaNguyenLieu": "NL027",
+      "TenNguyenLieu": "Cua đồng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA926",
+      "TenMonAn": "Lẩu cua đồng",
+      "MaThanhPhan": "TP1172",
+      "MaNguyenLieu": "NL029",
+      "TenNguyenLieu": "Đậu hũ",
+      "Natri": "6.30000000"
+    },
+    {
+      "MaMonAn": "MA926",
+      "TenMonAn": "Lẩu cua đồng",
+      "MaThanhPhan": "TP1178",
+      "MaNguyenLieu": "NL035",
+      "TenNguyenLieu": "Cà chua",
+      "Natri": "4.44000000"
+    },
+    {
+      "MaMonAn": "MA926",
+      "TenMonAn": "Lẩu cua đồng",
+      "MaThanhPhan": "TP1176",
+      "MaNguyenLieu": "NL049",
+      "TenNguyenLieu": "Hành tím",
+      "Natri": "3.00000000"
+    },
+    {
+      "MaMonAn": "MA926",
+      "TenMonAn": "Lẩu cua đồng",
+      "MaThanhPhan": "TP1175",
+      "MaNguyenLieu": "NL053",
+      "TenNguyenLieu": "Sả",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA926",
+      "TenMonAn": "Lẩu cua đồng",
+      "MaThanhPhan": "TP1180",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA926",
+      "TenMonAn": "Lẩu cua đồng",
+      "MaThanhPhan": "TP1179",
+      "MaNguyenLieu": "NL1154",
+      "TenNguyenLieu": "Gia vị thông dụng (đường/ muối/ hạt nêm)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA926",
+      "TenMonAn": "Lẩu cua đồng",
+      "MaThanhPhan": "TP1174",
+      "MaNguyenLieu": "NL1155",
+      "TenNguyenLieu": "Rau ăn kèm (Mồng tơi/mướp/rau muống/bắp cải/rau mồng tơi)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA926",
+      "TenMonAn": "Lẩu cua đồng",
+      "MaThanhPhan": "TP1170",
+      "MaNguyenLieu": "NL1156",
+      "TenNguyenLieu": "Xương ống",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA926",
+      "TenMonAn": "Lẩu cua đồng",
+      "MaThanhPhan": "TP1177",
+      "MaNguyenLieu": "NL907",
+      "TenNguyenLieu": "Tỏi băm",
+      "Natri": "0.54000000"
+    },
+    {
+      "MaMonAn": "MA928",
+      "TenMonAn": "Lẩu gà ớt hiểm",
+      "MaThanhPhan": "TP1203",
+      "MaNguyenLieu": "NL048",
+      "TenNguyenLieu": "Hành tây",
+      "Natri": "1.50000000"
+    },
+    {
+      "MaMonAn": "MA928",
+      "TenMonAn": "Lẩu gà ớt hiểm",
+      "MaThanhPhan": "TP1204",
+      "MaNguyenLieu": "NL049",
+      "TenNguyenLieu": "Hành tím",
+      "Natri": "0.60000000"
+    },
+    {
+      "MaMonAn": "MA928",
+      "TenMonAn": "Lẩu gà ớt hiểm",
+      "MaThanhPhan": "TP1202",
+      "MaNguyenLieu": "NL051",
+      "TenNguyenLieu": "Tỏi",
+      "Natri": "0.85000000"
+    },
+    {
+      "MaMonAn": "MA928",
+      "TenMonAn": "Lẩu gà ớt hiểm",
+      "MaThanhPhan": "TP1201",
+      "MaNguyenLieu": "NL053",
+      "TenNguyenLieu": "Sả",
+      "Natri": "1.50000000"
+    },
+    {
+      "MaMonAn": "MA928",
+      "TenMonAn": "Lẩu gà ớt hiểm",
+      "MaThanhPhan": "TP1205",
+      "MaNguyenLieu": "NL071",
+      "TenNguyenLieu": "Nước tương",
+      "Natri": "411.97500000"
+    },
+    {
+      "MaMonAn": "MA928",
+      "TenMonAn": "Lẩu gà ớt hiểm",
+      "MaThanhPhan": "TP1206",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA928",
+      "TenMonAn": "Lẩu gà ớt hiểm",
+      "MaThanhPhan": "TP1207",
+      "MaNguyenLieu": "NL097",
+      "TenNguyenLieu": "Hạt nêm",
+      "Natri": "1636.35750000"
+    },
+    {
+      "MaMonAn": "MA928",
+      "TenMonAn": "Lẩu gà ớt hiểm",
+      "MaThanhPhan": "TP1200",
+      "MaNguyenLieu": "NL116",
+      "TenNguyenLieu": "Kỷ tử",
+      "Natri": "3.72500000"
+    },
+    {
+      "MaMonAn": "MA928",
+      "TenMonAn": "Lẩu gà ớt hiểm",
+      "MaThanhPhan": "TP1198",
+      "MaNguyenLieu": "NL1163",
+      "TenNguyenLieu": "Gà (1 con)",
+      "Natri": "210.00000000"
+    },
+    {
+      "MaMonAn": "MA928",
+      "TenMonAn": "Lẩu gà ớt hiểm",
+      "MaThanhPhan": "TP1208",
+      "MaNguyenLieu": "NL1164",
+      "TenNguyenLieu": "Muối hạt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA928",
+      "TenMonAn": "Lẩu gà ớt hiểm",
+      "MaThanhPhan": "TP1199",
+      "MaNguyenLieu": "NL136",
+      "TenNguyenLieu": "Ớt hiểm",
+      "Natri": "2.25000000"
+    },
+    {
+      "MaMonAn": "MA928",
+      "TenMonAn": "Lẩu gà ớt hiểm",
+      "MaThanhPhan": "TP1209",
+      "MaNguyenLieu": "NL183",
+      "TenNguyenLieu": "Nước",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA929",
+      "TenMonAn": "Lẩu kim chi Hàn Quốc",
+      "MaThanhPhan": "TP1212",
+      "MaNguyenLieu": "NL018",
+      "TenNguyenLieu": "Thịt ba chỉ",
+      "Natri": "24.00000000"
+    },
+    {
+      "MaMonAn": "MA929",
+      "TenMonAn": "Lẩu kim chi Hàn Quốc",
+      "MaThanhPhan": "TP1210",
+      "MaNguyenLieu": "NL1167",
+      "TenNguyenLieu": "Kim chi Hàn Quốc",
+      "Natri": "622.50000000"
+    },
+    {
+      "MaMonAn": "MA929",
+      "TenMonAn": "Lẩu kim chi Hàn Quốc",
+      "MaThanhPhan": "TP1211",
+      "MaNguyenLieu": "NL232",
+      "TenNguyenLieu": "Xương heo",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA951",
+      "TenMonAn": "Matcha latte thạch trà xanh",
+      "MaThanhPhan": "TP93926",
+      "MaNguyenLieu": "NL067",
+      "TenNguyenLieu": "Sữa tươi không đường",
+      "Natri": "53.75000000"
+    },
+    {
+      "MaMonAn": "MA951",
+      "TenMonAn": "Matcha latte thạch trà xanh",
+      "MaThanhPhan": "TP93923",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.15000000"
+    },
+    {
+      "MaMonAn": "MA951",
+      "TenMonAn": "Matcha latte thạch trà xanh",
+      "MaThanhPhan": "TP93925",
+      "MaNguyenLieu": "NL076",
+      "TenNguyenLieu": "Mật ong",
+      "Natri": "0.30000000"
+    },
+    {
+      "MaMonAn": "MA951",
+      "TenMonAn": "Matcha latte thạch trà xanh",
+      "MaThanhPhan": "TP93922",
+      "MaNguyenLieu": "NL080",
+      "TenNguyenLieu": "Nước lọc",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA951",
+      "TenMonAn": "Matcha latte thạch trà xanh",
+      "MaThanhPhan": "TP93921",
+      "MaNguyenLieu": "NL1232",
+      "TenNguyenLieu": "Bột matcha",
+      "Natri": "0.18000000"
+    },
+    {
+      "MaMonAn": "MA951",
+      "TenMonAn": "Matcha latte thạch trà xanh",
+      "MaThanhPhan": "TP93924",
+      "MaNguyenLieu": "NL1233",
+      "TenNguyenLieu": "Bột rau câu dẻo",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA907",
+      "TenMonAn": "Mì Ý gà giòn sốt kem",
+      "MaThanhPhan": "TP971",
+      "MaNguyenLieu": "NL013",
+      "TenNguyenLieu": "Ức gà",
+      "Natri": "111.00000000"
+    },
+    {
+      "MaMonAn": "MA907",
+      "TenMonAn": "Mì Ý gà giòn sốt kem",
+      "MaThanhPhan": "TP973",
+      "MaNguyenLieu": "NL028",
+      "TenNguyenLieu": "Trứng gà",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA907",
+      "TenMonAn": "Mì Ý gà giòn sốt kem",
+      "MaThanhPhan": "TP981",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA907",
+      "TenMonAn": "Mì Ý gà giòn sốt kem",
+      "MaThanhPhan": "TP984",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.05000000"
+    },
+    {
+      "MaMonAn": "MA907",
+      "TenMonAn": "Mì Ý gà giòn sốt kem",
+      "MaThanhPhan": "TP980",
+      "MaNguyenLieu": "NL080",
+      "TenNguyenLieu": "Nước lọc",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA907",
+      "TenMonAn": "Mì Ý gà giòn sốt kem",
+      "MaThanhPhan": "TP979",
+      "MaNguyenLieu": "NL146",
+      "TenNguyenLieu": "Bột năng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA907",
+      "TenMonAn": "Mì Ý gà giòn sốt kem",
+      "MaThanhPhan": "TP976",
+      "MaNguyenLieu": "NL171",
+      "TenNguyenLieu": "Whipping cream",
+      "Natri": "6.75000000"
+    },
+    {
+      "MaMonAn": "MA907",
+      "TenMonAn": "Mì Ý gà giòn sốt kem",
+      "MaThanhPhan": "TP977",
+      "MaNguyenLieu": "NL321",
+      "TenNguyenLieu": "Sữa tươi",
+      "Natri": "52.87500000"
+    },
+    {
+      "MaMonAn": "MA907",
+      "TenMonAn": "Mì Ý gà giòn sốt kem",
+      "MaThanhPhan": "TP972",
+      "MaNguyenLieu": "NL972",
+      "TenNguyenLieu": "Bột mì đa dụng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA907",
+      "TenMonAn": "Mì Ý gà giòn sốt kem",
+      "MaThanhPhan": "TP974",
+      "MaNguyenLieu": "NL974",
+      "TenNguyenLieu": "Sốt cà cô đặc",
+      "Natri": "453.50000000"
+    },
+    {
+      "MaMonAn": "MA907",
+      "TenMonAn": "Mì Ý gà giòn sốt kem",
+      "MaThanhPhan": "TP975",
+      "MaNguyenLieu": "NL975",
+      "TenNguyenLieu": "Dầu oliu",
+      "Natri": "0.10000000"
+    },
+    {
+      "MaMonAn": "MA907",
+      "TenMonAn": "Mì Ý gà giòn sốt kem",
+      "MaThanhPhan": "TP978",
+      "MaNguyenLieu": "NL978",
+      "TenNguyenLieu": "Bột phô mai",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA907",
+      "TenMonAn": "Mì Ý gà giòn sốt kem",
+      "MaThanhPhan": "TP982",
+      "MaNguyenLieu": "NL982",
+      "TenNguyenLieu": "Mè rang",
+      "Natri": "0.27500000"
+    },
+    {
+      "MaMonAn": "MA907",
+      "TenMonAn": "Mì Ý gà giòn sốt kem",
+      "MaThanhPhan": "TP983",
+      "MaNguyenLieu": "NL983",
+      "TenNguyenLieu": "Gia vị (muối/tiêu)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA908",
+      "TenMonAn": "Nấm xào chua ngọt chay",
+      "MaThanhPhan": "TP988",
+      "MaNguyenLieu": "NL033",
+      "TenNguyenLieu": "Nấm rơm",
+      "Natri": "0.62500000"
+    },
+    {
+      "MaMonAn": "MA908",
+      "TenMonAn": "Nấm xào chua ngọt chay",
+      "MaThanhPhan": "TP995",
+      "MaNguyenLieu": "NL048",
+      "TenNguyenLieu": "Hành tây",
+      "Natri": "0.75000000"
+    },
+    {
+      "MaMonAn": "MA908",
+      "TenMonAn": "Nấm xào chua ngọt chay",
+      "MaThanhPhan": "TP1002",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA908",
+      "TenMonAn": "Nấm xào chua ngọt chay",
+      "MaThanhPhan": "TP996",
+      "MaNguyenLieu": "NL078",
+      "TenNguyenLieu": "Giấm gạo",
+      "Natri": "0.18750000"
+    },
+    {
+      "MaMonAn": "MA908",
+      "TenMonAn": "Nấm xào chua ngọt chay",
+      "MaThanhPhan": "TP1000",
+      "MaNguyenLieu": "NL1000",
+      "TenNguyenLieu": "Gia vị thông dụng (muối/đường/hạt nêm chay/bột ngọt)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA908",
+      "TenMonAn": "Nấm xào chua ngọt chay",
+      "MaThanhPhan": "TP990",
+      "MaNguyenLieu": "NL125",
+      "TenNguyenLieu": "Nấm mèo",
+      "Natri": "1.75000000"
+    },
+    {
+      "MaMonAn": "MA908",
+      "TenMonAn": "Nấm xào chua ngọt chay",
+      "MaThanhPhan": "TP1001",
+      "MaNguyenLieu": "NL311",
+      "TenNguyenLieu": "Hành boa rô",
+      "Natri": "0.75000000"
+    },
+    {
+      "MaMonAn": "MA908",
+      "TenMonAn": "Nấm xào chua ngọt chay",
+      "MaThanhPhan": "TP992",
+      "MaNguyenLieu": "NL942",
+      "TenNguyenLieu": "Ớt chuông xanh",
+      "Natri": "0.55500000"
+    },
+    {
+      "MaMonAn": "MA908",
+      "TenMonAn": "Nấm xào chua ngọt chay",
+      "MaThanhPhan": "TP998",
+      "MaNguyenLieu": "NL953",
+      "TenNguyenLieu": "Tương cà",
+      "Natri": "68.02500000"
+    },
+    {
+      "MaMonAn": "MA908",
+      "TenMonAn": "Nấm xào chua ngọt chay",
+      "MaThanhPhan": "TP985",
+      "MaNguyenLieu": "NL985",
+      "TenNguyenLieu": "Nấm linh chi nâu",
+      "Natri": "0.25000000"
+    },
+    {
+      "MaMonAn": "MA908",
+      "TenMonAn": "Nấm xào chua ngọt chay",
+      "MaThanhPhan": "TP986",
+      "MaNguyenLieu": "NL986",
+      "TenNguyenLieu": "Nấm linh chi trắng",
+      "Natri": "0.25000000"
+    },
+    {
+      "MaMonAn": "MA908",
+      "TenMonAn": "Nấm xào chua ngọt chay",
+      "MaThanhPhan": "TP987",
+      "MaNguyenLieu": "NL987",
+      "TenNguyenLieu": "Nấm đông cô tươi",
+      "Natri": "1.12500000"
+    },
+    {
+      "MaMonAn": "MA908",
+      "TenMonAn": "Nấm xào chua ngọt chay",
+      "MaThanhPhan": "TP989",
+      "MaNguyenLieu": "NL989",
+      "TenNguyenLieu": "Nấm bào ngư",
+      "Natri": "2.25000000"
+    },
+    {
+      "MaMonAn": "MA908",
+      "TenMonAn": "Nấm xào chua ngọt chay",
+      "MaThanhPhan": "TP991",
+      "MaNguyenLieu": "NL991",
+      "TenNguyenLieu": "Thơm",
+      "Natri": "27.37625000"
+    },
+    {
+      "MaMonAn": "MA908",
+      "TenMonAn": "Nấm xào chua ngọt chay",
+      "MaThanhPhan": "TP993",
+      "MaNguyenLieu": "NL993",
+      "TenNguyenLieu": "Ớt chuông vàng",
+      "Natri": "0.37000000"
+    },
+    {
+      "MaMonAn": "MA908",
+      "TenMonAn": "Nấm xào chua ngọt chay",
+      "MaThanhPhan": "TP994",
+      "MaNguyenLieu": "NL994",
+      "TenNguyenLieu": "Ớt chuông đỏ",
+      "Natri": "0.74000000"
+    },
+    {
+      "MaMonAn": "MA908",
+      "TenMonAn": "Nấm xào chua ngọt chay",
+      "MaThanhPhan": "TP997",
+      "MaNguyenLieu": "NL997",
+      "TenNguyenLieu": "Tương ớt",
+      "Natri": "1.87500000"
+    },
+    {
+      "MaMonAn": "MA908",
+      "TenMonAn": "Nấm xào chua ngọt chay",
+      "MaThanhPhan": "TP999",
+      "MaNguyenLieu": "NL999",
+      "TenNguyenLieu": "Tương xí muội",
+      "Natri": "60.30000000"
+    },
+    {
+      "MaMonAn": "MA901",
+      "TenMonAn": "Nem nướng Ninh Hòa",
+      "MaThanhPhan": "TP901",
+      "MaNguyenLieu": "NL016",
+      "TenNguyenLieu": "Thịt heo xay",
+      "Natri": "124.66666666"
+    },
+    {
+      "MaMonAn": "MA901",
+      "TenMonAn": "Nem nướng Ninh Hòa",
+      "MaThanhPhan": "TP912",
+      "MaNguyenLieu": "NL070",
+      "TenNguyenLieu": "Nước mắm",
+      "Natri": "785.10000393"
+    },
+    {
+      "MaMonAn": "MA901",
+      "TenMonAn": "Nem nướng Ninh Hòa",
+      "MaThanhPhan": "TP908",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA901",
+      "TenMonAn": "Nem nướng Ninh Hòa",
+      "MaThanhPhan": "TP906",
+      "MaNguyenLieu": "NL093",
+      "TenNguyenLieu": "Bột nở",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA901",
+      "TenMonAn": "Nem nướng Ninh Hòa",
+      "MaThanhPhan": "TP911",
+      "MaNguyenLieu": "NL147",
+      "TenNguyenLieu": "Bột nếp",
+      "Natri": "0.51666667"
+    },
+    {
+      "MaMonAn": "MA901",
+      "TenMonAn": "Nem nướng Ninh Hòa",
+      "MaThanhPhan": "TP909",
+      "MaNguyenLieu": "NL149",
+      "TenNguyenLieu": "Dầu màu điều",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA901",
+      "TenMonAn": "Nem nướng Ninh Hòa",
+      "MaThanhPhan": "TP902",
+      "MaNguyenLieu": "NL902",
+      "TenNguyenLieu": "Giò sống",
+      "Natri": "31.33333333"
+    },
+    {
+      "MaMonAn": "MA901",
+      "TenMonAn": "Nem nướng Ninh Hòa",
+      "MaThanhPhan": "TP903",
+      "MaNguyenLieu": "NL903",
+      "TenNguyenLieu": "Mỡ heo",
+      "Natri": "7.00000000"
+    },
+    {
+      "MaMonAn": "MA901",
+      "TenMonAn": "Nem nướng Ninh Hòa",
+      "MaThanhPhan": "TP904",
+      "MaNguyenLieu": "NL904",
+      "TenNguyenLieu": "Pate gan heo",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA901",
+      "TenMonAn": "Nem nướng Ninh Hòa",
+      "MaThanhPhan": "TP907",
+      "MaNguyenLieu": "NL907",
+      "TenNguyenLieu": "Tỏi băm",
+      "Natri": "1.80000001"
+    },
+    {
+      "MaMonAn": "MA901",
+      "TenMonAn": "Nem nướng Ninh Hòa",
+      "MaThanhPhan": "TP910",
+      "MaNguyenLieu": "NL910",
+      "TenNguyenLieu": "Bơ đậu phộng",
+      "Natri": "63.90000000"
+    },
+    {
+      "MaMonAn": "MA901",
+      "TenMonAn": "Nem nướng Ninh Hòa",
+      "MaThanhPhan": "TP914",
+      "MaNguyenLieu": "NL914",
+      "TenNguyenLieu": "Bún ăn kèm",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA901",
+      "TenMonAn": "Nem nướng Ninh Hòa",
+      "MaThanhPhan": "TP905",
+      "MaNguyenLieu": "NL927",
+      "TenNguyenLieu": "Bánh tráng (loại bánh tráng tròn)",
+      "Natri": "200.00000001"
+    },
+    {
+      "MaMonAn": "MA901",
+      "TenMonAn": "Nem nướng Ninh Hòa",
+      "MaThanhPhan": "TP913",
+      "MaNguyenLieu": "NL928",
+      "TenNguyenLieu": "Gia vị thông dụng (muối/đường/hạt nêm/bột ngọt/tiêu)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA901",
+      "TenMonAn": "Nem nướng Ninh Hòa",
+      "MaThanhPhan": "TP915",
+      "MaNguyenLieu": "NL929",
+      "TenNguyenLieu": "Rau ăn kèm tùy sở thích (xà lách/tía tô/chuối chát/dưa leo...)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA922",
+      "TenMonAn": "Nghêu hấp Thái",
+      "MaThanhPhan": "TP1121",
+      "MaNguyenLieu": "NL049",
+      "TenNguyenLieu": "Hành tím",
+      "Natri": "2.25000000"
+    },
+    {
+      "MaMonAn": "MA922",
+      "TenMonAn": "Nghêu hấp Thái",
+      "MaThanhPhan": "TP1120",
+      "MaNguyenLieu": "NL052",
+      "TenNguyenLieu": "Gừng",
+      "Natri": "1.62500000"
+    },
+    {
+      "MaMonAn": "MA922",
+      "TenMonAn": "Nghêu hấp Thái",
+      "MaThanhPhan": "TP1118",
+      "MaNguyenLieu": "NL053",
+      "TenNguyenLieu": "Sả",
+      "Natri": "0.90000000"
+    },
+    {
+      "MaMonAn": "MA922",
+      "TenMonAn": "Nghêu hấp Thái",
+      "MaThanhPhan": "TP1122",
+      "MaNguyenLieu": "NL070",
+      "TenNguyenLieu": "Nước mắm",
+      "Natri": "294.41250000"
+    },
+    {
+      "MaMonAn": "MA922",
+      "TenMonAn": "Nghêu hấp Thái",
+      "MaThanhPhan": "TP1124",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA922",
+      "TenMonAn": "Nghêu hấp Thái",
+      "MaThanhPhan": "TP1117",
+      "MaNguyenLieu": "NL1131",
+      "TenNguyenLieu": "Dừa (lấy nước)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA922",
+      "TenMonAn": "Nghêu hấp Thái",
+      "MaThanhPhan": "TP1123",
+      "MaNguyenLieu": "NL1132",
+      "TenNguyenLieu": "Gia vị thông dụng (hạt nêm/ đường/ muối)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA922",
+      "TenMonAn": "Nghêu hấp Thái",
+      "MaThanhPhan": "TP1115",
+      "MaNguyenLieu": "NL1133",
+      "TenNguyenLieu": "Nghêu",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA922",
+      "TenMonAn": "Nghêu hấp Thái",
+      "MaThanhPhan": "TP1116",
+      "MaNguyenLieu": "NL1134",
+      "TenNguyenLieu": "Sốt lẩu Thái (khoảng 1/2 chai)",
+      "Natri": "1400.00000000"
+    },
+    {
+      "MaMonAn": "MA922",
+      "TenMonAn": "Nghêu hấp Thái",
+      "MaThanhPhan": "TP1119",
+      "MaNguyenLieu": "NL136",
+      "TenNguyenLieu": "Ớt hiểm",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA942",
+      "TenMonAn": "Nước ép cà rốt bằng máy xay sinh tố",
+      "MaThanhPhan": "TP93837",
+      "MaNguyenLieu": "NL036",
+      "TenNguyenLieu": "Cà rốt",
+      "Natri": "61.53600000"
+    },
+    {
+      "MaMonAn": "MA942",
+      "TenMonAn": "Nước ép cà rốt bằng máy xay sinh tố",
+      "MaThanhPhan": "TP93839",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.15000000"
+    },
+    {
+      "MaMonAn": "MA942",
+      "TenMonAn": "Nước ép cà rốt bằng máy xay sinh tố",
+      "MaThanhPhan": "TP93840",
+      "MaNguyenLieu": "NL080",
+      "TenNguyenLieu": "Nước lọc",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA942",
+      "TenMonAn": "Nước ép cà rốt bằng máy xay sinh tố",
+      "MaThanhPhan": "TP93838",
+      "MaNguyenLieu": "NL1208",
+      "TenNguyenLieu": "Nước cốt cam",
+      "Natri": "0.43000000"
+    },
+    {
+      "MaMonAn": "MA912",
+      "TenMonAn": "Ốc móng tay xào bơ tỏi",
+      "MaThanhPhan": "TP1029",
+      "MaNguyenLieu": "NL051",
+      "TenNguyenLieu": "Tỏi",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA912",
+      "TenMonAn": "Ốc móng tay xào bơ tỏi",
+      "MaThanhPhan": "TP1031",
+      "MaNguyenLieu": "NL052",
+      "TenNguyenLieu": "Gừng",
+      "Natri": "0.81250000"
+    },
+    {
+      "MaMonAn": "MA912",
+      "TenMonAn": "Ốc móng tay xào bơ tỏi",
+      "MaThanhPhan": "TP1032",
+      "MaNguyenLieu": "NL069",
+      "TenNguyenLieu": "Bơ lạt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA912",
+      "TenMonAn": "Ốc móng tay xào bơ tỏi",
+      "MaThanhPhan": "TP1035",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA912",
+      "TenMonAn": "Ốc móng tay xào bơ tỏi",
+      "MaThanhPhan": "TP1028",
+      "MaNguyenLieu": "NL1028",
+      "TenNguyenLieu": "Ốc móng tay",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA912",
+      "TenMonAn": "Ốc móng tay xào bơ tỏi",
+      "MaThanhPhan": "TP1036",
+      "MaNguyenLieu": "NL1036",
+      "TenNguyenLieu": "Gia vị thông dụng (muối/đường/hạt nêm)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA912",
+      "TenMonAn": "Ốc móng tay xào bơ tỏi",
+      "MaThanhPhan": "TP1033",
+      "MaNguyenLieu": "NL132",
+      "TenNguyenLieu": "Dầu hào",
+      "Natri": "253.42500000"
+    },
+    {
+      "MaMonAn": "MA912",
+      "TenMonAn": "Ốc móng tay xào bơ tỏi",
+      "MaThanhPhan": "TP1030",
+      "MaNguyenLieu": "NL934",
+      "TenNguyenLieu": "Ớt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA912",
+      "TenMonAn": "Ốc móng tay xào bơ tỏi",
+      "MaThanhPhan": "TP1034",
+      "MaNguyenLieu": "NL997",
+      "TenNguyenLieu": "Tương ớt",
+      "Natri": "1.87500000"
+    },
+    {
+      "MaMonAn": "MA921",
+      "TenMonAn": "Ốc nhồi hấp sả",
+      "MaThanhPhan": "TP23017",
+      "MaNguyenLieu": "NL051",
+      "TenNguyenLieu": "Tỏi",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA921",
+      "TenMonAn": "Ốc nhồi hấp sả",
+      "MaThanhPhan": "TP23016",
+      "MaNguyenLieu": "NL052",
+      "TenNguyenLieu": "Gừng",
+      "Natri": "1.62500000"
+    },
+    {
+      "MaMonAn": "MA921",
+      "TenMonAn": "Ốc nhồi hấp sả",
+      "MaThanhPhan": "TP23014",
+      "MaNguyenLieu": "NL053",
+      "TenNguyenLieu": "Sả",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA921",
+      "TenMonAn": "Ốc nhồi hấp sả",
+      "MaThanhPhan": "TP23011",
+      "MaNguyenLieu": "NL1114",
+      "TenNguyenLieu": "Ốc bươu lớn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA921",
+      "TenMonAn": "Ốc nhồi hấp sả",
+      "MaThanhPhan": "TP23015",
+      "MaNguyenLieu": "NL1118",
+      "TenNguyenLieu": "Sả xay",
+      "Natri": "0.75000000"
+    },
+    {
+      "MaMonAn": "MA921",
+      "TenMonAn": "Ốc nhồi hấp sả",
+      "MaThanhPhan": "TP23020",
+      "MaNguyenLieu": "NL1123",
+      "TenNguyenLieu": "Nước cốt chanh",
+      "Natri": "0.11250000"
+    },
+    {
+      "MaMonAn": "MA921",
+      "TenMonAn": "Ốc nhồi hấp sả",
+      "MaThanhPhan": "TP23013",
+      "MaNguyenLieu": "NL1129",
+      "TenNguyenLieu": "Cá thác lác (hoặc giò sống)",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA921",
+      "TenMonAn": "Ốc nhồi hấp sả",
+      "MaThanhPhan": "TP23019",
+      "MaNguyenLieu": "NL1130",
+      "TenNguyenLieu": "Lá chanh (hoặc lá gừng)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA921",
+      "TenMonAn": "Ốc nhồi hấp sả",
+      "MaThanhPhan": "TP23021",
+      "MaNguyenLieu": "NL239",
+      "TenNguyenLieu": "Gia vị thông dụng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA921",
+      "TenMonAn": "Ốc nhồi hấp sả",
+      "MaThanhPhan": "TP23018",
+      "MaNguyenLieu": "NL934",
+      "TenNguyenLieu": "Ớt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA921",
+      "TenMonAn": "Ốc nhồi hấp sả",
+      "MaThanhPhan": "TP23012",
+      "MaNguyenLieu": "NL956",
+      "TenNguyenLieu": "Thịt xay",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA230",
+      "TenMonAn": "Phở bò",
+      "MaThanhPhan": "TP23002",
+      "MaNguyenLieu": "NL011",
+      "TenNguyenLieu": "Thịt bò",
+      "Natri": "90.00000000"
+    },
+    {
+      "MaMonAn": "MA230",
+      "TenMonAn": "Phở bò",
+      "MaThanhPhan": "TP23005",
+      "MaNguyenLieu": "NL048",
+      "TenNguyenLieu": "Hành tây",
+      "Natri": "1.50000000"
+    },
+    {
+      "MaMonAn": "MA230",
+      "TenMonAn": "Phở bò",
+      "MaThanhPhan": "TP23006",
+      "MaNguyenLieu": "NL049",
+      "TenNguyenLieu": "Hành tím",
+      "Natri": "3.00000000"
+    },
+    {
+      "MaMonAn": "MA230",
+      "TenMonAn": "Phở bò",
+      "MaThanhPhan": "TP23007",
+      "MaNguyenLieu": "NL052",
+      "TenNguyenLieu": "Gừng",
+      "Natri": "1.62500000"
+    },
+    {
+      "MaMonAn": "MA230",
+      "TenMonAn": "Phở bò",
+      "MaThanhPhan": "TP23008",
+      "MaNguyenLieu": "NL131",
+      "TenNguyenLieu": "Đường phèn",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA230",
+      "TenMonAn": "Phở bò",
+      "MaThanhPhan": "TP23001",
+      "MaNguyenLieu": "NL230",
+      "TenNguyenLieu": "Phở",
+      "Natri": "227.50000000"
+    },
+    {
+      "MaMonAn": "MA230",
+      "TenMonAn": "Phở bò",
+      "MaThanhPhan": "TP23003",
+      "MaNguyenLieu": "NL232",
+      "TenNguyenLieu": "Xương heo",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA230",
+      "TenMonAn": "Phở bò",
+      "MaThanhPhan": "TP23004",
+      "MaNguyenLieu": "NL233",
+      "TenNguyenLieu": "Gia vị nấu phở bò",
+      "Natri": "3.33000000"
+    },
+    {
+      "MaMonAn": "MA230",
+      "TenMonAn": "Phở bò",
+      "MaThanhPhan": "TP23009",
+      "MaNguyenLieu": "NL238",
+      "TenNguyenLieu": "Rau ăn phở",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA230",
+      "TenMonAn": "Phở bò",
+      "MaThanhPhan": "TP23010",
+      "MaNguyenLieu": "NL239",
+      "TenNguyenLieu": "Gia vị thông dụng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA936",
+      "TenMonAn": "Phở cuốn chay",
+      "MaThanhPhan": "TP93604",
+      "MaNguyenLieu": "NL007",
+      "TenNguyenLieu": "Bột gạo",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA936",
+      "TenMonAn": "Phở cuốn chay",
+      "MaThanhPhan": "TP93607",
+      "MaNguyenLieu": "NL032",
+      "TenNguyenLieu": "Nấm đùi gà",
+      "Natri": "3.00000000"
+    },
+    {
+      "MaMonAn": "MA936",
+      "TenMonAn": "Phở cuốn chay",
+      "MaThanhPhan": "TP93608",
+      "MaNguyenLieu": "NL036",
+      "TenNguyenLieu": "Cà rốt",
+      "Natri": "10.25600021"
+    },
+    {
+      "MaMonAn": "MA936",
+      "TenMonAn": "Phở cuốn chay",
+      "MaThanhPhan": "TP93617",
+      "MaNguyenLieu": "NL040",
+      "TenNguyenLieu": "Xà lách",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA936",
+      "TenMonAn": "Phở cuốn chay",
+      "MaThanhPhan": "TP93611",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA936",
+      "TenMonAn": "Phở cuốn chay",
+      "MaThanhPhan": "TP93612",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.05000000"
+    },
+    {
+      "MaMonAn": "MA936",
+      "TenMonAn": "Phở cuốn chay",
+      "MaThanhPhan": "TP93616",
+      "MaNguyenLieu": "NL091",
+      "TenNguyenLieu": "Dầu mè",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA936",
+      "TenMonAn": "Phở cuốn chay",
+      "MaThanhPhan": "TP93605",
+      "MaNguyenLieu": "NL1188",
+      "TenNguyenLieu": "Bột khoai tây",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA936",
+      "TenMonAn": "Phở cuốn chay",
+      "MaThanhPhan": "TP93615",
+      "MaNguyenLieu": "NL1190",
+      "TenNguyenLieu": "Dầu hào chay",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA936",
+      "TenMonAn": "Phở cuốn chay",
+      "MaThanhPhan": "TP93618",
+      "MaNguyenLieu": "NL1198",
+      "TenNguyenLieu": "Rau diếp cá",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA936",
+      "TenMonAn": "Phở cuốn chay",
+      "MaThanhPhan": "TP93609",
+      "MaNguyenLieu": "NL1202",
+      "TenNguyenLieu": "Tương ớt chay",
+      "Natri": "1.24999999"
+    },
+    {
+      "MaMonAn": "MA936",
+      "TenMonAn": "Phở cuốn chay",
+      "MaThanhPhan": "TP93606",
+      "MaNguyenLieu": "NL304",
+      "TenNguyenLieu": "Củ sắn",
+      "Natri": "8.78666658"
+    },
+    {
+      "MaMonAn": "MA936",
+      "TenMonAn": "Phở cuốn chay",
+      "MaThanhPhan": "TP93614",
+      "MaNguyenLieu": "NL311",
+      "TenNguyenLieu": "Hành boa rô",
+      "Natri": "2.00000001"
+    },
+    {
+      "MaMonAn": "MA936",
+      "TenMonAn": "Phở cuốn chay",
+      "MaThanhPhan": "TP93613",
+      "MaNguyenLieu": "NL312",
+      "TenNguyenLieu": "Hạt nêm chay",
+      "Natri": "706.66667020"
+    },
+    {
+      "MaMonAn": "MA936",
+      "TenMonAn": "Phở cuốn chay",
+      "MaThanhPhan": "TP93603",
+      "MaNguyenLieu": "NL321",
+      "TenNguyenLieu": "Sữa tươi",
+      "Natri": "176.25000000"
+    },
+    {
+      "MaMonAn": "MA936",
+      "TenMonAn": "Phở cuốn chay",
+      "MaThanhPhan": "TP93601",
+      "MaNguyenLieu": "NL936",
+      "TenNguyenLieu": "Đậu phộng rang",
+      "Natri": "1.00000000"
+    },
+    {
+      "MaMonAn": "MA936",
+      "TenMonAn": "Phở cuốn chay",
+      "MaThanhPhan": "TP93602",
+      "MaNguyenLieu": "NL982",
+      "TenNguyenLieu": "Mè rang",
+      "Natri": "1.83333333"
+    },
+    {
+      "MaMonAn": "MA936",
+      "TenMonAn": "Phở cuốn chay",
+      "MaThanhPhan": "TP93610",
+      "MaNguyenLieu": "NL987",
+      "TenNguyenLieu": "Nấm đông cô tươi",
+      "Natri": "1.50000000"
+    },
+    {
+      "MaMonAn": "MA208",
+      "TenMonAn": "Pudding xoài",
+      "MaThanhPhan": "TP20809",
+      "MaNguyenLieu": "NL066",
+      "TenNguyenLieu": "Sữa chua không đường",
+      "Natri": "15.33333333"
+    },
+    {
+      "MaMonAn": "MA208",
+      "TenMonAn": "Pudding xoài",
+      "MaThanhPhan": "TP20804",
+      "MaNguyenLieu": "NL067",
+      "TenNguyenLieu": "Sữa tươi không đường",
+      "Natri": "31.53333333"
+    },
+    {
+      "MaMonAn": "MA208",
+      "TenMonAn": "Pudding xoài",
+      "MaThanhPhan": "TP20805",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.16666667"
+    },
+    {
+      "MaMonAn": "MA208",
+      "TenMonAn": "Pudding xoài",
+      "MaThanhPhan": "TP20801",
+      "MaNguyenLieu": "NL088",
+      "TenNguyenLieu": "Bột gelatin",
+      "Natri": "8.49333333"
+    },
+    {
+      "MaMonAn": "MA208",
+      "TenMonAn": "Pudding xoài",
+      "MaThanhPhan": "TP20806",
+      "MaNguyenLieu": "NL089",
+      "TenNguyenLieu": "Kem tươi",
+      "Natri": "12.66666667"
+    },
+    {
+      "MaMonAn": "MA208",
+      "TenMonAn": "Pudding xoài",
+      "MaThanhPhan": "TP20802",
+      "MaNguyenLieu": "NL154",
+      "TenNguyenLieu": "Lòng đỏ trứng gà",
+      "Natri": "14.40000007"
+    },
+    {
+      "MaMonAn": "MA208",
+      "TenMonAn": "Pudding xoài",
+      "MaThanhPhan": "TP20808",
+      "MaNguyenLieu": "NL162",
+      "TenNguyenLieu": "Nước cốt chanh dây đậm đặc",
+      "Natri": "0.15000000"
+    },
+    {
+      "MaMonAn": "MA208",
+      "TenMonAn": "Pudding xoài",
+      "MaThanhPhan": "TP20803",
+      "MaNguyenLieu": "NL170",
+      "TenNguyenLieu": "Vani",
+      "Natri": "0.15000000"
+    },
+    {
+      "MaMonAn": "MA208",
+      "TenMonAn": "Pudding xoài",
+      "MaThanhPhan": "TP20807",
+      "MaNguyenLieu": "NL172",
+      "TenNguyenLieu": "Xoài",
+      "Natri": "3.50000000"
+    },
+    {
+      "MaMonAn": "MA909",
+      "TenMonAn": "Răng mực xào bơ tỏi",
+      "MaThanhPhan": "TP1004",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": "322.98333979"
+    },
+    {
+      "MaMonAn": "MA909",
+      "TenMonAn": "Răng mực xào bơ tỏi",
+      "MaThanhPhan": "TP1005",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.05000000"
+    },
+    {
+      "MaMonAn": "MA909",
+      "TenMonAn": "Răng mực xào bơ tỏi",
+      "MaThanhPhan": "TP1006",
+      "MaNguyenLieu": "NL097",
+      "TenNguyenLieu": "Hạt nêm",
+      "Natri": "363.63499636"
+    },
+    {
+      "MaMonAn": "MA909",
+      "TenMonAn": "Răng mực xào bơ tỏi",
+      "MaThanhPhan": "TP1003",
+      "MaNguyenLieu": "NL1003",
+      "TenNguyenLieu": "Răng mực",
+      "Natri": "44.00000000"
+    },
+    {
+      "MaMonAn": "MA909",
+      "TenMonAn": "Răng mực xào bơ tỏi",
+      "MaThanhPhan": "TP1009",
+      "MaNguyenLieu": "NL1009",
+      "TenNguyenLieu": "Tóp mỡ",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA909",
+      "TenMonAn": "Răng mực xào bơ tỏi",
+      "MaThanhPhan": "TP1010",
+      "MaNguyenLieu": "NL1010",
+      "TenNguyenLieu": "Bơ",
+      "Natri": "11.00000000"
+    },
+    {
+      "MaMonAn": "MA909",
+      "TenMonAn": "Răng mực xào bơ tỏi",
+      "MaThanhPhan": "TP1007",
+      "MaNguyenLieu": "NL323",
+      "TenNguyenLieu": "Tiêu",
+      "Natri": "0.73333333"
+    },
+    {
+      "MaMonAn": "MA909",
+      "TenMonAn": "Răng mực xào bơ tỏi",
+      "MaThanhPhan": "TP1008",
+      "MaNguyenLieu": "NL907",
+      "TenNguyenLieu": "Tỏi băm",
+      "Natri": "2.70000000"
+    },
+    {
+      "MaMonAn": "MA909",
+      "TenMonAn": "Răng mực xào bơ tỏi",
+      "MaThanhPhan": "TP1011",
+      "MaNguyenLieu": "NL919",
+      "TenNguyenLieu": "Ớt băm",
+      "Natri": "0.45000000"
+    },
+    {
+      "MaMonAn": "MA215",
+      "TenMonAn": "Sủi cảo",
+      "MaThanhPhan": "TP21501",
+      "MaNguyenLieu": "NL016",
+      "TenNguyenLieu": "Thịt heo xay",
+      "Natri": "51.00000000"
+    },
+    {
+      "MaMonAn": "MA215",
+      "TenMonAn": "Sủi cảo",
+      "MaThanhPhan": "TP21509",
+      "MaNguyenLieu": "NL028",
+      "TenNguyenLieu": "Trứng gà",
+      "Natri": "17.75000000"
+    },
+    {
+      "MaMonAn": "MA215",
+      "TenMonAn": "Sủi cảo",
+      "MaThanhPhan": "TP21506",
+      "MaNguyenLieu": "NL036",
+      "TenNguyenLieu": "Cà rốt",
+      "Natri": "3.84600000"
+    },
+    {
+      "MaMonAn": "MA215",
+      "TenMonAn": "Sủi cảo",
+      "MaThanhPhan": "TP21507",
+      "MaNguyenLieu": "NL049",
+      "TenNguyenLieu": "Hành tím",
+      "Natri": "2.25000000"
+    },
+    {
+      "MaMonAn": "MA215",
+      "TenMonAn": "Sủi cảo",
+      "MaThanhPhan": "TP21508",
+      "MaNguyenLieu": "NL050",
+      "TenNguyenLieu": "Hành lá",
+      "Natri": "1.20000000"
+    },
+    {
+      "MaMonAn": "MA215",
+      "TenMonAn": "Sủi cảo",
+      "MaThanhPhan": "TP21504",
+      "MaNguyenLieu": "NL079",
+      "TenNguyenLieu": "Bột bắp",
+      "Natri": "1.12500000"
+    },
+    {
+      "MaMonAn": "MA215",
+      "TenMonAn": "Sủi cảo",
+      "MaThanhPhan": "TP21503",
+      "MaNguyenLieu": "NL301",
+      "TenNguyenLieu": "Bột mì",
+      "Natri": "2.50000000"
+    },
+    {
+      "MaMonAn": "MA215",
+      "TenMonAn": "Sủi cảo",
+      "MaThanhPhan": "TP21505",
+      "MaNguyenLieu": "NL302",
+      "TenNguyenLieu": "Cải thảo",
+      "Natri": "0.60000000"
+    },
+    {
+      "MaMonAn": "MA215",
+      "TenMonAn": "Sủi cảo",
+      "MaThanhPhan": "TP21502",
+      "MaNguyenLieu": "NL322",
+      "TenNguyenLieu": "Thịt tôm tươi",
+      "Natri": "74.00000000"
+    },
+    {
+      "MaMonAn": "MA917",
+      "TenMonAn": "Sụn gà chiên nước mắm",
+      "MaThanhPhan": "TP1068",
+      "MaNguyenLieu": "NL028",
+      "TenNguyenLieu": "Trứng gà",
+      "Natri": "17.75000000"
+    },
+    {
+      "MaMonAn": "MA917",
+      "TenMonAn": "Sụn gà chiên nước mắm",
+      "MaThanhPhan": "TP1069",
+      "MaNguyenLieu": "NL048",
+      "TenNguyenLieu": "Hành tây",
+      "Natri": "1.50000000"
+    },
+    {
+      "MaMonAn": "MA917",
+      "TenMonAn": "Sụn gà chiên nước mắm",
+      "MaThanhPhan": "TP1072",
+      "MaNguyenLieu": "NL050",
+      "TenNguyenLieu": "Hành lá",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA917",
+      "TenMonAn": "Sụn gà chiên nước mắm",
+      "MaThanhPhan": "TP1065",
+      "MaNguyenLieu": "NL052",
+      "TenNguyenLieu": "Gừng",
+      "Natri": "3.25000000"
+    },
+    {
+      "MaMonAn": "MA917",
+      "TenMonAn": "Sụn gà chiên nước mắm",
+      "MaThanhPhan": "TP1074",
+      "MaNguyenLieu": "NL070",
+      "TenNguyenLieu": "Nước mắm",
+      "Natri": "588.82500000"
+    },
+    {
+      "MaMonAn": "MA917",
+      "TenMonAn": "Sụn gà chiên nước mắm",
+      "MaThanhPhan": "TP1073",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA917",
+      "TenMonAn": "Sụn gà chiên nước mắm",
+      "MaThanhPhan": "TP1077",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": "1453.42500000"
+    },
+    {
+      "MaMonAn": "MA917",
+      "TenMonAn": "Sụn gà chiên nước mắm",
+      "MaThanhPhan": "TP1076",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.15000000"
+    },
+    {
+      "MaMonAn": "MA917",
+      "TenMonAn": "Sụn gà chiên nước mắm",
+      "MaThanhPhan": "TP1071",
+      "MaNguyenLieu": "NL1058",
+      "TenNguyenLieu": "Hành tím băm",
+      "Natri": "0.15000000"
+    },
+    {
+      "MaMonAn": "MA917",
+      "TenMonAn": "Sụn gà chiên nước mắm",
+      "MaThanhPhan": "TP1063",
+      "MaNguyenLieu": "NL1063",
+      "TenNguyenLieu": "Sụn gà",
+      "Natri": "292.50000000"
+    },
+    {
+      "MaMonAn": "MA917",
+      "TenMonAn": "Sụn gà chiên nước mắm",
+      "MaThanhPhan": "TP1066",
+      "MaNguyenLieu": "NL146",
+      "TenNguyenLieu": "Bột năng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA917",
+      "TenMonAn": "Sụn gà chiên nước mắm",
+      "MaThanhPhan": "TP1067",
+      "MaNguyenLieu": "NL323",
+      "TenNguyenLieu": "Tiêu",
+      "Natri": "0.55000000"
+    },
+    {
+      "MaMonAn": "MA917",
+      "TenMonAn": "Sụn gà chiên nước mắm",
+      "MaThanhPhan": "TP1070",
+      "MaNguyenLieu": "NL907",
+      "TenNguyenLieu": "Tỏi băm",
+      "Natri": "0.22500000"
+    },
+    {
+      "MaMonAn": "MA917",
+      "TenMonAn": "Sụn gà chiên nước mắm",
+      "MaThanhPhan": "TP1064",
+      "MaNguyenLieu": "NL934",
+      "TenNguyenLieu": "Ớt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA917",
+      "TenMonAn": "Sụn gà chiên nước mắm",
+      "MaThanhPhan": "TP1075",
+      "MaNguyenLieu": "NL997",
+      "TenNguyenLieu": "Tương ớt",
+      "Natri": "1.87500000"
+    },
+    {
+      "MaMonAn": "MA110",
+      "TenMonAn": "Sườn cay khổng lồ kiểu Thái",
+      "MaThanhPhan": "TP11001",
+      "MaNguyenLieu": "NL017",
+      "TenNguyenLieu": "Sườn heo",
+      "Natri": "124.00000000"
+    },
+    {
+      "MaMonAn": "MA110",
+      "TenMonAn": "Sườn cay khổng lồ kiểu Thái",
+      "MaThanhPhan": "TP11004",
+      "MaNguyenLieu": "NL048",
+      "TenNguyenLieu": "Hành tây",
+      "Natri": "1.20000000"
+    },
+    {
+      "MaMonAn": "MA110",
+      "TenMonAn": "Sườn cay khổng lồ kiểu Thái",
+      "MaThanhPhan": "TP11010",
+      "MaNguyenLieu": "NL054",
+      "TenNguyenLieu": "Ớt tươi",
+      "Natri": "0.28000000"
+    },
+    {
+      "MaMonAn": "MA110",
+      "TenMonAn": "Sườn cay khổng lồ kiểu Thái",
+      "MaThanhPhan": "TP11008",
+      "MaNguyenLieu": "NL062",
+      "TenNguyenLieu": "Chanh",
+      "Natri": "0.12000000"
+    },
+    {
+      "MaMonAn": "MA110",
+      "TenMonAn": "Sườn cay khổng lồ kiểu Thái",
+      "MaThanhPhan": "TP11007",
+      "MaNguyenLieu": "NL070",
+      "TenNguyenLieu": "Nước mắm",
+      "Natri": "1177.65000000"
+    },
+    {
+      "MaMonAn": "MA110",
+      "TenMonAn": "Sườn cay khổng lồ kiểu Thái",
+      "MaThanhPhan": "TP11006",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": "1162.74000000"
+    },
+    {
+      "MaMonAn": "MA110",
+      "TenMonAn": "Sườn cay khổng lồ kiểu Thái",
+      "MaThanhPhan": "TP11003",
+      "MaNguyenLieu": "NL075",
+      "TenNguyenLieu": "Tiêu đen",
+      "Natri": "1.20000000"
+    },
+    {
+      "MaMonAn": "MA110",
+      "TenMonAn": "Sườn cay khổng lồ kiểu Thái",
+      "MaThanhPhan": "TP11002",
+      "MaNguyenLieu": "NL134",
+      "TenNguyenLieu": "Gốc ngò rí",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA110",
+      "TenMonAn": "Sườn cay khổng lồ kiểu Thái",
+      "MaThanhPhan": "TP11005",
+      "MaNguyenLieu": "NL135",
+      "TenNguyenLieu": "Củ cải trắng",
+      "Natri": "6.76000000"
+    },
+    {
+      "MaMonAn": "MA110",
+      "TenMonAn": "Sườn cay khổng lồ kiểu Thái",
+      "MaThanhPhan": "TP11009",
+      "MaNguyenLieu": "NL136",
+      "TenNguyenLieu": "Ớt hiểm",
+      "Natri": "0.90000000"
+    },
+    {
+      "MaMonAn": "MA110",
+      "TenMonAn": "Sườn cay khổng lồ kiểu Thái",
+      "MaThanhPhan": "TP11011",
+      "MaNguyenLieu": "NL137",
+      "TenNguyenLieu": "Ngò gai",
+      "Natri": "2.76000000"
+    },
+    {
+      "MaMonAn": "MA904",
+      "TenMonAn": "Sườn đút lò",
+      "MaThanhPhan": "TP941",
+      "MaNguyenLieu": "NL017",
+      "TenNguyenLieu": "Sườn heo",
+      "Natri": "77.50000000"
+    },
+    {
+      "MaMonAn": "MA904",
+      "TenMonAn": "Sườn đút lò",
+      "MaThanhPhan": "TP944",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA904",
+      "TenMonAn": "Sườn đút lò",
+      "MaThanhPhan": "TP949",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.11250000"
+    },
+    {
+      "MaMonAn": "MA904",
+      "TenMonAn": "Sườn đút lò",
+      "MaThanhPhan": "TP950",
+      "MaNguyenLieu": "NL076",
+      "TenNguyenLieu": "Mật ong",
+      "Natri": "0.30000000"
+    },
+    {
+      "MaMonAn": "MA904",
+      "TenMonAn": "Sườn đút lò",
+      "MaThanhPhan": "TP945",
+      "MaNguyenLieu": "NL094",
+      "TenNguyenLieu": "Xì dầu",
+      "Natri": "634.16250000"
+    },
+    {
+      "MaMonAn": "MA904",
+      "TenMonAn": "Sườn đút lò",
+      "MaThanhPhan": "TP948",
+      "MaNguyenLieu": "NL097",
+      "TenNguyenLieu": "Hạt nêm",
+      "Natri": "545.45250000"
+    },
+    {
+      "MaMonAn": "MA904",
+      "TenMonAn": "Sườn đút lò",
+      "MaThanhPhan": "TP946",
+      "MaNguyenLieu": "NL132",
+      "TenNguyenLieu": "Dầu hào",
+      "Natri": "253.42500000"
+    },
+    {
+      "MaMonAn": "MA904",
+      "TenMonAn": "Sườn đút lò",
+      "MaThanhPhan": "TP942",
+      "MaNguyenLieu": "NL942",
+      "TenNguyenLieu": "Ớt chuông xanh",
+      "Natri": "1.11000000"
+    },
+    {
+      "MaMonAn": "MA904",
+      "TenMonAn": "Sườn đút lò",
+      "MaThanhPhan": "TP943",
+      "MaNguyenLieu": "NL943",
+      "TenNguyenLieu": "Ớt bột",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA904",
+      "TenMonAn": "Sườn đút lò",
+      "MaThanhPhan": "TP947",
+      "MaNguyenLieu": "NL947",
+      "TenNguyenLieu": "Bột gừng",
+      "Natri": "0.40000000"
+    },
+    {
+      "MaMonAn": "MA904",
+      "TenMonAn": "Sườn đút lò",
+      "MaThanhPhan": "TP951",
+      "MaNguyenLieu": "NL951",
+      "TenNguyenLieu": "Hành tỏi xay",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA904",
+      "TenMonAn": "Sườn đút lò",
+      "MaThanhPhan": "TP952",
+      "MaNguyenLieu": "NL952",
+      "TenNguyenLieu": "Giấm",
+      "Natri": "0.06250000"
+    },
+    {
+      "MaMonAn": "MA904",
+      "TenMonAn": "Sườn đút lò",
+      "MaThanhPhan": "TP953",
+      "MaNguyenLieu": "NL953",
+      "TenNguyenLieu": "Tương cà",
+      "Natri": "34.01250000"
+    },
+    {
+      "MaMonAn": "MA914",
+      "TenMonAn": "Sườn kho thơm (dứa)",
+      "MaThanhPhan": "TP1040",
+      "MaNguyenLieu": "NL017",
+      "TenNguyenLieu": "Sườn heo",
+      "Natri": "77.50000000"
+    },
+    {
+      "MaMonAn": "MA914",
+      "TenMonAn": "Sườn kho thơm (dứa)",
+      "MaThanhPhan": "TP1042",
+      "MaNguyenLieu": "NL049",
+      "TenNguyenLieu": "Hành tím",
+      "Natri": "3.75000000"
+    },
+    {
+      "MaMonAn": "MA914",
+      "TenMonAn": "Sườn kho thơm (dứa)",
+      "MaThanhPhan": "TP1045",
+      "MaNguyenLieu": "NL050",
+      "TenNguyenLieu": "Hành lá",
+      "Natri": "1.20000000"
+    },
+    {
+      "MaMonAn": "MA914",
+      "TenMonAn": "Sườn kho thơm (dứa)",
+      "MaThanhPhan": "TP1043",
+      "MaNguyenLieu": "NL051",
+      "TenNguyenLieu": "Tỏi",
+      "Natri": "1.06250000"
+    },
+    {
+      "MaMonAn": "MA914",
+      "TenMonAn": "Sườn kho thơm (dứa)",
+      "MaThanhPhan": "TP1046",
+      "MaNguyenLieu": "NL070",
+      "TenNguyenLieu": "Nước mắm",
+      "Natri": "1177.65000000"
+    },
+    {
+      "MaMonAn": "MA914",
+      "TenMonAn": "Sườn kho thơm (dứa)",
+      "MaThanhPhan": "TP1047",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA914",
+      "TenMonAn": "Sườn kho thơm (dứa)",
+      "MaThanhPhan": "TP1041",
+      "MaNguyenLieu": "NL1041",
+      "TenNguyenLieu": "Thơm (dứa)",
+      "Natri": "27.37625000"
+    },
+    {
+      "MaMonAn": "MA914",
+      "TenMonAn": "Sườn kho thơm (dứa)",
+      "MaThanhPhan": "TP1044",
+      "MaNguyenLieu": "NL934",
+      "TenNguyenLieu": "Ớt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA914",
+      "TenMonAn": "Sườn kho thơm (dứa)",
+      "MaThanhPhan": "TP1048",
+      "MaNguyenLieu": "NL940",
+      "TenNguyenLieu": "Gia vị thông dụng (muối/đường/hạt nêm/tiêu)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA212",
+      "TenMonAn": "Sương sáo nước cốt dừa",
+      "MaThanhPhan": "TP21205",
+      "MaNguyenLieu": "NL067",
+      "TenNguyenLieu": "Sữa tươi không đường",
+      "Natri": "16.12500000"
+    },
+    {
+      "MaMonAn": "MA212",
+      "TenMonAn": "Sương sáo nước cốt dừa",
+      "MaThanhPhan": "TP21203",
+      "MaNguyenLieu": "NL068",
+      "TenNguyenLieu": "Nước cốt dừa",
+      "Natri": "15.00000000"
+    },
+    {
+      "MaMonAn": "MA212",
+      "TenMonAn": "Sương sáo nước cốt dừa",
+      "MaThanhPhan": "TP21207",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.37500000"
+    },
+    {
+      "MaMonAn": "MA212",
+      "TenMonAn": "Sương sáo nước cốt dừa",
+      "MaThanhPhan": "TP21201",
+      "MaNguyenLieu": "NL173",
+      "TenNguyenLieu": "Bột sương sáo đen",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA212",
+      "TenMonAn": "Sương sáo nước cốt dừa",
+      "MaThanhPhan": "TP21202",
+      "MaNguyenLieu": "NL174",
+      "TenNguyenLieu": "Bột sương sáo trắng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA212",
+      "TenMonAn": "Sương sáo nước cốt dừa",
+      "MaThanhPhan": "TP21206",
+      "MaNguyenLieu": "NL180",
+      "TenNguyenLieu": "Hạt é",
+      "Natri": "0.30000000"
+    },
+    {
+      "MaMonAn": "MA212",
+      "TenMonAn": "Sương sáo nước cốt dừa",
+      "MaThanhPhan": "TP21208",
+      "MaNguyenLieu": "NL183",
+      "TenNguyenLieu": "Nước",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA212",
+      "TenMonAn": "Sương sáo nước cốt dừa",
+      "MaThanhPhan": "TP21204",
+      "MaNguyenLieu": "NL187",
+      "TenNguyenLieu": "Sữa đặc",
+      "Natri": "15.87500000"
+    },
+    {
+      "MaMonAn": "MA106",
+      "TenMonAn": "Súp hải sản tuyết yến",
+      "MaThanhPhan": "TP10605",
+      "MaNguyenLieu": "NL034",
+      "TenNguyenLieu": "Nấm hương",
+      "Natri": "1.12500000"
+    },
+    {
+      "MaMonAn": "MA106",
+      "TenMonAn": "Súp hải sản tuyết yến",
+      "MaThanhPhan": "TP10610",
+      "MaNguyenLieu": "NL052",
+      "TenNguyenLieu": "Gừng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA106",
+      "TenMonAn": "Súp hải sản tuyết yến",
+      "MaThanhPhan": "TP10613",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": "484.47500000"
+    },
+    {
+      "MaMonAn": "MA106",
+      "TenMonAn": "Súp hải sản tuyết yến",
+      "MaThanhPhan": "TP10614",
+      "MaNguyenLieu": "NL097",
+      "TenNguyenLieu": "Hạt nêm",
+      "Natri": "272.72625000"
+    },
+    {
+      "MaMonAn": "MA106",
+      "TenMonAn": "Súp hải sản tuyết yến",
+      "MaThanhPhan": "TP10606",
+      "MaNguyenLieu": "NL105",
+      "TenNguyenLieu": "Nước dùng gà",
+      "Natri": "357.50000000"
+    },
+    {
+      "MaMonAn": "MA106",
+      "TenMonAn": "Súp hải sản tuyết yến",
+      "MaThanhPhan": "TP10608",
+      "MaNguyenLieu": "NL112",
+      "TenNguyenLieu": "Hoài sơn",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA106",
+      "TenMonAn": "Súp hải sản tuyết yến",
+      "MaThanhPhan": "TP10607",
+      "MaNguyenLieu": "NL116",
+      "TenNguyenLieu": "Kỷ tử",
+      "Natri": "37.25000000"
+    },
+    {
+      "MaMonAn": "MA106",
+      "TenMonAn": "Súp hải sản tuyết yến",
+      "MaThanhPhan": "TP10602",
+      "MaNguyenLieu": "NL127",
+      "TenNguyenLieu": "Thịt càng cua",
+      "Natri": "79.00000000"
+    },
+    {
+      "MaMonAn": "MA106",
+      "TenMonAn": "Súp hải sản tuyết yến",
+      "MaThanhPhan": "TP10601",
+      "MaNguyenLieu": "NL128",
+      "TenNguyenLieu": "Cồi sò điệp",
+      "Natri": "73.00000000"
+    },
+    {
+      "MaMonAn": "MA106",
+      "TenMonAn": "Súp hải sản tuyết yến",
+      "MaThanhPhan": "TP10603",
+      "MaNguyenLieu": "NL129",
+      "TenNguyenLieu": "Tuyết yến",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA106",
+      "TenMonAn": "Súp hải sản tuyết yến",
+      "MaThanhPhan": "TP10604",
+      "MaNguyenLieu": "NL130",
+      "TenNguyenLieu": "Nấm đông trùng hạ thảo",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA106",
+      "TenMonAn": "Súp hải sản tuyết yến",
+      "MaThanhPhan": "TP10611",
+      "MaNguyenLieu": "NL131",
+      "TenNguyenLieu": "Đường phèn",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA106",
+      "TenMonAn": "Súp hải sản tuyết yến",
+      "MaThanhPhan": "TP10612",
+      "MaNguyenLieu": "NL132",
+      "TenNguyenLieu": "Dầu hào",
+      "Natri": "126.71250000"
+    },
+    {
+      "MaMonAn": "MA106",
+      "TenMonAn": "Súp hải sản tuyết yến",
+      "MaThanhPhan": "TP10609",
+      "MaNguyenLieu": "NL188",
+      "TenNguyenLieu": "Táo đỏ",
+      "Natri": "0.37500000"
+    },
+    {
+      "MaMonAn": "MA216",
+      "TenMonAn": "Súp hoành thánh chiên nhân chay",
+      "MaThanhPhan": "TP21601",
+      "MaNguyenLieu": "NL036",
+      "TenNguyenLieu": "Cà rốt",
+      "Natri": "15.38400000"
+    },
+    {
+      "MaMonAn": "MA216",
+      "TenMonAn": "Súp hoành thánh chiên nhân chay",
+      "MaThanhPhan": "TP21618",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA216",
+      "TenMonAn": "Súp hoành thánh chiên nhân chay",
+      "MaThanhPhan": "TP21615",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.01875000"
+    },
+    {
+      "MaMonAn": "MA216",
+      "TenMonAn": "Súp hoành thánh chiên nhân chay",
+      "MaThanhPhan": "TP21617",
+      "MaNguyenLieu": "NL091",
+      "TenNguyenLieu": "Dầu mè",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA216",
+      "TenMonAn": "Súp hoành thánh chiên nhân chay",
+      "MaThanhPhan": "TP21613",
+      "MaNguyenLieu": "NL131",
+      "TenNguyenLieu": "Đường phèn",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA216",
+      "TenMonAn": "Súp hoành thánh chiên nhân chay",
+      "MaThanhPhan": "TP21602",
+      "MaNguyenLieu": "NL135",
+      "TenNguyenLieu": "Củ cải trắng",
+      "Natri": "8.45000000"
+    },
+    {
+      "MaMonAn": "MA216",
+      "TenMonAn": "Súp hoành thánh chiên nhân chay",
+      "MaThanhPhan": "TP21604",
+      "MaNguyenLieu": "NL304",
+      "TenNguyenLieu": "Củ sắn",
+      "Natri": "6.59000000"
+    },
+    {
+      "MaMonAn": "MA216",
+      "TenMonAn": "Súp hoành thánh chiên nhân chay",
+      "MaThanhPhan": "TP21609",
+      "MaNguyenLieu": "NL305",
+      "TenNguyenLieu": "Đậu xanh đãi vỏ",
+      "Natri": "0.75000000"
+    },
+    {
+      "MaMonAn": "MA216",
+      "TenMonAn": "Súp hoành thánh chiên nhân chay",
+      "MaThanhPhan": "TP21611",
+      "MaNguyenLieu": "NL311",
+      "TenNguyenLieu": "Hành boa rô",
+      "Natri": "2.50000000"
+    },
+    {
+      "MaMonAn": "MA216",
+      "TenMonAn": "Súp hoành thánh chiên nhân chay",
+      "MaThanhPhan": "TP21614",
+      "MaNguyenLieu": "NL312",
+      "TenNguyenLieu": "Hạt nêm chay",
+      "Natri": "1590.00000000"
+    },
+    {
+      "MaMonAn": "MA216",
+      "TenMonAn": "Súp hoành thánh chiên nhân chay",
+      "MaThanhPhan": "TP21608",
+      "MaNguyenLieu": "NL313",
+      "TenNguyenLieu": "Khoai môn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA216",
+      "TenMonAn": "Súp hoành thánh chiên nhân chay",
+      "MaThanhPhan": "TP21610",
+      "MaNguyenLieu": "NL315",
+      "TenNguyenLieu": "Nấm hương tươi",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA216",
+      "TenMonAn": "Súp hoành thánh chiên nhân chay",
+      "MaThanhPhan": "TP21612",
+      "MaNguyenLieu": "NL316",
+      "TenNguyenLieu": "Nấm mèo khô",
+      "Natri": "8.75000000"
+    },
+    {
+      "MaMonAn": "MA216",
+      "TenMonAn": "Súp hoành thánh chiên nhân chay",
+      "MaThanhPhan": "TP21607",
+      "MaNguyenLieu": "NL318",
+      "TenNguyenLieu": "Nước dừa tươi",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA216",
+      "TenMonAn": "Súp hoành thánh chiên nhân chay",
+      "MaThanhPhan": "TP21605",
+      "MaNguyenLieu": "NL319",
+      "TenNguyenLieu": "Rễ ngò",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA216",
+      "TenMonAn": "Súp hoành thánh chiên nhân chay",
+      "MaThanhPhan": "TP21603",
+      "MaNguyenLieu": "NL320",
+      "TenNguyenLieu": "Su hào",
+      "Natri": "26.40000000"
+    },
+    {
+      "MaMonAn": "MA216",
+      "TenMonAn": "Súp hoành thánh chiên nhân chay",
+      "MaThanhPhan": "TP21616",
+      "MaNguyenLieu": "NL323",
+      "TenNguyenLieu": "Tiêu",
+      "Natri": "0.55000000"
+    },
+    {
+      "MaMonAn": "MA216",
+      "TenMonAn": "Súp hoành thánh chiên nhân chay",
+      "MaThanhPhan": "TP21606",
+      "MaNguyenLieu": "NL324",
+      "TenNguyenLieu": "Vỏ hoành thánh",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA211",
+      "TenMonAn": "Tàu hủ nước đường bằng máy xay sinh tố",
+      "MaThanhPhan": "TP21107",
+      "MaNguyenLieu": "NL052",
+      "TenNguyenLieu": "Gừng",
+      "Natri": "1.08333336"
+    },
+    {
+      "MaMonAn": "MA211",
+      "TenMonAn": "Tàu hủ nước đường bằng máy xay sinh tố",
+      "MaThanhPhan": "TP21102",
+      "MaNguyenLieu": "NL080",
+      "TenNguyenLieu": "Nước lọc",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA211",
+      "TenMonAn": "Tàu hủ nước đường bằng máy xay sinh tố",
+      "MaThanhPhan": "TP21105",
+      "MaNguyenLieu": "NL131",
+      "TenNguyenLieu": "Đường phèn",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA211",
+      "TenMonAn": "Tàu hủ nước đường bằng máy xay sinh tố",
+      "MaThanhPhan": "TP21101",
+      "MaNguyenLieu": "NL177",
+      "TenNguyenLieu": "Đậu nành khô",
+      "Natri": "0.33333333"
+    },
+    {
+      "MaMonAn": "MA211",
+      "TenMonAn": "Tàu hủ nước đường bằng máy xay sinh tố",
+      "MaThanhPhan": "TP21103",
+      "MaNguyenLieu": "NL178",
+      "TenNguyenLieu": "Gelatine bột",
+      "Natri": "3.26666667"
+    },
+    {
+      "MaMonAn": "MA211",
+      "TenMonAn": "Tàu hủ nước đường bằng máy xay sinh tố",
+      "MaThanhPhan": "TP21104",
+      "MaNguyenLieu": "NL181",
+      "TenNguyenLieu": "Lá dứa",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA211",
+      "TenMonAn": "Tàu hủ nước đường bằng máy xay sinh tố",
+      "MaThanhPhan": "TP21106",
+      "MaNguyenLieu": "NL184",
+      "TenNguyenLieu": "Nước để nấu nước đường",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA915",
+      "TenMonAn": "Thịt kho tàu bằng nồi áp suất",
+      "MaThanhPhan": "TP1061",
+      "MaNguyenLieu": "NL070",
+      "TenNguyenLieu": "Nước mắm",
+      "Natri": "588.82500000"
+    },
+    {
+      "MaMonAn": "MA915",
+      "TenMonAn": "Thịt kho tàu bằng nồi áp suất",
+      "MaThanhPhan": "TP1054",
+      "MaNguyenLieu": "NL1054",
+      "TenNguyenLieu": "Thịt ba rọi (thịt ba chỉ)",
+      "Natri": "40.00000000"
+    },
+    {
+      "MaMonAn": "MA915",
+      "TenMonAn": "Thịt kho tàu bằng nồi áp suất",
+      "MaThanhPhan": "TP1058",
+      "MaNguyenLieu": "NL1058",
+      "TenNguyenLieu": "Hành tím băm",
+      "Natri": "0.90000000"
+    },
+    {
+      "MaMonAn": "MA915",
+      "TenMonAn": "Thịt kho tàu bằng nồi áp suất",
+      "MaThanhPhan": "TP1060",
+      "MaNguyenLieu": "NL1060",
+      "TenNguyenLieu": "Rượu",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA915",
+      "TenMonAn": "Thịt kho tàu bằng nồi áp suất",
+      "MaThanhPhan": "TP1056",
+      "MaNguyenLieu": "NL143",
+      "TenNguyenLieu": "Trứng vịt",
+      "Natri": "200.55000000"
+    },
+    {
+      "MaMonAn": "MA915",
+      "TenMonAn": "Thịt kho tàu bằng nồi áp suất",
+      "MaThanhPhan": "TP1055",
+      "MaNguyenLieu": "NL318",
+      "TenNguyenLieu": "Nước dừa tươi",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA915",
+      "TenMonAn": "Thịt kho tàu bằng nồi áp suất",
+      "MaThanhPhan": "TP1057",
+      "MaNguyenLieu": "NL907",
+      "TenNguyenLieu": "Tỏi băm",
+      "Natri": "0.67500000"
+    },
+    {
+      "MaMonAn": "MA915",
+      "TenMonAn": "Thịt kho tàu bằng nồi áp suất",
+      "MaThanhPhan": "TP1059",
+      "MaNguyenLieu": "NL934",
+      "TenNguyenLieu": "Ớt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA915",
+      "TenMonAn": "Thịt kho tàu bằng nồi áp suất",
+      "MaThanhPhan": "TP1062",
+      "MaNguyenLieu": "NL940",
+      "TenNguyenLieu": "Gia vị thông dụng (muối/đường/hạt nêm/tiêu)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA910",
+      "TenMonAn": "Tôm sốt phô mai",
+      "MaThanhPhan": "TP1014",
+      "MaNguyenLieu": "NL010",
+      "TenNguyenLieu": "Bắp ngọt",
+      "Natri": "10.00000000"
+    },
+    {
+      "MaMonAn": "MA910",
+      "TenMonAn": "Tôm sốt phô mai",
+      "MaThanhPhan": "TP1012",
+      "MaNguyenLieu": "NL026",
+      "TenNguyenLieu": "Tôm",
+      "Natri": "185.00000000"
+    },
+    {
+      "MaMonAn": "MA910",
+      "TenMonAn": "Tôm sốt phô mai",
+      "MaThanhPhan": "TP1017",
+      "MaNguyenLieu": "NL069",
+      "TenNguyenLieu": "Bơ lạt",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA910",
+      "TenMonAn": "Tôm sốt phô mai",
+      "MaThanhPhan": "TP1013",
+      "MaNguyenLieu": "NL1013",
+      "TenNguyenLieu": "Phô mai mozzarella",
+      "Natri": "1035.00000002"
+    },
+    {
+      "MaMonAn": "MA910",
+      "TenMonAn": "Tôm sốt phô mai",
+      "MaThanhPhan": "TP1015",
+      "MaNguyenLieu": "NL1015",
+      "TenNguyenLieu": "Rong biển",
+      "Natri": "26.66666672"
+    },
+    {
+      "MaMonAn": "MA910",
+      "TenMonAn": "Tôm sốt phô mai",
+      "MaThanhPhan": "TP1016",
+      "MaNguyenLieu": "NL1016",
+      "TenNguyenLieu": "Mùi tây khô",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA910",
+      "TenMonAn": "Tôm sốt phô mai",
+      "MaThanhPhan": "TP1020",
+      "MaNguyenLieu": "NL1020",
+      "TenNguyenLieu": "Muối/Tiêu xay",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA910",
+      "TenMonAn": "Tôm sốt phô mai",
+      "MaThanhPhan": "TP1018",
+      "MaNguyenLieu": "NL907",
+      "TenNguyenLieu": "Tỏi băm",
+      "Natri": "0.89999999"
+    },
+    {
+      "MaMonAn": "MA910",
+      "TenMonAn": "Tôm sốt phô mai",
+      "MaThanhPhan": "TP1019",
+      "MaNguyenLieu": "NL943",
+      "TenNguyenLieu": "Ớt bột",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA939",
+      "TenMonAn": "Trà dâu ngâm",
+      "MaThanhPhan": "TP93823",
+      "MaNguyenLieu": "NL065",
+      "TenNguyenLieu": "Dâu tây",
+      "Natri": "0.75000000"
+    },
+    {
+      "MaMonAn": "MA939",
+      "TenMonAn": "Trà dâu ngâm",
+      "MaThanhPhan": "TP93828",
+      "MaNguyenLieu": "NL073",
+      "TenNguyenLieu": "Muối",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA939",
+      "TenMonAn": "Trà dâu ngâm",
+      "MaThanhPhan": "TP93826",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.75000000"
+    },
+    {
+      "MaMonAn": "MA939",
+      "TenMonAn": "Trà dâu ngâm",
+      "MaThanhPhan": "TP93824",
+      "MaNguyenLieu": "NL1204",
+      "TenNguyenLieu": "Trà túi lọc",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA939",
+      "TenMonAn": "Trà dâu ngâm",
+      "MaThanhPhan": "TP93825",
+      "MaNguyenLieu": "NL1205",
+      "TenNguyenLieu": "Nước cốt tắc",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA939",
+      "TenMonAn": "Trà dâu ngâm",
+      "MaThanhPhan": "TP93827",
+      "MaNguyenLieu": "NL301",
+      "TenNguyenLieu": "Bột mì",
+      "Natri": "0.30000000"
+    },
+    {
+      "MaMonAn": "MA950",
+      "TenMonAn": "Trà sữa trân châu",
+      "MaThanhPhan": "TP93919",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.25000000"
+    },
+    {
+      "MaMonAn": "MA950",
+      "TenMonAn": "Trà sữa trân châu",
+      "MaThanhPhan": "TP93915",
+      "MaNguyenLieu": "NL1229",
+      "TenNguyenLieu": "Trà túi lọc Lipton",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA950",
+      "TenMonAn": "Trà sữa trân châu",
+      "MaThanhPhan": "TP93917",
+      "MaNguyenLieu": "NL1230",
+      "TenNguyenLieu": "Bột cacao",
+      "Natri": "0.70000000"
+    },
+    {
+      "MaMonAn": "MA950",
+      "TenMonAn": "Trà sữa trân châu",
+      "MaThanhPhan": "TP93920",
+      "MaNguyenLieu": "NL1231",
+      "TenNguyenLieu": "Nước đá",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA950",
+      "TenMonAn": "Trà sữa trân châu",
+      "MaThanhPhan": "TP93916",
+      "MaNguyenLieu": "NL146",
+      "TenNguyenLieu": "Bột năng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA950",
+      "TenMonAn": "Trà sữa trân châu",
+      "MaThanhPhan": "TP93918",
+      "MaNguyenLieu": "NL187",
+      "TenNguyenLieu": "Sữa đặc",
+      "Natri": "31.75000006"
+    },
+    {
+      "MaMonAn": "MA940",
+      "TenMonAn": "Trân châu phô mai",
+      "MaThanhPhan": "TP93832",
+      "MaNguyenLieu": "NL074",
+      "TenNguyenLieu": "Đường",
+      "Natri": "0.11250000"
+    },
+    {
+      "MaMonAn": "MA940",
+      "TenMonAn": "Trân châu phô mai",
+      "MaThanhPhan": "TP93829",
+      "MaNguyenLieu": "NL1206",
+      "TenNguyenLieu": "Phô mai",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA940",
+      "TenMonAn": "Trân châu phô mai",
+      "MaThanhPhan": "TP93830",
+      "MaNguyenLieu": "NL1207",
+      "TenNguyenLieu": "Đường bột",
+      "Natri": "0.12247500"
+    },
+    {
+      "MaMonAn": "MA940",
+      "TenMonAn": "Trân châu phô mai",
+      "MaThanhPhan": "TP93831",
+      "MaNguyenLieu": "NL146",
+      "TenNguyenLieu": "Bột năng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA927",
+      "TenMonAn": "Vịt nấu chao",
+      "MaThanhPhan": "TP1190",
+      "MaNguyenLieu": "NL003",
+      "TenNguyenLieu": "Bún tươi",
+      "Natri": "18.75000000"
+    },
+    {
+      "MaMonAn": "MA927",
+      "TenMonAn": "Vịt nấu chao",
+      "MaThanhPhan": "TP1196",
+      "MaNguyenLieu": "NL033",
+      "TenNguyenLieu": "Nấm rơm",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA927",
+      "TenMonAn": "Vịt nấu chao",
+      "MaThanhPhan": "TP1184",
+      "MaNguyenLieu": "NL046",
+      "TenNguyenLieu": "Rau muống",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA927",
+      "TenMonAn": "Vịt nấu chao",
+      "MaThanhPhan": "TP1186",
+      "MaNguyenLieu": "NL049",
+      "TenNguyenLieu": "Hành tím",
+      "Natri": "3.00000000"
+    },
+    {
+      "MaMonAn": "MA927",
+      "TenMonAn": "Vịt nấu chao",
+      "MaThanhPhan": "TP1187",
+      "MaNguyenLieu": "NL051",
+      "TenNguyenLieu": "Tỏi",
+      "Natri": "1.06250000"
+    },
+    {
+      "MaMonAn": "MA927",
+      "TenMonAn": "Vịt nấu chao",
+      "MaThanhPhan": "TP1188",
+      "MaNguyenLieu": "NL052",
+      "TenNguyenLieu": "Gừng",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA927",
+      "TenMonAn": "Vịt nấu chao",
+      "MaThanhPhan": "TP1195",
+      "MaNguyenLieu": "NL067",
+      "TenNguyenLieu": "Sữa tươi không đường",
+      "Natri": "21.50000000"
+    },
+    {
+      "MaMonAn": "MA927",
+      "TenMonAn": "Vịt nấu chao",
+      "MaThanhPhan": "TP1192",
+      "MaNguyenLieu": "NL072",
+      "TenNguyenLieu": "Dầu ăn",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA927",
+      "TenMonAn": "Vịt nấu chao",
+      "MaThanhPhan": "TP1185",
+      "MaNguyenLieu": "NL1157",
+      "TenNguyenLieu": "Cải thìa",
+      "Natri": "12.50000000"
+    },
+    {
+      "MaMonAn": "MA927",
+      "TenMonAn": "Vịt nấu chao",
+      "MaThanhPhan": "TP1183",
+      "MaNguyenLieu": "NL1158",
+      "TenNguyenLieu": "Chao đỏ (nước chao 90ml)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA927",
+      "TenMonAn": "Vịt nấu chao",
+      "MaThanhPhan": "TP1194",
+      "MaNguyenLieu": "NL1159",
+      "TenNguyenLieu": "Gia vị thông dụng (Muối/ hạt nêm/ đường/ bột ngọt)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA927",
+      "TenMonAn": "Vịt nấu chao",
+      "MaThanhPhan": "TP1182",
+      "MaNguyenLieu": "NL1160",
+      "TenNguyenLieu": "Khoai môn (2 củ)",
+      "Natri": "0E-8"
+    },
+    {
+      "MaMonAn": "MA927",
+      "TenMonAn": "Vịt nấu chao",
+      "MaThanhPhan": "TP1189",
+      "MaNguyenLieu": "NL1161",
+      "TenNguyenLieu": "Ớt sa tế",
+      "Natri": "15.62500000"
+    },
+    {
+      "MaMonAn": "MA927",
+      "TenMonAn": "Vịt nấu chao",
+      "MaThanhPhan": "TP1181",
+      "MaNguyenLieu": "NL1162",
+      "TenNguyenLieu": "Vịt (khoảng 1.5kg)",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA927",
+      "TenMonAn": "Vịt nấu chao",
+      "MaThanhPhan": "TP1191",
+      "MaNguyenLieu": "NL131",
+      "TenNguyenLieu": "Đường phèn",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA927",
+      "TenMonAn": "Vịt nấu chao",
+      "MaThanhPhan": "TP1193",
+      "MaNguyenLieu": "NL149",
+      "TenNguyenLieu": "Dầu màu điều",
+      "Natri": null
+    },
+    {
+      "MaMonAn": "MA927",
+      "TenMonAn": "Vịt nấu chao",
+      "MaThanhPhan": "TP1197",
+      "MaNguyenLieu": "NL183",
+      "TenNguyenLieu": "Nước",
+      "Natri": null
+    }
+  ]
+}

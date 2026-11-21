@@ -1,0 +1,35 @@
+viii 
+ 
+- Các carotenoid: lutein, zeaxanthin, beta-cryptoxanthin, lycopen, alpha-
+caroten, beta-caroten 
+- Purin 
+- Các isoflavon: tổng số isoflavon, daidzein, genistein, glycetin 
+- Các acid béo: t ổng s ố acid béo no và không no, pa lmitic, margaric, stearic, 
+arachidic, behenic, lignoceric, linoleic, linolenic, arachidonic, EPA, DHA và 
+tổng số acid béo trans 
+- Các acid amin: lysin, methionin, trypt ophan, phenylalanin , threonin, valin, 
+leucin, isoleucin, arginin, histidin, cys tin, tyrosin, alanin, acid aspartic, acid 
+glutamic, glycin, prolin, serin 
+2. Số thứ tự, mã số  
+Số thứ tự của mỗi thực phẩm được thống nhất đánh số trong các bảng như sau:  
+• Cột mã số thực phẩm theo từng nhóm, bắt đầu bằng 1001, trong đó số 
+1 ở hàng nghìn thể hiện nhóm thực phẩm, số 1 ở hàng đơn vị thể hiện 
+số thứ tự thực phẩm trong nhóm. 
+• Số thứ tự thực phẩm từ 1 đến 526 
+3. Các thành phần dinh dưỡng của thực phẩm 
+Nước: Được xác định b ằng ph ương pháp s ấy khô ở 100-105oC đến tr ọng l ượng 
+không đổi 
+Giá tr ị n ăng l ượng: Được bi ểu th ị b ằng kilocalori (Kcal). N ếu chuy ển thành 
+kilojoul (Kj) thì tính theo hệ số 1 Kcal = 4,184 Kj 
+Giá trị năng lượng của thực phẩm được tính theo hệ số:  
+1g protein cho 4 Kcal , 1 g lipid cho 9 Kcal, 1 g glucid cho 4 Kcal, 1 g c ồn 
+(alcol etylic) cho 7 Kcal. 
+Protein: Được xác định theo t ổng s ố nit ơ trong th ực ph ẩm theo ph ương pháp 
+Kjeldahl, sau đó được chuyển đổi thành protein theo hệ số sau: 
+Thực phẩm H ệ số chuyển đổi Th ực phẩm H ệ số chuyển đổi 
+Ngũ cốc, đậu 
+đỗ 
+5,7 Các th ực phẩm 
+khác 
+6,25 
+Gạo 5,95 S ữa 6,38 

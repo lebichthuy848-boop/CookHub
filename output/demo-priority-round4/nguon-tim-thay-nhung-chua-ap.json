@@ -1,0 +1,30 @@
+[
+  {
+    "id": "MEXT 05023",
+    "source": "https://fooddb.mext.go.jp/details/details.pl?ITEM_NO=5_05023_7",
+    "values": [
+      81,
+      5.9,
+      14.9,
+      0.5,
+      2.6,
+      2
+    ],
+    "status": "KHÔNG TỰ ÁP",
+    "reason": "Mẫu hạt sen non sống bỏ vỏ/áo; tài liệu mô tả không xác nhận bỏ tâm. Công thức cháo bỏ tâm; cần kiểm tra khác biệt trước khi chốt."
+  },
+  {
+    "id": "PhilFCT G081",
+    "source": "https://i.fnri.dost.gov.ph/fct/library/report/4061",
+    "values": [
+      99,
+      21.2,
+      0,
+      1.6,
+      0,
+      88
+    ],
+    "status": "KHÔNG TỰ ÁP",
+    "reason": "Tìm thấy bảng chính thức cá lóc Channa striata trên chỉ mục tìm kiếm; máy chủ báo cáo lỗi HTTP, chưa tải/kiểm chứng PDF nên chưa cập nhật."
+  }
+]

@@ -1,0 +1,993 @@
+{
+  "citation": "Kunchit Judprasong et al., Institute of Nutrition, Mahidol University (2025). Thai Food Composition Database, Online version 3, August 2025, Thailand.",
+  "homepage": "https://inmu.mahidol.ac.th/thaifcd/home",
+  "raw_noodles": {
+    "Density": {
+      "unit": "g/mL",
+      "value": "-",
+      "remaining_columns": [
+        "Not analysed",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Edible portion": {
+      "unit": "%",
+      "value": "-",
+      "remaining_columns": [
+        "Not analysed",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Energy, by calculation": {
+      "unit": "kcal",
+      "value": "103",
+      "remaining_columns": [
+        "Calculated",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        "01/10/2015"
+      ]
+    },
+    "Total energy - by calculation": {
+      "unit": "kcal",
+      "value": "-",
+      "remaining_columns": [
+        "Not calculated",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Moisture": {
+      "unit": "g",
+      "value": "74.4",
+      "remaining_columns": [
+        "Analysed",
+        "7",
+        "-",
+        "-",
+        "2.5",
+        "",
+        "01/10/2015"
+      ]
+    },
+    "Protein, total": {
+      "unit": "g",
+      "value": "1.43",
+      "remaining_columns": [
+        "Analysed",
+        "5",
+        "-",
+        "-",
+        "0.07",
+        "",
+        "01/10/2015"
+      ]
+    },
+    "True protein": {
+      "unit": "g",
+      "value": "-",
+      "remaining_columns": [
+        "Not analysed",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Fat, total": {
+      "unit": "g",
+      "value": "0.31",
+      "remaining_columns": [
+        "Analysed",
+        "3",
+        "-",
+        "-",
+        "0.17",
+        "",
+        "01/10/2015"
+      ]
+    },
+    "Carbohydrate, available": {
+      "unit": "g",
+      "value": "23.42",
+      "remaining_columns": [
+        "Calculated",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        "01/10/2015"
+      ]
+    },
+    "Carbohydrate, total": {
+      "unit": "g",
+      "value": "-",
+      "remaining_columns": [
+        "Not calculated",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Dietary fibre": {
+      "unit": "g",
+      "value": "0.3",
+      "remaining_columns": [
+        "Analysed",
+        "1",
+        "-",
+        "-",
+        "-",
+        "",
+        "01/10/2015"
+      ]
+    },
+    "Ash": {
+      "unit": "g",
+      "value": "0.16",
+      "remaining_columns": [
+        "Analysed",
+        "4",
+        "-",
+        "-",
+        "0.03",
+        "",
+        "01/10/2015"
+      ]
+    },
+    "Calcium": {
+      "unit": "mg",
+      "value": "16",
+      "remaining_columns": [
+        "Analysed",
+        "3",
+        "-",
+        "-",
+        "4",
+        "",
+        "01/10/2015"
+      ]
+    },
+    "Phosphorus": {
+      "unit": "mg",
+      "value": "10",
+      "remaining_columns": [
+        "Analysed",
+        "3",
+        "-",
+        "-",
+        "3",
+        "",
+        "01/10/2015"
+      ]
+    },
+    "Magnesium": {
+      "unit": "mg",
+      "value": "-",
+      "remaining_columns": [
+        "Not analysed",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Sodium": {
+      "unit": "mg",
+      "value": "47",
+      "remaining_columns": [
+        "Analysed",
+        "1",
+        "-",
+        "-",
+        "-",
+        "",
+        "01/10/2015"
+      ]
+    },
+    "Potassium": {
+      "unit": "mg",
+      "value": "10",
+      "remaining_columns": [
+        "Analysed",
+        "1",
+        "-",
+        "-",
+        "-",
+        "",
+        "01/10/2015"
+      ]
+    },
+    "Iron": {
+      "unit": "mg",
+      "value": "-",
+      "remaining_columns": [
+        "Not analysed",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Copper": {
+      "unit": "mg",
+      "value": "-",
+      "remaining_columns": [
+        "Not analysed",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Zinc": {
+      "unit": "mg",
+      "value": "-",
+      "remaining_columns": [
+        "Not analysed",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Selenium": {
+      "unit": "mcg",
+      "value": "-",
+      "remaining_columns": [
+        "Not analysed",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Retinol": {
+      "unit": "mcg",
+      "value": "0",
+      "remaining_columns": [
+        "Assumed zero",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        "01/10/2015"
+      ]
+    },
+    "b-carotene": {
+      "unit": "mcg",
+      "value": "0",
+      "remaining_columns": [
+        "Analysed",
+        "1",
+        "-",
+        "-",
+        "-",
+        "",
+        "01/10/2015"
+      ]
+    },
+    "Vitamin A; retinol activity equivalent": {
+      "unit": "mcg",
+      "value": "0",
+      "remaining_columns": [
+        "Calculated",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        "01/10/2015"
+      ]
+    },
+    "Vitamin D (D2+D3)": {
+      "unit": "mcg",
+      "value": "-",
+      "remaining_columns": [
+        "Not analysed",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Alpha-tocopherol": {
+      "unit": "mg",
+      "value": "-",
+      "remaining_columns": [
+        "Not analysed",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Thiamin": {
+      "unit": "mg",
+      "value": "0.60",
+      "remaining_columns": [
+        "Analysed",
+        "1",
+        "-",
+        "-",
+        "-",
+        "",
+        "01/10/2015"
+      ]
+    },
+    "Riboflavin": {
+      "unit": "mg",
+      "value": "-",
+      "remaining_columns": [
+        "Not analysed",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Niacin": {
+      "unit": "mg",
+      "value": "-",
+      "remaining_columns": [
+        "Not analysed",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Vitamin B-6, total": {
+      "unit": "mg",
+      "value": "-",
+      "remaining_columns": [
+        "Not analysed",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Folate, total": {
+      "unit": "mcg",
+      "value": "-",
+      "remaining_columns": [
+        "Not analysed",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Vitamin B-12": {
+      "unit": "mcg",
+      "value": "-",
+      "remaining_columns": [
+        "Not analysed",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Vitamin C": {
+      "unit": "mg",
+      "value": "0",
+      "remaining_columns": [
+        "Analysed",
+        "1",
+        "-",
+        "-",
+        "-",
+        "",
+        "01/10/2015"
+      ]
+    },
+    "Sugars, total": {
+      "unit": "g",
+      "value": "-",
+      "remaining_columns": [
+        "Not analysed",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Fatty acids, total saturated": {
+      "unit": "g",
+      "value": "-",
+      "remaining_columns": [
+        "Not analysed",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Fatty acids, total monounsaturated": {
+      "unit": "g",
+      "value": "-",
+      "remaining_columns": [
+        "Not analysed",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Fatty acids, total polyunsaturated": {
+      "unit": "g",
+      "value": "-",
+      "remaining_columns": [
+        "Not analysed",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Fatty acids, total omega-3 polyunsaturated": {
+      "unit": "g",
+      "value": "-",
+      "remaining_columns": [
+        "Not analysed",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Fatty acids, total omega-6 polyunsaturated": {
+      "unit": "g",
+      "value": "-",
+      "remaining_columns": [
+        "Not analysed",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Cholesterol": {
+      "unit": "mg",
+      "value": "0",
+      "remaining_columns": [
+        "Assumed zero",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    }
+  },
+  "raw_galanga": {
+    "Density": {
+      "unit": "g/mL",
+      "value": "-",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Edible portion": {
+      "unit": "%",
+      "value": "-",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Energy, by calculation": {
+      "unit": "kcal",
+      "value": "-",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Total energy - by calculation": {
+      "unit": "kcal",
+      "value": "35",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Moisture": {
+      "unit": "g",
+      "value": "90.9",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Protein, total": {
+      "unit": "g",
+      "value": "0.69",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "True protein": {
+      "unit": "g",
+      "value": "-",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Fat, total": {
+      "unit": "g",
+      "value": "0.17",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Carbohydrate, available": {
+      "unit": "g",
+      "value": "-",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Carbohydrate, total": {
+      "unit": "g",
+      "value": "7.79",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Dietary fibre": {
+      "unit": "g",
+      "value": "-",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Ash": {
+      "unit": "g",
+      "value": "0.44",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Calcium": {
+      "unit": "mg",
+      "value": "6",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Phosphorus": {
+      "unit": "mg",
+      "value": "19",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Magnesium": {
+      "unit": "mg",
+      "value": "-",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Sodium": {
+      "unit": "mg",
+      "value": "82",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Potassium": {
+      "unit": "mg",
+      "value": "397",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Iron": {
+      "unit": "mg",
+      "value": "0.83",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Copper": {
+      "unit": "mg",
+      "value": "0.15",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Zinc": {
+      "unit": "mg",
+      "value": "0.72",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Retinol": {
+      "unit": "mcg",
+      "value": "0",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "b-carotene": {
+      "unit": "mcg",
+      "value": "14",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Vitamin A; retinol activity equivalent": {
+      "unit": "mcg",
+      "value": "1",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Thiamin": {
+      "unit": "mg",
+      "value": "0.24",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Riboflavin": {
+      "unit": "mg",
+      "value": "0.15",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Niacin": {
+      "unit": "mg",
+      "value": "0.27",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Vitamin C": {
+      "unit": "mg",
+      "value": "4",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Sugars, total": {
+      "unit": "g",
+      "value": "-",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Fatty acids, total saturated": {
+      "unit": "g",
+      "value": "-",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Fatty acids, total monounsaturated": {
+      "unit": "g",
+      "value": "-",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Fatty acids, total polyunsaturated": {
+      "unit": "g",
+      "value": "-",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Fatty acids, total omega-3 polyunsaturated": {
+      "unit": "g",
+      "value": "-",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Fatty acids, total omega-6 polyunsaturated": {
+      "unit": "g",
+      "value": "-",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    },
+    "Cholesterol": {
+      "unit": "mg",
+      "value": "-",
+      "remaining_columns": [
+        "",
+        "-",
+        "-",
+        "-",
+        "-",
+        "",
+        ""
+      ]
+    }
+  },
+  "calculated_fields": [
+    {
+      "field": "ChatBotDuong",
+      "ids": [
+        "NL003",
+        "NL914"
+      ],
+      "value": "23.70",
+      "type": "CALCULATED_BY_DIFFERENCE",
+      "formula": "100 - moisture - protein - fat - ash",
+      "inputs": {
+        "moisture": "74.4",
+        "protein": "1.43",
+        "fat": "0.31",
+        "ash": "0.16"
+      },
+      "method_source": "https://www.fao.org/fileadmin/templates/food_composition/documents/Guidelines_data_checking_02.pdf#page=24"
+    }
+  ],
+  "files": {
+    "fresh-rice-noodles-profile.html": "d051073a3959b570e79e3f9c4f1c5a886e4094dfc7006b57e14efb2ffe8267d3",
+    "galanga-profile.html": "a83a6654ae1914037467c46f7d8e9cb795e7c1cc2dd1c244e71756d9a50c3514"
+  }
+}

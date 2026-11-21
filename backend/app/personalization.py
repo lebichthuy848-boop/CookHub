@@ -22,6 +22,8 @@ WORDS = {
     'sweet_sour': ['chua', 'ngọt'], 'light': ['thanh', 'hấp', 'luộc'], 'rich': ['béo', 'cốt dừa', 'kem'],
     'children': ['trẻ', 'cháo', 'súp'], 'friends': ['nhậu', 'lẩu', 'nướng'],
     'stove': ['xào', 'chiên', 'kho', 'luộc', 'hấp', 'canh', 'cháo'],
+    'gas_stove': ['xào', 'chiên', 'kho', 'luộc', 'hấp', 'canh', 'cháo'],
+    'induction_stove': ['xào', 'chiên', 'kho', 'luộc', 'hấp', 'canh', 'cháo'],
     'air_fryer': ['nồi chiên không dầu'], 'pressure_cooker': ['hầm', 'nồi áp suất'],
     'oven': ['lò nướng'], 'no_cook': ['không cần nấu', 'salad', 'sinh tố'],
 }
@@ -44,8 +46,12 @@ DISH_TYPE_NAMES = {
 AVOID_INGREDIENTS = {
     'fish': ('cá', 'nước mắm', 'mắm cá', 'cá cơm'),
     'shellfish': ('tôm', 'cua', 'mực', 'nghêu', 'sò', 'ốc', 'hàu', 'mắm ruốc', 'mắm tôm'),
+    'egg': ('trứng gà', 'trứng vịt', 'trứng cút', 'lòng đỏ trứng', 'lòng trắng trứng'),
+    'tree_nuts': ('hạt điều', 'hạnh nhân', 'óc chó', 'hạt dẻ', 'mắc ca', 'macadamia'),
     'soy': ('đậu nành', 'đậu tương', 'đậu hũ', 'đậu phụ', 'tàu hũ', 'nước tương', 'xì dầu', 'sữa đậu nành'),
     'dairy': ('sữa', 'bơ lạt', 'bơ sữa', 'kem tươi', 'phô mai', 'váng sữa', 'whey'),
+    'wheat': ('lúa mì', 'bột mì', 'bánh mì', 'mì ý', 'pasta'),
+    'sesame': ('mè', 'vừng', 'dầu mè', 'dầu vừng'),
     'seafood_allergy': ('cá', 'tôm', 'cua', 'mực', 'nghêu', 'sò', 'ốc', 'hàu',
                         'hải sản', 'nước mắm', 'mắm ruốc', 'mắm tôm'),
     'peanut': ('đậu phộng', 'lạc'),
@@ -142,8 +148,9 @@ def rank_dishes(db, user_id, answers):
         hits += [bool(answers['time']) and minutes > 0 and (minutes < 15 if answers['time'] == 'quick' else 15 <= minutes <= 30 if answers['time'] == 'medium' else minutes > 30)]
         hits += [any(matches(text, tag) for tag in answers['tools'])]
         hits += [any(any(term in categories for term in DISH_TYPE_NAMES.get(tag, ())) for tag in answers['dish_types'])]
-        method_terms = {'stir_fry': ('xào', 'áp chảo'), 'steam': ('hấp', 'luộc'),
-                        'grill': ('nướng',), 'stew': ('hầm', 'kho')}
+        method_terms = {'stir_fry': ('xào',), 'pan_sear': ('áp chảo',),
+                        'steam': ('hấp',), 'boil': ('luộc',),
+                        'grill': ('nướng',), 'stew': ('hầm',), 'braise': ('kho',)}
         method = answers['method']
         hits += [bool(method) and any(term in text for term in method_terms.get(method, ()))]
         difficulty = {'beginner': 'Dễ', 'basic': 'Trung bình', 'chef': 'Khó'}.get(answers['skill'])

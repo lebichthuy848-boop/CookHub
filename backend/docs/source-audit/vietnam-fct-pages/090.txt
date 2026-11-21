@@ -1,0 +1,69 @@
+STT: 73
+M· sè: 3024
+Th¶i bá (%): 0.0
+Thμnh phÇn dinh d−ìng
+(Nutrients)
+ĐV
+(Unit)
+Hμm lượng
+(Value)
+TLTK
+(Source)
+Thμnh phÇn dinh d−ìng
+(Nutrients)
+ĐV
+(Unit)
+Hμm lượng
+(Value)
+TLTK
+(Source)
+Nước (Water ) g 8.0 1 Tổng số isoflavon (Total isoflavone) mg 0.26 3
+Năng lượng (Energy ) KCal 575 Daidzein mg 0.03 3
+KJ 2406 Genistein mg 0.24 3
+Protein g 27.5 1 Glycetin mg -
+Lipid (Fat) g 45.0 1 Tổng số acid béo no g 6.250 3
+Glucid (Carbohydrate) g 15.0 1 (Total saturated fatty acid)
+Celluloza (Fiber) g 2.1 1 Palmitic (C16:0) g 4.710 3
+Tro (Ash) g 2.4 1 Margaric (C17:0) g 0.000 3
+Đường tổng số (Sugar) g - Stearic (C18:0) g 1.010 3
+Galactoza (Galactose) g - Arachidic (C20:0) g 0.000 3
+Maltoza (Maltose) g - Behenic (22:0) g 0.000 3
+Lactoza (Lactose) g - Lignoceric (C24:0) g 0.000 3
+Fructoza (Fructose) g - TS acid béo không no 1 nối đôi g 22.330 3
+Glucoza (Glucose) g - (Total monounsaturated fatty acid)
+Sacaroza (Sucrose) g - Myristoleic (C14:1) g 0.000 3
+Calci (Calcium) mg 80 1 Palmitoleic (C16:1) g 0.010 3
+Sắt (Iron) mg 3.00 1 Oleic (C18:1) g 21.710 3
+Magiê (Magnesium) mg 182 3 TS acid béo không no nhiềun ối đôi g 14 220 3
+Tªn thùc phÈm (Vietnamese): Bét l¹c
+Tªn tiÕng Anh (English): Peanut flour
+Thμnh phÇn dinh d−ìng trong 100g phÇn ¨n ®−îc (100 grams edible portion)
+Magiê (Magnesium) mg 182 3 TS acid béo không no nhiều nối đôi g 14.220 3
+Mangan (Manganese) mg 1.570 3 (Total polyunsaturated fatty acid)
+Phospho (Phosphorous) mg 380 1 Linoleic (C18:2 n6) g 14.220 3
+Kali (Potassium) mg 414 3 Linolenic (C18:2 n3) g 0.000 3
+Natri (Sodium) mg 43 Arachidonic (C20:4) g 0.000 3
+Kẽm  (Zinc) mg 1.87 3 Eicosapentaenoic  (C20:5 n3) g 0.000 3
+Đồng (Copper) μg 413 3 Docosahexaenoic (C22:6 n3) g 0.000 3
+Selen (Selenium) μg - TS acid béo trans (Total trans fatty acid) g -
+Vitamin C (Ascorbic acid) mg - Cholesterol mg 01
+Vitamin B1 (Thiamine) mg 0.40 1 Phytosterol mg -
+Vitamin B2 (Riboflavin) mg 0.11 1 Lysin mg 1055 3
+Vitamin PP (Niacin) mg 15.3 1 Methionin mg 384 3
+Vitamin B5 (Pantothenic acid) mg 1.739 3 Tryptophan mg 320 3
+Vitamin B6 (Pyridoxine) mg 0.342 3 Phenylalanin mg 1791 3
+Folat (Folate) μg 236 3 Threonin mg 821 3
+Vitamin B9 (Folic acid) μg 03 Valin mg 1375 3
+Vitamin H (Biotin ) μg - Leucin mg 1876 3
+Vitamin B12 (Cyanocobalamine) μg 03 Isoleucin mg 938 3
+Vitamin A (Retinol) μg 01 Arginin mg 2899 3
+Vitamin D (Calciferol ) μg - Histidin mg 618 3
+Vitamin E (Alpha-tocopherol) mg 8.20 3 Cystin mg 265 3
+Vitamin K (Phylloquinone) μg 03 Tyrosin mg 713 3
+Beta-caroten μg 10 3 Alanin mg 713 3
+Alpha-caroten μg - Acid aspartic mg 3147 3
+Beta-cryptoxanthin μg - Acid glutamic mg 5404 3
+Lycopen μg - Glycin mg 1372 3
+Lutein + Zeaxanthin μg - Prolin mg 1317 3
+Purin mg 73 4 Serin mg 1660 3
+73

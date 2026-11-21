@@ -1,0 +1,236 @@
+[
+  {
+    "ingredient_id": "NL918",
+    "current": {
+      "MaThongTin": "DD918",
+      "MaNguyenLieu": "NL918",
+      "KhoiLuongChuan": "100.00",
+      "MaDonVi": "DVT001",
+      "NangLuong": "1.00",
+      "ChatDam": "0.80",
+      "ChatBotDuong": "16.50",
+      "ChatBeo": "1.00",
+      "ChatXo": "0.00",
+      "natri": "7.00"
+    },
+    "reference": {
+      "ndb": "11972",
+      "source": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+      "values": {
+        "NangLuong": 99.0,
+        "ChatDam": 1.82,
+        "ChatBotDuong": 25.31,
+        "ChatBeo": 0.49,
+        "ChatXo": null,
+        "natri": 6.0
+      },
+      "description": "Lemon grass (citronella), raw"
+    },
+    "note": "Sả băm: 1 kcal/100 g không phù hợp hồ sơ sả tươi tham khảo. Phải đối chiếu và sửa cả hồ sơ chất, không chỉ kcal.",
+    "affected_dishes": [
+      "MA902"
+    ]
+  },
+  {
+    "ingredient_id": "NL1118",
+    "current": {
+      "MaThongTin": "DD044",
+      "MaNguyenLieu": "NL1118",
+      "KhoiLuongChuan": "100.00",
+      "MaDonVi": "DVT001",
+      "NangLuong": "1.00",
+      "ChatDam": "0.80",
+      "ChatBotDuong": "16.50",
+      "ChatBeo": "1.00",
+      "ChatXo": "0.00",
+      "natri": "7.00"
+    },
+    "reference": {
+      "ndb": "11972",
+      "source": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+      "values": {
+        "NangLuong": 99.0,
+        "ChatDam": 1.82,
+        "ChatBotDuong": 25.31,
+        "ChatBeo": 0.49,
+        "ChatXo": null,
+        "natri": 6.0
+      },
+      "description": "Lemon grass (citronella), raw"
+    },
+    "note": "Sả xay: cùng vấn đề với sả băm; không áp hồ sơ này nếu có pha dầu/gia vị.",
+    "affected_dishes": [
+      "MA921"
+    ]
+  },
+  {
+    "ingredient_id": "NL117",
+    "current": {
+      "MaThongTin": "DD101",
+      "MaNguyenLieu": "NL117",
+      "KhoiLuongChuan": "100.00",
+      "MaDonVi": "DVT001",
+      "NangLuong": "50.00",
+      "ChatDam": "0.50",
+      "ChatBotDuong": "11.70",
+      "ChatBeo": "0.00",
+      "ChatXo": "0.60",
+      "natri": "15.20"
+    },
+    "reference": {
+      "ndb": "09147",
+      "source": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+      "values": {
+        "NangLuong": 281.0,
+        "ChatDam": 4.72,
+        "ChatBotDuong": 72.52,
+        "ChatBeo": 0.5,
+        "ChatXo": 6.0,
+        "natri": 5.0
+      },
+      "description": "Jujube, Chinese, fresh, dried"
+    },
+    "note": "Ghi chú DB ghi táo tàu KHÔ; hồ sơ 50 kcal/100 g không khớp dạng khô USDA. Cần hồ sơ đúng trạng thái.",
+    "affected_dishes": [
+      "MA103",
+      "MA107"
+    ]
+  },
+  {
+    "ingredient_id": "NL122",
+    "current": {
+      "MaThongTin": "DD112",
+      "MaNguyenLieu": "NL122",
+      "KhoiLuongChuan": "100.00",
+      "MaDonVi": "DVT001",
+      "NangLuong": "52.00",
+      "ChatDam": "0.90",
+      "ChatBotDuong": "12.00",
+      "ChatBeo": "0.00",
+      "ChatXo": "1.00",
+      "natri": "25.50"
+    },
+    "reference": {
+      "ndb": "09173",
+      "source": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+      "values": {
+        "NangLuong": 286.0,
+        "ChatDam": 4.9,
+        "ChatBotDuong": 74.0,
+        "ChatBeo": 0.4,
+        "ChatXo": null,
+        "natri": 48.0
+      },
+      "description": "Longans, dried"
+    },
+    "note": "Ghi chú DB ghi nhãn nhục KHÔ; 52 kcal/100 g không khớp dạng khô USDA. Cần hồ sơ đúng trạng thái.",
+    "affected_dishes": [
+      "MA103"
+    ]
+  },
+  {
+    "ingredient_id": "NL080",
+    "current": {
+      "MaThongTin": "DD080",
+      "MaNguyenLieu": "NL080",
+      "KhoiLuongChuan": "100.00",
+      "MaDonVi": "DVT001",
+      "NangLuong": "1.00",
+      "ChatDam": "0.00",
+      "ChatBotDuong": "0.00",
+      "ChatBeo": "0.00",
+      "ChatXo": "0.00",
+      "natri": null
+    },
+    "reference": {
+      "ndb": "14555",
+      "source": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+      "values": {
+        "NangLuong": 0.0,
+        "ChatDam": 0.0,
+        "ChatBotDuong": 0.0,
+        "ChatBeo": 0.0,
+        "ChatXo": 0.0,
+        "natri": 2.0
+      },
+      "description": "Water, bottled, generic"
+    },
+    "note": "Nước lọc không đường: nguồn nước uống tham khảo có năng lượng 0. Không suy ra natri bằng 0.",
+    "affected_dishes": [
+      "MA101",
+      "MA109",
+      "MA210",
+      "MA211",
+      "MA907",
+      "MA942",
+      "MA951"
+    ]
+  },
+  {
+    "ingredient_id": "NL183",
+    "current": {
+      "MaThongTin": "DD183",
+      "MaNguyenLieu": "NL183",
+      "KhoiLuongChuan": "100.00",
+      "MaDonVi": "DVT001",
+      "NangLuong": "1.00",
+      "ChatDam": "0.00",
+      "ChatBotDuong": "0.00",
+      "ChatBeo": "0.00",
+      "ChatXo": "0.00",
+      "natri": null
+    },
+    "reference": {
+      "ndb": "14555",
+      "source": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+      "values": {
+        "NangLuong": 0.0,
+        "ChatDam": 0.0,
+        "ChatBotDuong": 0.0,
+        "ChatBeo": 0.0,
+        "ChatXo": 0.0,
+        "natri": 2.0
+      },
+      "description": "Water, bottled, generic"
+    },
+    "note": "Nước thường không đường: nguồn nước uống tham khảo có năng lượng 0. Không suy ra natri bằng 0.",
+    "affected_dishes": [
+      "MA212",
+      "MA923",
+      "MA927",
+      "MA928"
+    ]
+  },
+  {
+    "ingredient_id": "NL974",
+    "current": {
+      "MaThongTin": "DD974",
+      "MaNguyenLieu": "NL974",
+      "KhoiLuongChuan": "100.00",
+      "MaDonVi": "DVT001",
+      "NangLuong": "1.00",
+      "ChatDam": "1.10",
+      "ChatBotDuong": "27.40",
+      "ChatBeo": "0.10",
+      "ChatXo": "0.30",
+      "natri": "907.00"
+    },
+    "reference": {
+      "ndb": "11546",
+      "source": "https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip",
+      "values": {
+        "NangLuong": 82.0,
+        "ChatDam": 4.32,
+        "ChatBotDuong": 18.91,
+        "ChatBeo": 0.47,
+        "ChatXo": 4.1,
+        "natri": 59.0
+      },
+      "description": "Tomato products, canned, paste, without salt added"
+    },
+    "note": "1 kcal/100 g cần xác minh. Nếu đúng tomato paste không thêm muối thì hồ sơ USDA là 82 kcal; không áp cho ketchup hay sản phẩm khác.",
+    "affected_dishes": [
+      "MA907"
+    ]
+  }
+]

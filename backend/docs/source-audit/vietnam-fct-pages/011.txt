@@ -1,0 +1,26 @@
+x 
+ 
+4. Nguồn số liệu tham khảo: Số liệu tham khảo trong BTP 2007 từ các nguồn tài 
+liệu sau, được ký hiệu bằng các chữ số từ 1 đến 7 trong cột TLTK (Source) 
+- Ký hiệu số 1: Bảng thành phần thực phẩm năm 2000. 
+- Ký hiệu số 2: Bảng thành phần thực phẩm FAO năm 1972. 
+- Ký hi ệu s ố 3: C ơ s ở d ữ li ệu thành ph ần th ực ph ẩm M ỹ - USDA Food 
+Composition Database, Version 18, năm 2006. 
+- Ký hi ệu s ố 4: B ảng thành ph ần th ực ph ẩm Đức 2006, tham kh ảo hàm 
+lượng purin. 
+- Ký hiệu số 5: B ảng thành phần thực phẩm Đan Mạch 2006, tham kh ảo số 
+liệu biotin. 
+- Ký hiệu số 6: Bảng thành phần thực phẩm ASEAN năm 2000 
+- Ký hiệu số 7: Số liệu tham khảo các kết quả nghiên cứu từ 2000 - 2007 tại 
+Viện Dinh dưỡng 
+5. Chú thích số liệu 
+- Đối với các thành ph ần còn thi ếu số liệu (chưa phân tích, không có s ố liệu 
+tham khảo, ký hiệu bằng dấu gạch ngang (-). 
+- Đối với các thành phần không có trong thực phẩm, số liệu được ghi là 0. 
+ 
+Các chữ viết tắt trong Bảng thành phần thực phẩm: 
+STT:   S ố thứ tự 
+ĐV:  Đơn vị 
+TLTK: Tài li ệu tham khảo 
+TS:  T ổng số 
+ 

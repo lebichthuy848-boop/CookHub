@@ -334,6 +334,49 @@ def menu_dish_options(user=Depends(current_user), db:Session=Depends(get_db)):
                  image=local_image(d.duongDanAnh,d.tenMonAn),time=d.thoiGianCheBien or 0)
             for d in db.scalars(select(m.MonAn).where(published).order_by(m.MonAn.tenMonAn))]
 
+@router.get('/menu/nutrition-options')
+def menu_nutrition_options(on: date, user=Depends(current_user), db: Session = Depends(get_db)):
+    if db.bind.dialect.name != 'mssql':
+        return []
+    rows = db.execute(text("""
+        SELECT m.MaMonAn, f.NangLuong, f.ChatDam, f.ChatBotDuong, f.ChatBeo, f.ChatXo, f.Natri,
+               f.MaDonVi, dv.KyHieu, f.ThieuLuongAnDuoc, f.ThieuDinhDuong,
+               f.ThieuQuyDoiDinhDuong, f.LyDoLuongAnDuoc
+        FROM dbo.MonAn m
+        CROSS APPLY dbo.FnTinhMonAn(m.MaMonAn, 1, :used_on, NULL) f
+        LEFT JOIN dbo.DonViTinh dv ON dv.MaDonVi=f.MaDonVi
+        WHERE EXISTS (SELECT 1 FROM dbo.CongThuc c WHERE c.MaMonAn=m.MaMonAn AND c.DaCongBo=1)
+    """), {'used_on': on}).all()
+    options = {}
+    metrics = ('nang_luong', 'chat_dam', 'chat_bot_duong', 'chat_beo', 'chat_xo', 'natri')
+    for dish_id, *values in rows:
+        nutrients=values[:6]
+        unit_symbol=' '.join(str(values[7] or '').casefold().split())
+        unspecified=unit_symbol in {'ít','1 ít'}
+        unverified_intake, missing_nutrition, missing_conversion, intake_reason=values[8:12]
+        option=options.setdefault(dish_id.strip(),{
+            'totals':dict.fromkeys(metrics,0.0),'missing_metrics':set(),'processing_issues':[]})
+        if unverified_intake:
+            option['missing_metrics'].update(metrics)
+            issue=intake_reason or 'Chưa xác định lượng thực sự ăn vào sau chế biến.'
+            if issue not in option['processing_issues']:
+                option['processing_issues'].append(issue)
+            continue
+        if not any(value is not None for value in nutrients) and (missing_nutrition or missing_conversion) and not unspecified:
+            option['missing_metrics'].update(metrics)
+            continue
+        for key,value in zip(metrics,nutrients):
+            if value is None:
+                if not unspecified:
+                    option['missing_metrics'].add(key)
+            else:
+                option['totals'][key]+=float(value)
+    return [{'id':dish_id,'totals':option['totals'],
+             'missing_metrics':sorted(option['missing_metrics']),
+             'complete':not option['missing_metrics'],
+             'processing_issues':option['processing_issues']}
+            for dish_id,option in options.items()]
+
 @router.get('/menu/nutrition')
 def menu_nutrition_for_day(on: date, user=Depends(current_user), db: Session = Depends(get_db)):
     return menu_nutrition(db, user.maNguoiDung, on)
@@ -519,6 +562,50 @@ def _menu_sql_http_error(exc):
     if number == 547:
         return HTTPException(409, 'Dữ liệu vi phạm ràng buộc cơ sở dữ liệu.')
     return HTTPException(500, 'Không thể thêm món vào thực đơn. Kiểm tra log backend để xem lỗi SQL chi tiết.')
+
+@router.put('/menu/{item_id}')
+def update_menu(item_id: str, data: s.MenuItemUpdate, user=Depends(current_user), db: Session = Depends(get_db)):
+    row = db.scalar(select(m.ChiTietThucDon).join(m.ThucDon,
+        m.ThucDon.maThucDon == m.ChiTietThucDon.maThucDon).where(
+        m.ChiTietThucDon.maChiTiet == item_id, m.ThucDon.maNguoiDung == user.maNguoiDung))
+    if row is None:
+        raise HTTPException(404, 'Không tìm thấy mục thực đơn.')
+    meal = {'Sáng': 'Bữa sáng', 'Trưa': 'Bữa trưa', 'Tối': 'Bữa tối', 'Ăn nhẹ': 'Bữa phụ'}[data.meal]
+    changing_meal = (row.buaAn or '').strip() not in (meal, data.meal)
+    duplicate = changing_meal and db.scalar(select(m.ChiTietThucDon).where(
+        m.ChiTietThucDon.maThucDon == row.maThucDon,
+        m.ChiTietThucDon.ngayDung == row.ngayDung,
+        m.ChiTietThucDon.maMonAn == row.maMonAn,
+        m.ChiTietThucDon.maChiTiet != item_id,
+        m.ChiTietThucDon.buaAn.in_([meal, data.meal])))
+    if duplicate:
+        raise HTTPException(409, 'Bữa này đã có món đó. Hãy chọn bữa khác.')
+    previous_servings=float(row.soKhauPhan or 1)
+    if changing_meal:
+        row.buaAn = meal
+    row.soKhauPhan = data.servings
+    if previous_servings>0 and float(data.servings)!=previous_servings:
+        from ..household import read_state, rescale_portion_split
+        preference,answers,state=read_state(db,user.maNguoiDung,lock=True)
+        day=state.get('days',{}).get(str(row.ngayDung),{})
+        portions=day.get('portions',{})
+        shares=portions.get(item_id)
+        scaled=rescale_portion_split(shares,previous_servings,float(data.servings))
+        if scaled is not None:
+            portions[item_id]=scaled
+            day['portions']=portions
+            state.setdefault('days',{})[str(row.ngayDung)]=day
+            state['revision']=int(state.get('revision',0))+1
+            answers['_household']=state
+            if preference is not None:
+                preference.answers=json.dumps(answers,ensure_ascii=False)
+    try:
+        db.commit()
+    except SQLAlchemyError as exc:
+        db.rollback()
+        _log_sql_error('update_menu', exc)
+        raise HTTPException(409, 'Không thể lưu thay đổi cho món này. Kiểm tra ràng buộc thực đơn trong log backend.') from exc
+    return {'id': item_id, 'meal': data.meal, 'servings': data.servings}
 
 @router.delete('/menu/{item_id}', status_code=204)
 def remove_menu(item_id: str, user=Depends(current_user), db: Session = Depends(get_db)):

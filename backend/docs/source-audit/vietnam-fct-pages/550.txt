@@ -1,0 +1,24 @@
+   
+ 
+Các thực phẩm nhóm 14: Nước giải khát, bia, rượu 
+Mã số BTP 
+ 2000 
+Mã số BTP 
+2007 Tên thực phẩm Trang 
+14001 14001 Bia (c ồn: 4,5 g) 511 
+14002 14002 Cô nh ắc (cồn 32 g) 512 
+14003 14003 C ốc tain (cồn 13 g) 513 
+14004 14004 Coca cola 514 
+14005 14005 N ước cam tươi 515 
+14006 14006 N ước dừa non tươi 516 
+14007 14007 N ước ép cà chua 517 
+14008 14008 N ước khoáng 518 
+14009 14009 N ước quít tươi 519 
+14010 14010 R ượu cam, chanh (cồn 24,2 g) 520 
+14011 14011 R ượu nếp (80g/ 24 ml) (cồn 5 g) 521 
+14012 14012 R ượu trắng (cồn 39 g) 522 
+14013 14013 R ượu vang đỏ (cồn 9,5 g) 523 
+14014 14014 R ượu vang trắng (cồn 9,5 g) 524 
+14015 14015 R ượu vang trắng ngọt (cồn 10.2 g) 525 
+14016 14016 R ượu Whisky (cồn 35,2 g) 526 
+ 

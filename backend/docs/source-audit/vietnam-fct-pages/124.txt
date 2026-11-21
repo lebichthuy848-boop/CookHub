@@ -1,0 +1,69 @@
+STT: 104
+M· sè: 4022
+Th¶i bá (%): 0.0
+Thμnh phÇn dinh d−ìng
+(Nutrients)
+ĐV
+(Unit)
+Hμm lượng
+(Value)
+TLTK
+(Source)
+Thμnh phÇn dinh d−ìng
+(Nutrients)
+ĐV
+(Unit)
+Hμm lượng
+(Value)
+TLTK
+(Source)
+Nước (Water ) g 16.0 1 Tổng số isoflavon (Total isoflavone) mg -
+Năng lượng (Energy ) KCal 220 Daidzein mg -
+KJ 918 Genistein mg -
+Protein g 17.6 1 Glycetin mg -
+Lipid (Fat) g 1.5 1 Tổng số acid béo no g 0.220 3
+Glucid (Carbohydrate) g 33.9 1 (Total saturated fatty acid)
+Celluloza (Fiber) g 17.7 1 Palmitic (C16:0) g 0.190 3
+Tro (Ash) g 13.3 1 Margaric (C17:0) g 0.000 3
+Đường tổng số (Sugar) g - Stearic (C18:0) g 0.030 3
+Galactoza (Galactose) g - Arachidic (C20:0) g 0.000 3
+Maltoza (Maltose) g - Behenic (22:0) g 0.000 3
+Lactoza (Lactose) g - Lignoceric (C24:0) g 0.000 3
+Fructoza (Fructose) g - TS acid béo không no 1 nối đôi g 0.120 3
+Glucoza (Glucose) g - (Total monounsaturated fatty acid)
+Sacaroza (Sucrose) g - Myristoleic (C14:1) g 0.000 3
+Calci (Calcium) mg 629 3 Palmitoleic (C16:1) g 0.000 3
+Sắt (Iron) mg 6.73 3 Oleic (C18:1) g 0.120 3
+Magiê (Magnesium) mg 170 3 TS acid béo không no nhiềun ối đôi g 0 330 3
+Tªn thùc phÈm (Vietnamese): Cñ c¶i tr¾ng kh«
+Tªn tiÕng Anh (English): Dried radish, white
+Thμnh phÇn dinh d−ìng trong 100g phÇn ¨n ®−îc (100 grams edible portion)
+Magiê (Magnesium) mg 170 3 TS acid béo không no nhiều nối đôi g 0.330 3
+Mangan (Manganese) mg 0.540 3 (Total polyunsaturated fatty acid)
+Phospho (Phosphorous) mg 204 3 Linoleic (C18:2 n6) g 0.120 3
+Kali (Potassium) mg 3494 3 Linolenic (C18:2 n3) g 0.210 3
+Natri (Sodium) mg 278 3 Arachidonic (C20:4) g 0.000 3
+Kẽm  (Zinc) mg 2.13 3 Eicosapentaenoic  (C20:5 n3) g 0.000 3
+Đồng (Copper) μg 1631 3 Docosahexaenoic (C22:6 n3) g 0.000 3
+Selen (Selenium) μg 0.7 3 TS acid béo trans (Total trans fatty acid) g -
+Vitamin C (Ascorbic acid) mg 03 Cholesterol mg 03
+Vitamin B1 (Thiamine) mg 0.27 3 Phytosterol mg -
+Vitamin B2 (Riboflavin) mg 0.68 3 Lysin mg 393 3
+Vitamin PP (Niacin) mg 3.4 3 Methionin mg 75 3
+Vitamin B5 (Pantothenic acid) mg 1.854 3 Tryptophan mg 43 3
+Vitamin B6 (Pyridoxine) mg 0.618 3 Phenylalanin mg 262 3
+Folat (Folate) μg 295 3 Threonin mg 326 3
+Vitamin B9 (Folic acid) μg 03 Valin mg 365 3
+Vitamin H (Biotin ) μg - Leucin mg 413 3
+Vitamin B12 (Cyanocobalamine) μg 03 Isoleucin mg 344 3
+Vitamin A (Retinol) μg 01 Arginin mg 456 3
+Vitamin D (Calciferol ) μg - Histidin mg 149 3
+Vitamin E (Alpha-tocopherol) mg - Cystin mg -3
+Vitamin K (Phylloquinone) μg - Tyrosin mg 150 3
+Beta-caroten μg 03 Alanin mg 248 3
+Alpha-caroten μg 03 Acid aspartic mg 538 3
+Beta-cryptoxanthin μg 03 Acid glutamic mg 1492 3
+Lycopen μg 03 Glycin mg 248 3
+Lutein + Zeaxanthin μg 03 Prolin mg 202 3
+Purin mg - Serin mg 240 3
+104

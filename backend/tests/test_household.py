@@ -1,7 +1,7 @@
 import json
 from types import SimpleNamespace
 import pytest
-from app.household import distribution, targets
+from app.household import distribution, targets, public_state
 from conftest import login
 from app import models as m
 
@@ -48,6 +48,33 @@ def test_portion_totals_and_ownership_are_validated(client):
     payload['revision']=1;payload['portions']={'someone-elses-item':{'adult':3}}
     assert client.put('/api/menu/household?on=2026-11-07',json=payload).status_code==422
 
+def test_update_menu_rescales_persisted_member_shares():
+    from app.routers.personal import update_menu
+    from app.schemas import MenuItemUpdate
+    from datetime import date
+    item=SimpleNamespace(maChiTiet='item',maThucDon='plan',maMonAn='MA001',ngayDung=date(2026,11,7),buaAn='Bữa trưa',soKhauPhan=3)
+    stored={'_household':{'revision':1,'members':[],'days':{'2026-11-07':{
+        'active_ids':['a','b'],'portions':{'item':{'a':1,'b':2}}}}}}
+    preference=SimpleNamespace(answers=json.dumps(stored))
+    class FakeDB:
+        bind=SimpleNamespace(dialect=SimpleNamespace(name='sqlite'))
+        calls=0
+        def scalar(self,_statement):
+            self.calls+=1
+            return item if self.calls==1 else preference
+        def commit(self): pass
+    response=update_menu('item',MenuItemUpdate(meal='Trưa',servings=6),
+                         user=SimpleNamespace(maNguoiDung='ND001'),db=FakeDB())
+    assert response['servings']==6
+    saved=json.loads(preference.answers)['_household']
+    assert saved['days']['2026-11-07']['portions']['item']=={'a':2.0,'b':4.0}
+    assert saved['revision']==2
+
+def test_rescale_portion_split_keeps_ratio_and_rejects_stale_totals():
+    from app.household import rescale_portion_split
+    assert rescale_portion_split({'a':1,'b':2},3,6)=={'a':2,'b':4}
+    assert rescale_portion_split({'a':1,'b':1},3,6) is None
+
 def test_distribution_conserves_totals_for_unequal_and_equal_shares():
     state=dict(revision=1,members=[profile('a'),profile('b')],days={'2026-11-07':dict(active_ids=['a','b'],portions={'item':{'a':1,'b':2}})})
     items=[SimpleNamespace(maChiTiet='item',soKhauPhan=3)]
@@ -56,6 +83,10 @@ def test_distribution_conserves_totals_for_unequal_and_equal_shares():
     assert [x['totals']['nang_luong'] for x in result['members']]==[300,600]
     assert sum(x['totals']['natri'] for x in result['members'])==900
     assert not result['equal_split_items']
+    assert result['member_item_totals']['a']['item']['nang_luong']==300
+    assert result['member_item_totals']['b']['item']['nang_luong']==600
+    assert result['member_portions']['a']['item']==1
+    assert result['member_portions']['b']['item']==2
     state['days']['2026-11-07']['portions']={}
     equal=distribution(state,'2026-11-07',items,rows,{})
     assert [x['totals']['nang_luong'] for x in equal['members']]==[450,450]
@@ -74,6 +105,46 @@ def test_macro_energy_matches_target_and_sodium_does_not_scale():
         goals,_=targets({**profile(), 'goal':goal})
         assert goals['natri']==2000 and goals['chat_xo']==25
         assert abs(goals['chat_dam']*4+goals['chat_bot_duong']*4+goals['chat_beo']*9-goals['nang_luong'])<.1
+
+
+@pytest.mark.parametrize('weight,goal,warning', [(45,'lose','thiếu cân'),(90,'gain','BMI từ 25')])
+def test_bmi_warnings_preserve_selected_scenario_and_group_targets(weight,goal,warning):
+    member={**profile('a'), 'weight':weight, 'height':170, 'goal':goal}
+    chosen=targets(member)[0]
+    maintenance=targets({**member,'goal':'maintain'})[0]
+    assert chosen is not None
+    assert (chosen['nang_luong'] < maintenance['nang_luong']) if goal=='lose' else (chosen['nang_luong'] > maintenance['nang_luong'])
+    state=dict(revision=3,members=[member,profile('b'),profile('c')],days={})
+    public=public_state(state,'2026-11-18')
+    person=public['members'][0]
+    assert person['goal']==goal and 'requested_goal' not in person
+    assert any(warning in note for note in person['goal_warnings'])
+    assert person['goals']==chosen
+    result=distribution(state,'2026-11-18',[],[],{})
+    assert result['group_goals']['nang_luong']==sum(m['goals']['nang_luong'] for m in public['members'])
+    assert state['members'][0]['goal']==goal and state['revision']==3
+
+
+@pytest.mark.parametrize('weight,goal', [(45,'lose'),(90,'gain')])
+def test_saves_adult_weight_goal_with_warning_and_numeric_targets(client,weight,goal):
+    login(client)
+    member={**profile(), 'weight':weight, 'height':170, 'goal':goal}
+    payload=dict(revision=0,members=[member],active_ids=['adult'],portions={})
+    response=client.put('/api/menu/household?on=2026-11-18',json=payload)
+    assert response.status_code==200,response.text
+    saved=client.get('/api/menu/household?on=2026-11-18').json()
+    assert saved['revision']==1 and saved['members'][0]['goal']==goal
+    assert saved['members'][0]['goals']['nang_luong']>0
+    assert saved['members'][0]['goal_warnings']
+
+
+def test_low_calorie_scenario_is_shown_with_warning_instead_of_becoming_null():
+    member={**profile(), 'weight':35, 'height':160, 'age':45, 'goal':'lose'}
+    person=public_state(dict(revision=1,members=[member],days={}), '2026-11-18')['members'][0]
+    assert person['goal']=='lose'
+    assert 0 < person['goals']['nang_luong'] < 1200
+    assert any('Mức kcal' in warning for warning in person['goal_warnings'])
+
 
 def test_deleted_menu_items_do_not_block_future_profile_updates(client):
     login(client)

@@ -1,0 +1,2748 @@
+[
+  {
+    "MaMonAn": "MA101",
+    "TenMonAn": "Canh kim chi thịt bò",
+    "MaCongThuc": "CT101",
+    "SoKhauPhanChuan": 2,
+    "SoNguyenLieu": 11,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 1,
+      "ChatDam": 1,
+      "ChatBotDuong": 1,
+      "ChatBeo": 1,
+      "ChatXo": 1,
+      "natri": 3
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 673.6,
+      "ChatDam": 59.29,
+      "ChatBotDuong": 22.03,
+      "ChatBeo": 37.8,
+      "ChatXo": 4.49,
+      "natri": 1130.83
+    },
+    "LuuYCheBien": [
+      "Can kiem tra loc ba/nuoc dung",
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 11,
+      "Can doi chieu nguon va kich co quy doi": 5,
+      "Thieu quy doi dinh duong": 1,
+      "Thieu chi so: natri": 2,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA102",
+    "TenMonAn": "Gà ác hầm sâm",
+    "MaCongThuc": "CT102",
+    "SoKhauPhanChuan": 3,
+    "SoNguyenLieu": 12,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 3,
+      "ChatDam": 3,
+      "ChatBotDuong": 3,
+      "ChatBeo": 3,
+      "ChatXo": 3,
+      "natri": 3
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 182.12,
+      "ChatDam": 6.86,
+      "ChatBotDuong": 26.25,
+      "ChatBeo": 2.69,
+      "ChatXo": 2.36,
+      "natri": 344.86
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam",
+      "Can kiem tra ruou con lai"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 7,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 12,
+      "Thieu quy doi dinh duong": 2,
+      "Thieu chi so: NangLuong, ChatBotDuong, ChatXo, natri": 1,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA103",
+    "TenMonAn": "Gà tiềm thuốc bắc",
+    "MaCongThuc": "CT103",
+    "SoKhauPhanChuan": 2,
+    "SoNguyenLieu": 14,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 10,
+      "ChatDam": 10,
+      "ChatBotDuong": 10,
+      "ChatBeo": 10,
+      "ChatXo": 10,
+      "natri": 10
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 12.12,
+      "ChatDam": 0.45,
+      "ChatBotDuong": 2.69,
+      "ChatBeo": 0.02,
+      "ChatXo": 0.43,
+      "natri": 8.69
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 14,
+      "Thieu quy doi dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatBotDuong, ChatXo, natri": 1,
+      "Chua co dong dinh duong": 9,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 9
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA104",
+    "TenMonAn": "Canh chua cá lóc",
+    "MaCongThuc": "CT104",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 11,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 3,
+      "ChatDam": 3,
+      "ChatBotDuong": 3,
+      "ChatBeo": 4,
+      "ChatXo": 4,
+      "natri": 4
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 184.46,
+      "ChatDam": 24.69,
+      "ChatBotDuong": 15.28,
+      "ChatBeo": 3.66,
+      "ChatXo": 2.56,
+      "natri": 364.2
+    },
+    "LuuYCheBien": [],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 11,
+      "Can doi chieu nguon va kich co quy doi": 3,
+      "Thieu quy doi dinh duong": 2,
+      "Thieu chi so: ChatBeo, ChatXo, natri": 1,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA105",
+    "TenMonAn": "Canh khổ qua nhồi thịt",
+    "MaCongThuc": "CT105",
+    "SoKhauPhanChuan": 3,
+    "SoNguyenLieu": 8,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 1,
+      "ChatDam": 1,
+      "ChatBotDuong": 1,
+      "ChatBeo": 1,
+      "ChatXo": 2,
+      "natri": 1
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 272.58,
+      "ChatDam": 18.3,
+      "ChatBotDuong": 8.26,
+      "ChatBeo": 17.89,
+      "ChatXo": 1.7,
+      "natri": 783.63
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 8,
+      "Can doi chieu nguon va kich co quy doi": 5,
+      "Thieu quy doi dinh duong": 1,
+      "Thieu chi so: ChatXo": 1,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA106",
+    "TenMonAn": "Súp hải sản tuyết yến",
+    "MaCongThuc": "CT106",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 13,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 4,
+      "ChatDam": 4,
+      "ChatBotDuong": 4,
+      "ChatBeo": 4,
+      "ChatXo": 4,
+      "natri": 5
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 216.28,
+      "ChatDam": 15.85,
+      "ChatBotDuong": 30.56,
+      "ChatBeo": 3.33,
+      "ChatXo": 1.72,
+      "natri": 1431.04
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Thieu quy doi dinh duong": 1,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 12,
+      "Can doi chieu nguon va kich co quy doi": 4,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1,
+      "Chua co dong dinh duong": 3,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 3,
+      "Thieu chi so: natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA107",
+    "TenMonAn": "Giò heo hầm đậu nành",
+    "MaCongThuc": "CT107",
+    "SoKhauPhanChuan": 3,
+    "SoNguyenLieu": 12,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "natri": 3,
+      "NangLuong": 1,
+      "ChatDam": 1,
+      "ChatBotDuong": 1,
+      "ChatBeo": 1,
+      "ChatXo": 1
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 905.92,
+      "ChatDam": 54.16,
+      "ChatBotDuong": 45.13,
+      "ChatBeo": 54.0,
+      "ChatXo": 2.98,
+      "natri": 1857.97
+    },
+    "LuuYCheBien": [
+      "Can kiem tra loc ba/nuoc dung",
+      "Can tach nguyen lieu so che/nuoc ngam",
+      "Can kiem tra ruou con lai",
+      "Can kiem tra nuoc cham/nuoc ngam an vao"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 12,
+      "Can doi chieu nguon va kich co quy doi": 6,
+      "Thieu chi so: natri": 2,
+      "Thieu quy doi dinh duong": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA108",
+    "TenMonAn": "Canh tôm mọc hạt sen",
+    "MaCongThuc": "CT108",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 14,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "ChatBotDuong": 1,
+      "ChatXo": 1
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 279.47,
+      "ChatDam": 25.74,
+      "ChatBotDuong": 20.3,
+      "ChatBeo": 9.91,
+      "ChatXo": 2.13,
+      "natri": 2718.19
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 14,
+      "Can doi chieu nguon va kich co quy doi": 10,
+      "Thieu chi so: ChatBotDuong, ChatXo": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA109",
+    "TenMonAn": "Canh sườn hầm hạt sen",
+    "MaCongThuc": "CT109",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 9,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "natri": 2
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 285.73,
+      "ChatDam": 19.09,
+      "ChatBotDuong": 13.68,
+      "ChatBeo": 16.84,
+      "ChatXo": 0.92,
+      "natri": 2184.32
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 9,
+      "Can doi chieu nguon va kich co quy doi": 4,
+      "Thieu chi so: natri": 2,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA110",
+    "TenMonAn": "Sườn cay khổng lồ kiểu Thái",
+    "MaCongThuc": "CT110",
+    "SoKhauPhanChuan": 5,
+    "SoNguyenLieu": 11,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 1,
+      "ChatDam": 1,
+      "ChatBotDuong": 1,
+      "ChatBeo": 1,
+      "ChatXo": 1,
+      "natri": 1
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 611.05,
+      "ChatDam": 43.16,
+      "ChatBotDuong": 11.91,
+      "ChatBeo": 44.3,
+      "ChatXo": 3.38,
+      "natri": 2477.61
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 11,
+      "Can doi chieu nguon va kich co quy doi": 7,
+      "Thieu quy doi dinh duong": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA201",
+    "TenMonAn": "Bánh bột lọc nhân tôm thịt bằng bánh tráng",
+    "MaCongThuc": "CT201",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 11,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 5,
+      "ChatDam": 5,
+      "ChatBotDuong": 5,
+      "ChatBeo": 5,
+      "ChatXo": 5,
+      "natri": 5
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 475.71,
+      "ChatDam": 23.75,
+      "ChatBotDuong": 1.58,
+      "ChatBeo": 41.74,
+      "ChatXo": 0.23,
+      "natri": 1572.66
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam",
+      "Can kiem tra ruou con lai",
+      "Can kiem tra nuoc cham/nuoc ngam an vao"
+    ],
+    "VanDeNguyenLieu": {
+      "Thieu quy doi dinh duong": 3,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 11,
+      "Can doi chieu nguon va kich co quy doi": 5,
+      "Chua co dong dinh duong": 2,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 2
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA202",
+    "TenMonAn": "Bánh mochi nhân kem sầu riêng",
+    "MaCongThuc": "CT202",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 9,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "natri": 2,
+      "NangLuong": 1,
+      "ChatDam": 1,
+      "ChatBotDuong": 1,
+      "ChatBeo": 1,
+      "ChatXo": 1
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 656.08,
+      "ChatDam": 9.49,
+      "ChatBotDuong": 95.29,
+      "ChatBeo": 26.8,
+      "ChatXo": 2.37,
+      "natri": 280.59
+    },
+    "LuuYCheBien": [],
+    "VanDeNguyenLieu": {
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 2,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 9,
+      "Thieu chi so: natri": 1,
+      "Can doi chieu nguon va kich co quy doi": 2,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA203",
+    "TenMonAn": "Cream brulee",
+    "MaCongThuc": "CT203",
+    "SoKhauPhanChuan": 6,
+    "SoNguyenLieu": 7,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 1,
+      "ChatDam": 1,
+      "ChatBotDuong": 1,
+      "ChatBeo": 1,
+      "ChatXo": 1,
+      "natri": 1
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 330.3,
+      "ChatDam": 8.31,
+      "ChatBotDuong": 10.13,
+      "ChatBeo": 28.85,
+      "ChatXo": 0.32,
+      "natri": 412.25
+    },
+    "LuuYCheBien": [],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 4,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 7,
+      "Thieu quy doi dinh duong": 1,
+      "Thieu chi so: ChatXo, natri": 1,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA204",
+    "TenMonAn": "Bánh bông lan bơ nho",
+    "MaCongThuc": "CT204",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 11,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "natri": 2,
+      "NangLuong": 1,
+      "ChatDam": 1,
+      "ChatBeo": 1,
+      "ChatXo": 1
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 652.16,
+      "ChatDam": 10.08,
+      "ChatBotDuong": 67.12,
+      "ChatBeo": 37.02,
+      "ChatXo": 0.61,
+      "natri": 310.95
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam",
+      "Can kiem tra ruou con lai"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 4,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 11,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 2,
+      "Thieu chi so: natri": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBeo, ChatXo, natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA205",
+    "TenMonAn": "Bánh bò thốt nốt nướng",
+    "MaCongThuc": "CT205",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 9,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 3,
+      "ChatDam": 3,
+      "ChatBotDuong": 2,
+      "ChatBeo": 3,
+      "ChatXo": 3,
+      "natri": 4
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 258.32,
+      "ChatDam": 5.96,
+      "ChatBotDuong": 27.81,
+      "ChatBeo": 14.36,
+      "ChatXo": 1.15,
+      "natri": 401.25
+    },
+    "LuuYCheBien": [],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 9,
+      "Can doi chieu nguon va kich co quy doi": 2,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1,
+      "Thieu quy doi dinh duong": 1,
+      "Thieu chi so: natri": 2,
+      "Thieu chi so: NangLuong, ChatDam, ChatBeo, ChatXo, natri": 1,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA206",
+    "TenMonAn": "Bánh bao nhân thịt trứng",
+    "MaCongThuc": "CT206",
+    "SoKhauPhanChuan": 10,
+    "SoNguyenLieu": 11,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 6,
+      "ChatDam": 6,
+      "ChatBotDuong": 6,
+      "ChatBeo": 6,
+      "ChatXo": 6,
+      "natri": 6
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 184.91,
+      "ChatDam": 10.17,
+      "ChatBotDuong": 2.82,
+      "ChatBeo": 14.56,
+      "ChatXo": 0.4,
+      "natri": 150.97
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 11,
+      "Can doi chieu nguon va kich co quy doi": 4,
+      "Thieu quy doi dinh duong": 5,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA208",
+    "TenMonAn": "Pudding xoài",
+    "MaCongThuc": "CT208",
+    "SoKhauPhanChuan": 3,
+    "SoNguyenLieu": 9,
+    "DuSauChiSoVaQuyDoi": true,
+    "SoDongThieuTheoChiSo": {},
+    "TongDaBietMotPhan": {
+      "NangLuong": 422.27,
+      "ChatDam": 11.02,
+      "ChatBotDuong": 49.83,
+      "ChatBeo": 20.04,
+      "ChatXo": 0.07,
+      "natri": 86.39
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 9,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 2,
+      "Can doi chieu nguon va kich co quy doi": 3
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA209",
+    "TenMonAn": "Bánh bao đào tiên",
+    "MaCongThuc": "CT209",
+    "SoKhauPhanChuan": 8,
+    "SoNguyenLieu": 16,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "natri": 3,
+      "NangLuong": 2,
+      "ChatDam": 2,
+      "ChatBeo": 2,
+      "ChatXo": 2,
+      "ChatBotDuong": 1
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 274.75,
+      "ChatDam": 6.51,
+      "ChatBotDuong": 40.75,
+      "ChatBeo": 9.85,
+      "ChatXo": 0.57,
+      "natri": 300.4
+    },
+    "LuuYCheBien": [
+      "Can kiem tra nguyen lieu trung gian"
+    ],
+    "VanDeNguyenLieu": {
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 3,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 16,
+      "Thieu chi so: natri": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBeo, ChatXo, natri": 1,
+      "Can doi chieu nguon va kich co quy doi": 4,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA210",
+    "TenMonAn": "Chè trái lê táo đỏ",
+    "MaCongThuc": "CT210",
+    "SoKhauPhanChuan": 3,
+    "SoNguyenLieu": 5,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "natri": 2
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 263.43,
+      "ChatDam": 2.75,
+      "ChatBotDuong": 62.28,
+      "ChatBeo": 0.36,
+      "ChatXo": 2.43,
+      "natri": 34.63
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Thieu chi so: natri": 2,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 4,
+      "Can doi chieu nguon va kich co quy doi": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA211",
+    "TenMonAn": "Tàu hủ nước đường bằng máy xay sinh tố",
+    "MaCongThuc": "CT211",
+    "SoKhauPhanChuan": 6,
+    "SoNguyenLieu": 7,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "natri": 4,
+      "NangLuong": 1,
+      "ChatDam": 1,
+      "ChatBotDuong": 1,
+      "ChatBeo": 1,
+      "ChatXo": 1
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 220.42,
+      "ChatDam": 7.66,
+      "ChatBotDuong": 39.84,
+      "ChatBeo": 3.39,
+      "ChatXo": 1.72,
+      "natri": 4.68
+    },
+    "LuuYCheBien": [
+      "Can kiem tra loc ba/nuoc dung",
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 1,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 6,
+      "Thieu chi so: natri": 3,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 2,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA212",
+    "TenMonAn": "Sương sáo nước cốt dừa",
+    "MaCongThuc": "CT212",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 8,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 2,
+      "ChatDam": 2,
+      "ChatBotDuong": 2,
+      "ChatBeo": 2,
+      "ChatXo": 3,
+      "natri": 3
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 476.05,
+      "ChatDam": 5.61,
+      "ChatBotDuong": 55.49,
+      "ChatBeo": 27.56,
+      "ChatXo": 2.2,
+      "natri": 47.67
+    },
+    "LuuYCheBien": [],
+    "VanDeNguyenLieu": {
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 4,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 8,
+      "Chua co dong dinh duong": 2,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 2,
+      "Thieu chi so: ChatXo": 1,
+      "Can doi chieu nguon va kich co quy doi": 1,
+      "Thieu chi so: natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA213",
+    "TenMonAn": "Chè khúc bạch",
+    "MaCongThuc": "CT213",
+    "SoKhauPhanChuan": 5,
+    "SoNguyenLieu": 6,
+    "DuSauChiSoVaQuyDoi": true,
+    "SoDongThieuTheoChiSo": {},
+    "TongDaBietMotPhan": {
+      "NangLuong": 676.94,
+      "ChatDam": 11.51,
+      "ChatBotDuong": 85.22,
+      "ChatBeo": 34.27,
+      "ChatXo": 4.45,
+      "natri": 143.86
+    },
+    "LuuYCheBien": [],
+    "VanDeNguyenLieu": {
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 3,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 6
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA214",
+    "TenMonAn": "Chè đậu đỏ bột lọc",
+    "MaCongThuc": "CT214",
+    "SoKhauPhanChuan": 5,
+    "SoNguyenLieu": 10,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "natri": 5,
+      "NangLuong": 3,
+      "ChatDam": 3,
+      "ChatBotDuong": 3,
+      "ChatBeo": 3,
+      "ChatXo": 3
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 685.34,
+      "ChatDam": 12.81,
+      "ChatBotDuong": 112.01,
+      "ChatBeo": 21.69,
+      "ChatXo": 7.52,
+      "natri": 39.42
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 2,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 9,
+      "Thieu chi so: natri": 2,
+      "Chua co dong dinh duong": 3,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 3
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA215",
+    "TenMonAn": "Sủi cảo",
+    "MaCongThuc": "CT215",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 9,
+    "DuSauChiSoVaQuyDoi": true,
+    "SoDongThieuTheoChiSo": {},
+    "TongDaBietMotPhan": {
+      "NangLuong": 539.38,
+      "ChatDam": 30.78,
+      "ChatBotDuong": 61.96,
+      "ChatBeo": 18.14,
+      "ChatXo": 1.21,
+      "natri": 154.27
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 9,
+      "Can doi chieu nguon va kich co quy doi": 2
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA216",
+    "TenMonAn": "Súp hoành thánh chiên nhân chay",
+    "MaCongThuc": "CT216",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 18,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "natri": 5,
+      "ChatXo": 3,
+      "NangLuong": 2,
+      "ChatDam": 2,
+      "ChatBotDuong": 2,
+      "ChatBeo": 2
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 932.16,
+      "ChatDam": 15.32,
+      "ChatBotDuong": 68.45,
+      "ChatBeo": 67.62,
+      "ChatXo": 14.37,
+      "natri": 1659.39
+    },
+    "LuuYCheBien": [
+      "Can tach dau chien va bot ao con du",
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 9,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 17,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 2,
+      "Thieu chi so: natri": 3,
+      "Thieu chi so: ChatXo": 1,
+      "Thieu quy doi dinh duong": 2
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA217",
+    "TenMonAn": "Kem chuối que",
+    "MaCongThuc": "CT217",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 7,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "natri": 2,
+      "NangLuong": 1,
+      "ChatDam": 1,
+      "ChatBotDuong": 1,
+      "ChatBeo": 1,
+      "ChatXo": 1
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 495.7,
+      "ChatDam": 9.98,
+      "ChatBotDuong": 22.05,
+      "ChatBeo": 44.35,
+      "ChatXo": 8.04,
+      "natri": 151.34
+    },
+    "LuuYCheBien": [],
+    "VanDeNguyenLieu": {
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 7,
+      "Can doi chieu nguon va kich co quy doi": 3,
+      "Thieu chi so: natri": 1,
+      "Thieu quy doi dinh duong": 1,
+      "Thieu chi so: ChatXo": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA218",
+    "TenMonAn": "Kem trái cây nước dừa",
+    "MaCongThuc": "CT218",
+    "SoKhauPhanChuan": 5,
+    "SoNguyenLieu": 7,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 1,
+      "ChatDam": 1,
+      "ChatBotDuong": 1,
+      "ChatBeo": 1,
+      "ChatXo": 1,
+      "natri": 1
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 171.52,
+      "ChatDam": 1.6,
+      "ChatBotDuong": 42.2,
+      "ChatBeo": 0.5,
+      "ChatXo": 0.92,
+      "natri": 1.36
+    },
+    "LuuYCheBien": [],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 4,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 7,
+      "Thieu quy doi dinh duong": 1,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA219",
+    "TenMonAn": "Bingsu trái cây",
+    "MaCongThuc": "CT219",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 6,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 2,
+      "ChatDam": 2,
+      "ChatBotDuong": 2,
+      "ChatBeo": 2,
+      "ChatXo": 2,
+      "natri": 2
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 679.23,
+      "ChatDam": 15.68,
+      "ChatBotDuong": 104.23,
+      "ChatBeo": 24.55,
+      "ChatXo": 4.52,
+      "natri": 509.67
+    },
+    "LuuYCheBien": [],
+    "VanDeNguyenLieu": {
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 2,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 6,
+      "Can doi chieu nguon va kich co quy doi": 1,
+      "Thieu quy doi dinh duong": 2
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA230",
+    "TenMonAn": "Phở bò",
+    "MaCongThuc": "CT230",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 10,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "natri": 3,
+      "ChatXo": 3,
+      "NangLuong": 2,
+      "ChatDam": 2,
+      "ChatBotDuong": 2,
+      "ChatBeo": 2
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 1043.92,
+      "ChatDam": 42.26,
+      "ChatBotDuong": 120.19,
+      "ChatBeo": 40.25,
+      "ChatXo": 3.69,
+      "natri": 326.95
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 7,
+      "Can doi chieu nguon va kich co quy doi": 6,
+      "Thieu chi so: natri": 1,
+      "Thieu chi so: ChatXo": 1,
+      "Chua co dong dinh duong": 2,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 2
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA901",
+    "TenMonAn": "Nem nướng Ninh Hòa",
+    "MaCongThuc": "CT901",
+    "SoKhauPhanChuan": 3,
+    "SoNguyenLieu": 15,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 5,
+      "ChatDam": 5,
+      "ChatBeo": 5,
+      "ChatXo": 5,
+      "natri": 6,
+      "ChatBotDuong": 4
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 1785.93,
+      "ChatDam": 53.65,
+      "ChatBotDuong": 89.66,
+      "ChatBeo": 136.05,
+      "ChatXo": 2.0,
+      "natri": 1214.32
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam",
+      "Can kiem tra nuoc cham/nuoc ngam an vao"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 15,
+      "Can doi chieu nguon va kich co quy doi": 5,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBeo, ChatXo, natri": 1,
+      "Chua co dong dinh duong": 4,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 4,
+      "Thieu chi so: natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA902",
+    "TenMonAn": "Gà nướng muối sả",
+    "MaCongThuc": "CT902",
+    "SoKhauPhanChuan": 2,
+    "SoNguyenLieu": 11,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "natri": 3,
+      "ChatBotDuong": 3,
+      "ChatXo": 3,
+      "NangLuong": 2,
+      "ChatDam": 2,
+      "ChatBeo": 2
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 502.68,
+      "ChatDam": 2.66,
+      "ChatBotDuong": 43.24,
+      "ChatBeo": 37.95,
+      "ChatXo": 1.7,
+      "natri": 3228.4
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam",
+      "Can kiem tra ruou con lai",
+      "Can kiem tra nuoc cham/nuoc ngam an vao"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 7,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 11,
+      "Thieu chi so: natri": 1,
+      "Thieu chi so: ChatBotDuong, ChatXo": 1,
+      "Thieu quy doi dinh duong": 1,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA903",
+    "TenMonAn": "Cá saba nướng mỡ hành",
+    "MaCongThuc": "CT903",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 11,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 3,
+      "ChatDam": 3,
+      "ChatBotDuong": 3,
+      "ChatBeo": 3,
+      "ChatXo": 3,
+      "natri": 3
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 167.57,
+      "ChatDam": 3.42,
+      "ChatBotDuong": 9.68,
+      "ChatBeo": 13.88,
+      "ChatXo": 2.04,
+      "natri": 1184.61
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam",
+      "Can kiem tra ruou con lai",
+      "Can kiem tra nuoc cham/nuoc ngam an vao"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 7,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 11,
+      "Thieu quy doi dinh duong": 2,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA904",
+    "TenMonAn": "Sườn đút lò",
+    "MaCongThuc": "CT904",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 13,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "natri": 2,
+      "NangLuong": 1,
+      "ChatDam": 1,
+      "ChatBotDuong": 1,
+      "ChatBeo": 1,
+      "ChatXo": 1
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 527.17,
+      "ChatDam": 27.47,
+      "ChatBotDuong": 26.39,
+      "ChatBeo": 35.3,
+      "ChatXo": 1.72,
+      "natri": 1546.54
+    },
+    "LuuYCheBien": [],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 13,
+      "Can doi chieu nguon va kich co quy doi": 12,
+      "Thieu chi so: natri": 1,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA905",
+    "TenMonAn": "Cháo thịt bằm tía tô",
+    "MaCongThuc": "CT905",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 10,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "natri": 2,
+      "NangLuong": 1,
+      "ChatDam": 1,
+      "ChatBotDuong": 1,
+      "ChatBeo": 1,
+      "ChatXo": 1
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 290.43,
+      "ChatDam": 12.26,
+      "ChatBotDuong": 36.12,
+      "ChatBeo": 10.84,
+      "ChatXo": 2.46,
+      "natri": 317.35
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 5,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 10,
+      "Thieu chi so: natri": 1,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA906",
+    "TenMonAn": "Cháo tôm bí đỏ bằng máy xay nấu đa năng",
+    "MaCongThuc": "CT906",
+    "SoKhauPhanChuan": 3,
+    "SoNguyenLieu": 7,
+    "DuSauChiSoVaQuyDoi": true,
+    "SoDongThieuTheoChiSo": {},
+    "TongDaBietMotPhan": {
+      "NangLuong": 419.2,
+      "ChatDam": 16.38,
+      "ChatBotDuong": 84.12,
+      "ChatBeo": 2.04,
+      "ChatXo": 0.96,
+      "natri": 143.84
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 2,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 7
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA907",
+    "TenMonAn": "Mì Ý gà giòn sốt kem",
+    "MaCongThuc": "CT907",
+    "SoKhauPhanChuan": 2,
+    "SoNguyenLieu": 14,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "natri": 4,
+      "NangLuong": 2,
+      "ChatDam": 2,
+      "ChatBotDuong": 2,
+      "ChatBeo": 2,
+      "ChatXo": 2
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 2167.43,
+      "ChatDam": 91.53,
+      "ChatBotDuong": 279.17,
+      "ChatBeo": 81.75,
+      "ChatXo": 1.76,
+      "natri": 743.05
+    },
+    "LuuYCheBien": [
+      "Can tach dau chien va bot ao con du",
+      "Can tach nguyen lieu so che/nuoc ngam",
+      "Can kiem tra ruou con lai"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 14,
+      "Can doi chieu nguon va kich co quy doi": 3,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 5,
+      "Thieu chi so: natri": 2,
+      "Chua co dong dinh duong": 2,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 2
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA908",
+    "TenMonAn": "Nấm xào chua ngọt chay",
+    "MaCongThuc": "CT908",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 18,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 1,
+      "ChatDam": 1,
+      "ChatBotDuong": 1,
+      "ChatBeo": 1,
+      "ChatXo": 2,
+      "natri": 1
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 174.93,
+      "ChatDam": 3.93,
+      "ChatBotDuong": 23.83,
+      "ChatBeo": 7.98,
+      "ChatXo": 3.86,
+      "natri": 167.18
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 18,
+      "Can doi chieu nguon va kich co quy doi": 11,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1,
+      "Thieu chi so: ChatXo": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA909",
+    "TenMonAn": "Răng mực xào bơ tỏi",
+    "MaCongThuc": "CT909",
+    "SoKhauPhanChuan": 3,
+    "SoNguyenLieu": 9,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 1,
+      "ChatDam": 1,
+      "ChatBotDuong": 1,
+      "ChatBeo": 1,
+      "ChatXo": 1,
+      "natri": 1
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 877.38,
+      "ChatDam": 18.1,
+      "ChatBotDuong": 10.95,
+      "ChatBeo": 84.61,
+      "ChatXo": 0.88,
+      "natri": 745.55
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 6,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 9,
+      "Thieu quy doi dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatBotDuong, ChatBeo, ChatXo": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA910",
+    "TenMonAn": "Tôm sốt phô mai",
+    "MaCongThuc": "CT910",
+    "SoKhauPhanChuan": 3,
+    "SoNguyenLieu": 9,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "natri": 4,
+      "NangLuong": 2,
+      "ChatDam": 2,
+      "ChatBotDuong": 2,
+      "ChatBeo": 2,
+      "ChatXo": 2
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 977.12,
+      "ChatDam": 85.46,
+      "ChatBotDuong": 15.09,
+      "ChatBeo": 64.98,
+      "ChatXo": 2.07,
+      "natri": 1257.57
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 9,
+      "Thieu chi so: natri": 2,
+      "Thieu quy doi dinh duong": 2,
+      "Can doi chieu nguon va kich co quy doi": 2
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA911",
+    "TenMonAn": "Cà tím xào tỏi ớt",
+    "MaCongThuc": "CT911",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 7,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "natri": 3,
+      "NangLuong": 2,
+      "ChatDam": 2,
+      "ChatBotDuong": 2,
+      "ChatBeo": 2,
+      "ChatXo": 2
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 148.15,
+      "ChatDam": 3.1,
+      "ChatBotDuong": 17.59,
+      "ChatBeo": 7.58,
+      "ChatXo": 3.93,
+      "natri": 256.68
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 5,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 7,
+      "Thieu chi so: natri": 1,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1,
+      "Thieu quy doi dinh duong": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA912",
+    "TenMonAn": "Ốc móng tay xào bơ tỏi",
+    "MaCongThuc": "CT912",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 9,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 3,
+      "ChatDam": 3,
+      "ChatBotDuong": 3,
+      "ChatBeo": 3,
+      "ChatXo": 3,
+      "natri": 5
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 287.9,
+      "ChatDam": 16.22,
+      "ChatBotDuong": 4.91,
+      "ChatBeo": 22.6,
+      "ChatXo": 0.19,
+      "natri": 256.11
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Thieu quy doi dinh duong": 2,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 9,
+      "Can doi chieu nguon va kich co quy doi": 5,
+      "Thieu chi so: natri": 2,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA913",
+    "TenMonAn": "Cá lóc kho tộ",
+    "MaCongThuc": "CT913",
+    "SoKhauPhanChuan": 2,
+    "SoNguyenLieu": 3,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "natri": 2,
+      "NangLuong": 1,
+      "ChatDam": 1,
+      "ChatBotDuong": 1,
+      "ChatBeo": 1,
+      "ChatXo": 1
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 308.25,
+      "ChatDam": 49.75,
+      "ChatBotDuong": 0.0,
+      "ChatBeo": 12.0,
+      "ChatXo": 0.0,
+      "natri": 17.0
+    },
+    "LuuYCheBien": [],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 3,
+      "Thieu chi so: natri": 2,
+      "Thieu quy doi dinh duong": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA914",
+    "TenMonAn": "Sườn kho thơm (dứa)",
+    "MaCongThuc": "CT914",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 9,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 2,
+      "ChatDam": 2,
+      "ChatBotDuong": 2,
+      "ChatBeo": 2,
+      "ChatXo": 2,
+      "natri": 2
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 521.36,
+      "ChatDam": 27.97,
+      "ChatBotDuong": 16.66,
+      "ChatBeo": 38.83,
+      "ChatXo": 2.23,
+      "natri": 1288.54
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 9,
+      "Can doi chieu nguon va kich co quy doi": 6,
+      "Thieu quy doi dinh duong": 1,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA915",
+    "TenMonAn": "Thịt kho tàu bằng nồi áp suất",
+    "MaCongThuc": "CT915",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 9,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 2,
+      "ChatDam": 2,
+      "ChatBotDuong": 2,
+      "ChatBeo": 2,
+      "ChatXo": 2,
+      "natri": 2
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 861.59,
+      "ChatDam": 26.31,
+      "ChatBotDuong": 7.85,
+      "ChatBeo": 78.93,
+      "ChatXo": 0.3,
+      "natri": 830.95
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam",
+      "Can kiem tra ruou con lai"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 5,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 9,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1,
+      "Thieu quy doi dinh duong": 1,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA916",
+    "TenMonAn": "Đậu hũ non chiên xù",
+    "MaCongThuc": "CT916",
+    "SoKhauPhanChuan": 3,
+    "SoNguyenLieu": 5,
+    "DuSauChiSoVaQuyDoi": true,
+    "SoDongThieuTheoChiSo": {},
+    "TongDaBietMotPhan": {
+      "NangLuong": 2101.17,
+      "ChatDam": 39.87,
+      "ChatBotDuong": 152.35,
+      "ChatBeo": 150.02,
+      "ChatXo": 0.5,
+      "natri": 79.33
+    },
+    "LuuYCheBien": [
+      "Can tach dau chien va bot ao con du"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 1,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 5,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA917",
+    "TenMonAn": "Sụn gà chiên nước mắm",
+    "MaCongThuc": "CT917",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 15,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 3,
+      "ChatDam": 3,
+      "ChatBotDuong": 3,
+      "ChatBeo": 3,
+      "ChatXo": 3,
+      "natri": 4
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 189.93,
+      "ChatDam": 12.47,
+      "ChatBotDuong": 31.98,
+      "ChatBeo": 1.86,
+      "ChatXo": 1.74,
+      "natri": 2360.2
+    },
+    "LuuYCheBien": [
+      "Can tach dau chien va bot ao con du"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 10,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 15,
+      "Thieu quy doi dinh duong": 3,
+      "Thieu chi so: natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA918",
+    "TenMonAn": "Chả giò miền Nam",
+    "MaCongThuc": "CT918",
+    "SoKhauPhanChuan": 50,
+    "SoNguyenLieu": 12,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 2,
+      "ChatDam": 2,
+      "ChatBotDuong": 2,
+      "ChatBeo": 2,
+      "ChatXo": 2,
+      "natri": 2
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 51.39,
+      "ChatDam": 3.1,
+      "ChatBotDuong": 4.75,
+      "ChatBeo": 2.23,
+      "ChatXo": 0.29,
+      "natri": 18.21
+    },
+    "LuuYCheBien": [
+      "Can tach dau chien va bot ao con du",
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 12,
+      "Chua co dong dinh duong": 2,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 2,
+      "Can doi chieu nguon va kich co quy doi": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA919",
+    "TenMonAn": "Cơm chiên dứa",
+    "MaCongThuc": "CT919",
+    "SoKhauPhanChuan": 2,
+    "SoNguyenLieu": 11,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 2,
+      "ChatDam": 2,
+      "ChatBotDuong": 2,
+      "ChatBeo": 2,
+      "ChatXo": 2,
+      "natri": 2
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 802.99,
+      "ChatDam": 33.19,
+      "ChatBotDuong": 104.0,
+      "ChatBeo": 28.41,
+      "ChatXo": 6.63,
+      "natri": 822.38
+    },
+    "LuuYCheBien": [],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 11,
+      "Thieu quy doi dinh duong": 2,
+      "Can doi chieu nguon va kich co quy doi": 7
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA920",
+    "TenMonAn": "Gà hấp muối sả",
+    "MaCongThuc": "CT920",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 14,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 5,
+      "ChatDam": 5,
+      "ChatBotDuong": 5,
+      "ChatBeo": 5,
+      "ChatXo": 5,
+      "natri": 5
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 87.64,
+      "ChatDam": 2.59,
+      "ChatBotDuong": 20.02,
+      "ChatBeo": 0.65,
+      "ChatXo": 1.34,
+      "natri": 48754.11
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam",
+      "Can kiem tra ruou con lai",
+      "Can kiem tra nuoc cham/nuoc ngam an vao"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 8,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 14,
+      "Thieu quy doi dinh duong": 4,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA921",
+    "TenMonAn": "Ốc nhồi hấp sả",
+    "MaCongThuc": "CT921",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 11,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 5,
+      "ChatDam": 5,
+      "ChatBotDuong": 5,
+      "ChatBeo": 5,
+      "ChatXo": 5,
+      "natri": 6
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 922.96,
+      "ChatDam": 117.87,
+      "ChatBotDuong": 87.51,
+      "ChatBeo": 12.3,
+      "ChatXo": 0.3,
+      "natri": 2.61
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam",
+      "Can kiem tra nuoc cham/nuoc ngam an vao"
+    ],
+    "VanDeNguyenLieu": {
+      "Thieu quy doi dinh duong": 4,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 11,
+      "Can doi chieu nguon va kich co quy doi": 2,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1,
+      "Thieu chi so: natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA922",
+    "TenMonAn": "Nghêu hấp Thái",
+    "MaCongThuc": "CT922",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 10,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 3,
+      "ChatDam": 3,
+      "ChatBotDuong": 3,
+      "ChatBeo": 3,
+      "ChatXo": 4,
+      "natri": 3
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 513.26,
+      "ChatDam": 41.36,
+      "ChatBotDuong": 48.93,
+      "ChatBeo": 16.54,
+      "ChatXo": 0.85,
+      "natri": 1699.19
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 5,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 10,
+      "Thieu quy doi dinh duong": 2,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1,
+      "Thieu chi so: ChatXo": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA923",
+    "TenMonAn": "Cá lóc hấp tương",
+    "MaCongThuc": "CT923",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 14,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 3,
+      "ChatDam": 3,
+      "ChatBotDuong": 3,
+      "ChatBeo": 3,
+      "ChatXo": 3,
+      "natri": 4
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 696.84,
+      "ChatDam": 54.04,
+      "ChatBotDuong": 11.87,
+      "ChatBeo": 46.71,
+      "ChatXo": 2.24,
+      "natri": 44.23
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam",
+      "Can kiem tra ruou con lai"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 14,
+      "Can doi chieu nguon va kich co quy doi": 6,
+      "Chua co dong dinh duong": 3,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 3,
+      "Thieu chi so: natri": 1,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA924",
+    "TenMonAn": "Lẩu bò Mông Cổ",
+    "MaCongThuc": "CT924",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 17,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 10,
+      "ChatDam": 10,
+      "ChatBotDuong": 10,
+      "ChatBeo": 10,
+      "ChatXo": 10,
+      "natri": 10
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 360.07,
+      "ChatDam": 31.57,
+      "ChatBotDuong": 41.73,
+      "ChatBeo": 8.06,
+      "ChatXo": 2.54,
+      "natri": 60.27
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam",
+      "Can kiem tra ruou con lai",
+      "Can kiem tra nuoc cham/nuoc ngam an vao"
+    ],
+    "VanDeNguyenLieu": {
+      "Thieu quy doi dinh duong": 7,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 17,
+      "Can doi chieu nguon va kich co quy doi": 1,
+      "Chua co dong dinh duong": 3,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 3,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA925",
+    "TenMonAn": "Lẩu bò nhúng giấm (dấm)",
+    "MaCongThuc": "CT925",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 13,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 3,
+      "ChatDam": 3,
+      "ChatBotDuong": 3,
+      "ChatBeo": 3,
+      "ChatXo": 3,
+      "natri": 4
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 877.9,
+      "ChatDam": 68.47,
+      "ChatBotDuong": 42.33,
+      "ChatBeo": 45.49,
+      "ChatXo": 1.85,
+      "natri": 212.33
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam",
+      "Can kiem tra ruou con lai",
+      "Can kiem tra nuoc cham/nuoc ngam an vao"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 12,
+      "Can doi chieu nguon va kich co quy doi": 7,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 2,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1,
+      "Thieu quy doi dinh duong": 2,
+      "Thieu chi so: natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA926",
+    "TenMonAn": "Lẩu cua đồng",
+    "MaCongThuc": "CT926",
+    "SoKhauPhanChuan": 5,
+    "SoNguyenLieu": 12,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 3,
+      "ChatDam": 3,
+      "ChatBotDuong": 3,
+      "ChatBeo": 3,
+      "ChatXo": 3,
+      "natri": 3
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 1400.2,
+      "ChatDam": 61.19,
+      "ChatBotDuong": 60.11,
+      "ChatBeo": 102.13,
+      "ChatXo": 4.18,
+      "natri": 673.08
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 12,
+      "Can doi chieu nguon va kich co quy doi": 5,
+      "Thieu quy doi dinh duong": 1,
+      "Chua co dong dinh duong": 2,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 2
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA927",
+    "TenMonAn": "Vịt nấu chao",
+    "MaCongThuc": "CT927",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 17,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 6,
+      "ChatDam": 6,
+      "ChatBotDuong": 6,
+      "ChatBeo": 6,
+      "ChatXo": 6,
+      "natri": 9
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 643.12,
+      "ChatDam": 9.06,
+      "ChatBotDuong": 87.92,
+      "ChatBeo": 28.66,
+      "ChatXo": 5.08,
+      "natri": 72.44
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam",
+      "Can kiem tra nuoc cham/nuoc ngam an vao"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 16,
+      "Thieu quy doi dinh duong": 3,
+      "Thieu chi so: natri": 3,
+      "Can doi chieu nguon va kich co quy doi": 6,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 2,
+      "Chua co dong dinh duong": 3,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 3
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA928",
+    "TenMonAn": "Lẩu gà ớt hiểm",
+    "MaCongThuc": "CT928",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 12,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 1,
+      "ChatDam": 1,
+      "ChatBotDuong": 1,
+      "ChatBeo": 1,
+      "ChatXo": 1,
+      "natri": 2
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 900.74,
+      "ChatDam": 64.3,
+      "ChatBotDuong": 16.55,
+      "ChatBeo": 64.73,
+      "ChatXo": 1.15,
+      "natri": 2268.76
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam",
+      "Can kiem tra nuoc cham/nuoc ngam an vao"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 2,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 12,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 2,
+      "Thieu quy doi dinh duong": 1,
+      "Thieu chi so: natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA929",
+    "TenMonAn": "Lẩu kim chi Hàn Quốc",
+    "MaCongThuc": "CT929",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 3,
+    "DuSauChiSoVaQuyDoi": true,
+    "SoDongThieuTheoChiSo": {},
+    "TongDaBietMotPhan": {
+      "NangLuong": 1343.5,
+      "ChatDam": 11.22,
+      "ChatBotDuong": 3.0,
+      "ChatBeo": 143.12,
+      "ChatXo": 2.0,
+      "natri": 646.5
+    },
+    "LuuYCheBien": [
+      "Can kiem tra loc ba/nuoc dung",
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 3
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA930",
+    "TenMonAn": "Gỏi hàu sốt Thái",
+    "MaCongThuc": "CT930",
+    "SoKhauPhanChuan": 3,
+    "SoNguyenLieu": 13,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 2,
+      "ChatDam": 2,
+      "ChatBotDuong": 2,
+      "ChatBeo": 2,
+      "ChatXo": 2,
+      "natri": 3
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 370.6,
+      "ChatDam": 22.34,
+      "ChatBotDuong": 62.65,
+      "ChatBeo": 4.8,
+      "ChatXo": 6.22,
+      "natri": 983.48
+    },
+    "LuuYCheBien": [],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 13,
+      "Can doi chieu nguon va kich co quy doi": 7,
+      "Thieu quy doi dinh duong": 2,
+      "Thieu chi so: natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA931",
+    "TenMonAn": "Gỏi ngó sen chay",
+    "MaCongThuc": "CT931",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 12,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 3,
+      "ChatDam": 3,
+      "ChatBotDuong": 3,
+      "ChatBeo": 3,
+      "ChatXo": 4,
+      "natri": 3
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 350.94,
+      "ChatDam": 11.95,
+      "ChatBotDuong": 49.6,
+      "ChatBeo": 12.4,
+      "ChatXo": 7.02,
+      "natri": 939.99
+    },
+    "LuuYCheBien": [
+      "Can tach dau chien va bot ao con du"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 6,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 12,
+      "Thieu quy doi dinh duong": 3,
+      "Thieu chi so: ChatXo": 1,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA932",
+    "TenMonAn": "Hải sản sốt Thái",
+    "MaCongThuc": "CT932",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 14,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 2,
+      "ChatDam": 2,
+      "ChatBotDuong": 2,
+      "ChatBeo": 2,
+      "ChatXo": 2,
+      "natri": 3
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 313.25,
+      "ChatDam": 38.52,
+      "ChatBotDuong": 31.34,
+      "ChatBeo": 2.58,
+      "ChatXo": 2.1,
+      "natri": 1582.71
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam",
+      "Can kiem tra ruou con lai"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 9,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 14,
+      "Thieu quy doi dinh duong": 2,
+      "Thieu chi so: natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA933",
+    "TenMonAn": "Cơm thăn bò rong biển",
+    "MaCongThuc": "CT933",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 8,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 2,
+      "ChatDam": 2,
+      "ChatBotDuong": 2,
+      "ChatBeo": 2,
+      "ChatXo": 2,
+      "natri": 2
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 302.89,
+      "ChatDam": 16.6,
+      "ChatBotDuong": 8.64,
+      "ChatBeo": 21.76,
+      "ChatXo": 1.03,
+      "natri": 423.39
+    },
+    "LuuYCheBien": [
+      "Can kiem tra ruou con lai"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 4,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 8,
+      "Thieu quy doi dinh duong": 1,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA934",
+    "TenMonAn": "Cà ri bò",
+    "MaCongThuc": "CT934",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 11,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 2,
+      "ChatDam": 2,
+      "ChatBotDuong": 2,
+      "ChatBeo": 2,
+      "ChatXo": 2,
+      "natri": 2
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 1072.15,
+      "ChatDam": 71.41,
+      "ChatBotDuong": 51.42,
+      "ChatBeo": 63.56,
+      "ChatXo": 7.58,
+      "natri": 254.2
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 8,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 11,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1,
+      "Chua co dong dinh duong": 2,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 2
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA935",
+    "TenMonAn": "Bò kho miền Nam",
+    "MaCongThuc": "CT935",
+    "SoKhauPhanChuan": 8,
+    "SoNguyenLieu": 11,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 5,
+      "ChatDam": 5,
+      "ChatBotDuong": 5,
+      "ChatBeo": 5,
+      "ChatXo": 5,
+      "natri": 5
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 752.34,
+      "ChatDam": 68.12,
+      "ChatBotDuong": 27.02,
+      "ChatBeo": 38.47,
+      "ChatXo": 0.95,
+      "natri": 236.31
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam",
+      "Can kiem tra ruou con lai"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 11,
+      "Can doi chieu nguon va kich co quy doi": 3,
+      "Thieu quy doi dinh duong": 4,
+      "Thieu chi so: ChatXo": 2,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA936",
+    "TenMonAn": "Phở cuốn chay",
+    "MaCongThuc": "CT936",
+    "SoKhauPhanChuan": 3,
+    "SoNguyenLieu": 18,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 4,
+      "ChatDam": 4,
+      "ChatBotDuong": 4,
+      "ChatBeo": 4,
+      "ChatXo": 5,
+      "natri": 6
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 710.27,
+      "ChatDam": 16.21,
+      "ChatBotDuong": 108.33,
+      "ChatBeo": 24.93,
+      "ChatXo": 17.37,
+      "natri": 912.59
+    },
+    "LuuYCheBien": [],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 18,
+      "Can doi chieu nguon va kich co quy doi": 8,
+      "Thieu quy doi dinh duong": 3,
+      "Thieu chi so: natri": 2,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1,
+      "Thieu chi so: ChatXo": 1,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA937",
+    "TenMonAn": "Cơm chay lá sen",
+    "MaCongThuc": "CT937",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 11,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 4,
+      "ChatDam": 4,
+      "ChatBotDuong": 4,
+      "ChatBeo": 4,
+      "ChatXo": 5,
+      "natri": 4
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 108.3,
+      "ChatDam": 5.81,
+      "ChatBotDuong": 20.69,
+      "ChatBeo": 0.31,
+      "ChatXo": 0.93,
+      "natri": 711.11
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 11,
+      "Chua co dong dinh duong": 3,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 3,
+      "Thieu quy doi dinh duong": 1,
+      "Thieu chi so: ChatXo": 2
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA938",
+    "TenMonAn": "Cà ri xanh chay",
+    "MaCongThuc": "CT938",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 22,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 8,
+      "ChatDam": 8,
+      "ChatBotDuong": 8,
+      "ChatBeo": 8,
+      "ChatXo": 9,
+      "natri": 10
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 763.31,
+      "ChatDam": 10.19,
+      "ChatBotDuong": 40.02,
+      "ChatBeo": 67.78,
+      "ChatXo": 8.21,
+      "natri": 3225.58
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Thieu quy doi dinh duong": 7,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 21,
+      "Thieu chi so: natri": 4,
+      "Can doi chieu nguon va kich co quy doi": 11,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1,
+      "Thieu chi so: ChatXo": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA939",
+    "TenMonAn": "Trà dâu ngâm",
+    "MaCongThuc": "CT939",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 6,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 3,
+      "ChatDam": 3,
+      "ChatBotDuong": 3,
+      "ChatBeo": 3,
+      "ChatXo": 3,
+      "natri": 3
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 340.27,
+      "ChatDam": 1.35,
+      "ChatBotDuong": 86.27,
+      "ChatBeo": 0.31,
+      "ChatXo": 1.52,
+      "natri": 1.8
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam",
+      "Can kiem tra nuoc cham/nuoc ngam an vao"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 6,
+      "Thieu quy doi dinh duong": 1,
+      "Chua co dong dinh duong": 2,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 2
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA940",
+    "TenMonAn": "Trân châu phô mai",
+    "MaCongThuc": "CT940",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 4,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 1,
+      "ChatDam": 1,
+      "ChatBotDuong": 1,
+      "ChatBeo": 1,
+      "ChatXo": 1,
+      "natri": 2
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 105.95,
+      "ChatDam": 0.08,
+      "ChatBotDuong": 26.93,
+      "ChatBeo": 0.0,
+      "ChatXo": 0.09,
+      "natri": 0.23
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 3,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 4,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1,
+      "Thieu chi so: natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA941",
+    "TenMonAn": "Dưa hấu chanh tuyết",
+    "MaCongThuc": "CT941",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 4,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 1,
+      "ChatDam": 1,
+      "ChatBotDuong": 1,
+      "ChatBeo": 1,
+      "ChatXo": 1,
+      "natri": 1
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 384.56,
+      "ChatDam": 6.84,
+      "ChatBotDuong": 88.5,
+      "ChatBeo": 2.27,
+      "ChatXo": 4.62,
+      "natri": 11.63
+    },
+    "LuuYCheBien": [],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 2,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 4,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1,
+      "Thieu quy doi dinh duong": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA942",
+    "TenMonAn": "Nước ép cà rốt bằng máy xay sinh tố",
+    "MaCongThuc": "CT942",
+    "SoKhauPhanChuan": 2,
+    "SoNguyenLieu": 4,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "natri": 1
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 114.1,
+      "ChatDam": 1.5,
+      "ChatBotDuong": 26.7,
+      "ChatBeo": 0.22,
+      "ChatXo": 1.05,
+      "natri": 62.12
+    },
+    "LuuYCheBien": [
+      "Can kiem tra loc ba/nuoc dung"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 2,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 4,
+      "Thieu chi so: natri": 1,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA943",
+    "TenMonAn": "Củ kiệu chua ngọt",
+    "MaCongThuc": "CT943",
+    "SoKhauPhanChuan": 1,
+    "SoNguyenLieu": 5,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 2,
+      "ChatDam": 2,
+      "ChatBotDuong": 2,
+      "ChatBeo": 2,
+      "ChatXo": 2,
+      "natri": 2
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 2483.0,
+      "ChatDam": 14.0,
+      "ChatBotDuong": 697.5,
+      "ChatBeo": 2.0,
+      "ChatXo": 207.0,
+      "natri": 49.0
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam",
+      "Can kiem tra nuoc cham/nuoc ngam an vao"
+    ],
+    "VanDeNguyenLieu": {
+      "Thieu quy doi dinh duong": 1,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 5,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA944",
+    "TenMonAn": "Khô heo tẩm vị xé sợi",
+    "MaCongThuc": "CT944",
+    "SoKhauPhanChuan": 2,
+    "SoNguyenLieu": 14,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 6,
+      "ChatDam": 6,
+      "ChatBotDuong": 7,
+      "ChatBeo": 6,
+      "ChatXo": 7,
+      "natri": 7
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 1652.97,
+      "ChatDam": 196.26,
+      "ChatBotDuong": 57.68,
+      "ChatBeo": 71.64,
+      "ChatXo": 7.97,
+      "natri": 4363.75
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 8,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 14,
+      "Thieu quy doi dinh duong": 4,
+      "Thieu chi so: ChatBotDuong, ChatXo": 1,
+      "Thieu chi so: ChatXo": 1,
+      "Chua co dong dinh duong": 2,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 2,
+      "Thieu chi so: natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA945",
+    "TenMonAn": "Cơm trộn bằng nồi cơm điện",
+    "MaCongThuc": "CT945",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 12,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 3,
+      "ChatDam": 3,
+      "ChatBotDuong": 3,
+      "ChatBeo": 3,
+      "ChatXo": 3,
+      "natri": 3
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 276.79,
+      "ChatDam": 10.08,
+      "ChatBotDuong": 42.81,
+      "ChatBeo": 8.41,
+      "ChatXo": 3.06,
+      "natri": 3869.78
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 6,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 12,
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 1,
+      "Thieu quy doi dinh duong": 3,
+      "Thieu chi so: natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA946",
+    "TenMonAn": "Bạch tuộc trộn khế sốt Thái",
+    "MaCongThuc": "CT946",
+    "SoKhauPhanChuan": 3,
+    "SoNguyenLieu": 21,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 10,
+      "ChatDam": 10,
+      "ChatBotDuong": 10,
+      "ChatBeo": 10,
+      "ChatXo": 10,
+      "natri": 10
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 566.03,
+      "ChatDam": 51.37,
+      "ChatBotDuong": 34.62,
+      "ChatBeo": 23.7,
+      "ChatXo": 1.87,
+      "natri": 11249.44
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 10,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 21,
+      "Thieu quy doi dinh duong": 5,
+      "Thieu chi so: ChatXo": 3,
+      "Chua co dong dinh duong": 5,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 5,
+      "Thieu chi so: ChatBeo, natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA947",
+    "TenMonAn": "Bánh tro",
+    "MaCongThuc": "CT947",
+    "SoKhauPhanChuan": 25,
+    "SoNguyenLieu": 5,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 1,
+      "ChatDam": 1,
+      "ChatBotDuong": 1,
+      "ChatBeo": 1,
+      "ChatXo": 1,
+      "natri": 1
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 90.77,
+      "ChatDam": 2.58,
+      "ChatBotDuong": 19.2,
+      "ChatBeo": 0.42,
+      "ChatXo": 0.28,
+      "natri": 310.82
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam",
+      "Can kiem tra nuoc cham/nuoc ngam an vao"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 5,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA948",
+    "TenMonAn": "Bánh tét trứng muối",
+    "MaCongThuc": "CT948",
+    "SoKhauPhanChuan": 4,
+    "SoNguyenLieu": 10,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 1,
+      "ChatDam": 1,
+      "ChatBotDuong": 1,
+      "ChatBeo": 2,
+      "ChatXo": 1,
+      "natri": 1
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 3186.92,
+      "ChatDam": 101.16,
+      "ChatBotDuong": 516.49,
+      "ChatBeo": 79.31,
+      "ChatXo": 12.26,
+      "natri": 2911.7
+    },
+    "LuuYCheBien": [
+      "Can kiem tra loc ba/nuoc dung",
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 10,
+      "Can doi chieu nguon va kich co quy doi": 4,
+      "Thieu quy doi dinh duong": 1,
+      "Thieu chi so: ChatXo": 1,
+      "Thieu chi so: ChatBeo": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA949",
+    "TenMonAn": "Dưa cải muối",
+    "MaCongThuc": "CT949",
+    "SoKhauPhanChuan": 5,
+    "SoNguyenLieu": 7,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 1,
+      "ChatDam": 1,
+      "ChatBotDuong": 1,
+      "ChatBeo": 1,
+      "ChatXo": 1,
+      "natri": 1
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 94.63,
+      "ChatDam": 6.71,
+      "ChatBotDuong": 19.03,
+      "ChatBeo": 0.91,
+      "ChatXo": 7.72,
+      "natri": 4697.35
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 2,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 7,
+      "Thieu quy doi dinh duong": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA950",
+    "TenMonAn": "Trà sữa trân châu",
+    "MaCongThuc": "CT950",
+    "SoKhauPhanChuan": 3,
+    "SoNguyenLieu": 6,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "NangLuong": 2,
+      "ChatDam": 2,
+      "ChatBotDuong": 2,
+      "ChatBeo": 2,
+      "ChatXo": 2,
+      "natri": 3
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 310.37,
+      "ChatDam": 2.89,
+      "ChatBotDuong": 71.73,
+      "ChatBeo": 2.63,
+      "ChatXo": 1.53,
+      "natri": 32.7
+    },
+    "LuuYCheBien": [
+      "Can tach nguyen lieu so che/nuoc ngam"
+    ],
+    "VanDeNguyenLieu": {
+      "Can doi chieu nguon va kich co quy doi": 2,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 6,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1,
+      "Thieu quy doi dinh duong": 1,
+      "Thieu chi so: natri": 2
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  },
+  {
+    "MaMonAn": "MA951",
+    "TenMonAn": "Matcha latte thạch trà xanh",
+    "MaCongThuc": "CT951",
+    "SoKhauPhanChuan": 2,
+    "SoNguyenLieu": 6,
+    "DuSauChiSoVaQuyDoi": false,
+    "SoDongThieuTheoChiSo": {
+      "natri": 2,
+      "NangLuong": 1,
+      "ChatDam": 1,
+      "ChatBotDuong": 1,
+      "ChatBeo": 1,
+      "ChatXo": 1
+    },
+    "TongDaBietMotPhan": {
+      "NangLuong": 165.11,
+      "ChatDam": 4.91,
+      "ChatBotDuong": 28.36,
+      "ChatBeo": 4.28,
+      "ChatXo": 1.17,
+      "natri": 54.38
+    },
+    "LuuYCheBien": [],
+    "VanDeNguyenLieu": {
+      "Can nguon khoi luong rieng; dang dung he so ml/l chung": 2,
+      "Snapshot chua co URL nguon dinh duong trong ghi chu": 6,
+      "Can doi chieu nguon va kich co quy doi": 3,
+      "Thieu chi so: natri": 1,
+      "Chua co dong dinh duong": 1,
+      "Thieu chi so: NangLuong, ChatDam, ChatBotDuong, ChatBeo, ChatXo, natri": 1
+    },
+    "TrangThaiNguon": "Chua duyet het nguon; khong coi du so lieu la da dung"
+  }
+]

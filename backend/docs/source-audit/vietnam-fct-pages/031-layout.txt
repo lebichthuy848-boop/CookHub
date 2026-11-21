@@ -1,0 +1,57 @@
+          Tªn thùc phÈm (Vietnamese):              Bét m×                                                                                                                                     STT:            18
+          Tªn tiÕng Anh (English):                        Wheat flour                                                                                                                         M· sè:          1018
+          Thμnh phÇn dinh d−ìng trong 100g phÇn ¨n ®−îc (100 grams edible portion)                                                                                                            Th¶i bá (%):   0.0
+
+
+                    Thμnh phÇn dinh d−ìng                            ĐV       Hμm lượng             TLTK                       Thμnh phÇn dinh d−ìng                                 ĐV        Hμm lượng              TLTK
+                              (Nutrients)                          (Unit)        (Value)          (Source)                               (Nutrients)                                (Unit)        (Value)           (Source)
+             Nước (Water )                                      g            14.0              1           Tổng số isoflavon (Total isoflavone)           mg              -
+             Năng lượng (Energy )                       KCal          346                                  Daidzein                                                 mg              -
+                                                                     KJ           1446                                 Genistein                                               mg              -
+             Protein                                                 g            10.3              1                 Glycetin                                                 mg              -
+             Lipid (Fat)                                            g             1.1               1           Tổng số acid béo no                                     g            0.320              3
+             Glucid (Carbohydrate)                         g            73.6              1           (Total saturated fatty acid)
+             Celluloza (Fiber)                                  g             0.3               1                 Palmitic (C16:0)                                       g            0.270              3
+             Tro (Ash)                                              g             0.7               1                 Margaric (C17:0)                                      g            0.000              3
+             Đường tổng số (Sugar)                      g               -                                    Stearic (C18:0)                                         g            0.020              3
+                  Galactoza (Galactose)                   g               -                                    Arachidic (C20:0)                                     g            0.000              3
+                  Maltoza (Maltose)                          g               -                                    Behenic (22:0)                                          g            0.000              3
+                  Lactoza (Lactose)                          g               -                                    Lignoceric (C24:0)                                   g            0.000              3
+                  Fructoza  (Fructose)                      g               -                              TS acid béo không no 1 nối đôi                   g            0.230              3
+                  Glucoza (Glucose)                         g               -                              (Total monounsaturated fatty acid)
+
+                  Sacaroza (Sucrose)                       g               -                                    Myristoleic (C14:1)                                  g            0.000              3
+             Calci (Calcium)                                  mg            29                1                 Palmitoleic (C16:1)                                  g            0.010              3
+             Sắt (Iron)                                            mg           2.00              1                 Oleic (C18:1)                                            g            0.220              3
+             MagiêMagiê (Magnesium)(Magnesium)                       mgmg           173173             11          TS acid béo không no nhiTS acid béo không no nhiềunối đôiều nối đôi gg           0 7800.780           33
+             Mangan (Manganese)                        mg          2.000             1           (Total polyunsaturated fatty acid)
+             Phospho (Phosphorous)                    mg           132               1                 Linoleic (C18:2 n6)                                  g            0.740              3
+             Kali (Potassium)                                mg           186               1                 Linolenic (C18:2 n3)                                g            0.040              3
+             Natri (Sodium)                                   mg 41Arachidonic (C20:4)                                g            0.000              3
+             Kẽm  (Zinc)                                        mg           2.50              1                 Eicosapentaenoic  (C20:5 n3)                g            0.000              3
+             Đồng (Copper)                    μg             21                1                 Docosahexaenoic (C22:6 n3)                 g            0.000              3
+             Selen (Selenium)                  μg             28                1           TS acid béo trans (Total trans fatty acid)          g                -
+             Vitamin C (Ascorbic acid)                  mg 01Cholesterol                                                  mg 01
+             Vitamin B1 (Thiamine)                       mg           0.18              1           Phytosterol                                                  mg              -
+             Vitamin B2 (Riboflavin)                      mg           0.13              1           Lysin                                                            mg            340                1
+             Vitamin PP (Niacin)                           mg            1.0               1           Methionin                                                    mg            140                1
+             Vitamin B5 (Pantothenic acid)           mg          1.008             3           Tryptophan                                                  mg            110                1
+             Vitamin B6 (Pyridoxine)                     mg          0.341             3           Phenylalanin                                               mg            630                1
+             Folat (Folate)                     μg             44                3           Threonin                                                      mg            380                1
+             Vitamin B9 (Folic acid)             μg 03Valin                                                             mg            520                1
+             Vitamin H (Biotin )                 μg            1.9               5           Leucin                                                          mg            780                1
+             Vitamin B12 (Cyanocobalamine)    μg 03Isoleucin                                                      mg            380                1
+             Vitamin A (Retinol)                μg 01Arginin                                                         mg            320                1
+             Vitamin D (Calciferol )              μg              -                              Histidin                                                        mg            170                1
+             Vitamin E  (Alpha-tocopherol )            mg           0.82              3           Cystin                                                          mg            265                1
+             Vitamin K (Phylloquinone)          μg            1.9               3           Tyrosin                                                        mg            142                1
+
+             Beta-caroten                     μg 03Alanin                                                          mg            278                1
+             Alpha-caroten                    μg 03Acid aspartic                                               mg            329                1
+             Beta-cryptoxanthin               μg 03Acid glutamic                                              mg           3480               1
+             Lycopen                         μg 03Glycin                                                          mg            341                1
+             Lutein + Zeaxanthin               μg 03Prolin                                                           mg           1254               1
+             Purin                                                  mg            14                4           Serin                                                            mg            449                1
+
+
+18

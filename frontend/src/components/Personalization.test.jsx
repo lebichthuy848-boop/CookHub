@@ -15,7 +15,7 @@ it('collects ten questions, previews without saving, persists favorites, and ret
   render(<OnboardingSurvey onComplete={complete} onFavorites={favorites}/>);
   await screen.findByRole('dialog');
   expect(screen.getByRole('button',{name:'Tiếp theo →'})).toBeDisabled();
-  for(const label of ['Thịt gà','Không theo chế độ riêng','Đậm đà / Mặn mà','15–30 phút','Bếp gas / Bếp từ','Cơm, cháo, món nước','Không kiêng','Xào / áp chảo','Dễ làm']) {
+  for(const label of ['Thịt gà','Không theo chế độ riêng','Đậm đà / Mặn mà','15–30 phút','Bếp gas','Cơm, cháo, món nước','Không kiêng','Xào','Dễ làm']) {
     fireEvent.click(await screen.findByRole('button',{name:new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'))}));
     fireEvent.click(screen.getByRole('button',{name:'Tiếp theo →'}));
   }
@@ -24,7 +24,8 @@ it('collects ten questions, previews without saving, persists favorites, and ret
   fireEvent.click(screen.getByRole('button',{name:'Xem nhận định & món gợi ý ✦'}));
   await screen.findByText('Phong cách ăn uống của bạn');
   expect(screen.getByText('Gu đậm đà, thích nấu gọn')).toBeInTheDocument();
-  await screen.findByText('70% Hợp vị');
+  await screen.findByText('Cơm gà');
+  expect(screen.queryByText(/Hợp vị/)).not.toBeInTheDocument();
   expect(mocks.api).not.toHaveBeenCalledWith('/v1/user/preferences',expect.anything());
   mocks.api.mockResolvedValueOnce(null);
   fireEvent.click(screen.getByRole('button',{name:'Yêu thích Cơm gà'}));
@@ -37,7 +38,7 @@ it('collects ten questions, previews without saving, persists favorites, and ret
   mocks.api.mockResolvedValueOnce({id:'new',has_completed_survey:true,survey_pending:false});
   fireEvent.click(screen.getByRole('button',{name:'Lưu sở thích & bắt đầu khám phá ✦'}));
   await waitFor(()=>expect(complete).toHaveBeenCalledTimes(1));
-  expect(mocks.api).toHaveBeenCalledWith('/v1/user/onboarding-preferences',{method:'POST',body:{ingredients:['chicken'],occasions:'none',tastes:['savory'],time:'medium',tools:['stove'],dish_types:['rice_noodles'],avoid:['none'],method:'stir_fry',skill:'beginner',meals:['breakfast']}});
+  expect(mocks.api).toHaveBeenCalledWith('/v1/user/onboarding-preferences',{method:'POST',body:{ingredients:['chicken'],occasions:'none',tastes:['savory'],time:'medium',tools:['gas_stove'],dish_types:['rice_noodles'],avoid:['none'],method:'stir_fry',skill:'beginner',meals:['breakfast']}});
 });
 it('does not display the survey after the database claim was used',async()=>{
   mocks.api.mockResolvedValue({show:false});
@@ -49,12 +50,14 @@ it('loads and edits saved preferences with a static form',async()=>{
   mocks.saved={ingredients:['chicken'],occasions:['solo'],tastes:['savory'],time:'medium',tools:['stove'],regions:['north'],avoid:['none'],budget:'saving',skill:'beginner',meals:['breakfast']};
   render(<PreferencesSettings/>);
   expect(screen.getByRole('button',{name:/Thịt gà/})).toHaveAttribute('aria-pressed','true');
+  expect(screen.getByRole('button',{name:/Bếp gas/})).toHaveAttribute('aria-pressed','true');
+  expect(screen.getByRole('button',{name:/Bếp từ/})).toHaveAttribute('aria-pressed','true');
   fireEvent.click(screen.getByRole('button',{name:/Dưới 15 phút/}));
   fireEvent.click(screen.getByRole('button',{name:/Không theo chế độ riêng/}));
   fireEvent.click(screen.getByRole('button',{name:/Cơm, cháo, món nước/}));
-  fireEvent.click(screen.getByRole('button',{name:/Xào \/ áp chảo/}));
+  fireEvent.click(screen.getByRole('button',{name:/Xào/}));
   mocks.api.mockResolvedValue({id:'new',has_completed_survey:true});
   fireEvent.click(screen.getByRole('button',{name:'Cập nhật sở thích'}));
   await screen.findByText('Đã cập nhật sở thích. Gợi ý món ăn đã sẵn sàng.');
-  expect(mocks.api).toHaveBeenCalledWith('/v1/user/preferences',{method:'POST',body:{ingredients:['chicken'],occasions:'none',tastes:['savory'],time:'quick',tools:['stove'],dish_types:['rice_noodles'],avoid:['none'],method:'stir_fry',skill:'beginner',meals:['breakfast']}});
+  expect(mocks.api).toHaveBeenCalledWith('/v1/user/preferences',{method:'POST',body:{ingredients:['chicken'],occasions:'none',tastes:['savory'],time:'quick',tools:['gas_stove','induction_stove'],dish_types:['rice_noodles'],avoid:['none'],method:'stir_fry',skill:'beginner',meals:['breakfast']}});
 });

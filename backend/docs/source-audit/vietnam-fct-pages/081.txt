@@ -1,0 +1,69 @@
+STT: 64
+M· sè: 3015
+Th¶i bá (%): 0.0
+Thμnh phÇn dinh d−ìng
+(Nutrients)
+ĐV
+(Unit)
+Hμm lượng
+(Value)
+TLTK
+(Source)
+Thμnh phÇn dinh d−ìng
+(Nutrients)
+ĐV
+(Unit)
+Hμm lượng
+(Value)
+TLTK
+(Source)
+Nước (Water ) g 3.4 1 Tổng số isoflavon (Total isoflavone) mg -
+Năng lượng (Energy ) KCal 605 Daidzein mg -
+KJ 2532 Genistein mg -
+Protein g 18.4 1 Glycetin mg -
+Lipid (Fat) g 46.3 1 Tổng số acid béo no g 7.780 3
+Glucid (Carbohydrate) g 28.7 1 (Total saturated fatty acid)
+Celluloza (Fiber) g 0.6 1 Palmitic (C16:0) g 3.920 3
+Tro (Ash) g 2.6 1 Margaric (C17:0) g 0.050 3
+Đường tổng số (Sugar) g 5.91 3 Stearic (C18:0) g 3.220 3
+Galactoza (Galactose) g 03 Arachidic (C20:0) g 0.270 3
+Maltoza (Maltose) g 03 Behenic (22:0) g 0.170 3
+Lactoza (Lactose) g 03 Lignoceric (C24:0) g 0.100 3
+Fructoza (Fructose) g 0.05 3 TS acid béo không no 1 nối đôi g 23.800 3
+Glucoza (Glucose) g 0.05 3 (Total monounsaturated fatty acid)
+Sacaroza (Sucrose) g 5.81 3 Myristoleic (C14:1) g 0.000 3
+Calci (Calcium) mg 28 1 Palmitoleic (C16:1) g 0.140 3
+Sắt (Iron) mg 3.60 1 Oleic (C18:1) g 23.520 3
+Magiê (Magnesium) mg 292 3 TS acid béo không no nhiềun ối đôi g 7 850 3
+Thμnh phÇn dinh d−ìng trong 100g phÇn ¨n ®−îc (100 grams edible portion)
+Tªn thùc phÈm (Vietnamese): H¹t ®iÒu
+Tªn tiÕng Anh (English): Cashew nut, common
+Magiê (Magnesium) mg 292 3 TS acid béo không no nhiều nối đôi g 7.850 3
+Mangan (Manganese) mg 1.660 3 (Total polyunsaturated fatty acid)
+Phospho (Phosphorous) mg 462 1 Linoleic (C18:2 n6) g 7.780 3
+Kali (Potassium) mg 660 3 Linolenic (C18:2 n3) g 0.060 3
+Natri (Sodium) mg 12 3 Arachidonic (C20:4) g 0.000 3
+Kẽm  (Zinc) mg 5.78 3 Eicosapentaenoic  (C20:5 n3) g 0.000 3
+Đồng (Copper) μg 2195 3 Docosahexaenoic (C22:6 n3) g 0.000 3
+Selen (Selenium) μg 19.9 3 TS acid béo trans (Total trans fatty acid) g -
+Vitamin C (Ascorbic acid) mg 11 Cholesterol mg 01
+Vitamin B1 (Thiamine) mg 0.25 1 Phytosterol mg -
+Vitamin B2 (Riboflavin) mg 0.34 1 Lysin mg 928 3
+Vitamin PP (Niacin) mg 2.4 1 Methionin mg 362 3
+Vitamin B5 (Pantothenic acid) mg 0.864 3 Tryptophan mg 287 3
+Vitamin B6 (Pyridoxine) mg 0.417 3 Phenylalanin mg 951 3
+Folat (Folate) μg 25 3 Threonin mg 688 3
+Vitamin B9 (Folic acid) μg 03 Valin mg 1094 3
+Vitamin H (Biotin ) μg - Leucin mg 1472 3
+Vitamin B12 (Cyanocobalamine) μg 03 Isoleucin mg 789 3
+Vitamin A (Retinol) μg 01 Arginin mg 2123 3
+Vitamin D (Calciferol ) μg - Histidin mg 456 3
+Vitamin E (Alpha-tocopherol) mg 0.9 3 Cystin mg 393 3
+Vitamin K (Phylloquinone) μg 34.1 3 Tyrosin mg 508 3
+Beta-caroten μg 53 Alanin mg 837 3
+Alpha-caroten μg - Acid aspartic mg 1795 3
+Beta-cryptoxanthin μg - Acid glutamic mg 4506 3
+Lycopen μg - Glycin mg 937 3
+Lutein + Zeaxanthin μg - Prolin mg 812 3
+Purin mg - Serin mg 1079 3
+64

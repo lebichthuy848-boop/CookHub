@@ -14,6 +14,15 @@ router = APIRouter(prefix='/menu/household', tags=['Household nutrition'])
 KEY = '_household'
 METRICS = ('nang_luong','chat_dam','chat_bot_duong','chat_beo','chat_xo','natri')
 
+def rescale_portion_split(shares, previous_total, new_total):
+    """Preserve each diner's split ratio when a menu serving count changes."""
+    if not shares or previous_total <= 0 or abs(sum(float(value) for value in shares.values())-previous_total)>.001:
+        return None
+    scaled={key:float(value)*new_total/previous_total for key,value in shares.items()}
+    last_key=next(reversed(scaled))
+    scaled[last_key]+=new_total-sum(scaled.values())
+    return scaled
+
 class Member(BaseModel):
     model_config = ConfigDict(extra='forbid', allow_inf_nan=False, str_strip_whitespace=True)
     id: str = Field(min_length=1, max_length=40)
@@ -68,27 +77,45 @@ def targets(member):
     base = 10*weight + 6.25*height - 5*age + (5 if member['sex']=='male' else -161)
     maintenance = base * float(member['activity'])
     if member['goal']=='lose':
-        if weight / ((height/100)**2) < 18.5:
-            return None, 'Không tạo mục tiêu giảm cân tự động khi BMI dưới 18,5.'
         # App policy: cap the suggested deficit at 20%, never a fixed 600 for everybody.
         energy = maintenance - min(600, maintenance*.20)
     elif member['goal']=='gain':
         energy = maintenance + 300
     else:
         energy = maintenance
-    if energy < (1500 if member['sex']=='male' else 1200):
-        return None, 'Mức ước tính thấp: cần mục tiêu được chuyên gia hướng dẫn.'
+    if energy <= 0:
+        return None, 'Hồ sơ cho kết quả năng lượng không hợp lệ; hãy kiểm tra lại tuổi, chiều cao và cân nặng.'
     energy=round(energy/10)*10
     # Explicit app reference split: protein 15%, carbs 60%, fat 25%.
     return dict(nang_luong=energy,chat_dam=round(energy*.15/4,2),
                 chat_bot_duong=round(energy*.60/4,2),chat_beo=round(energy*.25/9,2),
                 chat_xo=25,natri=2000), 'Ước tính Mifflin–St Jeor × mức vận động; không phải chỉ định y khoa.'
 
+
+def goal_warnings(member, goals):
+    """Advisory messages never replace the adult's selected scenario or its totals."""
+    if goals is None:
+        return []
+    bmi = member['weight'] / ((member['height']/100)**2)
+    warnings = []
+    # General adult reference bands, not a diagnosis or a recommendation based on BMI alone.
+    # https://www.nhs.uk/conditions/malnutrition/symptoms/
+    # https://www.nhs.uk/conditions/overweight-and-obesity/
+    if member['goal'] == 'lose' and bmi < 18.5:
+        warnings.append('BMI dưới 18,5: đang ở mức thiếu cân. Giảm cân thêm có thể không phù hợp. Số liệu dưới đây chỉ để tham khảo mục tiêu đã chọn; nên cân nhắc duy trì hoặc tăng cân và trao đổi với chuyên gia.')
+    elif member['goal'] == 'gain' and bmi >= 25:
+        warnings.append('BMI từ 25 trở lên: đang ở mức cao theo ngưỡng tham chiếu người trưởng thành. Tăng cân thêm có thể không phù hợp. BMI không phản ánh riêng tỷ lệ cơ và mỡ; nên đánh giá thêm trước khi áp dụng.')
+    if goals['nang_luong'] < (1500 if member['sex']=='male' else 1200):
+        warnings.append('Mức kcal tính theo mục tiêu này thấp. Đây là kết quả ước tính để đối chiếu, không phải mức ăn được khuyến nghị; cần hướng dẫn chuyên môn trước khi áp dụng.')
+    return warnings
+
+
 def public_state(state, on):
     members=[]
     for member in state.get('members',[]):
         goals,note=targets(member)
-        members.append({**member,'goals':goals,'goal_note':note})
+        members.append({**member,'goals':goals,'goal_note':note,
+                        'goal_warnings':goal_warnings(member, goals)})
     day=state.get('days',{}).get(str(on),{})
     ids={x['id'] for x in members}
     active=[x for x in day.get('active_ids',[x['id'] for x in members]) if x in ids]
@@ -109,6 +136,11 @@ def save_household(data:HouseholdWrite, on:date, user=Depends(current_user), db:
     row,answers,state=read_state(db,user.maNguoiDung,lock=True)
     if data.revision != state.get('revision',0):
         raise HTTPException(409,'Thông tin đã thay đổi ở cửa sổ khác. Vui lòng tải lại trước khi lưu.')
+    for member in data.members:
+        if member.goal != 'maintain':
+            goals, note = targets(member.model_dump())
+            if goals is None:
+                raise HTTPException(422, f'{member.name}: {note}')
     items=db.scalars(select(m.ChiTietThucDon).join(m.ThucDon,m.ThucDon.maThucDon==m.ChiTietThucDon.maThucDon)
         .where(m.ThucDon.maNguoiDung==user.maNguoiDung,m.ChiTietThucDon.ngayDung==on)).all()
     owned={x.maChiTiet:float(x.soKhauPhan or 1) for x in items}
@@ -142,7 +174,7 @@ def distribution(state,on,items,raw_rows,names):
     bins={key:[] for key in active}
     used={}; equal=[]
     for item in items:
-        key=item.maChiTiet
+        key=str(item.maChiTiet).strip()
         total=float(item.soKhauPhan or 1)
         shares=result['portions'].get(key,{})
         if not active:
@@ -153,9 +185,10 @@ def distribution(state,on,items,raw_rows,names):
             shares={i:total/len(active) for i in active}
             equal.append(key)
         used[key]=shares
+    member_item_rows={member_id:{} for member_id in active}
     for raw in raw_rows or []:
         raw=dict(raw)
-        key=_value(raw,'MaChiTiet')
+        key=str(_value(raw,'MaChiTiet') or '').strip()
         shares=used.get(key,{})
         total=sum(shares.values())
         if not total: continue
@@ -168,11 +201,17 @@ def distribution(state,on,items,raw_rows,names):
                     # Normalize key casing so _result sees the scaled value first.
                     scaled[column]=float(value)*portion/total
             bins[member_id].append(scaled)
+            member_item_rows[member_id].setdefault(key,[]).append(scaled)
     result['members']=[{**member,**_result(bins.get(member['id'],[]),names)} for member in result['members']]
     for member in result['members']:
         if raw_rows is None:
             member.update(totals=None,complete=False)
     result.update(portions=used,equal_split_items=equal)
+    result['member_portions']={member_id:{item_id:float(shares.get(member_id,0))
+        for item_id,shares in used.items()} for member_id in active}
+    from .nutrition import _dish_profile_with_coverage
+    result['member_item_totals']={member_id:{item_id:_dish_profile_with_coverage(rows) for item_id,rows in by_item.items()}
+                                  for member_id,by_item in member_item_rows.items()}
     goals=[active[i].get('goals') for i in active]
     result['group_goals']={k:round(sum(g[k] for g in goals),2) for k in METRICS} if goals and all(goals) else None
     return result

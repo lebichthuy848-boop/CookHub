@@ -1,0 +1,705 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="h-100">
+
+<head>
+<meta charset="utf-8">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="">
+<meta name="author" content="">
+<link nonce="MTc1MTc5NTE1OTExMw==" rel="shortcut icon" href="/thaifcd/favicon.ico" type="image/x-icon">
+<meta name="theme-color" content="#FFFFFF" /><!--#11bfda-->
+
+<title>Food search - Search by food name</title>
+
+
+<link nonce="MTc1MTc5NTE1OTExMw==" href="/thaifcd/js/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<link nonce="MTc1MTc5NTE1OTExMw==" href="/thaifcd/assets_admin/styles/carousel.min.css" rel="stylesheet" />
+<link nonce="MTc1MTc5NTE1OTExMw==" href="/thaifcd/assets/fonts/fontawesome-free-5.9.0-web/css/all.min.css" rel="stylesheet" />
+<link nonce="MTc1MTc5NTE1OTExMw==" href="/thaifcd/assets_app/styles/style.min.css" rel="stylesheet" />
+<link nonce="MTc1MTc5NTE1OTExMw==" href="/thaifcd/assets_app/styles/kawpod-theme-extend.css?v=1" rel="stylesheet" />
+<link nonce="MTc1MTc5NTE1OTExMw==" rel="stylesheet" href="/thaifcd/assets_app/styles/style2.css?v=1" type="text/css" />
+<link nonce="MTc1MTc5NTE1OTExMw==" rel="stylesheet" href="/thaifcd/assets_app/styles/style_custom.css?v=5" type="text/css" />
+<link nonce="MTc1MTc5NTE1OTExMw==" rel="stylesheet" href="/thaifcd/assets_app/styles/style_custom_2.css" type="text/css" />
+<link nonce="MTc1MTc5NTE1OTExMw==" rel="stylesheet" href="/thaifcd/assets_app/styles/layout_web_clean_layout.css" type="text/css" />
+<link nonce="MTc1MTc5NTE1OTExMw==" rel="stylesheet" href="/thaifcd/assets_app/styles/style_sidebar.css" type="text/css" />
+
+<link nonce="MTc1MTc5NTE1OTExMw==" rel="stylesheet" type="text/css" href="/thaifcd/js/jquery-ui-1.13.1/jquery-ui.css">
+<link nonce="MTc1MTc5NTE1OTExMw==" href="/thaifcd/js/jquery_tab/style.css" rel="stylesheet" type="text/css" />
+<link nonce="MTc1MTc5NTE1OTExMw==" rel="stylesheet" type="text/css" href="/thaifcd/js/fancybox-master/dist/jquery.fancybox.css">
+<script nonce="MTc1MTc5NTE1OTExMw=="  type="text/javascript" src="/thaifcd/js/jquery-ui-1.13.1/external/jquery/jquery.js"></script>
+<script nonce="MTc1MTc5NTE1OTExMw=="  type="text/javascript" src="/thaifcd/js/jquery-migrate-3.4.0.min.js"></script>
+<script nonce="MTc1MTc5NTE1OTExMw=="  type="text/javascript" src="/thaifcd/js/jquery-ui-1.13.1/jquery-ui.js"></script>
+<link nonce="MTc1MTc5NTE1OTExMw==" rel="stylesheet" type="text/css" href="/thaifcd/js/jquery.multi-select-styles.css">
+<link nonce="MTc1MTc5NTE1OTExMw==" rel="stylesheet" type="text/css" href="/thaifcd/js/animate/animate.min.css">
+
+<script nonce="MTc1MTc5NTE1OTExMw=="  src="/thaifcd/js/project_scripts/script.js"></script>
+<style nonce="MTc1MTc5NTE1OTExMw==">
+</style>
+<script nonce="MTc1MTc5NTE1OTExMw==" language="javascript">
+var path_base = '/thaifcd/';
+var base_url = 'https://inmu.mahidol.ac.th/thaifcd/';
+</script>
+
+</head>
+
+<body class="h-100 p-0 m-0"><!-- Web Clean layout -->
+
+<div id="page-container" class="container-fluid pe-0 ps-0 h-100 d-flex flex-column">
+<section id="section_header" class="p-0 m-0">	
+<img src="/thaifcd/media/images/thaifcd_theme2_01.png" class="w-100" title="https://inmu.mahidol.ac.th/thaifcd/ONLINE THAI FOOD COMPOSITION DATABASE">
+</section>
+
+<nav class="navbar navbar-expand-md navbar-light bg-light sticky-top mt-0 shadow" >
+	<div class="container-fluid">
+		<a class="navbar-brand animated fadeInLeft" href="#" ><img id="navbar_brand_logo" src="/thaifcd/assets_app/images/nav_logo.png" alt="ONLINE THAI FOOD COMPOSITION DATABASE" ></a>
+  <button class="navbar-toggler collapsed p-0 border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="true" aria-label="Toggle navigation">
+    <span class="icon-bar top-bar"></span>
+	<span class="icon-bar middle-bar"></span>
+	<span class="icon-bar bottom-bar"></span>
+  </button>
+
+  <div class="collapse navbar-collapse " id="navbarSupportedContent">
+		
+	<ul class="navbar-nav justify-content-center ms-auto me-auto flex-wrap animated fadeInDown">	
+		<li class="nav-item"><a class="nav-link" href="/thaifcd/home">Home</a></li>
+				<li class="nav-item dropdown">
+			<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Food Search</a>
+			<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+				<li><a class="dropdown-item" href="/thaifcd/foodsearch/food_group">Food Search by Food Group</a></li>
+				<li><a class="dropdown-item" href="/thaifcd/foodsearch/food_name">Food Search by Food Name</a></li>
+				<li><a class="dropdown-item" href="/thaifcd/foodsearch/by_nutrient">Food Search by Nutrient</a></li>
+							</ul>
+		</li>
+		<li class="nav-item"><a class="nav-link" href="/thaifcd/content/term-and-condition">Term and Condition</a></li>
+		<li class="nav-item"><a class="nav-link" href="/thaifcd/category/news">News</a></li>
+		
+		<li class="nav-item"><a class="nav-link" href="/thaifcd/content/contact">Contact Us</a></li>
+		
+	</ul>
+
+		
+			<ul class="navbar-nav  me-2 animated fadeInRight">
+				<li class="nav-item ">
+					<a class="nav-link text-warning text-md-center text-start d-none" href="/thaifcd/user/signin" role="button" title="Account"><i class="fas fa-user"></i></a>
+				</li>
+			</ul>
+	</div>
+</div>
+</nav>
+
+
+
+	 
+<style nonce="MTc1MTc5NTE1OTExMw==">
+table thead tr th.border_left_thick, table tbody tr td.border_left_thick{ border-left:solid 2px #a0a0a0 !important; }
+</style>
+<form id="form1" method="post" action="" accept-charset="utf-8">
+<input type="hidden" name="order_fields" id="order_fields" value="">
+<input type="hidden" name="order_directions" id="order_directions" value="">
+<input type="hidden" name="page_no" id="page_no" value="1">
+<input type="hidden" name="dummy_page_no" id="dummy_page_no" value="1">
+<input type="hidden" name="status" id="status" value="A">
+
+<input type="hidden" name="selected_name" id="selected_name" value="">
+<input type="hidden" name="selected_id" id="selected_id" value="">
+<input type="hidden" name="selected_dbcode" id="selected_dbcode" value="">
+
+
+<div class="container pb-5">
+	<h1 class="mt-5"><i class="fas fa-search"></i> Food Search by Food Name</h1>
+	<div class="bg-light p-2 rounded border">
+		<div class="row">
+			<div class="col-md-8 col-lg-6 mt-2" >
+				<label class="form-control-label " for="food_group_id">Food Group:</label>
+				<select class="form-select" name="food_group_id" id="food_group_id" data-form-field="food_group_id" placeholder="Food group" >
+					<option value=''>-- Please choose --</option>
+					<option value='70' >A - Cereals and their products</option><option value='71' >B - Starchy roots, tubers and their products</option><option value='73' >C - Legums, nuts, seeds and their products</option><option value='74' >D - Vegetables and their products</option><option value='75' >E - Fruits and their products</option><option value='76' >F - Meat, other animals and their products</option><option value='77' >G - Finfish, shellfish, other aquatic animals and their products</option><option value='78' >H - Eggs and their products</option><option value='79' >J - Milk and its products</option><option value='80' >K - Fats, oils and their products</option><option value='81' >M - Sugars, syrup and confectionery</option><option value='72' >N - Spices, herbs, condiments and other seasonings</option><option value='82' >Q - Beverages: nonalcoholic</option><option value='83' >S - Fast foods: franchise foods</option><option value='84' >T - Mixed foods:  ready-to-eat</option><option value='85' >U - Miscellaneous</option><option value='69' >Z - Branded Food Products</option>				</select>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-8 col-lg-6 mt-2" >
+				<label class="form-control-label " for="food_name">Food Name<span class="require">*</span>:</label>
+				<input type="text" class="form-control" name="food_name" id="food_name" data-form-field="food_name" placeholder="Food Name" required value="">
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4 col-lg-2 mt-2" >
+				<button id="btnShow" type="button" class="btn btn-primary mt-md-4 mt-2 btn_responsive"><i class="fas fa-search"></i> Search </button>
+			</div>
+		</div>
+	</div>
+	
+
+	
+	<div class="row row-offset">
+		<div class="col-12 " id="div_list">
+			<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+		</div>
+	</div>
+	
+	<div class="row">
+		<div class="col-12">
+			<div id="div_action"></div>
+		</div>
+	</div>
+	
+	
+	
+	
+	
+
+
+	
+</div>
+</form>
+
+<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ... Information word
+      </div>
+      <div class="modal-footer">
+		<button type="button" id="btnModalClose" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script nonce="MTc1MTc5NTE1OTExMw=="  type="text/javascript">
+var base_url = "/thaifcd/";
+var base_url_admin = "/thaifcd/admin/";
+var path_base = "/thaifcd/";
+var path_base_admin = path_base + "admin/";
+
+var crsfName = "ci_csrf_token";
+var crsfCookieName = "ThaiFcd2024Cookie";
+
+
+		  
+
+
+
+
+function do_search_listing_table(){
+	$("#div_list").html('<div class="loader_lg"></div>');
+	
+	var myForm = document.getElementById('form1');
+	var formData = new FormData(myForm);    
+	formData.append('mode', "food_group_result");
+	//formData.append('page_no', $("#dummy_page_no").val()  );
+	formData.append(crsfName, getCookie(crsfCookieName));
+	const queryString = new URLSearchParams(formData).toString();
+
+	$.ajax({
+		async: true,
+		type: 'GET',
+		url: base_url + 'foodsearch/food_name_result',
+		data: queryString,
+		cache: false,
+		processData: false,
+		contentType: false,
+
+		success: function (data) {
+			console.log("form submit success");
+			$("#div_list").html(data);
+			
+			$("#nutrient_name").blur( function(){
+				if ($(this).data("current-value")!=$(this).val()){
+					$(this).data("current-value", $(this).val());
+					food_name_result_nutrient();
+				}
+			});
+			
+			if ($("#selected_dbcode").val()=="BFP"){
+				
+				$("#value_per_servingsize").blur( function(){
+					if (!isNumber(removeMoneySign($(this).val()))) $(this).val("1");
+					if ($(this).data("current-value")!=$(this).val()){
+						$(this).data("current-value", $(this).val());
+						food_name_result_nutrient();
+					}
+				});
+			}
+			
+			//refresh_page_object();
+			//alert('success');
+		},
+			error: function(request, status, error) {
+			console.log("error");
+			//alert('error');
+		}
+	});
+	
+}
+
+
+function food_name_result_nutrient(){
+	$("#tbody_food_nutrients").html('<tr><td colspan="3"><div class="loader_lg"></div></td></tr>');
+	
+	var formData = new FormData();    
+	formData.append('mode', "food_name_result_nutrient");
+	formData.append('food_id', $("#selected_id").val()  );
+	formData.append('dbcode', $("#selected_dbcode").val()  );
+	formData.append('nutrient_name', $("#nutrient_name").val()  );
+	formData.append('value_per_servingsize', $("#value_per_servingsize").val()  );
+	
+	formData.append(crsfName, getCookie(crsfCookieName));
+	const queryString = new URLSearchParams(formData).toString();
+
+	$.ajax({
+		async: true,
+		type: 'GET',
+		url: base_url + 'foodsearch/food_name_result_nutrient',
+		data: queryString,
+		cache: false,
+		processData: false,
+		contentType: false,
+
+		success: function (data) {
+			console.log("form submit success");
+			$("#tbody_food_nutrients").html(data);
+		},
+		error: function(request, status, error) {
+			console.log("error");
+			$("#tbody_food_nutrients").html('<tr><td colspan="3">Error response data.</td></tr>');
+		}
+	});
+	
+}
+
+
+
+function autocompleteJSONParseCode(data) {
+    var rows = new Array();
+    var rowData = null;
+    for (var i = 0, dataLength = data.length; i < dataLength; i++) {
+        rowData = data[i];
+        // alert(rowData.term2+":"+rowData.term1);//uncomment to see data as it parses
+        rows[i] = {
+            value: rowData.id,
+            label: rowData.name,
+			dbcode: rowData.dbcode
+        };
+    }
+
+    return rows;
+}
+
+
+$(document).ready(function() {
+	//$(".datepicker").datepicker( { dateFormat: "dd/mm/yy" } );
+	//$('.datepicker').mask('00/00/0000');
+	//$('.time_hm').mask('00:00');
+	
+	$("#btnShow").click(function(){
+		$('#dummy_page_no').val( 1 ); 
+		do_search_listing_table();
+	});
+	
+	$("#food_group_id").change( function() {
+		$("#selected_name").val("");
+		$("#selected_id").val("");
+		$("#selected_dbcode").val("");
+		$("#food_name").val("");
+	});
+	
+	$('#food_name').autocomplete({
+	  minLength: 2,
+	  source: function (request, response) {
+		  $.ajax({
+			  type: "GET",
+			  contentType: "application/json; charset=utf-8",
+			  url: path_base + 'appassistant/get_json_food_name',
+			  data: "food_group_id=" + $('#food_group_id').find(":selected").val() + "&term=" + document.getElementById('food_name').value + "",
+			  // data: "{'food_group_id':'" + $('#food_group_id').find(":selected").val() + "', 'term':'" + document.getElementById('food_name').value + "'}",
+			  dataType: "json",
+			  success: function (data) {
+				  var rows = autocompleteJSONParseCode(data);
+				  response(rows);
+			  },
+			  error: function (result) {
+				  alert("Error");
+			  }
+		  });
+	  },
+	  focus: function( event, ui ) {
+		event.preventDefault();
+		$(this).val(ui.item.label);
+		
+	},
+	  select: function (event, ui) {
+		  event.preventDefault();
+		  $(this).val(ui.item.label);
+		  
+		  var selected_name = $("#selected_name");
+		  var selected_id = $("#selected_id");  
+		  
+		  selected_name.val(ui.item.label);
+		  selected_id.val(ui.item.value);
+		  $("#selected_dbcode").val(ui.item.dbcode);
+		  do_search_listing_table();
+
+	  }
+  });
+  
+  if ($("#selected_id").val()!="" && $("#selected_name").val()!=""){
+	  do_search_listing_table();
+  }
+  
+  
+  
+	
+});
+</script>
+	
+
+
+
+<footer id="footer1" class="justify-content-center mt-auto footer_main" >
+	<div class="container-fluid">
+		<div class="row justify-content-center">
+			<div class="col-12 col-sm-12 col-md-12 col-lg-10"><!--LEFT-->
+			
+				<div class="row  justify-content-center pt-2 pt-sm-4 pb-2">
+					<div class="col-6 col-sm-4 col-md-3 col-lg-2 text-center ">
+												<img src="/thaifcd/assets_app/images/footer_logo.png" class="w-100 mb-2 animated fadeInLeft" title="Thai FCD" style="max-width:340px;">
+					</div>
+					<div class="col-12 col-sm-12 col-md-9 col-lg-9 text-center text-md-start animated fadeInUp">
+					
+<p class="pt-0 mt-2 pb-0 mb-0 footer_seminar_name"><b>ONLINE THAI FOOD COMPOSITION DATABASE</b></p>
+<p><i><u>Contact Address</u></i></p>
+<p class="ms-3"><b>สถาบันโภชนาการ มหาวิทยาลัยมหิดล</b>
+<br>ที่อยู่: 999 พุทธมณฑลสาย 4 ตำบลศาลายา อำเภอพุทธมณฑล จังหวัดนครปฐม 73170
+<br>โทรศัพท์: +66-2-800 2380 ต่อ 324, 423 &nbsp; โทรสาร: +66-2-441 9344
+<br>อีเมล์: <a href="mailto:kunchit.jud@mahidol.ac.th" class="text-warning">kunchit.jud@mahidol.ac.th</a>, <a href="mailto:piyanut.sri@mahidol.ac.th" class="text-warning">piyanut.sri@mahidol.ac.th</a>
+<br>เว็บไซต์: <a href="https://inmu.mahidol.ac.th/thaifcd/" target="_blank" class="text-warning">https://inmu.mahidol.ac.th/thaifcd/</a>
+</p>
+<p  class="ms-3 mt-3"><b>Institute of Nutrition, Mahidol University (INMU)</b>
+<br>Phutthamonthon 4 road, Salaya, Nakhon Pathom 73170 THAILAND
+<br>Phone: +66-2-800 2380 ext. 324, 423 &nbsp; Fax: +66-2-441 9344
+<br>E-mail: <a href="mailto:kunchit.jud@mahidol.ac.th" class="text-warning">kunchit.jud@mahidol.ac.th</a>, <a href="mailto:piyanut.sri@mahidol.ac.th" class="text-warning">piyanut.sri@mahidol.ac.th</a>
+<br>Web site: <a href="https://inmu.mahidol.ac.th/thaifcd/" target="_blank" class="text-warning">https://inmu.mahidol.ac.th/thaifcd/</a>
+</p>
+
+
+					</div>
+				</div>			
+			</div><!-- END LEFT-->
+			
+			<div class="col-12 col-sm-8 col-md-7 col-lg-2"><!-- RIGHT-->
+				<div class="row pt-4 pt-sm-1">
+					<div class="col-12 text-center fw-bold">&nbsp;</div>
+				</div>
+				<div class="row pt-2 justify-content-center">
+					<div class="col-12 text-center">
+			<!-- Start of StatCounter Code for Default Guide -->
+			<script nonce="MTc1MTc5NTE1OTExMw==" type="text/javascript">
+			var sc_project=10191495; 
+			var sc_invisible=0; 
+			var sc_security="a06af076"; 
+			var scJsHost = (("https:" == document.location.protocol) ?
+			"https://secure." : "http://www.");
+			document.write("<sc"+"ript type='text/javascript' nonce='MTc1MTc5NTE1OTExMw==' src='" +
+			scJsHost+
+			"statcounter.com/counter/counter.js'></"+"script>");
+			</script>
+			<noscript><div class="statcounter"><a title="shopify visitor
+			statistics" href="http://statcounter.com/shopify/"
+			target="_blank"><img class="statcounter"
+			src="http://c.statcounter.com/10191495/0/a06af076/0/"
+			alt="shopify visitor statistics"></a></div></noscript>
+			<!-- End of StatCounter Code for Default Guide -->					
+					</div>
+					<div class="col-12 text-center">
+<!-- BEGIN: Powered by Supercounters.com -->
+<center><script nonce="MTc1MTc5NTE1OTExMw==" type="text/javascript" src="//widget.supercounters.com/ssl/flag.js"></script><script nonce="MTc1MTc5NTE1OTExMw==" type="text/javascript">sc_flag(1703074,"112134","849ac7","141871",2,10,0,0)</script><br><noscript><a href="http://www.supercounters.com/">Flag Counter</a></noscript>
+</center>
+<!-- END: Powered by Supercounters.com -->
+
+				
+					</div>
+					
+				</div>
+				
+			</div><!-- END RIGHT-->
+		</div>
+
+    </div>
+	
+	<div class="container-fluid footer_ci_bg" >
+		<div class="row">
+			<div class="col-12 col-sm-6 rounded text-start footer_ci_info p-2" >
+			Page rendered in <strong>1.1306</strong> seconds. 			</div>
+			<div class="col-12 col-sm-6 rounded text-start text-sm-right footer_ci_info p-2" >
+			&copy;  Thai FCD ALL RIGHTS RESERVED.
+			</div>
+		</div>
+	</div>
+	
+</footer>
+
+
+
+ </div>
+  
+  
+  <!-- Back to top -->
+  <a id="back-to-top" href="#" class="btn btn-back-to-top btn-lg back-to-top" role="button" title="Click to return on the top page" data-bs-toggle="tooltip" data-placement="left">
+    <i class="fa fa-chevron-up" aria-hidden="true"></i>
+  </a>
+
+
+
+<script nonce="MTc1MTc5NTE1OTExMw=="  src="/thaifcd/js/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script nonce="MTc1MTc5NTE1OTExMw=="  src="/thaifcd/assets_admin/scripts/offcanvas.min.js"></script>
+<script nonce="MTc1MTc5NTE1OTExMw=="  src="/thaifcd/assets_admin/scripts/parallax.js-1.5.0/parallax.js"></script>
+<script nonce="MTc1MTc5NTE1OTExMw=="  type="text/javascript" src="/thaifcd/js/fancybox-master/dist/jquery.fancybox.js"></script>
+<script nonce="MTc1MTc5NTE1OTExMw=="  type="text/javascript" src="/thaifcd/js/jquery_tab/sprinkle.js"></script>
+<script nonce="MTc1MTc5NTE1OTExMw=="  type="text/javascript" src="/thaifcd/js/jquery.multi-select.min.js"></script>
+<script nonce="MTc1MTc5NTE1OTExMw=="  type="text/javascript" src="/thaifcd/js/jQuery-Mask-Plugin-master/dist/jquery.mask.min.js"></script>
+<script nonce="MTc1MTc5NTE1OTExMw=="  src="/thaifcd/assets_admin/scripts/script.min.js"></script>
+
+
+<script  nonce="MTc1MTc5NTE1OTExMw=="  src="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@v2.9.1/dist/cookieconsent.js"></script>
+<link  nonce="MTc1MTc5NTE1OTExMw=="  rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/orestbida/cookieconsent@v2.9.1/dist/cookieconsent.css" />
+<!-- <button type="button" data-cc="c-settings">Manage cookie settings</button>-->
+
+<!-- Inline script -->
+<script nonce="MTc1MTc5NTE1OTExMw=="  type="text/javascript" >
+        window.addEventListener('load', function(){
+
+            // obtain plugin
+            var cc = initCookieConsent();
+
+            // run plugin with your configuration
+            cc.run({
+                current_lang: 'en',
+                autoclear_cookies: true,                   // default: false
+                page_scripts: true,                        // default: false
+
+                // mode: 'opt-in'                          // default: 'opt-in'; value: 'opt-in' or 'opt-out'
+                // delay: 0,                               // default: 0
+                // auto_language: '',                      // default: null; could also be 'browser' or 'document'
+                // autorun: true,                          // default: true
+                // force_consent: false,                   // default: false
+                // hide_from_bots: true,                   // default: true
+                // remove_cookie_tables: false             // default: false
+                // cookie_name: 'cc_cookie',               // default: 'cc_cookie'
+                // cookie_expiration: 182,                 // default: 182 (days)
+                // cookie_necessary_only_expiration: 182   // default: disabled
+                // cookie_domain: location.hostname,       // default: current domain
+                // cookie_path: '/',                       // default: root
+                // cookie_same_site: 'Lax',                // default: 'Lax'
+                // use_rfc_cookie: false,                  // default: false
+                // revision: 0,                            // default: 0
+
+                onFirstAction: function(user_preferences, cookie){
+                    // callback triggered only once on the first accept/reject action
+                },
+
+                onAccept: function (cookie) {
+                    // callback triggered on the first accept/reject action, and after each page load
+                },
+
+                onChange: function (cookie, changed_categories) {
+                    // callback triggered when user changes preferences after consent has already been given
+                },
+
+                languages: {
+                    'en': {
+                        consent_modal: {
+                            title: 'We use cookies!',
+                            description: 'Hi, this website uses essential cookies to ensure its proper operation and tracking cookies to understand how you interact with it. The latter will be set only after consent. <button type="button" data-cc="c-settings" class="cc-link">Let me choose</button>',
+                            primary_btn: {
+                                text: 'Accept all',
+                                role: 'accept_all'              // 'accept_selected' or 'accept_all'
+                            },
+                            secondary_btn: {
+                                text: 'Reject all',
+                                role: 'accept_necessary'        // 'settings' or 'accept_necessary'
+                            }
+                        },
+                        settings_modal: {
+                            title: 'Cookie preferences',
+                            save_settings_btn: 'Save settings',
+                            accept_all_btn: 'Accept all',
+                            reject_all_btn: 'Reject all',
+                            close_btn_label: 'Close',
+                            // cookie_table_caption: 'Cookie list',
+                            cookie_table_headers: [
+                                {col1: 'Name'},
+                                {col2: 'Domain'},
+                                {col3: 'Expiration'},
+                                {col4: 'Description'}
+                            ],
+                            blocks: [
+                                {
+                                    title: 'Cookie usage 📢',
+                                    description: 'I use cookies to ensure the basic functionalities of the website and to enhance your online experience. You can choose for each category to opt-in/out whenever you want. For more details relative to cookies and other sensitive data, please read the full <a href="#" class="cc-link">privacy policy</a>.'
+                                }, {
+                                    title: 'Strictly necessary cookies',
+                                    description: 'These cookies are essential for the proper functioning of my website. Without these cookies, the website would not work properly',
+                                    toggle: {
+                                        value: 'necessary',
+                                        enabled: true,
+                                        readonly: true          // cookie categories with readonly=true are all treated as "necessary cookies"
+                                    }
+                                }, {
+                                    title: 'Performance and Analytics cookies',
+                                    description: 'These cookies allow the website to remember the choices you have made in the past',
+                                    toggle: {
+                                        value: 'analytics',     // your cookie category
+                                        enabled: false,
+                                        readonly: false
+                                    },
+                                    cookie_table: [             // list of all expected cookies
+                                        {
+                                            col1: '^_ga',       // match all cookies starting with "_ga"
+                                            col2: 'google.com',
+                                            col3: '2 years',
+                                            col4: 'description ...',
+                                            is_regex: true
+                                        },
+                                        {
+                                            col1: '_gid',
+                                            col2: 'google.com',
+                                            col3: '1 day',
+                                            col4: 'description ...',
+                                        }
+                                    ]
+                                }, {
+                                    title: 'Advertisement and Targeting cookies',
+                                    description: 'These cookies collect information about how you use the website, which pages you visited and which links you clicked on. All of the data is anonymized and cannot be used to identify you',
+                                    toggle: {
+                                        value: 'targeting',
+                                        enabled: false,
+                                        readonly: false
+                                    }
+                                }, {
+                                    title: 'More information',
+                                    description: 'For any queries in relation to our policy on cookies and your choices, please <a class="cc-link" href="#yourcontactpage">contact us</a>.',
+                                }
+                            ]
+                        }
+                    }
+                }
+            });
+        });
+
+$(document).ready(function() {
+	
+	
+	$(".fancy_iframe").fancybox({
+		'width'				: '98%',
+		'height'				: '98%',
+		'autoScale'			: false,
+		'transitionIn'		: 'elastic',
+		'transitionOut'		: 'none',
+		'type'				: 'iframe',
+		'fitToView'			: false,
+		'autoSize'			:false
+	});
+	
+	
+	
+	$(".fancy_iframe_2").fancybox({
+		'width'				: '98%',
+		'height'				: '98%',
+		'autoScale'			: false,
+		'transitionIn'		: 'elastic',
+		'transitionOut'		: 'none',
+		'type'				: 'iframe',
+		'fitToView'			: false,
+		'autoSize'			:false
+	});
+	
+	//$('.slide_marquee').marquee({delay:5000});
+	
+	$("#apopup").fancybox({
+				'width'				: 910,
+				'height'				: '99%',
+				'autoScale'			: false,
+				'transitionIn'		: 'elastic',
+				'transitionOut'		: 'none',
+				'type'				: 'iframe',
+				'fitToView'			: false,
+				'autoSize'			:false
+	});
+	/*
+	$('.fancybox').fancybox({
+    fitToView: false,
+    autoSize: false,
+    afterLoad: function () {
+        this.width = $(this.element).data("width");
+        this.height = $(this.element).data("height");
+    }
+});
+	*/
+	
+	function blinker() {
+			$('.blink_me').fadeOut(600);
+			$('.blink_me').fadeIn(200);
+	}
+
+	setInterval(blinker, 800); //Runs every second
+	
+	$(function(){
+        if (navigator.userAgent.match(/(iPod|iPhone|iPad|Android)/)) {
+          $('#ios-notice').removeClass('hidden');
+          $('.parallax-container').height( $(window).height() * 0.5 | 0 );
+        } else {
+          $(window).resize(function(){
+            var parallaxHeight = Math.max($(window).height() * 0.7, 200) | 0;
+            $('.parallax-container').height(parallaxHeight);
+          }).trigger('resize');
+        }
+      });
+	  
+	
+	$("#btnHomeUserSignout").click( function() {
+		if (confirm('Confirm to signout?')){
+			return true;
+		}
+		return false;
+	});
+	
+	window.onscroll = function() {
+		growShrinkLogo()
+	};
+
+
+	
+});
+		
+function growShrinkLogo() {
+  var Logo = document.getElementById("navbar_brand_logo")
+  //console.log(document.body.scrollTop + '/' + document.documentElement.scrollTop);
+  if (document.body.scrollTop > 35 || document.documentElement.scrollTop > 35) {
+    Logo.style.width = '120px';
+  } else {
+    Logo.style.width = '180px';
+  }
+}
+
+</script>
+<!-- Google tag (gtag.js) -->
+<script nonce="MTc1MTc5NTE1OTExMw==" async src="https://www.googletagmanager.com/gtag/js?id=G-ZNCZPJLX61"></script>
+<script nonce="MTc1MTc5NTE1OTExMw==">
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-ZNCZPJLX61');
+</script>
+  
+</body>
+
+</html>
+
+

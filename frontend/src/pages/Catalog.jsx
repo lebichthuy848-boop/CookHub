@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Link, useSearchParams } from 'react-router-dom';
 
@@ -38,7 +38,10 @@ function FavoriteManagerPopover({ dishId, onClose }) {
   </div>;
 }
 
-import { OnboardingSurvey } from '../components/Personalization';
+const OnboardingSurveyContent = lazy(() => import('../components/Personalization').then(module => ({default: module.OnboardingSurvey})));
+function OnboardingSurvey(props) {
+  return <Suspense fallback={null}><OnboardingSurveyContent {...props}/></Suspense>;
+}
 
 
 

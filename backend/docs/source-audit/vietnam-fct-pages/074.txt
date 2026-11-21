@@ -1,0 +1,69 @@
+STT: 57
+M· sè: 3008
+Th¶i bá (%): 2.0
+Thμnh phÇn dinh d−ìng
+(Nutrients)
+ĐV
+(Unit)
+Hμm lượng
+(Value)
+TLTK
+(Source)
+Thμnh phÇn dinh d−ìng
+(Nutrients)
+ĐV
+(Unit)
+Hμm lượng
+(Value)
+TLTK
+(Source)
+Nước (Water ) g 14.0 1 Tổng số isoflavon (Total isoflavone) mg 0.06 3
+Năng lượng (Energy ) KCal 327 Daidzein mg 0.02 3
+KJ 1368 Genistein mg 0.04 3
+Protein g 23.2 1 Glycetin mg -
+Lipid (Fat) g 2.1 1 Tổng số acid béo no g 0.120 3
+Glucid (Carbohydrate) g 53.8 1 (Total saturated fatty acid)
+Celluloza (Fiber) g 3.6 1 Palmitic (C16:0) g 0.110 3
+Tro (Ash) g 3.3 1 Margaric (C17:0) g 0.000 3
+Đường tổng số (Sugar) g - Stearic (C18:0) g 0.010 3
+Galactoza (Galactose) g - Arachidic (C20:0) g 0.000 3
+Maltoza (Maltose) g - Behenic (22:0) g 0.000 3
+Lactoza (Lactose) g - Lignoceric (C24:0) g 0.000 3
+Fructoza (Fructose) g - TS acid béo không no 1 nối đôi g 0.060 3
+Glucoza (Glucose) g - (Total monounsaturated fatty acid)
+Sacaroza (Sucrose) g - Myristoleic (C14:1) g 0.000 3
+Calci (Calcium) mg 160 1 Palmitoleic (C16:1) g 0.000 3
+Sắt (Iron) mg 6.80 1 Oleic (C18:1) g 0.060 3
+Magiê (Magnesium) mg - TS acid béo không no nhiềun ối đôi g 0 460 3
+Tªn thùc phÈm (Vietnamese): §Ëu tr¾ng h¹t (§Ëu T©y)
+Tªn tiÕng Anh (English): Kidney bean whole seeds, dried
+Thμnh phÇn dinh d−ìng trong 100g phÇn ¨n ®−îc (100 grams edible portion)
+Magiê (Magnesium) mg - TS acid béo không no nhiều nối đôi g 0.460 3
+Mangan (Manganese) mg - (Total polyunsaturated fatty acid)
+Phospho (Phosphorous) mg 514 1 Linoleic (C18:2 n6) g 0.180 3
+Kali (Potassium) mg - Linolenic (C18:2 n3) g 0.280 3
+Natri (Sodium) mg - Arachidonic (C20:4) g 0.000 3
+Kẽm  (Zinc) mg - Eicosapentaenoic  (C20:5 n3) g 0.000 3
+Đồng (Copper) μg - Docosahexaenoic (C22:6 n3) g 0.000 3
+Selen (Selenium) μg - TS acid béo trans (Total trans fatty acid) g -
+Vitamin C (Ascorbic acid) mg 31 Cholesterol mg 03
+Vitamin B1 (Thiamine) mg 0.54 1 Phytosterol mg 127
+Vitamin B2 (Riboflavin) mg 0.18 1 Lysin mg 1160 1
+Vitamin PP (Niacin) mg 2.1 1 Methionin mg 300 1
+Vitamin B5 (Pantothenic acid) mg 0.78 3 Tryptophan mg 320 1
+Vitamin B6 (Pyridoxine) mg 0.397 3 Phenylalanin mg 1280 1
+Folat (Folate) μg 394 3 Threonin mg 740 1
+Vitamin B9 (Folic acid) μg 03 Valin mg 930 1
+Vitamin H (Biotin ) μg - Leucin mg 1460 1
+Vitamin B12 (Cyanocobalamine) μg 03 Isoleucin mg 950 1
+Vitamin A (Retinol) μg 01 Arginin mg 1620 1
+Vitamin D (Calciferol ) μg - Histidin mg 600 1
+Vitamin E (Alpha-tocopherol) mg 0.22 3 Cystin mg 133 1
+Vitamin K (Phylloquinone) μg 19 3 Tyrosin mg 631 1
+Beta-caroten μg 10 3 Alanin mg 551 1
+Alpha-caroten μg - Acid aspartic mg 1976 1
+Beta-cryptoxanthin μg - Acid glutamic mg 3564 1
+Lycopen μg - Glycin mg 680 1
+Lutein + Zeaxanthin μg - Prolin mg 778 1
+Purin mg 128 4 Serin mg 1069 1
+57

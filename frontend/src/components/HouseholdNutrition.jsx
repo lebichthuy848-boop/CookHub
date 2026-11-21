@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { exceedsNutritionTarget } from '../nutrition-targets';
 import './household-nutrition.css';
 
 const format = value => Number(value || 0).toLocaleString('vi-VN', { maximumFractionDigits: 1 });
@@ -79,38 +80,77 @@ export function PortionEditor({item,name,model,onSave,onClose}) {
     {error&&<p role="alert" className="error">{error}</p>}<footer><button type="button" disabled={busy} onClick={onClose}>Hủy</button><button className="primary" disabled={busy||!members.length||Math.abs(total-expected)>.001}>{busy?'Đang lưu…':'Lưu khẩu phần'}</button></footer></form></HouseholdDialog>;
 }
 
-export default function HouseholdNutrition({day,nutrition,household,onSave,diners,onDinersChange,busy}) {
-  const [selected,setSelected]=useState('group'),[manage,setManage]=useState(false),[error,setError]=useState('');
+export default function HouseholdNutrition({day,nutrition,household,onSave,diners,onDinersChange,busy,mainMeals=0,selectedView='group',onSelectedViewChange}) {
+  const [selected,setSelected]=useState(selectedView),[manage,setManage]=useState(false),[error,setError]=useState('');
   const model=household.data?.date===day?household.data:null;
   const result=nutrition.data?.date===day?nutrition.data:null;
   const active=model?.members.filter(m=>model.active_ids.includes(m.id))||[];
   const raw=result?.household;
   const ready=raw?.revision===model?.revision;
   const person=active.find(m=>m.id===selected);
+  useEffect(()=>{if(selectedView!==selected)setSelected(selectedView);},[selectedView]);
+  useEffect(()=>{if(selected!=='group'&&!active.some(m=>m.id===selected)){setSelected('group');onSelectedViewChange?.('group');}},[day,model?.revision,active.map(m=>m.id).join('|')]);
   const personNutrition=ready?raw?.members.find(m=>m.id===selected):null;
   const view=person?'person':active.length?'group':'average';
   const totals=view==='person'?personNutrition?.totals:view==='group'?result?.totals:diners&&result?.totals?Object.fromEntries(fields.map(([k])=>[k,result.totals[k]/Number(diners)])):null;
   const goals=view==='person'?person?.goals:view==='group'&&ready?raw?.group_goals:null;
   const energy=totals?.nang_luong,target=goals?.nang_luong;
   const percent=target&&energy!=null?Math.round(energy/target*100):null;
-  useEffect(()=>{if(selected!=='group'&&!active.some(m=>m.id===selected))setSelected('group');},[day,model?.revision]);
+  const complete = view==='person' ? personNutrition?.complete : result?.complete;
+  const processingIssues = (view==='person' ? personNutrition?.processing_issues : result?.processing_issues) || [];
+  const statuses = Object.fromEntries(fields.flatMap(([key,label,unit]) => {
+    const amount = totals?.[key], goal = goals?.[key];
+    if (!Number.isFinite(amount) || !(goal > 0)) return [];
+    const ratio = amount / goal;
+    const high = key !== 'chat_xo' && exceedsNutritionTarget(key, amount, goal);
+    const low = key !== 'natri' && ratio < .95;
+    if (!high && !low) return [];
+    const pending = low && (!complete || mainMeals < 3);
+    const level = pending ? 'pending' : high && ratio >= (key==='natri' ? 1.1 : 1.2) ? 'high'
+      : low && ratio <= .8 ? 'low' : 'mild';
+    return [[key, { label, level, detail: `${high?'Vượt':pending?'Còn khoảng':'Thiếu'} ${format(Math.abs(amount-goal))} ${unit}` }]];
+  }));
+  const alerts = Object.entries(statuses).filter(([,item])=>item.level!=='pending');
+  const hasHigh = alerts.some(([,item])=>item.level==='high');
+  const hasLow = alerts.some(([,item])=>item.level==='low');
+  function selectView(value){setSelected(value);onSelectedViewChange?.(value);}
   async function save(payload){setError('');try{await onSave(payload);}catch(e){setError(e.message);throw e;}}
   async function choose(id){const ids=model.active_ids.includes(id)?model.active_ids.filter(x=>x!==id):[...model.active_ids,id];try{await save(householdPayload(model,{active_ids:ids,portions:{}}));}catch{}}
   return <section className="household-nutrition" id="nutrition-detail" aria-label="Dinh dưỡng theo thành viên">
-    <header className="household-card-heading"><div><small>ĂN CÙNG NHAU · HIỂU RIÊNG MÌNH</small><h3>Dinh dưỡng hôm nay</h3><p>{new Intl.DateTimeFormat('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'}).format(new Date(day+'T12:00:00'))}</p></div><span className="household-header-icon" aria-hidden="true"><svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M16 5.2a3 3 0 0 1 0 5.6M21 20v-2a6 6 0 0 0-4-5.65"/></svg></span></header>
+    <header className="household-card-heading">
+      <h3>Dinh dưỡng hôm nay</h3>
+      <p>{new Intl.DateTimeFormat('vi-VN').format(new Date(day+'T12:00:00'))}</p>
+    </header>
     <div className="household-section"><div className="household-section-title"><h4>Thành viên cùng ăn</h4><button type="button" disabled={!model||busy} onClick={()=>setManage(true)}>Quản lý ↗</button></div>
-      {household.loading&&!model?<p role="status">Đang tải thành viên…</p>:model?.members.length?<div className="household-chips">{model.members.map((m,i)=><label key={m.id} className={model.active_ids.includes(m.id)?'selected':''}><input type="checkbox" checked={model.active_ids.includes(m.id)} disabled={busy} onChange={()=>choose(m.id)}/><span className={'household-avatar tone-'+i%4}>{m.name.slice(0,1).toUpperCase()}</span><span>{m.name}</span></label>)}</div>:<div className="household-empty"><span aria-hidden="true">＋</span><p>Mỗi người một khẩu phần,<br/>cùng nhau ăn đủ chất.</p><button disabled={!model} onClick={()=>setManage(true)}>Thêm thành viên đầu tiên</button></div>}
+      {household.loading&&!model?<p role="status">Đang tải thành viên…</p>:model?.members.length?<details className="household-member-details"><summary>Đã chọn {active.length}/{model.members.length} người</summary><div className="household-chips">{model.members.map((m,i)=><label key={m.id} className={model.active_ids.includes(m.id)?'selected':''}><input type="checkbox" checked={model.active_ids.includes(m.id)} disabled={busy} onChange={()=>choose(m.id)}/><span className={'household-avatar tone-'+i%4}>{m.name.slice(0,1).toUpperCase()}</span><span>{m.name}</span></label>)}</div></details>:<div className="household-empty"><span aria-hidden="true">＋</span><p>Mỗi người một khẩu phần,<br/>cùng nhau ăn đủ chất.</p><button disabled={!model} onClick={()=>setManage(true)}>Thêm thành viên đầu tiên</button></div>}
       {!active.length&&<label className="household-view-label">Chia đều nhanh<select aria-label="Số người cùng ăn" value={diners} onChange={e=>onDinersChange(Number(e.target.value)||'')}><option value="">Chọn số người</option>{Array.from({length:20},(_,i)=>i+1).map(n=><option key={n} value={n}>{n} người</option>)}</select></label>}
-      {active.length>0&&<label className="household-view-label">Xem dinh dưỡng<select value={person?person.id:'group'} onChange={e=>setSelected(e.target.value)}><option value="group">Cả nhóm · {active.length} người</option>{active.map(m=><option key={m.id} value={m.id}>{m.name} · {m.age} tuổi</option>)}</select></label>}
+      {active.length>0&&<label className="household-view-label">Xem dinh dưỡng<select value={person?person.id:'group'} onChange={e=>selectView(e.target.value)}><option value="group">Cả nhóm · {active.length} người</option>{active.map(m=><option key={m.id} value={m.id}>{m.name} · {m.age} tuổi</option>)}</select></label>}
     </div>
     {(error||household.error||nutrition.error)&&<div role="alert" className="household-note warning">{error||household.error||nutrition.error}<button type="button" onClick={()=>{household.reload();nutrition.reload();}}>Thử tải lại</button></div>}
-    {person&&<div className="household-section household-goal"><div className="household-section-title"><h4>Mục tiêu của {person.name}</h4><button onClick={()=>setManage(true)}>Chỉnh hồ sơ</button></div><div className="household-goal-tabs">{Object.entries(goalLabels).map(([key,label])=><button type="button" key={key} className={person.goal===key?'active':''} disabled={busy||person.age<18} onClick={()=>{save(householdPayload(model,{members:model.members.map(m=>memberPayload(m.id===person.id?{...m,goal:key}:m))})).catch(()=>{});}}>{label}</button>)}</div><p className="household-goal-note">{person.goals?<><b>{format(person.goals.nang_luong)} kcal</b> / ngày · Ước tính cá nhân</>:person.goal_note}</p></div>}
-    <div className="household-section household-progress-section"><div className="household-section-title"><h4>{view==='group'?'Tổng dinh dưỡng cả nhóm':view==='person'?'Khẩu phần của '+person.name:'Trung bình mỗi người'}</h4><span className="household-estimate">Ước tính</span></div>
+    {person&&<div className="household-section household-goal"><div className="household-section-title"><h4>Mục tiêu của {person.name}</h4><button onClick={()=>setManage(true)}>Chỉnh hồ sơ</button></div><div className="household-goal-tabs">{Object.entries(goalLabels).map(([key,label])=><button type="button" key={key} className={person.goal===key?'active':''} disabled={busy||person.age<18} onClick={()=>{save(householdPayload(model,{members:model.members.map(m=>memberPayload(m.id===person.id?{...m,goal:key}:m))})).catch(()=>{});}}>{label}</button>)}</div><p className="household-goal-note">{person.goals?<><b>{format(person.goals.nang_luong)} kcal</b> / ngày · Ước tính cá nhân</>:person.goal_note}</p>{person.goal_warnings?.length>0&&<div className="household-goal-warning" role="alert"><strong>⚠ Lưu ý về mục tiêu {goalLabels[person.goal]?.toLocaleLowerCase('vi-VN')}</strong>{person.goal_warnings.map(note=><p key={note}>{note}</p>)}<small>Vẫn đang tính dinh dưỡng theo mục tiêu bạn chọn.</small></div>}</div>}
+    <div className="household-section household-progress-section"><div className="household-section-title"><h4>{view==='group'?'Tổng dinh dưỡng cả nhóm':view==='person'?'Khẩu phần của '+person.name:'Trung bình mỗi người'}</h4><span className="household-estimate" title={processingIssues.map(issue=>`${issue.name}: ${issue.reason}`).join('\n')}>{processingIssues.length?'Đã tính một phần':'Ước tính'}</span></div>
       {(nutrition.loading||active.length>0&&!ready)&&<p role="status">Đang cập nhật dinh dưỡng…</p>}
-      <div className={'household-energy '+(percent>110?'over':'')}><div className="household-ring" style={{'--progress':Math.min(100,percent||0)+'%'}}><b>{percent==null?'—':percent+'%'}</b></div><div><strong>{energy==null?'—':format(energy)} <small>kcal</small></strong><p>{target?'trên '+format(target)+' kcal mục tiêu':view==='average'?'Chia đều, chưa có mục tiêu cá nhân':'Chưa đủ hồ sơ để tính mục tiêu'}</p>{energy!=null&&target&&<span className="household-energy-difference">{energy>target?'Vượt khoảng '+format(energy-target):'Còn khoảng '+format(target-energy)} kcal</span>}</div></div>
-      <div className="household-macro-list">{fields.slice(1,4).map(([key,label,unit])=><div className={'household-macro '+key} key={key}><div><span>{label}</span><b>{totals?format(totals[key]):'—'} <small>{unit}{goals?' / '+format(goals[key])+' '+unit:''}</small></b></div><div className="household-track"><i style={{width:goals&&totals?Math.min(100,totals[key]/goals[key]*100)+'%':'0%'}}/></div></div>)}</div>
-      {view==='group'&&active.some(m=>!m.goals)&&<p className="household-note">Chưa so sánh mục tiêu cả nhóm vì có thành viên chưa đủ hồ sơ hoặc cần mục tiêu riêng theo độ tuổi.</p>}
-      <div className="household-macro-list household-extra-macros">{fields.slice(4).map(([key,label,unit])=><div className={'household-macro '+key} key={key}><div><span>{label}</span><b>{totals?format(totals[key]):'—'} <small>{unit}{goals?' / '+format(goals[key])+' '+unit:''}</small></b></div><div className="household-track"><i style={{width:goals&&totals?Math.min(100,totals[key]/goals[key]*100)+'%':'0%'}}/></div></div>)}</div>
+      <div className={'household-energy '+(percent>110?'over':'')}><div className="household-ring" style={{'--progress':Math.min(100,percent||0)+'%'}}><b>{percent==null?'—':percent+'%'}</b></div><div><strong>{energy==null?'—':format(energy)} <small>kcal</small></strong><p>{target?'trên '+format(target)+' kcal mục tiêu':view==='average'?'Chia đều, chưa có mục tiêu cá nhân':!ready?'Đang cập nhật mục tiêu…':'Chưa đủ hồ sơ để tính mục tiêu'}</p>{energy!=null&&target&&<span className="household-energy-difference">{energy>target?'Vượt khoảng '+format(energy-target):'Còn khoảng '+format(target-energy)} kcal</span>}</div></div>
+      <div role="status" aria-atomic="true">
+        {alerts.length>0&&<div className={'household-alert-box '+(hasHigh?'high':hasLow?'low':'mild')}>
+          <span aria-hidden="true">{hasHigh?'⚠':'ⓘ'}</span>
+          <strong>{hasHigh?'Vượt mục tiêu':hasLow?'Thiếu dinh dưỡng':'Lưu ý cân bằng'}</strong>
+          <span className="household-alert-count">{alerts.length} chỉ số cần lưu ý</span>
+        </div>}
+      </div>
+      <div className="household-macro-list">{fields.slice(1).map(([key,label,unit])=>{
+        const status=statuses[key];
+        const amount=totals?.[key], goal=goals?.[key];
+        const sodiumRoom=key==='natri'&&Number.isFinite(amount)&&goal>0&&amount<=goal?goal-amount:null;
+        return <div className={'household-macro '+key} data-nutrition-status={status?.level} key={key}>
+          <div><span>{key==='natri'?'Natri · không nên vượt':label}</span><b>{amount==null?'—':format(amount)} <small>{unit}{goal>0?(key==='natri'?' / giới hạn ':' / ')+format(goal)+' '+unit:''}</small></b></div>
+          <div className="household-track"><i style={{width:goal>0&&amount!=null?Math.min(100,amount/goal*100)+'%':'0%'}}/></div>
+          {sodiumRoom!=null&&<small className="household-sodium-room">Còn cách giới hạn tối đa {format(sodiumRoom)} mg · không cần ăn đủ</small>}
+          {status&&<small className="household-nutrient-status">{status.level==='mild'?'Lưu ý cân bằng · ':''}{status.detail}{status.level==='pending'?' để đạt mục tiêu ngày':''}</small>}
+        </div>;
+      })}</div>
+      {view==='group'&&ready&&active.some(m=>m.goal_warnings?.length>0)&&<div className="household-goal-warning" role="alert"><strong>⚠ Mục tiêu cần lưu ý</strong>{active.filter(m=>m.goal_warnings?.length>0).map(m=><p key={m.id}><b>{m.name} · {goalLabels[m.goal]}:</b> {m.goal_warnings.join(' ')}</p>)}<small>Tổng mục tiêu nhóm vẫn tính theo lựa chọn của từng người.</small></div>}
+      {view==='group'&&ready&&active.some(m=>!m.goals)&&<p className="household-note">Chưa so sánh mục tiêu cả nhóm vì có thành viên chưa đủ hồ sơ hoặc cần mục tiêu riêng theo độ tuổi.</p>}
     </div>
     {manage&&model&&<MembersEditor model={model} onSave={save} onClose={()=>setManage(false)}/>}
   </section>;

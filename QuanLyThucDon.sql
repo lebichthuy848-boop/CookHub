@@ -639,7 +639,7 @@ SELECT @Dich=COALESCE(q.KhoiLuongQuyDoiGram,d.HeSoGramChuan)
 	  raw.natri,
 	  CASE WHEN raw.ChiPhi>0 OR @SoLuong=0 OR gia.GiaThamKhao=0 THEN raw.ChiPhi END ChiPhi,
 	  CAST(CASE WHEN dd.MaThongTin IS NULL THEN 1 ELSE 0 END AS BIT) ThieuDinhDuong,
-	  CAST(CASE WHEN dd.MaThongTin IS NOT NULL AND (raw.NangLuong IS NULL OR (@SoLuong>0 AND dd.NangLuong>0 AND raw.NangLuong=0)) THEN 1 ELSE 0 END AS BIT) ThieuQuyDoiDinhDuong,
+	  CAST(CASE WHEN dd.MaThongTin IS NOT NULL AND f.HeSoDinhDuong IS NULL THEN 1 ELSE 0 END AS BIT) ThieuQuyDoiDinhDuong,
 	  CAST(CASE WHEN gia.MaGia IS NULL OR raw.ChiPhi IS NULL OR (@SoLuong>0 AND gia.GiaThamKhao>0 AND raw.ChiPhi=0) THEN 1 ELSE 0 END AS BIT) ThieuGiaKhaDung
 	 FROM (VALUES(1)) anchor(n)
 	 LEFT JOIN dbo.ThongTinDinhDuong dd ON dd.MaNguyenLieu=@MaNguyenLieu
@@ -34478,3 +34478,2087 @@ LEFT JOIN dbo.QuyDoiDonViNguyenLieu AS q
     ON q.MaNguyenLieu = nl.MaNguyenLieu
    AND q.MaDonVi = dv.MaDonVi
 WHERE nl.MaNguyenLieu = @MaNL;
+
+USE QuanLyThucDon;
+GO
+
+SET XACT_ABORT ON;
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DECLARE @Gam NVARCHAR(50);
+    DECLARE @MuongCanh NVARCHAR(50);
+    DECLARE @GioSong NVARCHAR(50);
+
+    -- 1. Kiểm tra đơn vị và nguyên liệu
+    IF (
+        SELECT COUNT(*)
+        FROM dbo.DonViTinh
+        WHERE TenDonVi = N'Gam'
+    ) <> 1
+        THROW 50001, N'Không xác định duy nhất đơn vị Gam.', 1;
+
+    IF (
+        SELECT COUNT(*)
+        FROM dbo.DonViTinh
+        WHERE TenDonVi = N'Muỗng canh'
+    ) <> 1
+        THROW 50002, N'Không xác định duy nhất đơn vị Muỗng canh.', 1;
+
+    IF (
+        SELECT COUNT(*)
+        FROM dbo.NguyenLieu
+        WHERE TenNguyenLieu = N'Giò sống'
+    ) <> 1
+        THROW 50003, N'Không xác định duy nhất nguyên liệu Giò sống.', 1;
+
+    SELECT @Gam = MaDonVi
+    FROM dbo.DonViTinh
+    WHERE TenDonVi = N'Gam';
+
+    SELECT @MuongCanh = MaDonVi
+    FROM dbo.DonViTinh
+    WHERE TenDonVi = N'Muỗng canh';
+
+    SELECT @GioSong = MaNguyenLieu
+    FROM dbo.NguyenLieu
+    WHERE TenNguyenLieu = N'Giò sống';
+
+    -- 2. Danh sách các thành phần cần sửa
+    DECLARE @Sua TABLE (
+        MaThanhPhan NVARCHAR(50) PRIMARY KEY,
+        MaCongThuc NVARCHAR(50),
+        MaNguyenLieuCu NVARCHAR(50),
+        MaNguyenLieuMoi NVARCHAR(50),
+        MaDonViMoi NVARCHAR(50),
+        SoLuongMoi DECIMAL(18, 3)
+    );
+
+    INSERT INTO @Sua (
+        MaThanhPhan,
+        MaCongThuc,
+        MaNguyenLieuCu,
+        MaNguyenLieuMoi,
+        MaDonViMoi,
+        SoLuongMoi
+    )
+    VALUES
+        -- MA103: nấm hương/đông cô 5 gam
+        (N'TP10310', N'CT103', N'NL034', N'NL034', @Gam, 5),
+
+        -- MA107: nấm hương/đông cô 30 gam
+        (N'TP10704', N'CT107', N'NL034', N'NL034', @Gam, 30),
+
+        -- MA107: hành tím 50 gam
+        (N'TP10707', N'CT107', N'NL049', N'NL049', @Gam, 50),
+
+        -- MA108: thay thịt heo xay bằng giò sống 200 gam
+        (N'TP10805', N'CT108', N'NL016', @GioSong, @Gam, 200),
+
+        -- MA108: hành tím băm 1 muỗng canh
+        (N'TP10807', N'CT108', N'NL049', N'NL049', @MuongCanh, 1),
+
+        -- MA108: tiêu xay 1/2 muỗng canh
+        (N'TP10808', N'CT108', N'NL075', N'NL075', @MuongCanh, 0.5);
+
+    -- Kiểm tra đúng thành phần trước khi cập nhật.
+    -- Cho phép chạy lại nếu nguyên liệu đã được sửa trước đó.
+    IF EXISTS (
+        SELECT 1
+        FROM @Sua s
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM dbo.ThanhPhanCongThuc tp WITH (UPDLOCK, HOLDLOCK)
+            WHERE tp.MaThanhPhan = s.MaThanhPhan
+              AND tp.MaCongThuc = s.MaCongThuc
+              AND tp.MaNguyenLieu IN (
+                  s.MaNguyenLieuCu,
+                  s.MaNguyenLieuMoi
+              )
+        )
+    )
+        THROW 50004,
+            N'Thành phần thực tế không khớp dữ liệu đã đối chiếu.',
+            1;
+
+    UPDATE tp
+    SET
+        tp.MaNguyenLieu = s.MaNguyenLieuMoi,
+        tp.MaDonVi = s.MaDonViMoi,
+        tp.SoLuong = s.SoLuongMoi
+    FROM dbo.ThanhPhanCongThuc tp
+    JOIN @Sua s
+        ON s.MaThanhPhan = tp.MaThanhPhan
+       AND s.MaCongThuc = tp.MaCongThuc;
+
+    -- 3. MA107: bổ sung dầu ăn 2 muỗng canh
+    IF NOT EXISTS (
+        SELECT 1
+        FROM dbo.NguyenLieu
+        WHERE MaNguyenLieu = N'NL072'
+          AND TenNguyenLieu = N'Dầu ăn'
+    )
+        THROW 50005, N'Mã NL072 không khớp nguyên liệu Dầu ăn.', 1;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM dbo.CongThuc
+        WHERE MaCongThuc = N'CT107'
+          AND MaMonAn = N'MA107'
+    )
+        THROW 50006, N'Không tìm thấy đúng công thức CT107 của MA107.', 1;
+
+    DECLARE @SoDongDau INT;
+
+    SELECT @SoDongDau = COUNT(*)
+    FROM dbo.ThanhPhanCongThuc WITH (UPDLOCK, HOLDLOCK)
+    WHERE MaCongThuc = N'CT107'
+      AND MaNguyenLieu = N'NL072';
+
+    IF @SoDongDau > 1
+        THROW 50007,
+            N'CT107 có nhiều dòng dầu ăn. Cần kiểm tra trùng.',
+            1;
+
+    IF @SoDongDau = 1
+    BEGIN
+        UPDATE dbo.ThanhPhanCongThuc
+        SET SoLuong = 2,
+            MaDonVi = @MuongCanh
+        WHERE MaCongThuc = N'CT107'
+          AND MaNguyenLieu = N'NL072';
+    END
+    ELSE
+    BEGIN
+        -- Mã hợp lệ: TP nối với số, không có dấu gạch dưới.
+        IF EXISTS (
+            SELECT 1
+            FROM dbo.ThanhPhanCongThuc WITH (UPDLOCK, HOLDLOCK)
+            WHERE MaThanhPhan = N'TP10712'
+        )
+            THROW 50008,
+                N'Mã TP10712 đã được sử dụng. Chưa thêm dầu ăn.',
+                1;
+
+        INSERT INTO dbo.ThanhPhanCongThuc (
+            MaThanhPhan,
+            MaCongThuc,
+            MaNguyenLieu,
+            MaDonVi,
+            SoLuong
+        )
+        VALUES (
+            N'TP10712',
+            N'CT107',
+            N'NL072',
+            @MuongCanh,
+            2
+        );
+    END;
+
+    COMMIT TRANSACTION;
+
+    -- 4. Hiển thị kết quả sau cập nhật
+    SELECT
+        ct.MaMonAn,
+        m.TenMonAn,
+        tp.MaCongThuc,
+        tp.MaThanhPhan,
+        nl.TenNguyenLieu,
+        tp.SoLuong,
+        dv.TenDonVi
+    FROM dbo.ThanhPhanCongThuc tp
+    JOIN dbo.CongThuc ct
+        ON ct.MaCongThuc = tp.MaCongThuc
+    JOIN dbo.MonAn m
+        ON m.MaMonAn = ct.MaMonAn
+    JOIN dbo.NguyenLieu nl
+        ON nl.MaNguyenLieu = tp.MaNguyenLieu
+    JOIN dbo.DonViTinh dv
+        ON dv.MaDonVi = tp.MaDonVi
+    WHERE tp.MaThanhPhan IN (
+        SELECT MaThanhPhan FROM @Sua
+    )
+    OR (
+        tp.MaCongThuc = N'CT107'
+        AND tp.MaNguyenLieu = N'NL072'
+    )
+    ORDER BY ct.MaMonAn, tp.MaThanhPhan;
+
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+USE QuanLyThucDon;
+GO
+
+CREATE OR ALTER FUNCTION dbo.FnTinhNguyenLieu
+(
+    @MaNguyenLieu NVARCHAR(20),
+    @SoLuong DECIMAL(24,8),
+    @MaDonVi NVARCHAR(20),
+    @Ngay DATE,
+    @KhuVuc NVARCHAR(150)
+)
+RETURNS TABLE
+AS RETURN
+SELECT
+    dd.MaThongTin,
+    dd.KhoiLuongChuan,
+    dd.MaDonVi AS DonViDinhDuong,
+    gia.MaGia,
+    gia.NgayApDung,
+    gia.MaDonVi AS DonViGia,
+    gia.GiaThamKhao,
+    gia.KhuVuc,
+    f.HeSoDinhDuong,
+    gia.LuongTinhGia,
+    raw.NangLuong,
+    raw.ChatDam,
+    raw.ChatBotDuong,
+    raw.ChatBeo,
+    raw.ChatXo,
+    raw.Natri,
+    CASE
+        WHEN raw.ChiPhi > 0
+          OR @SoLuong = 0
+          OR gia.GiaThamKhao = 0
+        THEN raw.ChiPhi
+    END AS ChiPhi,
+    CAST(
+        CASE WHEN dd.MaThongTin IS NULL THEN 1 ELSE 0 END
+        AS BIT
+    ) AS ThieuDinhDuong,
+
+    -- Thiếu quy đổi dựa vào hệ số, không dựa vào kcal.
+    CAST(
+        CASE
+            WHEN dd.MaThongTin IS NOT NULL
+             AND f.HeSoDinhDuong IS NULL
+            THEN 1 ELSE 0
+        END AS BIT
+    ) AS ThieuQuyDoiDinhDuong,
+
+    CAST(
+        CASE
+            WHEN gia.MaGia IS NULL
+              OR raw.ChiPhi IS NULL
+              OR (
+                  @SoLuong > 0
+                  AND gia.GiaThamKhao > 0
+                  AND raw.ChiPhi = 0
+              )
+            THEN 1 ELSE 0
+        END AS BIT
+    ) AS ThieuGiaKhaDung
+
+FROM (VALUES (1)) anchor(n)
+
+LEFT JOIN dbo.ThongTinDinhDuong dd
+    ON dd.MaNguyenLieu = @MaNguyenLieu
+
+OUTER APPLY (
+    SELECT TRY_CONVERT(
+        DECIMAL(28,12),
+        dbo.FnQuyDoiSoLuong(
+            @MaNguyenLieu,
+            @SoLuong,
+            @MaDonVi,
+            dd.MaDonVi
+        ) / NULLIF(dd.KhoiLuongChuan, 0)
+    ) AS HeSo
+) h
+
+OUTER APPLY (
+    SELECT
+        CASE
+            WHEN h.HeSo > 0 OR @SoLuong = 0
+            THEN h.HeSo
+        END AS HeSoDinhDuong
+) f
+
+OUTER APPLY (
+    SELECT TOP (1)
+        g.MaGia,
+        g.MaDonVi,
+        g.GiaThamKhao,
+        g.NgayApDung,
+        g.KhuVuc,
+        q.LuongTinhGia
+    FROM dbo.GiaNguyenLieu g
+    CROSS APPLY (
+        SELECT dbo.FnQuyDoiSoLuong(
+            @MaNguyenLieu,
+            @SoLuong,
+            @MaDonVi,
+            g.MaDonVi
+        ) AS LuongTinhGia
+    ) q
+    WHERE g.MaNguyenLieu = @MaNguyenLieu
+      AND g.NgayApDung <= @Ngay
+      AND (
+          g.KhuVuc = @KhuVuc
+          OR (g.KhuVuc IS NULL AND @KhuVuc IS NULL)
+      )
+      AND q.LuongTinhGia IS NOT NULL
+    ORDER BY
+        g.NgayApDung DESC,
+        CASE WHEN g.MaDonVi = @MaDonVi THEN 0 ELSE 1 END,
+        g.MaGia
+) gia
+
+CROSS APPLY (
+    SELECT
+        TRY_CONVERT(DECIMAL(28,8),
+            f.HeSoDinhDuong * dd.NangLuong) AS NangLuong,
+        TRY_CONVERT(DECIMAL(28,8),
+            f.HeSoDinhDuong * dd.ChatDam) AS ChatDam,
+        TRY_CONVERT(DECIMAL(28,8),
+            f.HeSoDinhDuong * dd.ChatBotDuong) AS ChatBotDuong,
+        TRY_CONVERT(DECIMAL(28,8),
+            f.HeSoDinhDuong * dd.ChatBeo) AS ChatBeo,
+        TRY_CONVERT(DECIMAL(28,8),
+            f.HeSoDinhDuong * dd.ChatXo) AS ChatXo,
+        TRY_CONVERT(DECIMAL(28,8),
+            f.HeSoDinhDuong * dd.Natri) AS Natri,
+        TRY_CONVERT(DECIMAL(28,8),
+            gia.LuongTinhGia * gia.GiaThamKhao) AS ChiPhi
+) raw;
+GO
+
+-- Kiểm tra kết quả tính cho 1 phần ăn của 10 món đầu.
+SELECT
+    m.MaMonAn,
+    m.TenMonAn,
+    f.MaNguyenLieu,
+    f.MaThanhPhan,
+    f.SoLuongCan,
+    f.HeSoDinhDuong,
+    f.NangLuong,
+    f.ChatDam,
+    f.ChatBotDuong,
+    f.ChatBeo,
+    f.ChatXo,
+    f.Natri,
+    f.ThieuDinhDuong,
+    f.ThieuQuyDoiDinhDuong
+FROM (
+    SELECT TOP (10) MaMonAn, TenMonAn
+    FROM dbo.MonAn
+    ORDER BY MaMonAn
+) m
+CROSS APPLY dbo.FnTinhMonAn(
+    m.MaMonAn, 1, CAST(GETDATE() AS DATE), NULL
+) f
+ORDER BY m.MaMonAn, f.MaThanhPhan;
+GO
+USE QuanLyThucDon;
+GO
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+-- Reviewed against the DB snapshot and the exact source URLs below.
+-- Updates recipe quantities only. Does not fill NULL nutrients, alter conversion
+-- factors, change standard servings, or estimate absorbed frying oil.
+-- Execute this file alone, not the complete QuanLyThucDon.sql seed file.
+DECLARE @P TABLE (
+ MaThanhPhan NVARCHAR(20) PRIMARY KEY, MaCongThuc NVARCHAR(20),
+ NguyenLieuCu NVARCHAR(20), DonViCu NVARCHAR(20), SoLuongCu DECIMAL(12,3),
+ NguyenLieuMoi NVARCHAR(20), DonViMoi NVARCHAR(20), SoLuongMoi DECIMAL(12,3),
+ Nguon NVARCHAR(1000), LyDo NVARCHAR(1000)
+);
+INSERT @P VALUES
+(N'TP10503',N'CT105',N'NL125',N'DVT023',50.000,N'NL125',N'DVT001',50,N'https://www.dienmayxanh.com/vao-bep/cach-lam-kho-qua-nhoi-thit-am-nong-ngay-tet-00537',N'Nấm mèo: nguồn ghi 50 g, DB đang ghi 50 tai.'),
+(N'TP20302',N'CT203',N'NL028',N'DVT005',6.000,N'NL154',N'DVT005',6,N'https://www.dienmayxanh.com/vao-bep/cach-lam-creme-brulee-kem-chay-thom-ngon-chuan-phap-cuc-de-01964',N'Bước đánh trứng chỉ lấy 6 lòng đỏ; không tính cả 6 quả.'),
+(N'TP20608',N'CT206',N'NL067',N'DVT015',2.000,N'NL067',N'DVT003',390,N'https://www.dienmayxanh.com/vao-bep/cach-lam-banh-bao-nhan-thit-mien-thom-ngon-de-lam-05203',N'50 ml kích hoạt men + 340 ml trộn bột = 390 ml; không quy ước gói chung.'),
+(N'TP20605',N'CT206',N'NL097',N'DVT014',1.000,N'NL097',N'DVT006',1.5,N'https://www.dienmayxanh.com/vao-bep/cach-lam-banh-bao-nhan-thit-mien-thom-ngon-de-lam-05203',N'Bước làm nhân: 1,5 muỗng canh hạt nêm.'),
+(N'TP20698',N'CT206',N'NL240',N'DVT014',1.000,N'NL240',N'DVT007',2,N'https://www.dienmayxanh.com/vao-bep/cach-lam-banh-bao-nhan-thit-mien-thom-ngon-de-lam-05203',N'Bước làm nhân: 2 muỗng cà phê tiêu.'),
+(N'TP93307',N'CT933',N'NL1128',N'DVT006',1.000,N'NL1128',N'DVT007',1,N'https://www.dienmayxanh.com/vao-bep/cach-lam-com-than-bo-rong-bien-sot-tuong-don-gian-01392',N'Danh sách nguyên liệu và bước ướp bò ghi 1 muỗng cà phê tiêu.'),
+(N'TP10605',N'CT106',NULL,NULL,NULL,N'NL034',N'DVT001',50,N'https://www.dienmayxanh.com/vao-bep/cach-lam-sup-hai-san-tuyet-yen-bo-duong-don-gian-ngay-tai-nha-16679',N'Danh sách nguồn có 50 g nấm đông cô/nấm hương tươi; DB đang thiếu dòng này.');
+
+DECLARE @Truoc TABLE (
+ MaThanhPhan NVARCHAR(20) PRIMARY KEY,
+ MaNguyenLieu NVARCHAR(20), MaDonVi NVARCHAR(20), SoLuong DECIMAL(12,3)
+);
+
+BEGIN TRY
+ BEGIN TRANSACTION;
+
+ -- Fail if the live row changed since the snapshot, unless already corrected.
+ IF EXISTS (
+  SELECT 1 FROM @P p
+  LEFT JOIN dbo.ThanhPhanCongThuc t WITH(UPDLOCK,HOLDLOCK)
+   ON t.MaThanhPhan=p.MaThanhPhan
+  WHERE p.NguyenLieuCu IS NOT NULL AND (
+   t.MaThanhPhan IS NULL OR t.MaCongThuc<>p.MaCongThuc OR
+   NOT (
+    (t.MaNguyenLieu=p.NguyenLieuCu AND t.MaDonVi=p.DonViCu AND t.SoLuong=p.SoLuongCu)
+    OR
+    (t.MaNguyenLieu=p.NguyenLieuMoi AND t.MaDonVi=p.DonViMoi AND t.SoLuong=p.SoLuongMoi)
+   )
+  )
+ )
+  THROW 51101,N'Dữ liệu đã thay đổi so với bản kiểm tra. Chưa cập nhật.',1;
+
+ IF EXISTS (
+  SELECT 1 FROM @P p
+  LEFT JOIN dbo.CongThuc c ON c.MaCongThuc=p.MaCongThuc
+  LEFT JOIN dbo.NguyenLieu n ON n.MaNguyenLieu=p.NguyenLieuMoi
+  LEFT JOIN dbo.DonViTinh d ON d.MaDonVi=p.DonViMoi
+  WHERE c.MaCongThuc IS NULL OR n.MaNguyenLieu IS NULL OR d.MaDonVi IS NULL
+ )
+  THROW 51102,N'Thiếu công thức, nguyên liệu hoặc đơn vị đích.',1;
+
+ -- Verify the unit codes have the same meaning as in the snapshot.
+ IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT001' AND KyHieu=N'g')
+ OR NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT003' AND KyHieu=N'ml')
+ OR NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT005' AND KyHieu=N'quả')
+ OR NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT006' AND KyHieu=N'muỗng canh')
+ OR NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT007' AND KyHieu=N'muỗng cà phê')
+  THROW 51103,N'Mã đơn vị không đúng ý nghĩa đã kiểm tra.',1;
+
+ IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu
+   WHERE MaNguyenLieu=N'NL154' AND TenNguyenLieu=N'Lòng đỏ trứng gà')
+ OR NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu
+   WHERE MaNguyenLieu=N'NL034' AND TenNguyenLieu=N'Nấm hương')
+  THROW 51104,N'Mã nguyên liệu đích không đúng tên đã kiểm tra.',1;
+
+ -- Prevent the unique recipe/ingredient constraint from being violated.
+ IF EXISTS (
+  SELECT 1 FROM @P p
+  JOIN dbo.ThanhPhanCongThuc t WITH(UPDLOCK,HOLDLOCK)
+   ON t.MaCongThuc=p.MaCongThuc AND t.MaNguyenLieu=p.NguyenLieuMoi
+   AND t.MaThanhPhan<>p.MaThanhPhan
+ )
+  THROW 51105,N'Nguyên liệu đã có ở dòng khác trong công thức. Cần đối chiếu lại.',1;
+
+ -- A reserved insert ID must be unused or already contain the exact correction.
+ IF EXISTS (
+  SELECT 1 FROM @P p
+  JOIN dbo.ThanhPhanCongThuc t WITH(UPDLOCK,HOLDLOCK)
+   ON t.MaThanhPhan=p.MaThanhPhan
+  WHERE p.NguyenLieuCu IS NULL AND (
+   t.MaCongThuc<>p.MaCongThuc OR t.MaNguyenLieu<>p.NguyenLieuMoi
+   OR t.MaDonVi<>p.DonViMoi OR t.SoLuong<>p.SoLuongMoi
+  )
+ )
+  THROW 51106,N'Mã thành phần mới đã được dùng cho dữ liệu khác.',1;
+
+ INSERT @Truoc
+ SELECT t.MaThanhPhan,t.MaNguyenLieu,t.MaDonVi,t.SoLuong
+ FROM dbo.ThanhPhanCongThuc t JOIN @P p ON p.MaThanhPhan=t.MaThanhPhan;
+
+ UPDATE t SET MaNguyenLieu=p.NguyenLieuMoi,MaDonVi=p.DonViMoi,SoLuong=p.SoLuongMoi
+ FROM dbo.ThanhPhanCongThuc t JOIN @P p ON p.MaThanhPhan=t.MaThanhPhan
+ WHERE p.NguyenLieuCu IS NOT NULL
+   AND (t.MaNguyenLieu<>p.NguyenLieuMoi OR t.MaDonVi<>p.DonViMoi OR t.SoLuong<>p.SoLuongMoi);
+
+ INSERT dbo.ThanhPhanCongThuc(MaThanhPhan,MaCongThuc,MaNguyenLieu,MaDonVi,SoLuong)
+ SELECT p.MaThanhPhan,p.MaCongThuc,p.NguyenLieuMoi,p.DonViMoi,p.SoLuongMoi
+ FROM @P p
+ WHERE p.NguyenLieuCu IS NULL
+ AND NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc t WITH(UPDLOCK,HOLDLOCK)
+                WHERE t.MaThanhPhan=p.MaThanhPhan);
+
+ COMMIT TRANSACTION;
+
+ SELECT p.MaCongThuc,p.MaThanhPhan,n.TenNguyenLieu,
+        b.MaNguyenLieu AS NguyenLieuTruoc,b.MaDonVi AS DonViTruoc,b.SoLuong AS SoLuongTruoc,
+        t.MaDonVi AS DonViSau,d.TenDonVi,t.SoLuong AS SoLuongSau,p.LyDo,p.Nguon
+ FROM @P p
+ JOIN dbo.ThanhPhanCongThuc t ON t.MaThanhPhan=p.MaThanhPhan
+ JOIN dbo.NguyenLieu n ON n.MaNguyenLieu=t.MaNguyenLieu
+ JOIN dbo.DonViTinh d ON d.MaDonVi=t.MaDonVi
+ LEFT JOIN @Truoc b ON b.MaThanhPhan=p.MaThanhPhan
+ ORDER BY p.MaCongThuc,p.MaThanhPhan;
+END TRY
+BEGIN CATCH
+ IF @@TRANCOUNT>0 ROLLBACK TRANSACTION;
+ THROW;
+END CATCH;
+GO
+
+USE QuanLyThucDon;
+GO
+SET XACT_ABORT ON;
+SET NOCOUNT ON;
+
+-- USDA SR28, NDB 02047, Salt, table: 0 kcal / 100 g.
+-- https://www.ars.usda.gov/ARSUserFiles/80400525/Data/SR/SR28/reports/sr28fg02.pdf
+-- Only correct energy for plain salt NL073. Preserve sodium and all other fields.
+BEGIN TRY
+ BEGIN TRANSACTION;
+ IF NOT EXISTS (
+  SELECT 1 FROM dbo.ThongTinDinhDuong d WITH(UPDLOCK,HOLDLOCK)
+  JOIN dbo.NguyenLieu n ON n.MaNguyenLieu=d.MaNguyenLieu
+  JOIN dbo.DonViTinh u ON u.MaDonVi=d.MaDonVi
+  WHERE d.MaThongTin=N'DD073' AND d.MaNguyenLieu=N'NL073'
+    AND n.TenNguyenLieu=N'Muối' AND d.KhoiLuongChuan=100 AND u.KyHieu=N'g'
+    AND d.NangLuong IN(0,1)
+    AND d.ChatDam=0 AND d.ChatBotDuong=0 AND d.ChatBeo=0
+ )
+  THROW 51201,N'Dữ liệu muối khác bản đã kiểm tra. Chưa cập nhật.',1;
+
+ UPDATE dbo.ThongTinDinhDuong
+ SET NangLuong=0
+ WHERE MaThongTin=N'DD073' AND MaNguyenLieu=N'NL073' AND NangLuong=1;
+ COMMIT TRANSACTION;
+
+ SELECT d.*,N'USDA SR28, NDB 02047: Salt, table. Chỉ sửa kcal.' AS CanCu
+ FROM dbo.ThongTinDinhDuong d WHERE d.MaThongTin=N'DD073';
+END TRY
+BEGIN CATCH
+ IF @@TRANCOUNT>0 ROLLBACK TRANSACTION;
+ THROW;
+END CATCH;
+GO
+USE QuanLyThucDon;
+GO
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+
+-- USDA SR28: values per 100 g edible portion. Generic reference, not lab analysis.
+-- Source: https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip
+-- Raw plain lemongrass; unsweetened dried jujube / dried longan.
+-- Water: correct kcal only; preserve sodium. Missing USDA fiber stays NULL.
+-- Do not use these profiles for sweetened fruit or lemongrass mixed with oil.
+BEGIN TRY
+ BEGIN TRANSACTION;
+
+ -- NL918 Sả băm / USDA NDB 11972
+ -- Lemon grass (citronella), raw
+ IF (SELECT COUNT(*) FROM dbo.ThongTinDinhDuong WITH(UPDLOCK,HOLDLOCK) WHERE MaNguyenLieu=N'NL918') <> 1
+  THROW 51300,N'Unexpected profile count for NL918; no updates committed.',1;
+ IF NOT EXISTS (
+  SELECT 1 FROM dbo.ThongTinDinhDuong d WITH(UPDLOCK,HOLDLOCK)
+  JOIN dbo.NguyenLieu n ON n.MaNguyenLieu=d.MaNguyenLieu
+  JOIN dbo.DonViTinh u ON u.MaDonVi=d.MaDonVi
+  WHERE d.MaThongTin=N'DD918' AND d.MaNguyenLieu=N'NL918'
+   AND n.TenNguyenLieu=N'Sả băm' AND d.KhoiLuongChuan=100 AND u.KyHieu=N'g'
+   AND (
+    (d.NangLuong=1.00 AND d.ChatDam=0.80 AND d.ChatBotDuong=16.50 AND d.ChatBeo=1.00 AND d.ChatXo=0.00 AND d.natri=7.00)
+    OR (d.NangLuong=99.0 AND d.ChatDam=1.82 AND d.ChatBotDuong=25.31 AND d.ChatBeo=0.49 AND d.ChatXo IS NULL AND d.natri=6.0)
+   )
+ )
+  THROW 51400,N'Profile differs from reviewed data for NL918; no updates committed.',1;
+ UPDATE dbo.ThongTinDinhDuong
+ SET NangLuong=99.0, ChatDam=1.82, ChatBotDuong=25.31, ChatBeo=0.49, ChatXo=NULL, natri=6.0
+ WHERE MaThongTin=N'DD918' AND MaNguyenLieu=N'NL918';
+
+ -- NL1118 Sả xay / USDA NDB 11972
+ -- Lemon grass (citronella), raw
+ IF (SELECT COUNT(*) FROM dbo.ThongTinDinhDuong WITH(UPDLOCK,HOLDLOCK) WHERE MaNguyenLieu=N'NL1118') <> 1
+  THROW 51301,N'Unexpected profile count for NL1118; no updates committed.',1;
+ IF NOT EXISTS (
+  SELECT 1 FROM dbo.ThongTinDinhDuong d WITH(UPDLOCK,HOLDLOCK)
+  JOIN dbo.NguyenLieu n ON n.MaNguyenLieu=d.MaNguyenLieu
+  JOIN dbo.DonViTinh u ON u.MaDonVi=d.MaDonVi
+  WHERE d.MaThongTin=N'DD044' AND d.MaNguyenLieu=N'NL1118'
+   AND n.TenNguyenLieu=N'Sả xay' AND d.KhoiLuongChuan=100 AND u.KyHieu=N'g'
+   AND (
+    (d.NangLuong=1.00 AND d.ChatDam=0.80 AND d.ChatBotDuong=16.50 AND d.ChatBeo=1.00 AND d.ChatXo=0.00 AND d.natri=7.00)
+    OR (d.NangLuong=99.0 AND d.ChatDam=1.82 AND d.ChatBotDuong=25.31 AND d.ChatBeo=0.49 AND d.ChatXo IS NULL AND d.natri=6.0)
+   )
+ )
+  THROW 51401,N'Profile differs from reviewed data for NL1118; no updates committed.',1;
+ UPDATE dbo.ThongTinDinhDuong
+ SET NangLuong=99.0, ChatDam=1.82, ChatBotDuong=25.31, ChatBeo=0.49, ChatXo=NULL, natri=6.0
+ WHERE MaThongTin=N'DD044' AND MaNguyenLieu=N'NL1118';
+
+ -- NL117 Táo tàu / USDA NDB 09147
+ -- Jujube, Chinese, fresh, dried
+ IF (SELECT COUNT(*) FROM dbo.ThongTinDinhDuong WITH(UPDLOCK,HOLDLOCK) WHERE MaNguyenLieu=N'NL117') <> 1
+  THROW 51302,N'Unexpected profile count for NL117; no updates committed.',1;
+ IF NOT EXISTS (
+  SELECT 1 FROM dbo.ThongTinDinhDuong d WITH(UPDLOCK,HOLDLOCK)
+  JOIN dbo.NguyenLieu n ON n.MaNguyenLieu=d.MaNguyenLieu
+  JOIN dbo.DonViTinh u ON u.MaDonVi=d.MaDonVi
+  WHERE d.MaThongTin=N'DD101' AND d.MaNguyenLieu=N'NL117'
+   AND n.TenNguyenLieu=N'Táo tàu' AND d.KhoiLuongChuan=100 AND u.KyHieu=N'g'
+   AND (
+    (d.NangLuong=50.00 AND d.ChatDam=0.50 AND d.ChatBotDuong=11.70 AND d.ChatBeo=0.00 AND d.ChatXo=0.60 AND d.natri=15.20)
+    OR (d.NangLuong=281.0 AND d.ChatDam=4.72 AND d.ChatBotDuong=72.52 AND d.ChatBeo=0.5 AND d.ChatXo=6.0 AND d.natri=5.0)
+   )
+ )
+  THROW 51402,N'Profile differs from reviewed data for NL117; no updates committed.',1;
+ UPDATE dbo.ThongTinDinhDuong
+ SET NangLuong=281.0, ChatDam=4.72, ChatBotDuong=72.52, ChatBeo=0.5, ChatXo=6.0, natri=5.0
+ WHERE MaThongTin=N'DD101' AND MaNguyenLieu=N'NL117';
+
+ -- NL122 Nhãn nhục / USDA NDB 09173
+ -- Longans, dried
+ IF (SELECT COUNT(*) FROM dbo.ThongTinDinhDuong WITH(UPDLOCK,HOLDLOCK) WHERE MaNguyenLieu=N'NL122') <> 1
+  THROW 51303,N'Unexpected profile count for NL122; no updates committed.',1;
+ IF NOT EXISTS (
+  SELECT 1 FROM dbo.ThongTinDinhDuong d WITH(UPDLOCK,HOLDLOCK)
+  JOIN dbo.NguyenLieu n ON n.MaNguyenLieu=d.MaNguyenLieu
+  JOIN dbo.DonViTinh u ON u.MaDonVi=d.MaDonVi
+  WHERE d.MaThongTin=N'DD112' AND d.MaNguyenLieu=N'NL122'
+   AND n.TenNguyenLieu=N'Nhãn nhục' AND d.KhoiLuongChuan=100 AND u.KyHieu=N'g'
+   AND (
+    (d.NangLuong=52.00 AND d.ChatDam=0.90 AND d.ChatBotDuong=12.00 AND d.ChatBeo=0.00 AND d.ChatXo=1.00 AND d.natri=25.50)
+    OR (d.NangLuong=286.0 AND d.ChatDam=4.9 AND d.ChatBotDuong=74.0 AND d.ChatBeo=0.4 AND d.ChatXo IS NULL AND d.natri=48.0)
+   )
+ )
+  THROW 51403,N'Profile differs from reviewed data for NL122; no updates committed.',1;
+ UPDATE dbo.ThongTinDinhDuong
+ SET NangLuong=286.0, ChatDam=4.9, ChatBotDuong=74.0, ChatBeo=0.4, ChatXo=NULL, natri=48.0
+ WHERE MaThongTin=N'DD112' AND MaNguyenLieu=N'NL122';
+
+ -- NL080 Nước lọc / USDA NDB 14555
+ -- Water, bottled, generic
+ IF (SELECT COUNT(*) FROM dbo.ThongTinDinhDuong WITH(UPDLOCK,HOLDLOCK) WHERE MaNguyenLieu=N'NL080') <> 1
+  THROW 51304,N'Unexpected profile count for NL080; no updates committed.',1;
+ IF NOT EXISTS (
+  SELECT 1 FROM dbo.ThongTinDinhDuong d WITH(UPDLOCK,HOLDLOCK)
+  JOIN dbo.NguyenLieu n ON n.MaNguyenLieu=d.MaNguyenLieu
+  JOIN dbo.DonViTinh u ON u.MaDonVi=d.MaDonVi
+  WHERE d.MaThongTin=N'DD080' AND d.MaNguyenLieu=N'NL080'
+   AND n.TenNguyenLieu=N'Nước lọc' AND d.KhoiLuongChuan=100 AND u.KyHieu=N'g'
+   AND (
+    (d.NangLuong=1.00)
+    OR (d.NangLuong=0.0)
+   )
+ )
+  THROW 51404,N'Profile differs from reviewed data for NL080; no updates committed.',1;
+ UPDATE dbo.ThongTinDinhDuong
+ SET NangLuong=0.0
+ WHERE MaThongTin=N'DD080' AND MaNguyenLieu=N'NL080';
+
+ -- NL183 Nước / USDA NDB 14555
+ -- Water, bottled, generic
+ IF (SELECT COUNT(*) FROM dbo.ThongTinDinhDuong WITH(UPDLOCK,HOLDLOCK) WHERE MaNguyenLieu=N'NL183') <> 1
+  THROW 51305,N'Unexpected profile count for NL183; no updates committed.',1;
+ IF NOT EXISTS (
+  SELECT 1 FROM dbo.ThongTinDinhDuong d WITH(UPDLOCK,HOLDLOCK)
+  JOIN dbo.NguyenLieu n ON n.MaNguyenLieu=d.MaNguyenLieu
+  JOIN dbo.DonViTinh u ON u.MaDonVi=d.MaDonVi
+  WHERE d.MaThongTin=N'DD183' AND d.MaNguyenLieu=N'NL183'
+   AND n.TenNguyenLieu=N'Nước' AND d.KhoiLuongChuan=100 AND u.KyHieu=N'g'
+   AND (
+    (d.NangLuong=1.00)
+    OR (d.NangLuong=0.0)
+   )
+ )
+  THROW 51405,N'Profile differs from reviewed data for NL183; no updates committed.',1;
+ UPDATE dbo.ThongTinDinhDuong
+ SET NangLuong=0.0
+ WHERE MaThongTin=N'DD183' AND MaNguyenLieu=N'NL183';
+ COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+ IF @@TRANCOUNT>0 ROLLBACK TRANSACTION;
+ THROW;
+END CATCH;
+
+SELECT n.TenNguyenLieu,d.* FROM dbo.ThongTinDinhDuong d
+JOIN dbo.NguyenLieu n ON n.MaNguyenLieu=d.MaNguyenLieu
+WHERE d.MaNguyenLieu IN(N'NL918',N'NL1118',N'NL117',N'NL122',N'NL080',N'NL183');
+GO
+
+USE QuanLyThucDon;
+GO
+SET XACT_ABORT ON;
+SET NOCOUNT ON;
+-- NO changes to the 80 dishes, recipe quantities, steps or raw ingredient nutrition.
+-- NULL edible weight means UNKNOWN, not zero. This does not finish 20 demo recipes.
+-- Review method source: https://www.fao.org/4/y4705e/y4705e23.htm
+BEGIN TRY
+ BEGIN TRANSACTION;
+ IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT001' AND KyHieu=N'g')
+  THROW 51500,N'DVT001 must be grams.',1;
+ IF REPLACE(REPLACE(UPPER(REPLACE(REPLACE(REPLACE(REPLACE(OBJECT_DEFINITION(OBJECT_ID(N'dbo.FnTinhMonAn')),CHAR(13),N''),CHAR(10),N''),CHAR(9),N''),N' ',N'')),N'CREATEORALTER',N'CREATE'),N'ALTERFUNCTION',N'CREATEFUNCTION') IS NULL OR REPLACE(REPLACE(UPPER(REPLACE(REPLACE(REPLACE(REPLACE(OBJECT_DEFINITION(OBJECT_ID(N'dbo.FnTinhMonAn')),CHAR(13),N''),CHAR(10),N''),CHAR(9),N''),N' ',N'')),N'CREATEORALTER',N'CREATE'),N'ALTERFUNCTION',N'CREATEFUNCTION') NOT IN (REPLACE(REPLACE(UPPER(REPLACE(REPLACE(REPLACE(REPLACE(N'CREATE   FUNCTION dbo.FnTinhMonAn
+	(@MaMonAn NVARCHAR(20),@SoKhauPhan INT,@Ngay DATE,@KhuVuc NVARCHAR(150))
+	RETURNS TABLE
+	AS RETURN
+	 SELECT n.*,t.* FROM dbo.FnNhuCauNguyenLieuMon(@MaMonAn,@SoKhauPhan) n
+	 CROSS APPLY dbo.FnTinhNguyenLieu(n.MaNguyenLieu,n.SoLuongCan,n.MaDonVi,@Ngay,@KhuVuc) t;',CHAR(13),N''),CHAR(10),N''),CHAR(9),N''),N' ',N'')),N'CREATEORALTER',N'CREATE'),N'ALTERFUNCTION',N'CREATEFUNCTION'),REPLACE(REPLACE(UPPER(REPLACE(REPLACE(REPLACE(REPLACE(N'CREATE OR ALTER FUNCTION dbo.FnTinhMonAn
+	(@MaMonAn NVARCHAR(20),@SoKhauPhan INT,@Ngay DATE,@KhuVuc NVARCHAR(150))
+	RETURNS TABLE
+	AS RETURN
+	 SELECT n.*,t.* FROM dbo.FnNhuCauNguyenLieuMon(@MaMonAn,@SoKhauPhan) n
+	 CROSS APPLY dbo.FnTinhThanhPhanDinhDuong(n.MaThanhPhan,n.MaNguyenLieu,n.SoLuongCan,n.MaDonVi,@Ngay,@KhuVuc,0) t;',CHAR(13),N''),CHAR(10),N''),CHAR(9),N''),N' ',N'')),N'CREATEORALTER',N'CREATE'),N'ALTERFUNCTION',N'CREATEFUNCTION'))
+  THROW 51501,N'FnTinhMonAn changed since review. No updates committed.',1;
+ IF REPLACE(REPLACE(UPPER(REPLACE(REPLACE(REPLACE(REPLACE(OBJECT_DEFINITION(OBJECT_ID(N'dbo.FnTinhChiTietThucDon')),CHAR(13),N''),CHAR(10),N''),CHAR(9),N''),N' ',N'')),N'CREATEORALTER',N'CREATE'),N'ALTERFUNCTION',N'CREATEFUNCTION') IS NULL OR REPLACE(REPLACE(UPPER(REPLACE(REPLACE(REPLACE(REPLACE(OBJECT_DEFINITION(OBJECT_ID(N'dbo.FnTinhChiTietThucDon')),CHAR(13),N''),CHAR(10),N''),CHAR(9),N''),N' ',N'')),N'CREATEORALTER',N'CREATE'),N'ALTERFUNCTION',N'CREATEFUNCTION') NOT IN (REPLACE(REPLACE(UPPER(REPLACE(REPLACE(REPLACE(REPLACE(N'CREATE   FUNCTION dbo.FnTinhChiTietThucDon
+	(@MaThucDon NVARCHAR(20),@KhuVuc NVARCHAR(150))
+	RETURNS TABLE
+	AS RETURN
+	 SELECT ct.MaChiTiet,ct.MaMonAn,ct.NgayDung,ct.BuaAn,ct.SoKhauPhan,
+	  c.MaCongThuc,c.SoKhauPhanChuan,tp.MaThanhPhan,
+	  tp.MaNguyenLieu AS MaNguyenLieuGoc,n.MaNguyenLieu,n.MaDonVi,n.SoLuongCan,
+	  CAST(CASE WHEN tb.MaChiTiet IS NULL THEN 0 ELSE 1 END AS BIT) DaTuyBien,
+	  t.*
+	 FROM dbo.ChiTietThucDon ct
+	 LEFT JOIN dbo.CongThuc c ON c.MaMonAn=ct.MaMonAn
+	 LEFT JOIN dbo.ThanhPhanCongThuc tp ON tp.MaCongThuc=c.MaCongThuc
+	 LEFT JOIN dbo.TuyBienNguyenLieuThucDon tb ON tb.MaChiTiet=ct.MaChiTiet AND tb.MaThanhPhan=tp.MaThanhPhan
+	 CROSS APPLY(SELECT COALESCE(tb.MaNguyenLieu,tp.MaNguyenLieu) MaNguyenLieu,
+	   COALESCE(tb.MaDonVi,tp.MaDonVi) MaDonVi,
+	   NULLIF(TRY_CONVERT(DECIMAL(24,8),CAST(COALESCE(tb.SoLuong,tp.SoLuong) AS DECIMAL(19,6))*ct.SoKhauPhan/NULLIF(c.SoKhauPhanChuan,0)),0) SoLuongCan) n
+	 CROSS APPLY dbo.FnTinhNguyenLieu(n.MaNguyenLieu,n.SoLuongCan,n.MaDonVi,ct.NgayDung,@KhuVuc) t
+	 WHERE ct.MaThucDon=@MaThucDon;',CHAR(13),N''),CHAR(10),N''),CHAR(9),N''),N' ',N'')),N'CREATEORALTER',N'CREATE'),N'ALTERFUNCTION',N'CREATEFUNCTION'),REPLACE(REPLACE(UPPER(REPLACE(REPLACE(REPLACE(REPLACE(N'CREATE OR ALTER FUNCTION dbo.FnTinhChiTietThucDon
+	(@MaThucDon NVARCHAR(20),@KhuVuc NVARCHAR(150))
+	RETURNS TABLE
+	AS RETURN
+	 SELECT ct.MaChiTiet,ct.MaMonAn,ct.NgayDung,ct.BuaAn,ct.SoKhauPhan,
+	  c.MaCongThuc,c.SoKhauPhanChuan,tp.MaThanhPhan,
+	  tp.MaNguyenLieu AS MaNguyenLieuGoc,n.MaNguyenLieu,n.MaDonVi,n.SoLuongCan,
+	  CAST(CASE WHEN tb.MaChiTiet IS NULL THEN 0 ELSE 1 END AS BIT) DaTuyBien,
+	  t.*
+	 FROM dbo.ChiTietThucDon ct
+	 LEFT JOIN dbo.CongThuc c ON c.MaMonAn=ct.MaMonAn
+	 LEFT JOIN dbo.ThanhPhanCongThuc tp ON tp.MaCongThuc=c.MaCongThuc
+	 LEFT JOIN dbo.TuyBienNguyenLieuThucDon tb ON tb.MaChiTiet=ct.MaChiTiet AND tb.MaThanhPhan=tp.MaThanhPhan
+	 CROSS APPLY(SELECT COALESCE(tb.MaNguyenLieu,tp.MaNguyenLieu) MaNguyenLieu,
+	   COALESCE(tb.MaDonVi,tp.MaDonVi) MaDonVi,
+	   NULLIF(TRY_CONVERT(DECIMAL(24,8),CAST(COALESCE(tb.SoLuong,tp.SoLuong) AS DECIMAL(19,6))*ct.SoKhauPhan/NULLIF(c.SoKhauPhanChuan,0)),0) SoLuongCan) n
+	 CROSS APPLY dbo.FnTinhThanhPhanDinhDuong(tp.MaThanhPhan,n.MaNguyenLieu,n.SoLuongCan,n.MaDonVi,ct.NgayDung,@KhuVuc,CAST(CASE WHEN tb.MaChiTiet IS NULL THEN 0 ELSE 1 END AS BIT)) t
+	 WHERE ct.MaThucDon=@MaThucDon;',CHAR(13),N''),CHAR(10),N''),CHAR(9),N''),N' ',N'')),N'CREATEORALTER',N'CREATE'),N'ALTERFUNCTION',N'CREATEFUNCTION'))
+  THROW 51502,N'FnTinhChiTietThucDon changed since review. No updates committed.',1;
+ IF OBJECT_ID(N'dbo.DinhDuongThanhPhanCheBien',N'U') IS NULL
+  EXEC(N'CREATE TABLE dbo.DinhDuongThanhPhanCheBien (
+ MaThanhPhan NVARCHAR(20) NOT NULL PRIMARY KEY,
+ MaNguyenLieuDoiChieu NVARCHAR(20) NOT NULL,
+ MaDonViDoiChieu NVARCHAR(20) NOT NULL,
+ SoLuongDoiChieu DECIMAL(24,8) NOT NULL CHECK(SoLuongDoiChieu>0),
+ MaNguyenLieuAnDuoc NVARCHAR(20) NULL REFERENCES dbo.NguyenLieu(MaNguyenLieu),
+ GramAnDuocMoiMe DECIMAL(24,8) NULL CHECK(GramAnDuocMoiMe>=0),
+ NguonKhoiLuong NVARCHAR(2000) NULL,
+ LyDo NVARCHAR(1000) NOT NULL,
+ NguonPhuongPhap NVARCHAR(2000) NOT NULL,
+ CONSTRAINT FK_DDThanhPhanCheBien FOREIGN KEY(MaThanhPhan)
+  REFERENCES dbo.ThanhPhanCongThuc(MaThanhPhan),
+ CONSTRAINT CK_DDThanhPhanCheBien_Nguon CHECK(
+  GramAnDuocMoiMe IS NULL OR (MaNguyenLieuAnDuoc IS NOT NULL AND NguonKhoiLuong IS NOT NULL AND
+    (NguonKhoiLuong LIKE N''https://%'' OR NguonKhoiLuong LIKE N''http://%'')))
+);');
+ IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP21618' AND MaCongThuc=N'CT216' AND MaNguyenLieu=N'NL072' AND MaDonVi=N'DVT003' AND SoLuong=250.000)
+  THROW 51600,N'TP21618 differs from reviewed recipe. No updates committed.',1;
+ IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP908' AND MaCongThuc=N'CT901' AND MaNguyenLieu=N'NL072' AND MaDonVi=N'DVT003' AND SoLuong=210.000)
+  THROW 51601,N'TP908 differs from reviewed recipe. No updates committed.',1;
+ IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP981' AND MaCongThuc=N'CT907' AND MaNguyenLieu=N'NL072' AND MaDonVi=N'DVT003' AND SoLuong=100.000)
+  THROW 51602,N'TP981 differs from reviewed recipe. No updates committed.',1;
+ IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP1053' AND MaCongThuc=N'CT916' AND MaNguyenLieu=N'NL072' AND MaDonVi=N'DVT003' AND SoLuong=400.000)
+  THROW 51603,N'TP1053 differs from reviewed recipe. No updates committed.',1;
+ IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP1049' AND MaCongThuc=N'CT916' AND MaNguyenLieu=N'NL028' AND MaDonVi=N'DVT005' AND SoLuong=3.000)
+  THROW 51604,N'TP1049 differs from reviewed recipe. No updates committed.',1;
+ IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP1051' AND MaCongThuc=N'CT916' AND MaNguyenLieu=N'NL1051' AND MaDonVi=N'DVT001' AND SoLuong=500.000)
+  THROW 51605,N'TP1051 differs from reviewed recipe. No updates committed.',1;
+ IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP1052' AND MaCongThuc=N'CT916' AND MaNguyenLieu=N'NL301' AND MaDonVi=N'DVT001' AND SoLuong=100.000)
+  THROW 51606,N'TP1052 differs from reviewed recipe. No updates committed.',1;
+ IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP972' AND MaCongThuc=N'CT907' AND MaNguyenLieu=N'NL972' AND MaDonVi=N'DVT001' AND SoLuong=600.000)
+  THROW 51607,N'TP972 differs from reviewed recipe. No updates committed.',1;
+ IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP973' AND MaCongThuc=N'CT907' AND MaNguyenLieu=N'NL028' AND MaDonVi=N'DVT005' AND SoLuong=3.000)
+  THROW 51608,N'TP973 differs from reviewed recipe. No updates committed.',1;
+ IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP979' AND MaCongThuc=N'CT907' AND MaNguyenLieu=N'NL146' AND MaDonVi=N'DVT006' AND SoLuong=6.000)
+  THROW 51609,N'TP979 differs from reviewed recipe. No updates committed.',1;
+ IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP1170' AND MaCongThuc=N'CT926' AND MaNguyenLieu=N'NL1156' AND MaDonVi=N'DVT001' AND SoLuong=500.000)
+  THROW 51610,N'TP1170 differs from reviewed recipe. No updates committed.',1;
+ IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP1211' AND MaCongThuc=N'CT929' AND MaNguyenLieu=N'NL232' AND MaDonVi=N'DVT001' AND SoLuong=500.000)
+  THROW 51611,N'TP1211 differs from reviewed recipe. No updates committed.',1;
+ IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP23003' AND MaCongThuc=N'CT230' AND MaNguyenLieu=N'NL232' AND MaDonVi=N'DVT001' AND SoLuong=100.000)
+  THROW 51612,N'TP23003 differs from reviewed recipe. No updates committed.',1;
+ IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP1169' AND MaCongThuc=N'CT926' AND MaNguyenLieu=N'NL027' AND MaDonVi=N'DVT002' AND SoLuong=1.000)
+  THROW 51613,N'TP1169 differs from reviewed recipe. No updates committed.',1;
+ EXEC(N'IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N''TP21618'')
+ INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N''TP21618'',N''NL072'',N''DVT003'',250.000,NULL,NULL,N''Dầu chuẩn bị chiên hoành thánh, chưa có lượng dầu ăn vào.'',N''https://www.fao.org/4/y4705e/y4705e23.htm'');
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N''TP908'')
+ INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N''TP908'',N''NL072'',N''DVT003'',210.000,NULL,NULL,N''Dầu dùng nhiều công đoạn của nem nướng, chưa tách dầu chiên dư.'',N''https://www.fao.org/4/y4705e/y4705e23.htm'');
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N''TP981'')
+ INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N''TP981'',N''NL072'',N''DVT003'',100.000,NULL,NULL,N''Dầu chiên gà, chưa có lượng dầu hấp thụ.'',N''https://www.fao.org/4/y4705e/y4705e23.htm'');
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N''TP1053'')
+ INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N''TP1053'',N''NL072'',N''DVT003'',400.000,NULL,NULL,N''Dầu chiên đậu hũ, chưa có lượng dầu hấp thụ.'',N''https://www.fao.org/4/y4705e/y4705e23.htm'');
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N''TP1049'')
+ INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N''TP1049'',N''NL028'',N''DVT005'',3.000,NULL,NULL,N''Trứng dùng áo đậu hũ, chưa xác định phần còn dư.'',N''https://www.fao.org/4/y4705e/y4705e23.htm'');
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N''TP1051'')
+ INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N''TP1051'',N''NL1051'',N''DVT001'',500.000,NULL,NULL,N''Bột chiên xù dùng áo, chưa xác định phần bám và phần dư.'',N''https://www.fao.org/4/y4705e/y4705e23.htm'');
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N''TP1052'')
+ INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N''TP1052'',N''NL301'',N''DVT001'',100.000,NULL,NULL,N''Bột mì dùng áo đậu hũ, chưa xác định phần bám và phần dư.'',N''https://www.fao.org/4/y4705e/y4705e23.htm'');
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N''TP972'')
+ INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N''TP972'',N''NL972'',N''DVT001'',600.000,NULL,NULL,N''Bột mì gồm phần làm mì và phần áo gà, chưa xác định tổng lượng ăn vào.'',N''https://www.fao.org/4/y4705e/y4705e23.htm'');
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N''TP973'')
+ INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N''TP973'',N''NL028'',N''DVT005'',3.000,NULL,NULL,N''Trứng dùng làm mì và áo gà, chưa tách phần dư.'',N''https://www.fao.org/4/y4705e/y4705e23.htm'');
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N''TP979'')
+ INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N''TP979'',N''NL146'',N''DVT006'',6.000,NULL,NULL,N''Bột dùng áo gà, chưa xác định phần bám và phần dư.'',N''https://www.fao.org/4/y4705e/y4705e23.htm'');
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N''TP1170'')
+ INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N''TP1170'',N''NL1156'',N''DVT001'',500.000,NULL,NULL,N''Xương nấu nước dùng, không áp hồ sơ chất béo cho toàn bộ xương.'',N''https://www.fao.org/4/y4705e/y4705e23.htm'');
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N''TP1211'')
+ INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N''TP1211'',N''NL232'',N''DVT001'',500.000,NULL,NULL,N''Xương nấu nước dùng, chưa có hồ sơ nước dùng tương ứng.'',N''https://www.fao.org/4/y4705e/y4705e23.htm'');
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N''TP23003'')
+ INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N''TP23003'',N''NL232'',N''DVT001'',100.000,NULL,NULL,N''Xương nấu phở, chưa có hồ sơ nước dùng tương ứng.'',N''https://www.fao.org/4/y4705e/y4705e23.htm'');
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N''TP1169'')
+ INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N''TP1169'',N''NL027'',N''DVT002'',1.000,NULL,NULL,N''Cua đồng xay lọc bã, chưa có lượng thịt/gạch hòa vào nước dùng.'',N''https://www.fao.org/4/y4705e/y4705e23.htm'');');
+ EXEC(N'CREATE OR ALTER FUNCTION dbo.FnTinhThanhPhanDinhDuong
+(@MaThanhPhan NVARCHAR(20),@MaNguyenLieu NVARCHAR(20),@SoLuong DECIMAL(24,8),
+ @MaDonVi NVARCHAR(20),@Ngay DATE,@KhuVuc NVARCHAR(150),@DaTuyBien BIT)
+RETURNS TABLE AS RETURN
+SELECT
+ CASE WHEN r.MaThanhPhan IS NOT NULL AND v.HopLe=1 AND r.GramAnDuocMoiMe IS NOT NULL THEN a.MaThongTin ELSE b.MaThongTin END AS MaThongTin,
+ CASE WHEN r.MaThanhPhan IS NOT NULL AND v.HopLe=1 AND r.GramAnDuocMoiMe IS NOT NULL THEN a.KhoiLuongChuan ELSE b.KhoiLuongChuan END AS KhoiLuongChuan,
+ CASE WHEN r.MaThanhPhan IS NOT NULL AND v.HopLe=1 AND r.GramAnDuocMoiMe IS NOT NULL THEN a.DonViDinhDuong ELSE b.DonViDinhDuong END AS DonViDinhDuong,
+ b.MaGia,
+ b.NgayApDung,
+ b.DonViGia,
+ b.GiaThamKhao,
+ b.KhuVuc,
+ CASE WHEN r.MaThanhPhan IS NULL THEN b.HeSoDinhDuong WHEN v.HopLe=1 AND r.GramAnDuocMoiMe IS NOT NULL THEN a.HeSoDinhDuong END AS HeSoDinhDuong,
+ b.LuongTinhGia,
+ CASE WHEN r.MaThanhPhan IS NULL THEN b.NangLuong WHEN v.HopLe=1 AND r.GramAnDuocMoiMe IS NOT NULL THEN a.NangLuong END AS NangLuong,
+ CASE WHEN r.MaThanhPhan IS NULL THEN b.ChatDam WHEN v.HopLe=1 AND r.GramAnDuocMoiMe IS NOT NULL THEN a.ChatDam END AS ChatDam,
+ CASE WHEN r.MaThanhPhan IS NULL THEN b.ChatBotDuong WHEN v.HopLe=1 AND r.GramAnDuocMoiMe IS NOT NULL THEN a.ChatBotDuong END AS ChatBotDuong,
+ CASE WHEN r.MaThanhPhan IS NULL THEN b.ChatBeo WHEN v.HopLe=1 AND r.GramAnDuocMoiMe IS NOT NULL THEN a.ChatBeo END AS ChatBeo,
+ CASE WHEN r.MaThanhPhan IS NULL THEN b.ChatXo WHEN v.HopLe=1 AND r.GramAnDuocMoiMe IS NOT NULL THEN a.ChatXo END AS ChatXo,
+ CASE WHEN r.MaThanhPhan IS NULL THEN b.Natri WHEN v.HopLe=1 AND r.GramAnDuocMoiMe IS NOT NULL THEN a.Natri END AS Natri,
+ b.ChiPhi,
+ CAST(CASE WHEN r.MaThanhPhan IS NOT NULL AND v.HopLe=1 AND r.GramAnDuocMoiMe IS NOT NULL THEN a.ThieuDinhDuong ELSE b.ThieuDinhDuong END AS BIT) AS ThieuDinhDuong,
+ CAST(CASE WHEN r.MaThanhPhan IS NULL THEN b.ThieuQuyDoiDinhDuong WHEN v.HopLe=1 AND r.GramAnDuocMoiMe IS NOT NULL THEN a.ThieuQuyDoiDinhDuong ELSE 0 END AS BIT) AS ThieuQuyDoiDinhDuong,
+ b.ThieuGiaKhaDung,
+ CAST(CASE WHEN r.MaThanhPhan IS NOT NULL AND (v.HopLe=0 OR r.GramAnDuocMoiMe IS NULL) THEN 1 ELSE 0 END AS BIT) AS ThieuLuongAnDuoc,
+ CASE WHEN r.MaThanhPhan IS NOT NULL AND v.HopLe=0 THEN N''Công thức/đơn vị đã đổi; cần kiểm tra lại lượng ăn được.'' ELSE r.LyDo END AS LyDoLuongAnDuoc,
+ COALESCE(r.NguonKhoiLuong,r.NguonPhuongPhap) AS NguonLuongAnDuoc
+FROM dbo.FnTinhNguyenLieu(@MaNguyenLieu,@SoLuong,@MaDonVi,@Ngay,@KhuVuc) b
+LEFT JOIN dbo.DinhDuongThanhPhanCheBien r ON r.MaThanhPhan=@MaThanhPhan
+LEFT JOIN dbo.ThanhPhanCongThuc tp ON tp.MaThanhPhan=@MaThanhPhan
+OUTER APPLY(SELECT CASE WHEN @DaTuyBien=0
+ AND tp.MaNguyenLieu=r.MaNguyenLieuDoiChieu AND @MaNguyenLieu=r.MaNguyenLieuDoiChieu
+ AND tp.MaDonVi=r.MaDonViDoiChieu AND @MaDonVi=r.MaDonViDoiChieu
+ AND tp.SoLuong=r.SoLuongDoiChieu THEN 1 ELSE 0 END AS HopLe) v
+OUTER APPLY(SELECT TRY_CONVERT(DECIMAL(24,8),
+ CASE WHEN v.HopLe=1 AND r.GramAnDuocMoiMe IS NOT NULL
+ THEN r.GramAnDuocMoiMe*@SoLuong/NULLIF(r.SoLuongDoiChieu,0) END) AS SoGram) g
+OUTER APPLY(SELECT a.* FROM dbo.FnTinhNguyenLieu(r.MaNguyenLieuAnDuoc,g.SoGram,N''DVT001'',@Ngay,@KhuVuc) a
+ WHERE g.SoGram IS NOT NULL) a;');
+ EXEC(N'CREATE OR ALTER FUNCTION dbo.FnTinhMonAn
+	(@MaMonAn NVARCHAR(20),@SoKhauPhan INT,@Ngay DATE,@KhuVuc NVARCHAR(150))
+	RETURNS TABLE
+	AS RETURN
+	 SELECT n.*,t.* FROM dbo.FnNhuCauNguyenLieuMon(@MaMonAn,@SoKhauPhan) n
+	 CROSS APPLY dbo.FnTinhThanhPhanDinhDuong(n.MaThanhPhan,n.MaNguyenLieu,n.SoLuongCan,n.MaDonVi,@Ngay,@KhuVuc,0) t;');
+ EXEC(N'CREATE OR ALTER FUNCTION dbo.FnTinhChiTietThucDon
+	(@MaThucDon NVARCHAR(20),@KhuVuc NVARCHAR(150))
+	RETURNS TABLE
+	AS RETURN
+	 SELECT ct.MaChiTiet,ct.MaMonAn,ct.NgayDung,ct.BuaAn,ct.SoKhauPhan,
+	  c.MaCongThuc,c.SoKhauPhanChuan,tp.MaThanhPhan,
+	  tp.MaNguyenLieu AS MaNguyenLieuGoc,n.MaNguyenLieu,n.MaDonVi,n.SoLuongCan,
+	  CAST(CASE WHEN tb.MaChiTiet IS NULL THEN 0 ELSE 1 END AS BIT) DaTuyBien,
+	  t.*
+	 FROM dbo.ChiTietThucDon ct
+	 LEFT JOIN dbo.CongThuc c ON c.MaMonAn=ct.MaMonAn
+	 LEFT JOIN dbo.ThanhPhanCongThuc tp ON tp.MaCongThuc=c.MaCongThuc
+	 LEFT JOIN dbo.TuyBienNguyenLieuThucDon tb ON tb.MaChiTiet=ct.MaChiTiet AND tb.MaThanhPhan=tp.MaThanhPhan
+	 CROSS APPLY(SELECT COALESCE(tb.MaNguyenLieu,tp.MaNguyenLieu) MaNguyenLieu,
+	   COALESCE(tb.MaDonVi,tp.MaDonVi) MaDonVi,
+	   NULLIF(TRY_CONVERT(DECIMAL(24,8),CAST(COALESCE(tb.SoLuong,tp.SoLuong) AS DECIMAL(19,6))*ct.SoKhauPhan/NULLIF(c.SoKhauPhanChuan,0)),0) SoLuongCan) n
+	 CROSS APPLY dbo.FnTinhThanhPhanDinhDuong(tp.MaThanhPhan,n.MaNguyenLieu,n.SoLuongCan,n.MaDonVi,ct.NgayDung,@KhuVuc,CAST(CASE WHEN tb.MaChiTiet IS NULL THEN 0 ELSE 1 END AS BIT)) t
+	 WHERE ct.MaThucDon=@MaThucDon;');
+ COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+ IF @@TRANCOUNT>0 ROLLBACK TRANSACTION;
+ THROW;
+END CATCH;
+GO
+SELECT m.MaMonAn,m.TenMonAn,f.MaThanhPhan,f.NangLuong,f.ChiPhi,f.ThieuLuongAnDuoc,f.LyDoLuongAnDuoc
+FROM dbo.MonAn m CROSS APPLY dbo.FnTinhMonAn(m.MaMonAn,1,CAST(GETDATE() AS DATE),NULL) f
+WHERE f.ThieuLuongAnDuoc=1;
+GO
+USE QuanLyThucDon;
+GO
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+-- CHỈ cập nhật hồ sơ đã có đối chiếu chính thức; không sửa công thức, số lượng hoặc quy đổi.
+-- Tất cả số: 100 g PHẦN ĂN ĐƯỢC; kcal, g protein/carbs/béo/xơ, mg NATRI (không phải muối).
+-- Chưa công bố tổng chất xơ -> NULL, tuyệt đối không điền 0 thay thế.
+-- Mặc định chạy thật trong giao dịch. Có kiểm tra snapshot cũ, chạy lại an toàn nếu dữ liệu đã đúng đích.
+BEGIN TRY
+ BEGIN TRANSACTION;
+ DECLARE @LockResult int;
+ EXEC @LockResult = sys.sp_getapplock @Resource=N'CookHub_VerifiedNutrientSources_v1', @LockMode=N'Exclusive', @LockOwner=N'Transaction', @LockTimeout=10000;
+ IF @LockResult < 0 THROW 51000,N'Không lấy được khóa cập nhật. Hãy chạy lại sau.',1;
+ CREATE TABLE #Nguon (
+  MaNguyenLieu nvarchar(20) PRIMARY KEY, TenNguyenLieu nvarchar(200),
+  NangLuong decimal(10,2), ChatDam decimal(10,2), ChatBotDuong decimal(10,2),
+  ChatBeo decimal(10,2), ChatXo decimal(10,2), natri decimal(10,2),
+  URL nvarchar(2048), MaThucPhamNguon nvarchar(100), TenTrongNguon nvarchar(1000),
+  DieuKien nvarchar(2000), SnapshotCu nvarchar(max));
+ INSERT INTO #Nguon VALUES
+(N'NL003',N'Bún tươi',110.00,1.70,25.70,NULL,NULL,NULL,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=33',N'VN2007 1020',N'Bún tươi / Rice vermicelli',N'Viện Dinh dưỡng 2007; trang PDF 33, trang in 20; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD003","MaNguyenLieu":"NL003","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"109.00","ChatDam":"1.80","ChatBotDuong":"25.00","ChatBeo":"0.20","ChatXo":"1.00","natri":"15.00"}'),
+(N'NL007',N'Bột gạo',366.00,5.95,80.13,1.42,2.40,0.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 20061',N'Rice flour, white, unenriched',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Bột gạo trắng khô, không phải bột gạo lứt.',N'{"MaThongTin":"DD007","MaNguyenLieu":"NL007","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"366.00","ChatDam":"5.90","ChatBotDuong":"80.10","ChatBeo":"1.40","ChatXo":"2.40","natri":"0.00"}'),
+(N'NL008',N'Bánh tráng',333.00,4.00,78.90,0.20,NULL,NULL,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=23',N'VN2007 1010',N'Bánh đa nem / Rice paper for rollers',N'Viện Dinh dưỡng 2007; trang PDF 23, trang in 10; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD008","MaNguyenLieu":"NL008","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"333.00","ChatDam":"4.00","ChatBotDuong":"80.00","ChatBeo":"0.50","ChatXo":"1.00","natri":"300.00"}'),
+(N'NL009',N'Khoai lang',86.00,1.57,20.12,0.05,3.00,55.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11507',N'Sweet potato, raw, unprepared',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Khoai lang sống, phần ăn được.',N'{"MaThongTin":"DD009","MaNguyenLieu":"NL009","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"86.00","ChatDam":"1.60","ChatBotDuong":"20.10","ChatBeo":"0.10","ChatXo":"3.00","natri":"55.00"}'),
+(N'NL010',N'Bắp ngọt',86.00,3.27,18.70,1.35,2.00,15.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11167',N'Corn, sweet, yellow, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Hạt bắp ngọt vàng sống; không áp cho bắp non.',N'{"MaThongTin":"DD010","MaNguyenLieu":"NL010","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"86.00","ChatDam":"3.20","ChatBotDuong":"19.00","ChatBeo":"1.20","ChatXo":"2.70","natri":"15.00"}'),
+(N'NL013',N'Ức gà',120.00,22.50,0.00,2.62,0.00,45.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 05062',N'Chicken, broiler or fryers, breast, skinless, boneless, meat only, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Ức gà SỐNG bỏ da/xương, không bơm dung dịch; thay bảng ức gà đã nấu khi cân nguyên liệu sống.',N'{"MaThongTin":"DD013","MaNguyenLieu":"NL013","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"165.00","ChatDam":"31.00","ChatBotDuong":"0.00","ChatBeo":"3.60","ChatXo":"0.00","natri":"74.00"}'),
+(N'NL016',N'Thịt heo xay',263.00,16.88,0.00,21.19,0.00,56.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 10219',N'Pork, fresh, ground, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Thịt heo xay sống; mẫu tham khảo chung gồm nạc và mỡ, không phải thịt chín.',N'{"MaThongTin":"DD016","MaNguyenLieu":"NL016","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"263.00","ChatDam":"17.00","ChatBotDuong":"0.00","ChatBeo":"21.00","ChatXo":"0.00","natri":"68.00"}'),
+(N'NL017',N'Sườn heo',187.00,17.90,0.00,12.80,NULL,60.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=357',N'VN2007 7053',N'Sườn lợn / Pork ribs',N'Viện Dinh dưỡng 2007; trang PDF 357, trang in 331; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD017","MaNguyenLieu":"NL017","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"277.00","ChatDam":"20.00","ChatBotDuong":"0.00","ChatBeo":"22.00","ChatXo":"0.00","natri":"62.00"}'),
+(N'NL018',N'Thịt ba chỉ',518.00,9.34,0.00,53.01,0.00,32.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 10005',N'Pork, fresh, belly, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Thịt ba chỉ heo sống, phần ăn được; tỷ lệ mỡ thực tế có thể khác.',N'{"MaThongTin":"DD018","MaNguyenLieu":"NL018","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"518.00","ChatDam":"9.30","ChatBotDuong":"0.00","ChatBeo":"53.00","ChatXo":"0.00","natri":"32.00"}'),
+(N'NL020',N'Cá lóc',97.00,18.20,0.00,2.70,NULL,NULL,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=410',N'VN2007 8022',N'Cá quả (cá lóc) / Snake head fish',N'Viện Dinh dưỡng 2007; trang PDF 410, trang in 382; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD020","MaNguyenLieu":"NL020","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"97.00","ChatDam":"18.20","ChatBotDuong":"0.00","ChatBeo":"2.70","ChatXo":"0.00","natri":"50.00"}'),
+(N'NL027',N'Cua đồng',87.00,12.30,2.00,3.30,NULL,453.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=422',N'VN2007 8034',N'Cua đồng / Fresh water crab',N'Viện Dinh dưỡng 2007; trang PDF 422, trang in 394; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD027","MaNguyenLieu":"NL027","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"87.00","ChatDam":"18.00","ChatBotDuong":"0.00","ChatBeo":"1.50","ChatXo":"0.00","natri":"300.00"}'),
+(N'NL028',N'Trứng gà',143.00,12.56,0.72,9.51,0.00,142.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 01123',N'Egg, whole, raw, fresh',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Trứng gà sống bỏ vỏ, nguyên lòng đỏ và lòng trắng.',N'{"MaThongTin":"DD028","MaNguyenLieu":"NL028","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"143.00","ChatDam":"12.60","ChatBotDuong":"0.70","ChatBeo":"9.50","ChatXo":"0.00","natri":"142.00"}'),
+(N'NL029',N'Đậu hũ',95.00,10.90,0.70,5.40,NULL,7.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=91',N'VN2007 3025',N'Đậu phụ / Soybean curd cake pressed raw',N'Viện Dinh dưỡng 2007; trang PDF 91, trang in 74; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD029","MaNguyenLieu":"NL029","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"76.00","ChatDam":"8.10","ChatBotDuong":"1.90","ChatBeo":"4.80","ChatXo":"0.30","natri":"7.00"}'),
+(N'NL032',N'Nấm đùi gà',31.00,2.80,6.00,0.40,3.40,2.00,N'https://fooddb.mext.go.jp/details/details.pl?ITEM_NO=8_08025_7',N'MEXT 2023 08025',N'King oyster mushrooms, raw; Pleurotus eryngii',N'100 g phần ăn được, nấm đùi gà tươi sống. Carbs là 炭水化物 tổng; xơ là 食物繊維総量. Không lấy số nấm bào ngư thay thế.',N'{"MaThongTin":"DD032","MaNguyenLieu":"NL032","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"35.00","ChatDam":"2.80","ChatBotDuong":"6.50","ChatBeo":"0.40","ChatXo":"2.40","natri":"18.00"}'),
+(N'NL033',N'Nấm rơm',57.00,3.60,3.40,3.20,NULL,NULL,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=227',N'VN2007 4125',N'Nấm rơm / Mushroom, straw',N'Viện Dinh dưỡng 2007; trang PDF 227, trang in 207; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD033","MaNguyenLieu":"NL033","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"22.00","ChatDam":"3.10","ChatBotDuong":"3.30","ChatBeo":"0.30","ChatXo":"1.00","natri":"5.00"}'),
+(N'NL035',N'Cà chua',18.00,0.88,3.89,0.20,1.20,5.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11529',N'Tomatoes, red, ripe, raw, year round average',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Cà chua chín tươi sống, không phải sốt.',N'{"MaThongTin":"DD035","MaNguyenLieu":"NL035","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"18.00","ChatDam":"0.90","ChatBotDuong":"3.90","ChatBeo":"0.20","ChatXo":"1.20","natri":"5.00"}'),
+(N'NL036',N'Cà rốt',41.00,0.93,9.58,0.24,2.80,69.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11124',N'Carrots, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Cà rốt sống; cắt nhỏ không làm thành cà rốt đã nấu.',N'{"MaThongTin":"DD036","MaNguyenLieu":"NL036","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"44.00","ChatDam":"1.50","ChatBotDuong":"9.03","ChatBeo":"0.17","ChatXo":"1.20","natri":"76.92"}'),
+(N'NL039',N'Bí đỏ',26.00,1.00,6.50,0.10,0.50,1.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11422',N'Pumpkin, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Bí đỏ sống, phần ăn được.',N'{"MaThongTin":"DD039","MaNguyenLieu":"NL039","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"26.00","ChatDam":"1.00","ChatBotDuong":"6.50","ChatBeo":"0.10","ChatXo":"0.50","natri":"1.00"}'),
+(N'NL040',N'Xà lách',17.00,1.50,1.80,0.40,NULL,59.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=192',N'VN2007 4090',N'Rau xà lách',N'Viện Dinh dưỡng 2007; trang PDF 192, trang in 172; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD040","MaNguyenLieu":"NL040","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"15.00","ChatDam":"1.40","ChatBotDuong":"2.90","ChatBeo":"0.20","ChatXo":"1.30","natri":"28.00"}'),
+(N'NL041',N'Giá đỗ',30.00,3.04,5.94,0.18,1.80,6.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11043',N'Mung beans, mature seeds, sprouted, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Giá đậu xanh sống, không phải giá đậu nành.',N'{"MaThongTin":"DD041","MaNguyenLieu":"NL041","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"30.00","ChatDam":"3.00","ChatBotDuong":"5.90","ChatBeo":"0.20","ChatXo":"1.80","natri":"6.00"}'),
+(N'NL042',N'Dưa leo',15.00,0.65,3.63,0.11,0.50,2.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11205',N'Cucumber, with peel, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Dưa leo sống còn vỏ, phần ăn được.',N'{"MaThongTin":"DD042","MaNguyenLieu":"NL042","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"15.00","ChatDam":"0.70","ChatBotDuong":"3.60","ChatBeo":"0.10","ChatXo":"0.50","natri":"2.00"}'),
+(N'NL045',N'Đậu Hà Lan',81.00,5.42,14.45,0.40,5.70,5.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11304',N'Peas, green, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Đậu Hà Lan hạt xanh tươi sống, không phải hạt khô.',N'{"MaThongTin":"DD045","MaNguyenLieu":"NL045","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"81.00","ChatDam":"5.40","ChatBotDuong":"14.50","ChatBeo":"0.40","ChatXo":"5.10","natri":"5.00"}'),
+(N'NL046',N'Rau muống',25.00,3.20,2.10,0.40,NULL,37.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=185',N'VN2007 4083',N'Rau muống / Water spinach',N'Viện Dinh dưỡng 2007; trang PDF 185, trang in 165; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD046","MaNguyenLieu":"NL046","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"28.00","ChatDam":"3.20","ChatBotDuong":"3.26","ChatBeo":"0.24","ChatXo":"1.00","natri":null}'),
+(N'NL047',N'Bông cải xanh',34.00,2.82,6.64,0.37,2.60,33.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11090',N'Broccoli, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Bông cải xanh sống.',N'{"MaThongTin":"DD047","MaNguyenLieu":"NL047","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"39.00","ChatDam":"2.95","ChatBotDuong":"6.08","ChatBeo":"0.30","ChatXo":"3.20","natri":null}'),
+(N'NL048',N'Hành tây',40.00,1.10,9.34,0.10,1.70,4.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11282',N'Onions, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Hành tây sống bỏ vỏ; kích thước củ không đổi bảng trên 100 g.',N'{"MaThongTin":"DD048","MaNguyenLieu":"NL048","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"40.00","ChatDam":"1.10","ChatBotDuong":"9.30","ChatBeo":"0.10","ChatXo":"1.70","natri":"4.00"}'),
+(N'NL049',N'Hành tím',72.00,2.50,16.80,0.10,3.20,12.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11677',N'Shallots, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Hành tím/shallot sống bỏ vỏ, không phải hành phi.',N'{"MaThongTin":"DD049","MaNguyenLieu":"NL049","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"72.00","ChatDam":"2.50","ChatBotDuong":"16.80","ChatBeo":"0.10","ChatXo":"3.20","natri":"12.00"}'),
+(N'NL050',N'Hành lá',32.00,1.83,7.34,0.19,2.60,16.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11291',N'Onions, spring or scallions (includes tops and bulb), raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Hành lá sống gồm lá và phần củ ăn được.',N'{"MaThongTin":"DD050","MaNguyenLieu":"NL050","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"32.00","ChatDam":"1.80","ChatBotDuong":"7.30","ChatBeo":"0.20","ChatXo":"2.60","natri":"16.00"}'),
+(N'NL051',N'Tỏi',149.00,6.36,33.06,0.50,2.10,17.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11215',N'Garlic, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Tỏi sống; tỏi băm chưa thêm dầu/muối.',N'{"MaThongTin":"DD051","MaNguyenLieu":"NL051","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"149.00","ChatDam":"6.40","ChatBotDuong":"33.10","ChatBeo":"0.50","ChatXo":"2.10","natri":"17.00"}'),
+(N'NL052',N'Gừng',80.00,1.82,17.77,0.75,2.00,13.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11216',N'Ginger root, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Gừng tươi sống, chưa nấu.',N'{"MaThongTin":"DD052","MaNguyenLieu":"NL052","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"80.00","ChatDam":"1.80","ChatBotDuong":"17.80","ChatBeo":"0.80","ChatXo":"2.00","natri":"13.00"}'),
+(N'NL053',N'Sả',99.00,1.82,25.31,0.49,NULL,6.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11972',N'Lemon grass (citronella), raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Sả sống nguyên chất. Nguồn KHÔNG công bố tổng chất xơ: giữ NULL.',N'{"MaThongTin":"DD053","MaNguyenLieu":"NL053","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"99.00","ChatDam":"1.80","ChatBotDuong":"25.30","ChatBeo":"0.50","ChatXo":"0.00","natri":"6.00"}'),
+(N'NL055',N'Rau mùi',23.00,2.13,3.67,0.52,2.80,46.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11165',N'Coriander (cilantro) leaves, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. LÁ rau mùi/ngò rí sống. KHÔNG áp cho rễ hoặc hạt ngò.',N'{"MaThongTin":"DD055","MaNguyenLieu":"NL055","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"23.00","ChatDam":"2.10","ChatBotDuong":"3.70","ChatBeo":"0.50","ChatXo":"2.80","natri":"46.00"}'),
+(N'NL061',N'Dứa',50.00,0.54,13.12,0.12,1.40,1.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 09266',N'Pineapple, raw, all varieties',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Thịt quả dứa chín tươi, đã loại vỏ/lõi không ăn; không phải nước ép.',N'{"MaThongTin":"DD061","MaNguyenLieu":"NL061","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"50.00","ChatDam":"0.50","ChatBotDuong":"13.10","ChatBeo":"0.10","ChatXo":"1.40","natri":"1.00"}'),
+(N'NL064',N'Táo',52.00,0.26,13.81,0.17,2.40,1.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 09003',N'Apples, raw, with skin',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Táo tươi còn vỏ, phần ăn được; không phải táo tàu khô.',N'{"MaThongTin":"DD064","MaNguyenLieu":"NL064","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"52.00","ChatDam":"0.30","ChatBotDuong":"13.80","ChatBeo":"0.20","ChatXo":"2.40","natri":"1.00"}'),
+(N'NL065',N'Dâu tây',32.00,0.67,7.68,0.30,2.00,1.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 09316',N'Strawberries, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Dâu tây tươi sống.',N'{"MaThongTin":"DD065","MaNguyenLieu":"NL065","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"32.00","ChatDam":"0.70","ChatBotDuong":"7.70","ChatBeo":"0.30","ChatXo":"2.00","natri":"1.00"}'),
+(N'NL066',N'Sữa chua không đường',61.00,3.47,4.66,3.25,0.00,46.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 01116',N'Yogurt, plain, whole milk, 8 grams protein per 8 ounce',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. CHỌN MẪU THAM CHIẾU: sữa chua nguyên kem không thêm đường, không phải loại tách béo hoặc sữa chua Hy Lạp.',N'{"MaThongTin":"DD066","MaNguyenLieu":"NL066","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"61.00","ChatDam":"3.50","ChatBotDuong":"4.70","ChatBeo":"3.30","ChatXo":"0.00","natri":"46.00"}'),
+(N'NL067',N'Sữa tươi không đường',61.00,3.15,4.78,3.27,0.00,43.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 01211',N'Milk, whole, 3.25% milkfat, without added vitamin A and vitamin D',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. CHỌN MẪU THAM CHIẾU theo yêu cầu người dùng: sữa bò nguyên kem 3.25% béo không thêm đường, không bổ sung vitamin A/D. Không dùng cho sữa tách béo/có đường. Chọn nguồn có nền mẫu rõ, không tự sửa số natri bất thường trong bảng Việt Nam.',N'{"MaThongTin":"DD067","MaNguyenLieu":"NL067","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"61.00","ChatDam":"3.20","ChatBotDuong":"4.80","ChatBeo":"3.30","ChatXo":"0.00","natri":"43.00"}'),
+(N'NL068',N'Nước cốt dừa',230.00,2.29,5.54,23.84,2.20,15.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 12117',N'Nuts, coconut milk, raw (liquid expressed from grated meat and water)',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Nước cốt dừa thô vắt từ cùi dừa và nước; mẫu chung, không phải kem dừa hoặc hộp có đường.',N'{"MaThongTin":"DD068","MaNguyenLieu":"NL068","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"230.00","ChatDam":"2.30","ChatBotDuong":"5.50","ChatBeo":"23.80","ChatXo":"2.20","natri":"15.00"}'),
+(N'NL069',N'Bơ lạt',717.00,0.85,0.06,81.11,0.00,11.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 01145',N'Butter, without salt',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Bơ động vật KHÔNG MUỐI. Không áp cho margarine hoặc bơ pha.',N'{"MaThongTin":"DD069","MaNguyenLieu":"NL069","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"756.00","ChatDam":"0.50","ChatBotDuong":"0.50","ChatBeo":"83.50","ChatXo":"0.00","natri":null}'),
+(N'NL070',N'Nước mắm',35.00,5.06,3.64,0.01,0.00,7851.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 06179',N'Sauce, fish, ready-to-serve',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Nước mắm dùng trực tiếp, mẫu tham khảo CHUNG do USDA công bố; không đại diện nhãn hàng cụ thể hoặc nước mắm đã pha loãng.',N'{"MaThongTin":"DD070","MaNguyenLieu":"NL070","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"35.00","ChatDam":"5.00","ChatBotDuong":"3.60","ChatBeo":"0.00","ChatXo":"0.00","natri":"7851.00"}'),
+(N'NL071',N'Nước tương',53.00,8.14,4.93,0.57,0.80,5493.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 16123',N'Soy sauce made from soy and wheat (shoyu)',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. CHỌN MẪU THAM CHIẾU theo yêu cầu người dùng: nước tương lên men từ đậu nành VÀ lúa mì (shoyu), loại thường. Không phải loại ít muối hoặc tamari; không chứng nhận mọi hãng cùng thành phần.',N'{"MaThongTin":"DD071","MaNguyenLieu":"NL071","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"53.00","ChatDam":"8.10","ChatBotDuong":"4.90","ChatBeo":"0.60","ChatXo":"0.80","natri":"5493.00"}'),
+(N'NL073',N'Muối',0.00,0.00,0.00,0.00,0.00,38758.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 02047',N'Salt, table',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Muối ăn nguyên chất; 0 kcal là số công bố, không phải điền thay NULL.',N'{"MaThongTin":"DD073","MaNguyenLieu":"NL073","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"0.00","ChatDam":"0.00","ChatBotDuong":"0.00","ChatBeo":"0.00","ChatXo":"0.00","natri":"38758.00"}'),
+(N'NL074',N'Đường',387.00,0.00,99.98,0.00,0.00,1.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 19335',N'Sugars, granulated',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Đường kính sucrose, không phải siro.',N'{"MaThongTin":"DD074","MaNguyenLieu":"NL074","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"387.00","ChatDam":"0.00","ChatBotDuong":"100.00","ChatBeo":"0.00","ChatXo":"0.00","natri":"1.00"}'),
+(N'NL075',N'Tiêu đen',251.00,10.39,63.95,3.26,25.30,20.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 02030',N'Spices, pepper, black',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Tiêu đen khô nguyên chất, không muối/độn.',N'{"MaThongTin":"DD075","MaNguyenLieu":"NL075","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"251.00","ChatDam":"10.40","ChatBotDuong":"64.00","ChatBeo":"3.30","ChatXo":"25.30","natri":"20.00"}'),
+(N'NL076',N'Mật ong',304.00,0.30,82.40,0.00,0.20,4.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 19296',N'Honey',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Mật ong nguyên chất, số trung bình tham khảo.',N'{"MaThongTin":"DD076","MaNguyenLieu":"NL076","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"304.00","ChatDam":"0.30","ChatBotDuong":"82.40","ChatBeo":"0.00","ChatXo":"0.20","natri":"4.00"}'),
+(N'NL077',N'Me chua',239.00,2.80,62.50,0.60,5.10,28.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 09322',N'Tamarinds, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Thịt quả me sống, phần ăn được; không phải nước cốt me pha loãng.',N'{"MaThongTin":"DD077","MaNguyenLieu":"NL077","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"239.00","ChatDam":"2.80","ChatBotDuong":"62.50","ChatBeo":"0.60","ChatXo":"5.10","natri":"28.00"}'),
+(N'NL079',N'Bột bắp',381.00,0.26,91.27,0.05,0.90,9.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 20027',N'Cornstarch',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Tinh bột bắp khô nguyên chất.',N'{"MaThongTin":"DD079","MaNguyenLieu":"NL079","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"381.00","ChatDam":"0.30","ChatBotDuong":"91.30","ChatBeo":"0.10","ChatXo":"0.90","natri":"9.00"}'),
+(N'NL080',N'Nước lọc',0.00,0.00,0.00,0.00,0.00,NULL,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 14411 (chỉ 5 đại lượng)',N'Beverages, water, tap, drinking',N'Nước lọc/đá nguyên chất không đường: chỉ dùng 5 đại lượng bằng 0 được USDA công bố. KHÔNG chép natri của mẫu nước máy Mỹ cho nước tại Việt Nam; natri giữ NULL.',N'{"MaThongTin":"DD080","MaNguyenLieu":"NL080","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"0.00","ChatDam":"0.00","ChatBotDuong":"0.00","ChatBeo":"0.00","ChatXo":"0.00","natri":null}'),
+(N'NL082',N'Đậu phộng',567.00,25.80,16.13,49.24,8.50,18.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 16087',N'Peanuts, all types, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Đậu phộng hạt sống, chưa rang/muối.',N'{"MaThongTin":"DD082","MaNguyenLieu":"NL082","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"567.00","ChatDam":"25.80","ChatBotDuong":"16.10","ChatBeo":"49.20","ChatXo":"8.50","natri":"18.00"}'),
+(N'NL085',N'Bột nghệ',312.00,9.68,67.14,3.25,22.70,27.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 02043',N'Spices, turmeric, ground',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Nghệ khô xay nguyên chất.',N'{"MaThongTin":"DD085","MaNguyenLieu":"NL085","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"312.00","ChatDam":"9.70","ChatBotDuong":"67.10","ChatBeo":"3.30","ChatXo":"22.70","natri":"38.00"}'),
+(N'NL088',N'Bột gelatin',335.00,85.60,0.00,0.10,0.00,196.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 19177',N'Gelatins, dry powder, unsweetened',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Gelatin bột khô nguyên chất, không đường, chưa ngâm.',N'{"MaThongTin":"DD088","MaNguyenLieu":"NL088","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"335.00","ChatDam":"85.60","ChatBotDuong":"0.00","ChatBeo":"0.10","ChatXo":"0.00","natri":"196.00"}'),
+(N'NL091',N'Dầu mè',884.00,0.00,0.00,100.00,0.00,0.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 04058',N'Oil, sesame, salad or cooking',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Dầu mè nguyên chất, không phải nước sốt dầu mè.',N'{"MaThongTin":"DD091","MaNguyenLieu":"NL091","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"900.00","ChatDam":"0.00","ChatBotDuong":"0.00","ChatBeo":"100.00","ChatXo":"0.00","natri":null}'),
+(N'NL094',N'Xì dầu',53.00,8.14,4.93,0.57,0.80,5493.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 16123',N'Soy sauce made from soy and wheat (shoyu)',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. CHỌN MẪU THAM CHIẾU theo yêu cầu người dùng: nước tương lên men từ đậu nành VÀ lúa mì (shoyu), loại thường. Không phải loại ít muối hoặc tamari; không chứng nhận mọi hãng cùng thành phần.',N'{"MaThongTin":"DD094","MaNguyenLieu":"NL094","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"55.00","ChatDam":"6.30","ChatBotDuong":"7.40","ChatBeo":"0.00","ChatXo":"0.80","natri":"5637.00"}'),
+(N'NL097',N'Hạt nêm',206.00,12.00,32.90,2.93,NULL,21800.00,N'https://www.nestle.com.vn/sites/g/files/pydnoa216/files/2022-12/Hat-nem-cao-cap-heo_HSCB_Sep2022.pdf',N'NIFC 25641/PKN-VKNQG 24-08-2022',N'Hạt nêm cao cấp MAGGI Heo; mẫu 08227043/DV.1; lô 2131002761',N'CHỌN MẪU THAM CHIẾU theo yêu cầu người dùng, KHÔNG phải trung bình thị trường. Kết quả chỉ áp cho mẫu nêu trong phiếu NIFC năm 2022 do Nestlé công bố; không khẳng định công thức hiện hành 2026. Natri nguồn 21.8 g/100 g = 21800 mg/100 g. Nguồn không công bố tổng xơ. Không trộn với nhãn 3 Ngọt Xương Hầm Heo khác.',N'{"MaThongTin":"DD001","MaNguyenLieu":"NL097","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"188.00","ChatDam":"12.70","ChatBotDuong":"30.10","ChatBeo":"1.80","ChatXo":"0.30","natri":"21818.10"}'),
+(N'NL099',N'Bột tỏi',331.00,16.55,72.73,0.73,9.00,60.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 02020',N'Spices, garlic powder',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Bột tỏi khô nguyên chất, không muối.',N'{"MaThongTin":"DD1213","MaNguyenLieu":"NL099","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"331.00","ChatDam":"16.55","ChatBotDuong":"72.73","ChatBeo":"0.73","ChatXo":"9.00","natri":"60.00"}'),
+(N'NL101',N'Kim chi cải thảo',15.00,1.10,2.40,0.50,1.60,498.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11118',N'Cabbage, kimchi',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Kim chi cải thảo tham khảo chung, độ mặn theo công thức/hãng có thể khác.',N'{"MaThongTin":"DD0101","MaNguyenLieu":"NL101","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"14.00","ChatDam":"0.90","ChatBotDuong":"2.50","ChatBeo":"0.00","ChatXo":"0.00","natri":null}'),
+(N'NL1016',N'Mùi tây khô',292.00,26.63,50.64,5.48,26.70,452.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 02029',N'Spices, parsley, dried',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Lá mùi tây khô nguyên chất.',N'{"MaThongTin":"DD1016","MaNguyenLieu":"NL1016","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"292.00","ChatDam":"26.60","ChatBotDuong":"50.60","ChatBeo":"5.50","ChatXo":"26.80","natri":"452.00"}'),
+(N'NL1021',N'Cà tím',25.00,0.98,5.88,0.18,3.00,2.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11209',N'Eggplant, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Cà tím sống, phần ăn được.',N'{"MaThongTin":"DD1021","MaNguyenLieu":"NL1021","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"28.00","ChatDam":"1.00","ChatBotDuong":"6.00","ChatBeo":"0.00","ChatXo":"1.50","natri":null}'),
+(N'NL103',N'Nấm kim châm',37.00,2.66,7.81,0.29,2.70,3.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11950',N'Mushrooms, enoki, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Nấm kim châm sống, không phải nấm nấu.',N'{"MaThongTin":"DD103","MaNguyenLieu":"NL103","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"44.00","ChatDam":"2.60","ChatBotDuong":"7.80","ChatBeo":"0.20","ChatXo":"2.70","natri":"3.00"}'),
+(N'NL1037',N'Cá lóc (khoảng 500gr)',97.00,18.20,0.00,2.70,NULL,NULL,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=410',N'VN2007 8022',N'Cá quả (cá lóc) / Snake head fish',N'Viện Dinh dưỡng 2007; trang PDF 410, trang in 382; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD1037","MaNguyenLieu":"NL1037","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"97.00","ChatDam":"18.20","ChatBotDuong":"0.00","ChatBeo":"2.70","ChatXo":"0.00","natri":null}'),
+(N'NL1039',N'Nước dừa',19.00,0.72,3.71,0.20,1.10,105.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 12119',N'Nuts, coconut water (liquid from coconuts)',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. NƯỚC dừa tươi, không đường, không phải cùi dừa hay cả quả. NL123 có mô tả DB là dừa xiêm LẤY NƯỚC.',N'{"MaThongTin":"DD1039","MaNguyenLieu":"NL1039","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"21.00","ChatDam":"0.40","ChatBotDuong":"4.70","ChatBeo":"0.10","ChatXo":"0.00","natri":null}'),
+(N'NL104',N'Tương ớt Hàn Quốc',220.00,6.00,47.00,2.00,5.00,2290.00,N'https://en.sempio.com/product/jangpaste/view/623',N'Sempio 623 Hot Pepper Paste Regular',N'Sempio Hot Pepper Paste, Regular; serving 100 g',N'CHỌN MẪU THAM CHIẾU gochujang Sempio Regular đúng trang 623, khẩu phần 100 g. Không phải tương ớt Việt Nam, không phải Sempio Regular Plus/Classic. Giá trị theo nhãn có làm tròn, không phải đo từng món.',N'{"MaThongTin":"DD005","MaNguyenLieu":"NL104","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"41.00","ChatDam":"0.50","ChatBotDuong":"8.50","ChatBeo":"0.50","ChatXo":"0.90","natri":"25.00"}'),
+(N'NL1041',N'Thơm (dứa)',50.00,0.54,13.12,0.12,1.40,1.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 09266',N'Pineapple, raw, all varieties',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Thịt quả dứa chín tươi, đã loại vỏ/lõi không ăn; không phải nước ép.',N'{"MaThongTin":"DD1041","MaNguyenLieu":"NL1041","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"32.00","ChatDam":"0.80","ChatBotDuong":"7.30","ChatBeo":"0.00","ChatXo":"0.80","natri":"24.20"}'),
+(N'NL1054',N'Thịt ba rọi (thịt ba chỉ)',518.00,9.34,0.00,53.01,0.00,32.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 10005',N'Pork, fresh, belly, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Ba chỉ heo sống, phần ăn được.',N'{"MaThongTin":"DD1258","MaNguyenLieu":"NL1054","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"518.00","ChatDam":"9.34","ChatBotDuong":"0.00","ChatBeo":"53.01","ChatXo":"0.00","natri":"32.00"}'),
+(N'NL1058',N'Hành tím băm',72.00,2.50,16.80,0.10,3.20,12.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11677',N'Shallots, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Hành tím/shallot sống bỏ vỏ, không phải hành phi.',N'{"MaThongTin":"DD1058","MaNguyenLieu":"NL1058","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"72.00","ChatDam":"2.50","ChatBotDuong":"16.80","ChatBeo":"0.10","ChatXo":"3.20","natri":"12.00"}'),
+(N'NL108',N'Củ sen',74.00,2.60,17.23,0.10,4.90,40.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11254',N'Lotus root, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Củ sen sống, phần ăn được.',N'{"MaThongTin":"DD1219","MaNguyenLieu":"NL108","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"74.00","ChatDam":"2.60","ChatBotDuong":"17.23","ChatBeo":"0.10","ChatXo":"4.90","natri":"40.00"}'),
+(N'NL109',N'Hạt sen',89.00,4.13,17.28,0.53,NULL,1.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 12205',N'Seeds, lotus seeds, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Hạt sen TƯƠI sống, bỏ vỏ/tâm không ăn; không áp cho hạt sen khô.',N'{"MaThongTin":"DD019","MaNguyenLieu":"NL109","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"164.00","ChatDam":"9.50","ChatBotDuong":"30.30","ChatBeo":"0.50","ChatXo":"0.80","natri":"1.00"}'),
+(N'NL1092',N'Cà rốt cắt nhỏ',41.00,0.93,9.58,0.24,2.80,69.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11124',N'Carrots, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Cà rốt sống; cắt nhỏ không làm thành cà rốt đã nấu.',N'{"MaThongTin":"DD021","MaNguyenLieu":"NL1092","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"44.00","ChatDam":"1.50","ChatBotDuong":"9.00","ChatBeo":"0.10","ChatXo":"1.20","natri":"52.00"}'),
+(N'NL1095',N'Cơm nguội',130.00,2.69,28.17,0.28,0.40,1.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 20045',N'Rice, white, long-grain, regular, enriched, cooked',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Cơm trắng chín không dầu/muối; không tự trừ kcal vì làm nguội.',N'{"MaThongTin":"DD1215","MaNguyenLieu":"NL1095","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"130.00","ChatDam":"2.69","ChatBotDuong":"28.17","ChatBeo":"0.28","ChatXo":"0.40","natri":"1.00"}'),
+(N'NL1098',N'Thơm cắt hạt lựu',50.00,0.54,13.12,0.12,1.40,1.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 09266',N'Pineapple, raw, all varieties',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Thịt quả dứa chín tươi, đã loại vỏ/lõi không ăn; không phải nước ép.',N'{"MaThongTin":"DD025","MaNguyenLieu":"NL1098","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"32.00","ChatDam":"0.80","ChatBotDuong":"7.30","ChatBeo":"0.00","ChatXo":"0.80","natri":"24.20"}'),
+(N'NL111',N'Trứng cút',158.00,13.05,0.41,11.09,0.00,141.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 01140',N'Egg, quail, whole, fresh, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Trứng cút nguyên quả sống bỏ vỏ.',N'{"MaThongTin":"DD037","MaNguyenLieu":"NL111","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"157.00","ChatDam":"12.70","ChatBotDuong":"2.80","ChatBeo":"10.40","ChatXo":"0.00","natri":"141.00"}'),
+(N'NL1112',N'Muối hột',0.00,0.00,0.00,0.00,0.00,38758.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 02047',N'Salt, table',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Muối ăn nguyên chất; 0 kcal là số công bố, không phải điền thay NULL.',N'{"MaThongTin":"DD038","MaNguyenLieu":"NL1112","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"1.00","ChatDam":"0.00","ChatBotDuong":"0.00","ChatBeo":"0.00","ChatXo":"0.00","natri":"38758.00"}'),
+(N'NL1118',N'Sả xay',99.00,1.82,25.31,0.49,NULL,6.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11972',N'Lemon grass (citronella), raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Sả sống nguyên chất. Nguồn KHÔNG công bố tổng chất xơ: giữ NULL.',N'{"MaThongTin":"DD044","MaNguyenLieu":"NL1118","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"99.00","ChatDam":"1.82","ChatBotDuong":"25.31","ChatBeo":"0.49","ChatXo":null,"natri":"6.00"}'),
+(N'NL1123',N'Nước cốt chanh',25.00,0.42,8.42,0.07,0.40,2.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 09160',N'Lime juice, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Nước chanh XANH tươi (lime), không đường, không pha. Không dùng dữ liệu lemon.',N'{"MaThongTin":"DD056","MaNguyenLieu":"NL1123","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"29.00","ChatDam":"0.90","ChatBotDuong":"5.90","ChatBeo":"0.10","ChatXo":"1.30","natri":"3.00"}'),
+(N'NL1128',N'Tiêu xay',251.00,10.39,63.95,3.26,25.30,20.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 02030',N'Spices, pepper, black',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Tiêu đen khô nguyên chất, không muối/độn.',N'{"MaThongTin":"DD1128","MaNguyenLieu":"NL1128","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"251.00","ChatDam":"10.40","ChatBotDuong":"64.00","ChatBeo":"3.30","ChatXo":"25.30","natri":"20.00"}'),
+(N'NL1131',N'Dừa (lấy nước)',19.00,0.72,3.71,0.20,1.10,105.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 12119',N'Nuts, coconut water (liquid from coconuts)',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. NƯỚC dừa tươi, không đường, không phải cùi dừa hay cả quả. NL123 có mô tả DB là dừa xiêm LẤY NƯỚC.',N'{"MaThongTin":"DD059","MaNguyenLieu":"NL1131","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"21.00","ChatDam":"0.40","ChatBotDuong":"4.70","ChatBeo":"0.10","ChatXo":"0.00","natri":"0.00"}'),
+(N'NL1136',N'Cá lóc (1 con)',97.00,18.20,0.00,2.70,NULL,NULL,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=410',N'VN2007 8022',N'Cá quả (cá lóc) / Snake head fish',N'Viện Dinh dưỡng 2007; trang PDF 410, trang in 382; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD063","MaNguyenLieu":"NL1136","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"97.00","ChatDam":"18.20","ChatBotDuong":"0.00","ChatBeo":"2.70","ChatXo":"0.00","natri":"0.00"}'),
+(N'NL1137',N'Cà rốt (1/2 củ)',41.00,0.93,9.58,0.24,2.80,69.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11124',N'Carrots, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Cà rốt sống; cắt nhỏ không làm thành cà rốt đã nấu.',N'{"MaThongTin":"DD081","MaNguyenLieu":"NL1137","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"44.00","ChatDam":"1.50","ChatBotDuong":"9.00","ChatBeo":"0.10","ChatXo":"1.20","natri":"52.00"}'),
+(N'NL1139',N'Gừng (2 củ)',80.00,1.82,17.77,0.75,2.00,13.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11216',N'Ginger root, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Gừng tươi sống, chưa nấu.',N'{"MaThongTin":"DD083","MaNguyenLieu":"NL1139","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"41.00","ChatDam":"0.40","ChatBotDuong":"8.50","ChatBeo":"0.50","ChatXo":"3.30","natri":"7.00"}'),
+(N'NL1146',N'Hành baro',61.00,1.50,14.15,0.30,1.80,20.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11246',N'Leeks, (bulb and lower leaf-portion), raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Boa rô tươi phần củ và lá dưới.',N'{"MaThongTin":"DD1231","MaNguyenLieu":"NL1146","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"61.00","ChatDam":"1.50","ChatBotDuong":"14.15","ChatBeo":"0.30","ChatXo":"1.80","natri":"20.00"}'),
+(N'NL1157',N'Cải thìa',13.00,1.50,2.18,0.20,1.00,65.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11116',N'Cabbage, chinese (pak-choi), raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Cải thìa/bok choy sống, phần ăn được.',N'{"MaThongTin":"DD090","MaNguyenLieu":"NL1157","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"24.00","ChatDam":"1.40","ChatBotDuong":"4.20","ChatBeo":"0.10","ChatXo":"1.80","natri":"25.00"}'),
+(N'NL116',N'Kỷ tử',349.00,14.26,77.06,0.39,13.00,298.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 09110',N'Goji berries, dried',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Kỷ tử khô, không phải quả tươi.',N'{"MaThongTin":"DD1237","MaNguyenLieu":"NL116","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"349.00","ChatDam":"14.26","ChatBotDuong":"77.06","ChatBeo":"0.39","ChatXo":"13.00","natri":"298.00"}'),
+(N'NL1160',N'Khoai môn (2 củ)',112.00,1.50,26.46,0.20,4.10,11.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11518',N'Taro, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Khoai môn Colocasia esculenta sống, phần ăn được. Không lấy bảng khoai sọ Việt Nam thay thế.',N'{"MaThongTin":"DD092","MaNguyenLieu":"NL1160","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"113.00","ChatDam":"1.50","ChatBotDuong":"26.40","ChatBeo":"0.20","ChatXo":"1.20","natri":"0.00"}'),
+(N'NL1162',N'Vịt (khoảng 1.5kg)',267.00,17.80,0.00,21.80,NULL,63.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=332',N'VN2007 7028',N'Thịt vịt / Duck meat average',N'Viện Dinh dưỡng 2007; trang PDF 332, trang in 306; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD095","MaNguyenLieu":"NL1162","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"267.00","ChatDam":"17.80","ChatBotDuong":"0.00","ChatBeo":"21.80","ChatXo":"0.00","natri":"63.00"}'),
+(N'NL1163',N'Gà (1 con)',199.00,20.30,0.00,13.10,NULL,70.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=317',N'VN2007 7013',N'Thịt gà / Chicken meat average',N'Viện Dinh dưỡng 2007; trang PDF 317, trang in 291; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD096","MaNguyenLieu":"NL1163","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"199.00","ChatDam":"20.30","ChatBotDuong":"0.00","ChatBeo":"13.10","ChatXo":"0.00","natri":"70.00"}'),
+(N'NL1164',N'Muối hạt',0.00,0.00,0.00,0.00,0.00,38758.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 02047',N'Salt, table',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Muối ăn nguyên chất; 0 kcal là số công bố, không phải điền thay NULL.',N'{"MaThongTin":"DD097","MaNguyenLieu":"NL1164","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"1.00","ChatDam":"0.00","ChatBotDuong":"0.00","ChatBeo":"0.00","ChatXo":"0.00","natri":"38758.00"}'),
+(N'NL1167',N'Kim chi Hàn Quốc',15.00,1.10,2.40,0.50,1.60,498.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11118',N'Cabbage, kimchi',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Kim chi cải thảo tham khảo chung, độ mặn theo công thức/hãng có thể khác.',N'{"MaThongTin":"DD1236","MaNguyenLieu":"NL1167","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"15.00","ChatDam":"1.10","ChatBotDuong":"2.40","ChatBeo":"0.50","ChatXo":"1.60","natri":"498.00"}'),
+(N'NL1169',N'Mực',73.00,16.30,0.00,0.90,NULL,44.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=428',N'VN2007 8040',N'Mực tươi / Squid raw',N'Viện Dinh dưỡng 2007; trang PDF 428, trang in 400; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD100","MaNguyenLieu":"NL1169","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"73.00","ChatDam":"16.30","ChatBotDuong":"0.00","ChatBeo":"0.90","ChatXo":"0.00","natri":"44.00"}'),
+(N'NL1172',N'Bắp cải tím',31.00,1.43,7.37,0.16,2.10,27.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11112',N'Cabbage, red, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Bắp cải tím sống.',N'{"MaThongTin":"DD104","MaNguyenLieu":"NL1172","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"36.00","ChatDam":"1.80","ChatBotDuong":"6.90","ChatBeo":"0.00","ChatXo":"1.60","natri":"28.30"}'),
+(N'NL1173',N'Đậu hũ chiên (1 bìa)',270.00,18.82,8.86,20.18,3.90,16.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 16129',N'Tofu, fried',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Đậu hũ đã chiên, cân phần ăn được sau chiên; không phải đậu hũ sống.',N'{"MaThongTin":"DD1223","MaNguyenLieu":"NL1173","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"270.00","ChatDam":"18.82","ChatBotDuong":"8.86","ChatBeo":"20.18","ChatXo":"3.90","natri":"16.00"}'),
+(N'NL1174',N'Ngó sen',61.00,1.00,13.90,0.10,NULL,40.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=161',N'VN2007 4059',N'Ngó sen / Lotus stem underground',N'Viện Dinh dưỡng 2007; trang PDF 161, trang in 141; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD105","MaNguyenLieu":"NL1174","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"65.00","ChatDam":"1.00","ChatBotDuong":"15.10","ChatBeo":"0.00","ChatXo":"1.20","natri":"40.00"}'),
+(N'NL1176',N'Hành tây nhỏ',40.00,1.10,9.34,0.10,1.70,4.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11282',N'Onions, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Hành tây sống bỏ vỏ; kích thước củ không đổi bảng trên 100 g.',N'{"MaThongTin":"DD106","MaNguyenLieu":"NL1176","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"45.00","ChatDam":"1.80","ChatBotDuong":"9.20","ChatBeo":"0.10","ChatXo":"1.10","natri":"7.50"}'),
+(N'NL1178',N'Lá húng lủi',44.00,3.29,8.41,0.73,6.80,30.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 02065',N'Spearmint, fresh',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Lá spearmint/húng lủi tươi.',N'{"MaThongTin":"DD1238","MaNguyenLieu":"NL1178","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"44.00","ChatDam":"3.29","ChatBotDuong":"8.41","ChatBeo":"0.73","ChatXo":"6.80","natri":"30.00"}'),
+(N'NL1181',N'Bột cà ri',325.00,14.29,55.83,14.01,53.20,52.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 02015',N'Spices, curry powder',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Bột cà ri chung, không phải hỗn hợp có thêm muối riêng.',N'{"MaThongTin":"DD1210","MaNguyenLieu":"NL1181","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"325.00","ChatDam":"14.29","ChatBotDuong":"55.83","ChatBeo":"14.01","ChatXo":"53.20","natri":"52.00"}'),
+(N'NL1186',N'Cơm nóng',130.00,2.69,28.17,0.28,0.40,1.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 20045',N'Rice, white, long-grain, regular, enriched, cooked',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Cơm trắng chín không dầu/muối; không tự trừ kcal vì làm nguội.',N'{"MaThongTin":"DD1216","MaNguyenLieu":"NL1186","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"130.00","ChatDam":"2.69","ChatBotDuong":"28.17","ChatBeo":"0.28","ChatXo":"0.40","natri":"1.00"}'),
+(N'NL1187',N'Bắp non',40.00,2.20,7.40,0.20,NULL,NULL,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=160',N'VN2007 4058',N'Ngô bao tử / Baby corn',N'Viện Dinh dưỡng 2007; trang PDF 160, trang in 140; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD1187","MaNguyenLieu":"NL1187","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"86.00","ChatDam":"3.20","ChatBotDuong":"19.00","ChatBeo":"1.20","ChatXo":"2.70","natri":"15.00"}'),
+(N'NL1190',N'Dầu hào chay',141.00,3.53,31.30,0.22,NULL,3800.00,N'https://cholimexfood.com.vn/wp-content/uploads/2025/20250827_CBTT/CV%20247_DHAO%20CHAY.pdf#page=4',N'Cholimex CV247 22-08-2025 nhan 820g',N'Dầu hào chay Cholimex 820 g; nhãn ký 22/08/2025',N'CHỌN MẪU THAM CHIẾU Cholimex theo yêu cầu người dùng. Đã đọc ảnh nhãn trang PDF 4: dinh dưỡng TRONG 100 G, không phải 100 ml; không công bố tổng chất xơ.',NULL),
+(N'NL1191',N'Đậu que',31.00,1.83,6.97,0.22,2.70,6.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11052',N'Beans, snap, green, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Đậu que xanh tươi sống, không phải hạt đậu khô.',N'{"MaThongTin":"DD108","MaNguyenLieu":"NL1191","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"77.00","ChatDam":"5.00","ChatBotDuong":"14.30","ChatBeo":"0.00","ChatXo":"1.00","natri":"95.70"}'),
+(N'NL1194',N'Hạt ngò',298.00,12.37,54.99,17.77,41.90,35.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 02013',N'Spices, coriander seed',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. HẠT ngò khô. Sửa nhầm bảng LÁ ngò đang có trong DB.',N'{"MaThongTin":"DD1194","MaNguyenLieu":"NL1194","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"23.00","ChatDam":"2.10","ChatBotDuong":"3.70","ChatBeo":"0.50","ChatXo":"2.80","natri":"46.00"}'),
+(N'NL1198',N'Rau diếp cá',22.00,2.90,2.70,NULL,NULL,NULL,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=173',N'VN2007 4071',N'Rau diếp cá',N'Viện Dinh dưỡng 2007; trang PDF 173, trang in 153; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD110","MaNguyenLieu":"NL1198","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"30.00","ChatDam":"2.90","ChatBotDuong":"4.50","ChatBeo":"0.00","ChatXo":"1.80","natri":"72.00"}'),
+(N'NL1199',N'Riềng',26.00,0.30,2.50,NULL,NULL,NULL,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=534',N'VN2007 13009',N'Riềng tươi / Alpinia root',N'Viện Dinh dưỡng 2007; trang PDF 534, trang in 496; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD111","MaNguyenLieu":"NL1199","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"26.00","ChatDam":"0.30","ChatBotDuong":"6.20","ChatBeo":"0.00","ChatXo":"3.70","natri":null}'),
+(N'NL1200',N'Sen tươi',89.00,4.13,17.28,0.53,NULL,1.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 12205',N'Seeds, lotus seeds, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Hạt sen TƯƠI sống, bỏ vỏ/tâm không ăn; không áp cho hạt sen khô.',N'{"MaThongTin":"DD1200","MaNguyenLieu":"NL1200","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"164.00","ChatDam":"9.50","ChatBotDuong":"30.30","ChatBeo":"0.50","ChatXo":"0.80","natri":"1.00"}'),
+(N'NL1201',N'Tiêu sọ',296.00,10.40,68.61,2.12,26.20,5.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 02032',N'Spices, pepper, white',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Tiêu trắng/tiêu sọ khô nguyên chất.',N'{"MaThongTin":"DD1262","MaNguyenLieu":"NL1201","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"296.00","ChatDam":"10.40","ChatBotDuong":"68.61","ChatBeo":"2.12","ChatXo":"26.20","natri":"5.00"}'),
+(N'NL1207',N'Đường bột',389.00,0.00,99.77,0.00,0.00,2.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 19336',N'Sugars, powdered',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Đường bột; mẫu USDA có thể chứa chất chống vón tinh bột theo loại sản phẩm.',N'{"MaThongTin":"DD1201","MaNguyenLieu":"NL1207","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"389.00","ChatDam":"0.00","ChatBotDuong":"99.77","ChatBeo":"0.00","ChatXo":"0.00","natri":"2.00"}'),
+(N'NL1208',N'Nước cốt cam',45.00,0.70,10.40,0.20,0.20,1.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 09206',N'Orange juice, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Nước cam tươi nguyên chất không đường, không phải siro cô đặc.',N'{"MaThongTin":"DD1202","MaNguyenLieu":"NL1208","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"45.00","ChatDam":"0.70","ChatBotDuong":"10.40","ChatBeo":"0.20","ChatXo":"0.20","natri":"1.00"}'),
+(N'NL1211',N'Thịt heo nạc',139.00,19.00,0.00,7.00,NULL,76.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=321',N'VN2007 7017',N'Thịt lợn nạc / Lean pork',N'Viện Dinh dưỡng 2007; trang PDF 321, trang in 295; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD1259","MaNguyenLieu":"NL1211","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"139.00","ChatDam":"19.00","ChatBotDuong":null,"ChatBeo":"7.00","ChatXo":null,"natri":"76.00"}'),
+(N'NL1216',N'Khế',31.00,1.04,6.73,0.33,2.80,2.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 09060',N'Carambola, (starfruit), raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Khế tươi sống, phần ăn được.',N'{"MaThongTin":"DD1205","MaNguyenLieu":"NL1216","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"31.00","ChatDam":"1.04","ChatBotDuong":"6.73","ChatBeo":"0.33","ChatXo":"2.80","natri":"2.00"}'),
+(N'NL1221',N'Bột ớt Hàn Quốc',403.00,14.80,56.80,12.90,NULL,31.60,N'https://www.dhfoods.com.vn/vi/natural-ot-bot-han-quoc-big-size',N'DH Foods NATURAL Ot Bot Han Quoc Big Size',N'NATURAL Ớt Bột Hàn Quốc DH Foods Big Size',N'CHỌN MẪU THAM CHIẾU sản phẩm 100% ớt Hàn Quốc, KHÔ nguyên chất, không phải tương gochujang hoặc bột trộn muối. Nguồn trên 100 g; không công bố tổng chất xơ.',NULL),
+(N'NL1228',N'Cải bẹ xanh tươi',27.00,2.86,4.67,0.42,3.20,20.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11270',N'Mustard greens, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Cải bẹ xanh sống.',N'{"MaThongTin":"DD1214","MaNguyenLieu":"NL1228","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"27.00","ChatDam":"2.86","ChatBotDuong":"4.67","ChatBeo":"0.42","ChatXo":"3.20","natri":"20.00"}'),
+(N'NL123',N'Dừa xiêm',19.00,0.72,3.71,0.20,1.10,105.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 12119',N'Nuts, coconut water (liquid from coconuts)',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. NƯỚC dừa tươi, không đường, không phải cùi dừa hay cả quả. NL123 có mô tả DB là dừa xiêm LẤY NƯỚC.',NULL),
+(N'NL1230',N'Bột cacao',228.00,19.60,57.90,13.70,37.00,21.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 19165',N'Cocoa, dry powder, unsweetened',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Bột cacao khô không đường.',N'{"MaThongTin":"DD1206","MaNguyenLieu":"NL1230","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"228.00","ChatDam":"19.60","ChatBotDuong":"57.90","ChatBeo":"13.70","ChatXo":"37.00","natri":"21.00"}'),
+(N'NL1231',N'Nước đá',0.00,0.00,0.00,0.00,0.00,NULL,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 14411 (chỉ 5 đại lượng)',N'Beverages, water, tap, drinking',N'Nước lọc/đá nguyên chất không đường: chỉ dùng 5 đại lượng bằng 0 được USDA công bố. KHÔNG chép natri của mẫu nước máy Mỹ cho nước tại Việt Nam; natri giữ NULL.',N'{"MaThongTin":"DD1246","MaNguyenLieu":"NL1231","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"0.00","ChatDam":"0.00","ChatBotDuong":"0.00","ChatBeo":"0.00","ChatXo":"0.00","natri":null}'),
+(N'NL1232',N'Bột matcha',237.00,29.60,39.50,5.30,38.50,6.00,N'https://fooddb.mext.go.jp/details/details.pl?ITEM_NO=16_16035_7',N'MEXT 2023 16035',N'Matcha (finely ground tea)',N'100 g matcha nguyên chất KHÔ không đường, không phải bột latte/đồ uống đã pha; dùng carbohydrate tổng và tổng xơ của nguồn.',N'{"MaThongTin":"DD1211","MaNguyenLieu":"NL1232","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"237.00","ChatDam":"29.60","ChatBotDuong":"39.50","ChatBeo":"5.30","ChatXo":"38.50","natri":"6.00"}'),
+(N'NL124',N'Khổ qua',17.00,1.00,3.70,0.17,2.80,5.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11024',N'Balsam-pear (bitter gourd), pods, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. QUẢ khổ qua tươi sống, không phải lá.',N'{"MaThongTin":"DD113","MaNguyenLieu":"NL124","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"20.00","ChatDam":"0.90","ChatBotDuong":"4.10","ChatBeo":"0.00","ChatXo":"1.10","natri":"5.00"}'),
+(N'NL125',N'Nấm mèo',304.00,10.60,65.00,0.20,NULL,70.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=223',N'VN2007 4121',N'Mộc nhĩ khô / Dried wood-ear',N'Viện Dinh dưỡng 2007; trang PDF 223, trang in 203; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD125","MaNguyenLieu":"NL125","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"332.00","ChatDam":"10.60","ChatBotDuong":"72.00","ChatBeo":"0.20","ChatXo":"7.00","natri":"70.00"}'),
+(N'NL128',N'Cồi sò điệp',69.00,12.06,3.18,0.49,0.00,392.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 15172',N'Mollusks, scallop, mixed species, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Cồi sò điệp sống; mẫu tham khảo nhiều loài, không ngâm phụ gia/muối.',N'{"MaThongTin":"DD115","MaNguyenLieu":"NL128","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"69.00","ChatDam":"12.10","ChatBotDuong":"3.10","ChatBeo":"0.40","ChatXo":"0.00","natri":"292.00"}'),
+(N'NL132',N'Dầu hào',51.00,1.35,10.92,0.25,0.30,2733.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 06176',N'Sauce, oyster, ready-to-serve',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Dầu hào dùng trực tiếp, mẫu tham khảo CHUNG do USDA công bố; không phải dầu hào chay hoặc nhãn hàng cụ thể.',N'{"MaThongTin":"DD116","MaNguyenLieu":"NL132","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"73.00","ChatDam":"2.90","ChatBotDuong":"14.70","ChatBeo":"0.30","ChatXo":"0.00","natri":"3379.00"}'),
+(N'NL133',N'Đậu nành',446.00,36.49,30.16,19.94,9.30,2.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 16108',N'Soybeans, mature seeds, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Đậu nành hạt già KHÔ, chưa ngâm/nấu; tên mô tả DB xác nhận khô.',N'{"MaThongTin":"DD0133","MaNguyenLieu":"NL133","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"413.00","ChatDam":"31.10","ChatBotDuong":"50.40","ChatBeo":"9.70","ChatXo":"2.20","natri":null}'),
+(N'NL135',N'Củ cải trắng',21.00,1.50,3.60,0.10,NULL,10.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=123',N'VN2007 4021',N'Củ cải trắng / White radish',N'Viện Dinh dưỡng 2007; trang PDF 123, trang in 103; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD117","MaNguyenLieu":"NL135","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"27.00","ChatDam":"1.50","ChatBotDuong":"5.10","ChatBeo":"0.00","ChatXo":"1.50","natri":"10.00"}'),
+(N'NL137',N'Ngò gai',25.00,2.10,2.40,0.80,NULL,39.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=184',N'VN2007 4082',N'Rau mùi tàu / Ngò gai',N'Viện Dinh dưỡng 2007; trang PDF 184, trang in 164; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD137","MaNguyenLieu":"NL137","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"22.00","ChatDam":"2.60","ChatBotDuong":"2.10","ChatBeo":"0.30","ChatXo":"1.80","natri":"46.00"}'),
+(N'NL138',N'Rau ngổ',15.00,1.50,2.30,NULL,NULL,5.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=187',N'VN2007 4085',N'Rau ngổ / Limnophila aromatic',N'Viện Dinh dưỡng 2007; trang PDF 187, trang in 167; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD118","MaNguyenLieu":"NL138","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"24.00","ChatDam":"1.50","ChatBotDuong":"4.40","ChatBeo":"0.00","ChatXo":"2.10","natri":"5.10"}'),
+(N'NL139',N'Bạc hà',5.00,0.40,0.80,NULL,NULL,NULL,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=128',N'VN2007 4026',N'Dọc mùng (bạc hà nấu canh)',N'Viện Dinh dưỡng 2007; trang PDF 128, trang in 108; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD1209","MaNguyenLieu":"NL139","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"5.00","ChatDam":"0.40","ChatBotDuong":"0.80","ChatBeo":null,"ChatXo":null,"natri":null}'),
+(N'NL140',N'Giò heo',230.00,15.70,0.00,18.60,NULL,47.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=336',N'VN2007 7032',N'Chân giò lợn / Pork leg',N'Viện Dinh dưỡng 2007; trang PDF 336, trang in 310; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD119","MaNguyenLieu":"NL140","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"230.00","ChatDam":"15.70","ChatBotDuong":"0.00","ChatBeo":"18.60","ChatXo":"0.00","natri":"47.00"}'),
+(N'NL142',N'Đậu bắp',33.00,1.93,7.45,0.19,3.20,7.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11278',N'Okra, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Đậu bắp sống.',N'{"MaThongTin":"DD1220","MaNguyenLieu":"NL142","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"33.00","ChatDam":"1.93","ChatBotDuong":"7.45","ChatBeo":"0.19","ChatXo":"3.20","natri":"7.00"}'),
+(N'NL143',N'Trứng vịt',185.00,12.81,1.45,13.77,0.00,146.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 01138',N'Egg, duck, whole, fresh, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Trứng vịt nguyên quả sống bỏ vỏ.',N'{"MaThongTin":"DD120","MaNguyenLieu":"NL143","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"172.00","ChatDam":"13.00","ChatBotDuong":"2.90","ChatBeo":"12.00","ChatXo":"0.00","natri":"191.00"}'),
+(N'NL146',N'Bột năng',354.00,0.10,85.30,0.20,0.00,1.00,N'https://fooddb.mext.go.jp/details/details.pl?ITEM_NO=2_02028_7',N'MEXT 2023 02028',N'Cassava starch; Manihot esculenta',N'100 g tinh bột sắn/bột năng KHÔ nguyên chất; không phải bột sắn nguyên củ hoặc trân châu. Tổng xơ (0) là số ƯỚC TÍNH do MEXT công bố, không phải số đo và không do ứng dụng tự gán.',N'{"MaThongTin":"DD146","MaNguyenLieu":"NL146","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"343.00","ChatDam":"0.70","ChatBotDuong":"85.10","ChatBeo":"0.00","ChatXo":"0.80","natri":null}'),
+(N'NL147',N'Bột nếp',362.00,8.20,78.80,1.60,NULL,3.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=29',N'VN2007 1016',N'Bột gạo nếp / Glutinous rice flour',N'Viện Dinh dưỡng 2007; trang PDF 29, trang in 16; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD147","MaNguyenLieu":"NL147","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"365.00","ChatDam":"8.20","ChatBotDuong":"79.40","ChatBeo":"1.60","ChatXo":"0.60","natri":"3.10"}'),
+(N'NL148',N'Củ dền',43.00,1.61,9.56,0.17,2.80,78.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11080',N'Beets, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Củ dền sống.',N'{"MaThongTin":"DD1217","MaNguyenLieu":"NL148","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"43.00","ChatDam":"1.61","ChatBotDuong":"9.56","ChatBeo":"0.17","ChatXo":"2.80","natri":"78.00"}'),
+(N'NL149',N'Dầu màu điều',900.00,0.00,0.00,100.00,NULL,0.00,N'https://dhfoods.com.vn/vi/dau-mau-dieu-big-size',N'DH Foods Dau Mau Dieu Big Size 1kg',N'Dầu Màu Điều DH Foods Big Size túi 1 kg',N'CHỌN MẪU THAM CHIẾU đúng bản Big Size 1 kg, thành phần dầu thực vật, hạt điều màu 20%, tỏi. Trang này công bố TRÊN 100 G. Không lấy bảng chai 90 ml có công thức/đơn vị khác, không tự coi ml bằng g; không công bố tổng xơ.',NULL),
+(N'NL152',N'Gelatin',335.00,85.60,0.00,0.10,0.00,196.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 19177',N'Gelatins, dry powder, unsweetened',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Gelatin bột khô nguyên chất không đường, chưa ngâm.',N'{"MaThongTin":"DD1229","MaNguyenLieu":"NL152","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"335.00","ChatDam":"85.60","ChatBotDuong":"0.00","ChatBeo":"0.10","ChatXo":"0.00","natri":"196.00"}'),
+(N'NL154',N'Lòng đỏ trứng gà',322.00,15.86,3.59,26.54,0.00,48.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 01125',N'Egg, yolk, raw, fresh',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Lòng đỏ trứng gà sống, không muối.',N'{"MaThongTin":"DD121","MaNguyenLieu":"NL154","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"327.00","ChatDam":"13.60","ChatBotDuong":"1.00","ChatBeo":"29.80","ChatXo":"0.00","natri":"108.00"}'),
+(N'NL155',N'Lòng trắng trứng',52.00,10.90,0.73,0.17,0.00,166.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 01124',N'Egg, white, raw, fresh',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Lòng trắng trứng gà sống, không muối.',N'{"MaThongTin":"DD122","MaNguyenLieu":"NL155","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"46.00","ChatDam":"10.30","ChatBotDuong":"1.00","ChatBeo":"0.10","ChatXo":"0.00","natri":"215.00"}'),
+(N'NL158',N'Muối nở',0.00,0.00,0.00,0.00,0.00,27360.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 18372',N'Leavening agents, baking soda',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Muối nở NaHCO3 nguyên chất, không phải bột nở.',N'{"MaThongTin":"DD1241","MaNguyenLieu":"NL158","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"0.00","ChatDam":"0.00","ChatBotDuong":"0.00","ChatBeo":"0.00","ChatXo":"0.00","natri":"27360.00"}'),
+(N'NL160',N'Ngò rí',23.00,2.13,3.67,0.52,2.80,46.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11165',N'Coriander (cilantro) leaves, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. LÁ rau mùi/ngò rí sống. KHÔNG áp cho rễ hoặc hạt ngò.',N'{"MaThongTin":"DD160","MaNguyenLieu":"NL160","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"22.00","ChatDam":"2.60","ChatBotDuong":"2.10","ChatBeo":"0.30","ChatXo":"1.80","natri":"46.00"}'),
+(N'NL161',N'Nho khô',299.00,3.07,79.18,0.46,3.70,11.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 09298',N'Raisins, seedless',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Nho khô không hạt, không thêm đường/dầu.',N'{"MaThongTin":"DD1245","MaNguyenLieu":"NL161","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"299.00","ChatDam":"3.07","ChatBotDuong":"79.18","ChatBeo":"0.46","ChatXo":"3.70","natri":"11.00"}'),
+(N'NL165',N'Sầu riêng',147.00,1.47,27.09,5.33,3.80,2.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 09422',N'Durian, raw or frozen',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Thịt quả sầu riêng tươi/đông lạnh nguyên chất, không đường.',N'{"MaThongTin":"DD123","MaNguyenLieu":"NL165","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"138.00","ChatDam":"2.50","ChatBotDuong":"28.30","ChatBeo":"1.60","ChatXo":"1.40","natri":"1.00"}'),
+(N'NL172',N'Xoài',60.00,0.82,14.98,0.38,1.60,1.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 09176',N'Mangos, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Thịt xoài chín tươi, bỏ vỏ/hạt.',N'{"MaThongTin":"DD124","MaNguyenLieu":"NL172","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"69.00","ChatDam":"0.60","ChatBotDuong":"15.90","ChatBeo":"0.30","ChatXo":"0.00","natri":"2.10"}'),
+(N'NL175',N'Cùi dừa',354.00,3.33,15.23,33.49,9.00,20.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 12104',N'Nuts, coconut meat, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Cùi dừa già tươi, không sấy/đường; không phải nước dừa.',N'{"MaThongTin":"DD175","MaNguyenLieu":"NL175","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"385.00","ChatDam":"4.80","ChatBotDuong":"10.40","ChatBeo":"36.00","ChatXo":"4.20","natri":"7.00"}'),
+(N'NL177',N'Đậu nành khô',446.00,36.49,30.16,19.94,9.30,2.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 16108',N'Soybeans, mature seeds, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Đậu nành hạt KHÔ chưa ngâm/nấu.',N'{"MaThongTin":"DD1222","MaNguyenLieu":"NL177","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"446.00","ChatDam":"36.49","ChatBotDuong":"30.16","ChatBeo":"19.94","ChatXo":"9.30","natri":"2.00"}'),
+(N'NL178',N'Gelatine bột',335.00,85.60,0.00,0.10,0.00,196.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 19177',N'Gelatins, dry powder, unsweetened',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Gelatin bột khô nguyên chất không đường, chưa ngâm.',N'{"MaThongTin":"DD1230","MaNguyenLieu":"NL178","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"335.00","ChatDam":"85.60","ChatBotDuong":"0.00","ChatBeo":"0.10","ChatXo":"0.00","natri":"196.00"}'),
+(N'NL182',N'Lê',57.00,0.36,15.23,0.14,3.10,1.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 09252',N'Pears, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Lê tươi còn vỏ, phần ăn được.',N'{"MaThongTin":"DD182","MaNguyenLieu":"NL182","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"48.00","ChatDam":"0.70","ChatBotDuong":"10.80","ChatBeo":"0.20","ChatXo":"0.60","natri":"5.00"}'),
+(N'NL183',N'Nước',0.00,0.00,0.00,0.00,0.00,NULL,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 14411 (chỉ 5 đại lượng)',N'Beverages, water, tap, drinking',N'Nước lọc/đá nguyên chất không đường: chỉ dùng 5 đại lượng bằng 0 được USDA công bố. KHÔNG chép natri của mẫu nước máy Mỹ cho nước tại Việt Nam; natri giữ NULL.',N'{"MaThongTin":"DD183","MaNguyenLieu":"NL183","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"0.00","ChatDam":"0.00","ChatBotDuong":"0.00","ChatBeo":"0.00","ChatXo":"0.00","natri":null}'),
+(N'NL184',N'Nước để nấu nước đường',0.00,0.00,0.00,0.00,0.00,NULL,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 14411 (chỉ 5 đại lượng)',N'Beverages, water, tap, drinking',N'Nước lọc/đá nguyên chất không đường: chỉ dùng 5 đại lượng bằng 0 được USDA công bố. KHÔNG chép natri của mẫu nước máy Mỹ cho nước tại Việt Nam; natri giữ NULL.',N'{"MaThongTin":"DD1247","MaNguyenLieu":"NL184","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"0.00","ChatDam":"0.00","ChatBotDuong":"0.00","ChatBeo":"0.00","ChatXo":"0.00","natri":null}'),
+(N'NL189',N'Vải',66.00,0.83,16.53,0.44,1.30,1.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 09164',N'Litchis, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Thịt quả vải tươi, bỏ vỏ/hạt.',N'{"MaThongTin":"DD189","MaNguyenLieu":"NL189","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"66.00","ChatDam":"0.80","ChatBotDuong":"16.60","ChatBeo":"0.40","ChatXo":"1.30","natri":"2.00"}'),
+(N'NL205',N'Nấm hương khô',296.00,9.58,75.37,0.99,11.50,13.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11268',N'Mushrooms, shiitake, dried',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Nấm hương KHÔ, cân trước ngâm.',N'{"MaThongTin":"DD1244","MaNguyenLieu":"NL205","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"296.00","ChatDam":"9.58","ChatBotDuong":"75.37","ChatBeo":"0.99","ChatXo":"11.50","natri":"13.00"}'),
+(N'NL206',N'Sữa bột nguyên kem',494.00,27.00,38.00,26.00,NULL,371.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=468',N'VN2007 10006',N'Sữa bột toàn phần / Whole milk powder',N'Viện Dinh dưỡng 2007; trang PDF 468, trang in 436; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD1254","MaNguyenLieu":"NL206","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"494.00","ChatDam":"27.00","ChatBotDuong":"38.00","ChatBeo":"26.00","ChatXo":null,"natri":"371.00"}'),
+(N'NL230',N'Phở',364.00,5.95,80.18,0.56,1.60,182.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 20133',N'Rice noodles, dry',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Bánh phở KHÔ; mô tả DB đã xác nhận khô. Không áp cho phở tươi/nấu.',N'{"MaThongTin":"DD230","MaNguyenLieu":"NL230","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"364.00","ChatDam":"5.95","ChatBotDuong":"80.18","ChatBeo":"0.56","ChatXo":"1.60","natri":"182.00"}'),
+(N'NL240',N'Hạt tiêu xay',251.00,10.39,63.95,3.26,25.30,20.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 02030',N'Spices, pepper, black',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Tiêu đen khô nguyên chất, không muối/độn.',N'{"MaThongTin":"DD240","MaNguyenLieu":"NL240","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"251.00","ChatDam":"10.40","ChatBotDuong":"64.00","ChatBeo":"3.30","ChatXo":"25.30","natri":"20.00"}'),
+(N'NL301',N'Bột mì',346.00,10.30,73.60,1.10,NULL,4.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=31',N'VN2007 1018',N'Bột mì / Wheat flour',N'Viện Dinh dưỡng 2007; trang PDF 31, trang in 18; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD301","MaNguyenLieu":"NL301","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"347.00","ChatDam":"11.00","ChatBotDuong":"73.20","ChatBeo":"1.10","ChatXo":"0.30","natri":"4.00"}'),
+(N'NL302',N'Cải thảo',16.00,1.20,3.23,0.20,1.20,9.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11119',N'Cabbage, chinese (pe-tsai), raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Cải thảo/pe-tsai sống.',N'{"MaThongTin":"DD302","MaNguyenLieu":"NL302","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"13.00","ChatDam":"1.20","ChatBotDuong":"2.20","ChatBeo":"0.20","ChatXo":"1.00","natri":"12.00"}'),
+(N'NL304',N'Củ sắn',38.00,0.72,8.82,0.09,4.90,4.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11603',N'Yambean (jicama), raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Củ sắn/củ đậu jicama, không phải khoai mì.',N'{"MaThongTin":"DD1218","MaNguyenLieu":"NL304","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"38.00","ChatDam":"0.72","ChatBotDuong":"8.82","ChatBeo":"0.09","ChatXo":"4.90","natri":"4.00"}'),
+(N'NL306',N'Dừa bào sợi',354.00,3.33,15.23,33.49,9.00,20.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 12104',N'Nuts, coconut meat, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Cùi dừa tươi bào, không đường/sấy.',N'{"MaThongTin":"DD1225","MaNguyenLieu":"NL306","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"354.00","ChatDam":"3.33","ChatBotDuong":"15.23","ChatBeo":"33.49","ChatXo":"9.00","natri":"20.00"}'),
+(N'NL307',N'Dưa hấu',30.00,0.61,7.55,0.15,0.40,1.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 09326',N'Watermelon, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Thịt quả dưa hấu tươi, không vỏ.',N'{"MaThongTin":"DD307","MaNguyenLieu":"NL307","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"30.00","ChatDam":"0.60","ChatBotDuong":"6.80","ChatBeo":"0.20","ChatXo":"0.40","natri":"1.00"}'),
+(N'NL309',N'Dưa lưới ruột vàng',34.00,0.84,8.16,0.19,0.90,16.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 09181',N'Melons, cantaloupe, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Dưa lưới ruột vàng/cantaloupe tươi, phần ăn được.',N'{"MaThongTin":"DD309","MaNguyenLieu":"NL309","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"38.00","ChatDam":"0.80","ChatBotDuong":"8.10","ChatBeo":"0.10","ChatXo":"0.90","natri":"16.00"}'),
+(N'NL310',N'Dưa lưới ruột xanh',36.00,0.54,9.09,0.14,0.80,18.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 09184',N'Melons, honeydew, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Dưa ruột xanh/honeydew tươi, phần ăn được.',N'{"MaThongTin":"DD310","MaNguyenLieu":"NL310","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"38.00","ChatDam":"0.80","ChatBotDuong":"8.10","ChatBeo":"0.10","ChatXo":"0.90","natri":"16.00"}'),
+(N'NL311',N'Hành boa rô',61.00,1.50,14.15,0.30,1.80,20.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11246',N'Leeks, (bulb and lower leaf-portion), raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Boa rô tươi phần củ và lá dưới.',N'{"MaThongTin":"DD1232","MaNguyenLieu":"NL311","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"61.00","ChatDam":"1.50","ChatBotDuong":"14.15","ChatBeo":"0.30","ChatXo":"1.80","natri":"20.00"}'),
+(N'NL312',N'Hạt nêm chay',192.00,14.80,28.00,2.00,NULL,20000.00,N'https://www.nestle.com.vn/sites/g/files/pydnoa216/files/2022-05/hat-nem-cao-cap-nam-huong.pdf',N'Nestle MAGGI Nam Huong TCCS 100:2021/NVL',N'Hạt nêm cao cấp MAGGI Nấm Hương; nhãn công bố 2022',N'CHỌN MẪU THAM CHIẾU nhãn công bố 2022, không khẳng định công thức mới nhất. Nguồn mỗi 2.5 g: 4.8 kcal, đạm .37 g, carbs .70 g, béo .05 g, natri .50 g; nhân 40 để về 100 g, đổi g natri sang mg. Không công bố tổng xơ; không dùng nhãn heo cho hạt nêm chay.',N'{"MaThongTin":"DD1274","MaNguyenLieu":"NL312","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"188.00","ChatDam":"14.40","ChatBotDuong":"28.00","ChatBeo":"2.00","ChatXo":null,"natri":"21200.00"}'),
+(N'NL313',N'Khoai môn',112.00,1.50,26.46,0.20,4.10,11.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11518',N'Taro, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Khoai môn Colocasia esculenta sống, phần ăn được. Không lấy bảng khoai sọ Việt Nam thay thế.',N'{"MaThongTin":"DD313","MaNguyenLieu":"NL313","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"113.00","ChatDam":"1.50","ChatBotDuong":"26.40","ChatBeo":"0.20","ChatXo":"1.20","natri":"0.00"}'),
+(N'NL315',N'Nấm hương tươi',34.00,2.24,6.79,0.49,2.50,9.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11238',N'Mushrooms, shiitake, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Nấm hương TƯƠI sống, không khô.',N'{"MaThongTin":"DD315","MaNguyenLieu":"NL315","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"51.00","ChatDam":"5.50","ChatBotDuong":"6.10","ChatBeo":"0.50","ChatXo":"3.00","natri":null}'),
+(N'NL316',N'Nấm mèo khô',304.00,10.60,65.00,0.20,NULL,70.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=223',N'VN2007 4121',N'Mộc nhĩ khô / Dried wood-ear',N'Viện Dinh dưỡng 2007; trang PDF 223, trang in 203; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD316","MaNguyenLieu":"NL316","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"332.00","ChatDam":"10.60","ChatBotDuong":"72.00","ChatBeo":"0.20","ChatXo":"7.00","natri":"70.00"}'),
+(N'NL317',N'Nho',69.00,0.72,18.10,0.16,0.90,2.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 09132',N'Grapes, red or green (European type, such as Thompson seedless), raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Nho đỏ/xanh tươi, mẫu chung; không phải nho khô.',N'{"MaThongTin":"DD317","MaNguyenLieu":"NL317","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"71.00","ChatDam":"0.40","ChatBotDuong":"16.90","ChatBeo":"0.10","ChatXo":"0.60","natri":"2.00"}'),
+(N'NL318',N'Nước dừa tươi',19.00,0.72,3.71,0.20,1.10,105.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 12119',N'Nuts, coconut water (liquid from coconuts)',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. NƯỚC dừa tươi, không đường, không phải cùi dừa hay cả quả. NL123 có mô tả DB là dừa xiêm LẤY NƯỚC.',N'{"MaThongTin":"DD318","MaNguyenLieu":"NL318","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"21.00","ChatDam":"0.40","ChatBotDuong":"4.70","ChatBeo":"0.10","ChatXo":"0.00","natri":"0.00"}'),
+(N'NL320',N'Su hào',27.00,1.70,6.20,0.10,3.60,20.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11241',N'Kohlrabi, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Su hào sống, phần ăn được.',N'{"MaThongTin":"DD320","MaNguyenLieu":"NL320","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"44.00","ChatDam":"2.80","ChatBotDuong":"7.90","ChatBeo":"0.00","ChatXo":"1.70","natri":"52.80"}'),
+(N'NL321',N'Sữa tươi',61.00,3.15,4.78,3.27,0.00,43.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 01211',N'Milk, whole, 3.25% milkfat, without added vitamin A and vitamin D',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. CHỌN MẪU THAM CHIẾU theo yêu cầu người dùng: sữa bò nguyên kem 3.25% béo không thêm đường, không bổ sung vitamin A/D. Không dùng cho sữa tách béo/có đường. Chọn nguồn có nền mẫu rõ, không tự sửa số natri bất thường trong bảng Việt Nam.',N'{"MaThongTin":"DD321","MaNguyenLieu":"NL321","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"74.00","ChatDam":"3.90","ChatBotDuong":"4.80","ChatBeo":"4.40","ChatXo":"0.00","natri":"352.50"}'),
+(N'NL907',N'Tỏi băm',149.00,6.36,33.06,0.50,2.10,17.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11215',N'Garlic, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Tỏi sống; tỏi băm chưa thêm dầu/muối.',N'{"MaThongTin":"DD907","MaNguyenLieu":"NL907","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"126.00","ChatDam":"6.00","ChatBotDuong":"24.60","ChatBeo":"0.30","ChatXo":"1.50","natri":"18.00"}'),
+(N'NL914',N'Bún ăn kèm',110.00,1.70,25.70,NULL,NULL,NULL,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=33',N'VN2007 1020',N'Bún tươi / Rice vermicelli',N'Viện Dinh dưỡng 2007; trang PDF 33, trang in 20; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD914","MaNguyenLieu":"NL914","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"116.00","ChatDam":"1.70","ChatBotDuong":"25.30","ChatBeo":"0.90","ChatXo":"0.50","natri":null}'),
+(N'NL916',N'Gà',199.00,20.30,0.00,13.10,NULL,70.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=317',N'VN2007 7013',N'Thịt gà / Chicken meat average',N'Viện Dinh dưỡng 2007; trang PDF 317, trang in 291; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD916","MaNguyenLieu":"NL916","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"199.00","ChatDam":"20.30","ChatBotDuong":"0.00","ChatBeo":"13.10","ChatXo":"0.00","natri":"70.00"}'),
+(N'NL918',N'Sả băm',99.00,1.82,25.31,0.49,NULL,6.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11972',N'Lemon grass (citronella), raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Sả sống nguyên chất. Nguồn KHÔNG công bố tổng chất xơ: giữ NULL.',N'{"MaThongTin":"DD918","MaNguyenLieu":"NL918","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"99.00","ChatDam":"1.82","ChatBotDuong":"25.31","ChatBeo":"0.49","ChatXo":null,"natri":"6.00"}'),
+(N'NL927',N'Bánh tráng (loại bánh tráng tròn)',333.00,4.00,78.90,0.20,NULL,NULL,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=23',N'VN2007 1010',N'Bánh đa nem / Rice paper for rollers',N'Viện Dinh dưỡng 2007; trang PDF 23, trang in 10; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD927","MaNguyenLieu":"NL927","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"333.00","ChatDam":"4.00","ChatBotDuong":"80.00","ChatBeo":"0.50","ChatXo":"1.00","natri":"300.00"}'),
+(N'NL942',N'Ớt chuông xanh',20.00,0.86,4.64,0.17,1.70,3.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11333',N'Peppers, sweet, green, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Ớt chuông xanh tươi sống.',N'{"MaThongTin":"DD942","MaNguyenLieu":"NL942","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"31.00","ChatDam":"1.30","ChatBotDuong":"6.00","ChatBeo":"0.10","ChatXo":"1.50","natri":"3.00"}'),
+(N'NL943',N'Ớt bột',227.00,15.60,31.80,4.20,NULL,NULL,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=533',N'VN2007 13008',N'Ớt khô bột / Red pepper dried powder',N'Viện Dinh dưỡng 2007; trang PDF 533, trang in 495; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD943","MaNguyenLieu":"NL943","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"322.00","ChatDam":"15.60","ChatBotDuong":"55.40","ChatBeo":"4.20","ChatXo":"23.60","natri":null}'),
+(N'NL947',N'Bột gừng',335.00,8.98,71.62,4.24,14.10,27.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 02021',N'Spices, ginger, ground',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Gừng khô xay nguyên chất.',N'{"MaThongTin":"DD947","MaNguyenLieu":"NL947","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"346.00","ChatDam":"7.60","ChatBotDuong":"74.50","ChatBeo":"2.90","ChatXo":"12.50","natri":"32.00"}'),
+(N'NL954',N'Gạo tẻ',344.00,7.90,75.90,1.00,NULL,5.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=17',N'VN2007 1004',N'Gạo tẻ máy / Ordinary polished rice',N'Viện Dinh dưỡng 2007; trang PDF 17, trang in 4; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD954","MaNguyenLieu":"NL954","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"359.00","ChatDam":"7.50","ChatBotDuong":"76.10","ChatBeo":"2.60","ChatXo":"3.40","natri":"5.00"}'),
+(N'NL955',N'Gạo nếp',346.00,8.40,74.90,1.60,NULL,3.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=15',N'VN2007 1002',N'Gạo nếp máy loại thường / Glutinous rice milled',N'Viện Dinh dưỡng 2007; trang PDF 15, trang in 2; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD955","MaNguyenLieu":"NL955","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"365.00","ChatDam":"8.20","ChatBotDuong":"79.40","ChatBeo":"1.60","ChatXo":"0.60","natri":"3.10"}'),
+(N'NL958',N'Khoai tây',93.00,2.00,20.90,0.10,NULL,7.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=52',N'VN2007 2014',N'Khoai tây / Potato white',N'Viện Dinh dưỡng 2007; trang PDF 52, trang in 37; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD958","MaNguyenLieu":"NL958","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"96.00","ChatDam":"2.00","ChatBotDuong":"21.90","ChatBeo":"0.00","ChatXo":"1.00","natri":"7.00"}'),
+(N'NL960',N'Tía tô',25.00,2.90,3.40,NULL,NULL,3.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=204',N'VN2007 4102',N'Tía tô',N'Viện Dinh dưỡng 2007; trang PDF 204, trang in 184; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD960","MaNguyenLieu":"NL960","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"40.00","ChatDam":"2.90","ChatBotDuong":"7.00","ChatBeo":"0.00","ChatXo":"3.60","natri":"2.80"}'),
+(N'NL964',N'Gạo tẻ (1 cốc)',344.00,7.90,75.90,1.00,NULL,5.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=17',N'VN2007 1004',N'Gạo tẻ máy / Ordinary polished rice',N'Viện Dinh dưỡng 2007; trang PDF 17, trang in 4; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD964","MaNguyenLieu":"NL964","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"350.00","ChatDam":"8.40","ChatBotDuong":"75.40","ChatBeo":"1.60","ChatXo":"0.50","natri":"3.00"}'),
+(N'NL965',N'Gạo nếp (1 cốc)',346.00,8.40,74.90,1.60,NULL,3.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=15',N'VN2007 1002',N'Gạo nếp máy loại thường / Glutinous rice milled',N'Viện Dinh dưỡng 2007; trang PDF 15, trang in 2; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD965","MaNguyenLieu":"NL965","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"350.00","ChatDam":"8.40","ChatBotDuong":"75.40","ChatBeo":"1.60","ChatXo":"0.50","natri":"3.00"}'),
+(N'NL969',N'Hạt sen tươi',89.00,4.13,17.28,0.53,NULL,1.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 12205',N'Seeds, lotus seeds, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Hạt sen TƯƠI sống, bỏ vỏ/tâm không ăn; không áp cho hạt sen khô.',N'{"MaThongTin":"DD969","MaNguyenLieu":"NL969","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"164.00","ChatDam":"9.50","ChatBotDuong":"30.30","ChatBeo":"0.50","ChatXo":"0.80","natri":"1.00"}'),
+(N'NL972',N'Bột mì đa dụng',346.00,10.30,73.60,1.10,NULL,4.00,N'https://www.fao.org/fileadmin/templates/food_composition/documents/pdf/VTN_FCT_2007.pdf#page=31',N'VN2007 1018',N'Bột mì / Wheat flour',N'Viện Dinh dưỡng 2007; trang PDF 31, trang in 18; 100 g phần ăn được. Bảng chỉ ghi Celluloza, KHÔNG phải tổng chất xơ: ChatXo giữ NULL; Celluloza được lưu riêng trong chứng cứ.',N'{"MaThongTin":"DD972","MaNguyenLieu":"NL972","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"347.00","ChatDam":"11.00","ChatBotDuong":"73.20","ChatBeo":"1.10","ChatXo":"0.30","natri":"4.00"}'),
+(N'NL975',N'Dầu oliu',884.00,0.00,0.00,100.00,0.00,2.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 04053',N'Oil, olive, salad or cooking',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Dầu ô liu nguyên chất, không gia vị.',N'{"MaThongTin":"DD975","MaNguyenLieu":"NL975","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"900.00","ChatDam":"0.00","ChatBotDuong":"0.00","ChatBeo":"100.00","ChatXo":"0.00","natri":"2.00"}'),
+(N'NL987',N'Nấm đông cô tươi',34.00,2.24,6.79,0.49,2.50,9.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11238',N'Mushrooms, shiitake, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Nấm đông cô tươi sống.',N'{"MaThongTin":"DD1243","MaNguyenLieu":"NL987","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"34.00","ChatDam":"2.24","ChatBotDuong":"6.79","ChatBeo":"0.49","ChatXo":"2.50","natri":"9.00"}'),
+(N'NL989',N'Nấm bào ngư',33.00,3.31,6.09,0.41,2.30,18.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11987',N'Mushrooms, oyster, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Nấm bào ngư tươi sống.',N'{"MaThongTin":"DD1242","MaNguyenLieu":"NL989","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"33.00","ChatDam":"3.31","ChatBotDuong":"6.09","ChatBeo":"0.41","ChatXo":"2.30","natri":"18.00"}'),
+(N'NL991',N'Thơm',50.00,0.54,13.12,0.12,1.40,1.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 09266',N'Pineapple, raw, all varieties',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Thịt quả dứa chín tươi, đã loại vỏ/lõi không ăn; không phải nước ép.',N'{"MaThongTin":"DD991","MaNguyenLieu":"NL991","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"32.00","ChatDam":"0.80","ChatBotDuong":"7.30","ChatBeo":"0.00","ChatXo":"0.80","natri":"24.20"}'),
+(N'NL993',N'Ớt chuông vàng',27.00,1.00,6.32,0.21,0.90,2.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11951',N'Peppers, sweet, yellow, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Ớt chuông vàng sống.',N'{"MaThongTin":"DD1249","MaNguyenLieu":"NL993","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"27.00","ChatDam":"1.00","ChatBotDuong":"6.32","ChatBeo":"0.21","ChatXo":"0.90","natri":"2.00"}'),
+(N'NL994',N'Ớt chuông đỏ',31.00,0.99,6.03,0.30,2.10,4.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11821',N'Peppers, sweet, red, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Ớt chuông đỏ sống.',N'{"MaThongTin":"DD1248","MaNguyenLieu":"NL994","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"31.00","ChatDam":"0.99","ChatBotDuong":"6.03","ChatBeo":"0.30","ChatXo":"2.10","natri":"4.00"}');
+ IF EXISTS(SELECT 1 FROM #Nguon s LEFT JOIN dbo.NguyenLieu n ON n.MaNguyenLieu=s.MaNguyenLieu
+           WHERE n.MaNguyenLieu IS NULL OR n.TenNguyenLieu COLLATE Latin1_General_100_BIN2 <> s.TenNguyenLieu COLLATE Latin1_General_100_BIN2)
+  THROW 51001,N'Mã/tên nguyên liệu đã khác bản rà soát. Dừng để tránh gán nhầm nguồn.',1;
+ IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT001' AND KyHieu=N'g' AND HeSoGramChuan=1)
+  THROW 51002,N'DVT001 không còn là gam. Dừng cập nhật.',1;
+ -- Dữ liệu mới hơn snapshot sẽ KHÔNG bị ghi đè. Chấp nhận bản cũ hoặc đích giống hệt.
+ IF EXISTS (
+  SELECT 1 FROM #Nguon s LEFT JOIN dbo.ThongTinDinhDuong d WITH(UPDLOCK,HOLDLOCK) ON d.MaNguyenLieu=s.MaNguyenLieu
+  WHERE NOT (
+    (s.SnapshotCu IS NULL AND d.MaThongTin IS NULL)
+    OR (d.MaThongTin IS NOT NULL AND NOT EXISTS(
+      SELECT d.KhoiLuongChuan,d.MaDonVi,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri
+      EXCEPT SELECT CONVERT(decimal(10,2),100),CONVERT(nvarchar(20),N'DVT001'),s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri))
+    OR (s.SnapshotCu IS NOT NULL AND d.MaThongTin IS NOT NULL AND NOT EXISTS(
+      SELECT d.MaThongTin,d.KhoiLuongChuan,d.MaDonVi,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri
+      EXCEPT SELECT j.MaThongTin,j.KhoiLuongChuan,j.MaDonVi,j.NangLuong,j.ChatDam,j.ChatBotDuong,j.ChatBeo,j.ChatXo,j.natri
+      FROM OPENJSON(s.SnapshotCu) WITH(MaThongTin nvarchar(20),KhoiLuongChuan decimal(10,2),MaDonVi nvarchar(20),NangLuong decimal(10,2),ChatDam decimal(10,2),ChatBotDuong decimal(10,2),ChatBeo decimal(10,2),ChatXo decimal(10,2),natri decimal(10,2)) j))
+  )) THROW 51003,N'Có dữ liệu đã đổi sau bản rà soát. Đã dừng; cần đối chiếu trước khi cập nhật.',1;
+ -- NULL là thiếu bằng chứng, không phải 0. Chỉ mở NULL nếu cột đang NOT NULL.
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'NangLuong' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [NangLuong] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatDam' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatDam] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatBotDuong' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatBotDuong] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatBeo' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatBeo] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatXo' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatXo] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'natri' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [natri] decimal(10,2) NULL;
+
+ IF OBJECT_ID(N'dbo.NguonDinhDuongDaDoiChieu',N'U') IS NULL
+ CREATE TABLE dbo.NguonDinhDuongDaDoiChieu(
+  MaNguyenLieu nvarchar(20) NOT NULL PRIMARY KEY,
+  MaThucPhamNguon nvarchar(100) NOT NULL, TenTrongNguon nvarchar(1000) NOT NULL,
+  URL nvarchar(2048) NOT NULL, DieuKien nvarchar(2000) NOT NULL,
+  DuLieuNguonJSON nvarchar(max) NOT NULL, DuLieuTruocLanDauJSON nvarchar(max) NULL,
+  NgayDoiChieu date NOT NULL, NgayApDung datetime2 NOT NULL DEFAULT SYSUTCDATETIME());
+ -- Lưu bản gốc lần đầu để truy vết; chạy lại không làm mất bản gốc.
+ INSERT dbo.NguonDinhDuongDaDoiChieu(MaNguyenLieu,MaThucPhamNguon,TenTrongNguon,URL,DieuKien,DuLieuNguonJSON,DuLieuTruocLanDauJSON,NgayDoiChieu)
+ SELECT s.MaNguyenLieu,s.MaThucPhamNguon,s.TenTrongNguon,s.URL,s.DieuKien,
+   (SELECT CONVERT(decimal(10,2),100) KhoiLuongChuan,N'DVT001' MaDonVi,s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri FOR JSON PATH,INCLUDE_NULL_VALUES,WITHOUT_ARRAY_WRAPPER),
+   (SELECT d.* FROM dbo.ThongTinDinhDuong d WHERE d.MaNguyenLieu=s.MaNguyenLieu FOR JSON PATH,INCLUDE_NULL_VALUES,WITHOUT_ARRAY_WRAPPER),
+   CONVERT(date,'20261120',112)
+ FROM #Nguon s WHERE NOT EXISTS(SELECT 1 FROM dbo.NguonDinhDuongDaDoiChieu p WHERE p.MaNguyenLieu=s.MaNguyenLieu);
+ UPDATE p SET MaThucPhamNguon=s.MaThucPhamNguon,TenTrongNguon=s.TenTrongNguon,URL=s.URL,DieuKien=s.DieuKien,
+  DuLieuNguonJSON=(SELECT CONVERT(decimal(10,2),100) KhoiLuongChuan,N'DVT001' MaDonVi,s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri FOR JSON PATH,INCLUDE_NULL_VALUES,WITHOUT_ARRAY_WRAPPER),NgayDoiChieu=CONVERT(date,'20261120',112)
+ FROM dbo.NguonDinhDuongDaDoiChieu p JOIN #Nguon s ON s.MaNguyenLieu=p.MaNguyenLieu;
+ UPDATE d SET KhoiLuongChuan=100,MaDonVi=N'DVT001',NangLuong=s.NangLuong,ChatDam=s.ChatDam,
+  ChatBotDuong=s.ChatBotDuong,ChatBeo=s.ChatBeo,ChatXo=s.ChatXo,natri=s.natri
+ FROM dbo.ThongTinDinhDuong d JOIN #Nguon s ON s.MaNguyenLieu=d.MaNguyenLieu;
+ -- Giữ mã DD cũ. Bản mới dùng DD + số, tránh trùng mã và đúng quy ước DD[0-9].
+ DECLARE @MaxDD bigint=(SELECT ISNULL(MAX(TRY_CONVERT(bigint,SUBSTRING(MaThongTin,3,18))),0) FROM dbo.ThongTinDinhDuong WITH(UPDLOCK,HOLDLOCK) WHERE MaThongTin LIKE N'DD%');
+ INSERT dbo.ThongTinDinhDuong(MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+ SELECT N'DD'+CONVERT(nvarchar(18),@MaxDD+ROW_NUMBER() OVER(ORDER BY s.MaNguyenLieu)),s.MaNguyenLieu,100,N'DVT001',s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri
+ FROM #Nguon s WHERE NOT EXISTS(SELECT 1 FROM dbo.ThongTinDinhDuong d WHERE d.MaNguyenLieu=s.MaNguyenLieu);
+ IF EXISTS(SELECT 1 FROM #Nguon s JOIN dbo.ThongTinDinhDuong d ON d.MaNguyenLieu=s.MaNguyenLieu WHERE EXISTS(
+  SELECT d.KhoiLuongChuan,d.MaDonVi,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri
+  EXCEPT SELECT CONVERT(decimal(10,2),100),CONVERT(nvarchar(20),N'DVT001'),s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri))
+  THROW 51004,N'Kiểm tra sau ghi không khớp dữ liệu nguồn. Đã hủy giao dịch.',1;
+ COMMIT TRANSACTION;
+ SELECT s.MaNguyenLieu,s.TenNguyenLieu,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri,s.MaThucPhamNguon,s.URL
+ FROM #Nguon s JOIN dbo.ThongTinDinhDuong d ON d.MaNguyenLieu=s.MaNguyenLieu ORDER BY s.MaNguyenLieu;
+ DROP TABLE #Nguon;
+END TRY
+BEGIN CATCH
+ IF XACT_STATE()<>0 ROLLBACK TRANSACTION;
+ THROW;
+END CATCH;
+GO
+USE QuanLyThucDon;
+GO
+SET XACT_ABORT ON;
+-- OFFLINE PATCH: assistant did not execute this file. Review source CSV first.
+BEGIN TRY
+BEGIN TRANSACTION;
+IF OBJECT_ID(N'dbo.NguonDinhDuongChiSo', N'U') IS NULL
+CREATE TABLE dbo.NguonDinhDuongChiSo (MaNguyenLieu nvarchar(20) NOT NULL, ChiSo nvarchar(40) NOT NULL, GiaTri decimal(10,2) NOT NULL, Nguon nvarchar(2048) NOT NULL, MaThucPham nvarchar(50) NOT NULL, GhiChu nvarchar(max) NOT NULL, GiaTriTruoc decimal(10,2) NULL, NgayDoiChieu datetime2 NOT NULL, CONSTRAINT PK_NguonDinhDuongChiSo PRIMARY KEY(MaNguyenLieu,ChiSo));
+-- NL033: Nấm rơm; TFDA G0300102; 100 g edible portion.
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WITH (UPDLOCK,HOLDLOCK) WHERE MaThongTin=N'DD033' AND MaNguyenLieu=N'NL033' AND KhoiLuongChuan=100 AND MaDonVi=N'DVT001') THROW 51001, N'Hồ sơ hoặc đơn vị chuẩn đã thay đổi; hãy đối chiếu lại.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD033' AND (NangLuong = 57.00 OR NangLuong=28.00)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL033' AND ChiSo=N'NangLuong') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL033',N'NangLuong',28.00,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'G0300102',N'Nấm rơm tươi sống; mẫu lấy năm 2025. Không dùng cho nấm đóng hộp.',57.00,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=28.00,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'G0300102',GhiChu=N'Nấm rơm tươi sống; mẫu lấy năm 2025. Không dùng cho nấm đóng hộp.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL033' AND ChiSo=N'NangLuong';
+UPDATE dbo.ThongTinDinhDuong SET NangLuong=28.00 WHERE MaThongTin=N'DD033';
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD033' AND (ChatDam = 3.60 OR ChatDam=3.50)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL033' AND ChiSo=N'ChatDam') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL033',N'ChatDam',3.50,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'G0300102',N'Nấm rơm tươi sống; mẫu lấy năm 2025. Không dùng cho nấm đóng hộp.',3.60,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=3.50,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'G0300102',GhiChu=N'Nấm rơm tươi sống; mẫu lấy năm 2025. Không dùng cho nấm đóng hộp.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL033' AND ChiSo=N'ChatDam';
+UPDATE dbo.ThongTinDinhDuong SET ChatDam=3.50 WHERE MaThongTin=N'DD033';
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD033' AND (ChatBotDuong = 3.40 OR ChatBotDuong=5.10)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL033' AND ChiSo=N'ChatBotDuong') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL033',N'ChatBotDuong',5.10,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'G0300102',N'Nấm rơm tươi sống; mẫu lấy năm 2025. Không dùng cho nấm đóng hộp.',3.40,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=5.10,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'G0300102',GhiChu=N'Nấm rơm tươi sống; mẫu lấy năm 2025. Không dùng cho nấm đóng hộp.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL033' AND ChiSo=N'ChatBotDuong';
+UPDATE dbo.ThongTinDinhDuong SET ChatBotDuong=5.10 WHERE MaThongTin=N'DD033';
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD033' AND (ChatBeo = 3.20 OR ChatBeo=0.30)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL033' AND ChiSo=N'ChatBeo') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL033',N'ChatBeo',0.30,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'G0300102',N'Nấm rơm tươi sống; mẫu lấy năm 2025. Không dùng cho nấm đóng hộp.',3.20,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=0.30,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'G0300102',GhiChu=N'Nấm rơm tươi sống; mẫu lấy năm 2025. Không dùng cho nấm đóng hộp.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL033' AND ChiSo=N'ChatBeo';
+UPDATE dbo.ThongTinDinhDuong SET ChatBeo=0.30 WHERE MaThongTin=N'DD033';
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD033' AND (ChatXo IS NULL OR ChatXo=1.80)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL033' AND ChiSo=N'ChatXo') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL033',N'ChatXo',1.80,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'G0300102',N'Nấm rơm tươi sống; mẫu lấy năm 2025. Không dùng cho nấm đóng hộp.',NULL,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=1.80,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'G0300102',GhiChu=N'Nấm rơm tươi sống; mẫu lấy năm 2025. Không dùng cho nấm đóng hộp.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL033' AND ChiSo=N'ChatXo';
+UPDATE dbo.ThongTinDinhDuong SET ChatXo=1.80 WHERE MaThongTin=N'DD033';
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD033' AND (natri IS NULL OR natri=3.00)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL033' AND ChiSo=N'natri') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL033',N'natri',3.00,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'G0300102',N'Nấm rơm tươi sống; mẫu lấy năm 2025. Không dùng cho nấm đóng hộp.',NULL,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=3.00,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'G0300102',GhiChu=N'Nấm rơm tươi sống; mẫu lấy năm 2025. Không dùng cho nấm đóng hộp.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL033' AND ChiSo=N'natri';
+UPDATE dbo.ThongTinDinhDuong SET natri=3.00 WHERE MaThongTin=N'DD033';
+-- NL1050: Đậu hũ non; TFDA R4701201; 100 g edible portion.
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WITH (UPDLOCK,HOLDLOCK) WHERE MaThongTin=N'DD1050' AND MaNguyenLieu=N'NL1050' AND KhoiLuongChuan=100 AND MaDonVi=N'DVT001') THROW 51001, N'Hồ sơ hoặc đơn vị chuẩn đã thay đổi; hãy đối chiếu lại.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD1050' AND (NangLuong = 97.00 OR NangLuong=51.00)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL1050' AND ChiSo=N'NangLuong') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL1050',N'NangLuong',51.00,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'R4701201',N'Đậu hũ non/soft tofu; mẫu tham khảo chung, không phải kết quả kiểm nghiệm sản phẩm Việt Nam.',97.00,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=51.00,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'R4701201',GhiChu=N'Đậu hũ non/soft tofu; mẫu tham khảo chung, không phải kết quả kiểm nghiệm sản phẩm Việt Nam.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL1050' AND ChiSo=N'NangLuong';
+UPDATE dbo.ThongTinDinhDuong SET NangLuong=51.00 WHERE MaThongTin=N'DD1050';
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD1050' AND (ChatDam = 10.90 OR ChatDam=4.90)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL1050' AND ChiSo=N'ChatDam') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL1050',N'ChatDam',4.90,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'R4701201',N'Đậu hũ non/soft tofu; mẫu tham khảo chung, không phải kết quả kiểm nghiệm sản phẩm Việt Nam.',10.90,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=4.90,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'R4701201',GhiChu=N'Đậu hũ non/soft tofu; mẫu tham khảo chung, không phải kết quả kiểm nghiệm sản phẩm Việt Nam.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL1050' AND ChiSo=N'ChatDam';
+UPDATE dbo.ThongTinDinhDuong SET ChatDam=4.90 WHERE MaThongTin=N'DD1050';
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD1050' AND (ChatBotDuong = 1.10 OR ChatBotDuong=1.60)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL1050' AND ChiSo=N'ChatBotDuong') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL1050',N'ChatBotDuong',1.60,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'R4701201',N'Đậu hũ non/soft tofu; mẫu tham khảo chung, không phải kết quả kiểm nghiệm sản phẩm Việt Nam.',1.10,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=1.60,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'R4701201',GhiChu=N'Đậu hũ non/soft tofu; mẫu tham khảo chung, không phải kết quả kiểm nghiệm sản phẩm Việt Nam.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL1050' AND ChiSo=N'ChatBotDuong';
+UPDATE dbo.ThongTinDinhDuong SET ChatBotDuong=1.60 WHERE MaThongTin=N'DD1050';
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD1050' AND (ChatBeo = 5.40 OR ChatBeo=3.00)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL1050' AND ChiSo=N'ChatBeo') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL1050',N'ChatBeo',3.00,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'R4701201',N'Đậu hũ non/soft tofu; mẫu tham khảo chung, không phải kết quả kiểm nghiệm sản phẩm Việt Nam.',5.40,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=3.00,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'R4701201',GhiChu=N'Đậu hũ non/soft tofu; mẫu tham khảo chung, không phải kết quả kiểm nghiệm sản phẩm Việt Nam.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL1050' AND ChiSo=N'ChatBeo';
+UPDATE dbo.ThongTinDinhDuong SET ChatBeo=3.00 WHERE MaThongTin=N'DD1050';
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD1050' AND (ChatXo = 0.40 OR ChatXo=0.80)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL1050' AND ChiSo=N'ChatXo') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL1050',N'ChatXo',0.80,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'R4701201',N'Đậu hũ non/soft tofu; mẫu tham khảo chung, không phải kết quả kiểm nghiệm sản phẩm Việt Nam.',0.40,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=0.80,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'R4701201',GhiChu=N'Đậu hũ non/soft tofu; mẫu tham khảo chung, không phải kết quả kiểm nghiệm sản phẩm Việt Nam.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL1050' AND ChiSo=N'ChatXo';
+UPDATE dbo.ThongTinDinhDuong SET ChatXo=0.80 WHERE MaThongTin=N'DD1050';
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD1050' AND (natri = 7.00 OR natri=32.00)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL1050' AND ChiSo=N'natri') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL1050',N'natri',32.00,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'R4701201',N'Đậu hũ non/soft tofu; mẫu tham khảo chung, không phải kết quả kiểm nghiệm sản phẩm Việt Nam.',7.00,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=32.00,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'R4701201',GhiChu=N'Đậu hũ non/soft tofu; mẫu tham khảo chung, không phải kết quả kiểm nghiệm sản phẩm Việt Nam.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL1050' AND ChiSo=N'natri';
+UPDATE dbo.ThongTinDinhDuong SET natri=32.00 WHERE MaThongTin=N'DD1050';
+-- NL125: Nấm mèo; TFDA G01101; 100 g edible portion.
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WITH (UPDLOCK,HOLDLOCK) WHERE MaThongTin=N'DD125' AND MaNguyenLieu=N'NL125' AND KhoiLuongChuan=100 AND MaDonVi=N'DVT001') THROW 51001, N'Hồ sơ hoặc đơn vị chuẩn đã thay đổi; hãy đối chiếu lại.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD125' AND (NangLuong = 304.00 OR NangLuong=224.00)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL125' AND ChiSo=N'NangLuong') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL125',N'NangLuong',224.00,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'G01101',N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',304.00,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=224.00,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'G01101',GhiChu=N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL125' AND ChiSo=N'NangLuong';
+UPDATE dbo.ThongTinDinhDuong SET NangLuong=224.00 WHERE MaThongTin=N'DD125';
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD125' AND (ChatDam = 10.60 OR ChatDam=13.80)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL125' AND ChiSo=N'ChatDam') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL125',N'ChatDam',13.80,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'G01101',N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',10.60,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=13.80,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'G01101',GhiChu=N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL125' AND ChiSo=N'ChatDam';
+UPDATE dbo.ThongTinDinhDuong SET ChatDam=13.80 WHERE MaThongTin=N'DD125';
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD125' AND (ChatBotDuong = 65.00 OR ChatBotDuong=74.70)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL125' AND ChiSo=N'ChatBotDuong') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL125',N'ChatBotDuong',74.70,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'G01101',N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',65.00,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=74.70,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'G01101',GhiChu=N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL125' AND ChiSo=N'ChatBotDuong';
+UPDATE dbo.ThongTinDinhDuong SET ChatBotDuong=74.70 WHERE MaThongTin=N'DD125';
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD125' AND (ChatBeo = 0.20 OR ChatBeo=0.70)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL125' AND ChiSo=N'ChatBeo') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL125',N'ChatBeo',0.70,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'G01101',N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',0.20,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=0.70,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'G01101',GhiChu=N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL125' AND ChiSo=N'ChatBeo';
+UPDATE dbo.ThongTinDinhDuong SET ChatBeo=0.70 WHERE MaThongTin=N'DD125';
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD125' AND (ChatXo IS NULL OR ChatXo=57.70)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL125' AND ChiSo=N'ChatXo') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL125',N'ChatXo',57.70,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'G01101',N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',NULL,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=57.70,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'G01101',GhiChu=N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL125' AND ChiSo=N'ChatXo';
+UPDATE dbo.ThongTinDinhDuong SET ChatXo=57.70 WHERE MaThongTin=N'DD125';
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD125' AND (natri = 70.00 OR natri=28.00)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL125' AND ChiSo=N'natri') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL125',N'natri',28.00,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'G01101',N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',70.00,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=28.00,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'G01101',GhiChu=N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL125' AND ChiSo=N'natri';
+UPDATE dbo.ThongTinDinhDuong SET natri=28.00 WHERE MaThongTin=N'DD125';
+-- NL316: Nấm mèo khô; TFDA G01101; 100 g edible portion.
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WITH (UPDLOCK,HOLDLOCK) WHERE MaThongTin=N'DD316' AND MaNguyenLieu=N'NL316' AND KhoiLuongChuan=100 AND MaDonVi=N'DVT001') THROW 51001, N'Hồ sơ hoặc đơn vị chuẩn đã thay đổi; hãy đối chiếu lại.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD316' AND (NangLuong = 304.00 OR NangLuong=224.00)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL316' AND ChiSo=N'NangLuong') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL316',N'NangLuong',224.00,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'G01101',N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',304.00,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=224.00,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'G01101',GhiChu=N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL316' AND ChiSo=N'NangLuong';
+UPDATE dbo.ThongTinDinhDuong SET NangLuong=224.00 WHERE MaThongTin=N'DD316';
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD316' AND (ChatDam = 10.60 OR ChatDam=13.80)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL316' AND ChiSo=N'ChatDam') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL316',N'ChatDam',13.80,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'G01101',N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',10.60,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=13.80,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'G01101',GhiChu=N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL316' AND ChiSo=N'ChatDam';
+UPDATE dbo.ThongTinDinhDuong SET ChatDam=13.80 WHERE MaThongTin=N'DD316';
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD316' AND (ChatBotDuong = 65.00 OR ChatBotDuong=74.70)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL316' AND ChiSo=N'ChatBotDuong') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL316',N'ChatBotDuong',74.70,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'G01101',N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',65.00,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=74.70,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'G01101',GhiChu=N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL316' AND ChiSo=N'ChatBotDuong';
+UPDATE dbo.ThongTinDinhDuong SET ChatBotDuong=74.70 WHERE MaThongTin=N'DD316';
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD316' AND (ChatBeo = 0.20 OR ChatBeo=0.70)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL316' AND ChiSo=N'ChatBeo') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL316',N'ChatBeo',0.70,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'G01101',N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',0.20,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=0.70,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'G01101',GhiChu=N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL316' AND ChiSo=N'ChatBeo';
+UPDATE dbo.ThongTinDinhDuong SET ChatBeo=0.70 WHERE MaThongTin=N'DD316';
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD316' AND (ChatXo IS NULL OR ChatXo=57.70)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL316' AND ChiSo=N'ChatXo') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL316',N'ChatXo',57.70,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'G01101',N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',NULL,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=57.70,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'G01101',GhiChu=N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL316' AND ChiSo=N'ChatXo';
+UPDATE dbo.ThongTinDinhDuong SET ChatXo=57.70 WHERE MaThongTin=N'DD316';
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD316' AND (natri = 70.00 OR natri=28.00)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL316' AND ChiSo=N'natri') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL316',N'natri',28.00,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'G01101',N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',70.00,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=28.00,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'G01101',GhiChu=N'Nấm mèo KHÔ, khối lượng trước ngâm; không áp cho nấm đã ngâm nở.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL316' AND ChiSo=N'natri';
+UPDATE dbo.ThongTinDinhDuong SET natri=28.00 WHERE MaThongTin=N'DD316';
+-- NL131: Đường phèn; TFDA N0100201; 100 g edible portion.
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WITH (UPDLOCK,HOLDLOCK) WHERE MaThongTin=N'DD1208' AND MaNguyenLieu=N'NL131' AND KhoiLuongChuan=100 AND MaDonVi=N'DVT001') THROW 51001, N'Hồ sơ hoặc đơn vị chuẩn đã thay đổi; hãy đối chiếu lại.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.ThongTinDinhDuong WHERE MaThongTin=N'DD1208' AND (natri IS NULL OR natri=1.00)) THROW 51002, N'Dữ liệu đã đổi sau lần chụp; dừng để tránh ghi đè.', 1;
+IF NOT EXISTS (SELECT 1 FROM dbo.NguonDinhDuongChiSo WHERE MaNguyenLieu=N'NL131' AND ChiSo=N'natri') INSERT dbo.NguonDinhDuongChiSo VALUES (N'NL131',N'natri',1.00,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'N0100201',N'Chỉ bổ sung natri 1 mg/100 g từ mẫu đường phèn TFDA. Các chỉ số khác vẫn theo MEXT 03009: đây là hồ sơ tham khảo ghép nguồn, không phải một mẫu phân tích duy nhất. Không chuyển Tr của MEXT thành 0.',NULL,SYSUTCDATETIME());
+UPDATE dbo.NguonDinhDuongChiSo SET GiaTri=1.00,Nguon=N'https://data.fda.gov.tw/data/opendata/export/20/json',MaThucPham=N'N0100201',GhiChu=N'Chỉ bổ sung natri 1 mg/100 g từ mẫu đường phèn TFDA. Các chỉ số khác vẫn theo MEXT 03009: đây là hồ sơ tham khảo ghép nguồn, không phải một mẫu phân tích duy nhất. Không chuyển Tr của MEXT thành 0.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL131' AND ChiSo=N'natri';
+UPDATE dbo.ThongTinDinhDuong SET natri=1.00 WHERE MaThongTin=N'DD1208';
+UPDATE dbo.NguyenLieu SET MoTa=N'Chỉ bổ sung natri 1 mg/100 g từ mẫu đường phèn TFDA. Các chỉ số khác vẫn theo MEXT 03009: đây là hồ sơ tham khảo ghép nguồn, không phải một mẫu phân tích duy nhất. Không chuyển Tr của MEXT thành 0. Nguồn natri: https://data.fda.gov.tw/data/opendata/export/20/json; TFDA N0100201. Nguồn chỉ số khác: https://fooddb.mext.go.jp/details/details.pl?ITEM_NO=3_03009_7' WHERE MaNguyenLieu=N'NL131' AND (MoTa=N'MEXT 03009: đường phèn kết tinh, trên 100 g. Đạm/béo/xơ (0) là giá trị ước tính. Natri Tr = lượng vết, không xác định số mg; lưu NULL. Dữ liệu tham khảo, không phải nhãn hãng cụ thể. Nguồn: https://fooddb.mext.go.jp/details/details.pl?ITEM_NO=3_03009_7' OR MoTa=N'Chỉ bổ sung natri 1 mg/100 g từ mẫu đường phèn TFDA. Các chỉ số khác vẫn theo MEXT 03009: đây là hồ sơ tham khảo ghép nguồn, không phải một mẫu phân tích duy nhất. Không chuyển Tr của MEXT thành 0. Nguồn natri: https://data.fda.gov.tw/data/opendata/export/20/json; TFDA N0100201. Nguồn chỉ số khác: https://fooddb.mext.go.jp/details/details.pl?ITEM_NO=3_03009_7');
+COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+THROW;
+END CATCH;
+GO
+SELECT * FROM dbo.ThongTinDinhDuong WHERE MaNguyenLieu IN (N'NL033',N'NL1050',N'NL125',N'NL316',N'NL131');
+USE QuanLyThucDon;
+GO
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+-- CHỈ cập nhật hồ sơ đã có đối chiếu chính thức; không sửa công thức, số lượng hoặc quy đổi.
+-- Tất cả số: 100 g PHẦN ĂN ĐƯỢC; kcal, g protein/carbs/béo/xơ, mg NATRI (không phải muối).
+-- Chưa công bố tổng chất xơ -> NULL, tuyệt đối không điền 0 thay thế.
+-- Mặc định chạy thật trong giao dịch. Có kiểm tra snapshot cũ, chạy lại an toàn nếu dữ liệu đã đúng đích.
+BEGIN TRY
+ BEGIN TRANSACTION;
+ DECLARE @LockResult int;
+ EXEC @LockResult = sys.sp_getapplock @Resource=N'CookHub_VerifiedNutrientSources_v1', @LockMode=N'Exclusive', @LockOwner=N'Transaction', @LockTimeout=10000;
+ IF @LockResult < 0 THROW 51000,N'Không lấy được khóa cập nhật. Hãy chạy lại sau.',1;
+ CREATE TABLE #Nguon (
+  MaNguyenLieu nvarchar(20) PRIMARY KEY, TenNguyenLieu nvarchar(200),
+  NangLuong decimal(10,2), ChatDam decimal(10,2), ChatBotDuong decimal(10,2),
+  ChatBeo decimal(10,2), ChatXo decimal(10,2), natri decimal(10,2),
+  URL nvarchar(2048), MaThucPhamNguon nvarchar(100), TenTrongNguon nvarchar(1000),
+  DieuKien nvarchar(2000), SnapshotCu nvarchar(max));
+ INSERT INTO #Nguon VALUES
+(N'NL046',N'Rau muống',19.00,2.60,3.30,0.50,2.40,41.00,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'E5600401',N'水蕹菜',N'TFDA; 100 g phần ăn được; dùng năng lượng hiệu chỉnh 修正熱量, không tính lại bằng 4-4-9. Rau muống sống phần ăn được, chưa xào với dầu/gia vị.',N'{"MaThongTin":"DD046","MaNguyenLieu":"NL046","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"25.00","ChatDam":"3.20","ChatBotDuong":"2.10","ChatBeo":"0.40","ChatXo":null,"natri":"37.00"}'),
+(N'NL078',N'Giấm gạo',46.00,0.20,7.40,0.00,0.00,12.00,N'https://fooddb.mext.go.jp/details/details.pl?ITEM_NO=17_17016_7',N'MEXT 17016',N'Rice vinegar / 米酢',N'Giấm gạo không pha gia vị, 100 g; tổng chất xơ (0) là giá trị ước tính được nguồn công bố, không phải tự điền thiếu thành 0. Không áp cho giấm sushi có đường/muối.',N'{"MaThongTin":"DD078","MaNguyenLieu":"NL078","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"18.00","ChatDam":"0.00","ChatBotDuong":"0.04","ChatBeo":"0.00","ChatXo":"0.00","natri":"5.00"}'),
+(N'NL080',N'Nước lọc',0.00,0.00,0.00,0.00,0.00,2.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 14555',N'Water, bottled, generic',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Chọn mẫu NƯỚC ĐÓNG CHAI CHUNG làm nước tham chiếu cho demo, không phải phép đo nước lọc/nước máy tại nhà. Đá tính khối lượng nước ăn vào, không gồm đá bỏ đi.',N'{"MaThongTin":"DD080","MaNguyenLieu":"NL080","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"0.00","ChatDam":"0.00","ChatBotDuong":"0.00","ChatBeo":"0.00","ChatXo":"0.00","natri":null}'),
+(N'NL1051',N'Bột chiên xù',395.00,13.35,71.98,5.30,4.50,732.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 18079',N'Bread crumbs, dry, grated, plain',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Chọn vụn bánh mì KHÔ không tẩm gia vị (plain bread crumbs) làm mẫu bột chiên xù. Không chứng nhận mọi nhãn panko; chỉ lượng bám thực sự ăn vào mới được tính.',N'{"MaThongTin":"DD006","MaNguyenLieu":"NL1051","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"383.00","ChatDam":"11.40","ChatBotDuong":"75.90","ChatBeo":"3.70","ChatXo":"0.00","natri":"0.00"}'),
+(N'NL1097',N'Hạt điều',553.00,18.22,30.19,43.85,3.30,12.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 12087',N'Nuts, cashew nuts, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Chọn hạt điều sống không muối, phần nhân ăn được; không áp cho hạt điều rang muối.',N'{"MaThongTin":"DD024","MaNguyenLieu":"NL1097","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"608.00","ChatDam":"18.40","ChatBotDuong":"29.30","ChatBeo":"46.30","ChatXo":"0.60","natri":"12.00"}'),
+(N'NL1231',N'Nước đá',0.00,0.00,0.00,0.00,0.00,2.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 14555',N'Water, bottled, generic',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Chọn mẫu NƯỚC ĐÓNG CHAI CHUNG làm nước tham chiếu cho demo, không phải phép đo nước lọc/nước máy tại nhà. Đá tính khối lượng nước ăn vào, không gồm đá bỏ đi.',N'{"MaThongTin":"DD1246","MaNguyenLieu":"NL1231","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"0.00","ChatDam":"0.00","ChatBotDuong":"0.00","ChatBeo":"0.00","ChatXo":"0.00","natri":null}'),
+(N'NL135',N'Củ cải trắng',18.00,0.60,4.10,0.10,1.60,21.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11430',N'Radishes, oriental, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Củ cải trắng oriental/daikon sống, phần ăn được.',N'{"MaThongTin":"DD117","MaNguyenLieu":"NL135","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"21.00","ChatDam":"1.50","ChatBotDuong":"3.60","ChatBeo":"0.10","ChatXo":null,"natri":"10.00"}'),
+(N'NL147',N'Bột nếp',359.00,4.50,82.30,0.40,0.60,16.00,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'A0520401',N'白糯米粉',N'TFDA; 100 g phần ăn được; dùng năng lượng hiệu chỉnh 修正熱量, không tính lại bằng 4-4-9. Bột nếp trắng xay nước, dạng bột khô, chưa nấu, không phải gạo hạt.',N'{"MaThongTin":"DD147","MaNguyenLieu":"NL147","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"362.00","ChatDam":"8.20","ChatBotDuong":"78.80","ChatBeo":"1.60","ChatXo":null,"natri":"3.00"}'),
+(N'NL153',N'Hạnh nhân cắt lát',579.00,21.15,21.55,49.93,12.50,1.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 12061',N'Nuts, almonds',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Chọn hạnh nhân sống KHÔNG MUỐI, cắt lát chưa rang/tẩm. Thay mẫu natri cao cũ, không phải mọi loại hạnh nhân lát bán sẵn.',N'{"MaThongTin":"DD153","MaNguyenLieu":"NL153","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"652.00","ChatDam":"21.20","ChatBotDuong":"17.60","ChatBeo":"55.10","ChatXo":"10.50","natri":"339.00"}'),
+(N'NL179',N'Hạnh nhân lát',579.00,21.15,21.55,49.93,12.50,1.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 12061',N'Nuts, almonds',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Chọn hạnh nhân sống KHÔNG MUỐI, cắt lát chưa rang/tẩm. Thay mẫu natri cao cũ, không phải mọi loại hạnh nhân lát bán sẵn.',N'{"MaThongTin":"DD179","MaNguyenLieu":"NL179","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"652.00","ChatDam":"21.20","ChatBotDuong":"17.60","ChatBeo":"55.10","ChatXo":"10.50","natri":"339.00"}'),
+(N'NL183',N'Nước',0.00,0.00,0.00,0.00,0.00,2.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 14555',N'Water, bottled, generic',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Chọn mẫu NƯỚC ĐÓNG CHAI CHUNG làm nước tham chiếu cho demo, không phải phép đo nước lọc/nước máy tại nhà. Đá tính khối lượng nước ăn vào, không gồm đá bỏ đi.',N'{"MaThongTin":"DD183","MaNguyenLieu":"NL183","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"0.00","ChatDam":"0.00","ChatBotDuong":"0.00","ChatBeo":"0.00","ChatXo":"0.00","natri":null}'),
+(N'NL184',N'Nước để nấu nước đường',0.00,0.00,0.00,0.00,0.00,2.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 14555',N'Water, bottled, generic',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Chọn mẫu NƯỚC ĐÓNG CHAI CHUNG làm nước tham chiếu cho demo, không phải phép đo nước lọc/nước máy tại nhà. Đá tính khối lượng nước ăn vào, không gồm đá bỏ đi.',N'{"MaThongTin":"DD1247","MaNguyenLieu":"NL184","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"0.00","ChatDam":"0.00","ChatBotDuong":"0.00","ChatBeo":"0.00","ChatXo":"0.00","natri":null}'),
+(N'NL206',N'Sữa bột nguyên kem',496.00,26.32,38.42,26.71,0.00,371.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 01212',N'Milk, dry, whole, without added vitamin D',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Sữa bột nguyên kem KHÔ, chưa pha, không bổ sung vitamin D; không áp cho sữa công thức hoặc bột kem thực vật.',N'{"MaThongTin":"DD1254","MaNguyenLieu":"NL206","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"494.00","ChatDam":"27.00","ChatBotDuong":"38.00","ChatBeo":"26.00","ChatXo":null,"natri":"371.00"}'),
+(N'NL301',N'Bột mì',364.00,10.33,76.31,0.98,2.70,2.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 20481',N'Wheat flour, white, all-purpose, unenriched',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Bột mì đa dụng trắng KHÔ, không tăng cường vi chất, không tự nở. Không dùng cho hỗn hợp bột bánh bao pha sẵn.',N'{"MaThongTin":"DD301","MaNguyenLieu":"NL301","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"346.00","ChatDam":"10.30","ChatBotDuong":"73.60","ChatBeo":"1.10","ChatXo":null,"natri":"4.00"}'),
+(N'NL305',N'Đậu xanh đãi vỏ',315.00,24.60,59.60,1.30,11.20,1.00,N'https://data.fda.gov.tw/data/opendata/export/20/json',N'H0710101',N'綠豆仁',N'TFDA; 100 g phần ăn được; dùng năng lượng hiệu chỉnh 修正熱量, không tính lại bằng 4-4-9. Đậu xanh đã bỏ vỏ dạng KHÔ, chưa ngâm/nấu.',N'{"MaThongTin":"DD305","MaNguyenLieu":"NL305","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"328.00","ChatDam":"23.40","ChatBotDuong":"53.10","ChatBeo":"2.40","ChatXo":"4.00","natri":"3.00"}'),
+(N'NL943',N'Ớt bột',318.00,12.01,56.63,17.27,27.20,30.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 02031',N'Spices, pepper, red or cayenne',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Chọn ớt đỏ/cayenne KHÔ XAY nguyên chất, không muối/độn; không phải bột ớt Hàn Quốc hay sa tế.',N'{"MaThongTin":"DD943","MaNguyenLieu":"NL943","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"227.00","ChatDam":"15.60","ChatBotDuong":"31.80","ChatBeo":"4.20","ChatXo":null,"natri":null}'),
+(N'NL954',N'Gạo tẻ',365.00,7.13,79.95,0.66,1.30,5.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 20444',N'Rice, white, long-grain, regular, raw, unenriched',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Gạo tẻ trắng hạt dài KHÔ, không tăng cường vi chất. Không phải cơm chín. Chọn mẫu tham khảo này; không đại diện mọi giống gạo.',N'{"MaThongTin":"DD954","MaNguyenLieu":"NL954","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"344.00","ChatDam":"7.90","ChatBotDuong":"75.90","ChatBeo":"1.00","ChatXo":null,"natri":"5.00"}'),
+(N'NL955',N'Gạo nếp',370.00,6.81,81.68,0.55,2.80,7.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 20054',N'Rice, white, glutinous, unenriched, uncooked',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Gạo nếp trắng KHÔ, không tăng cường vi chất. Không phải xôi/cơm nếp chín.',N'{"MaThongTin":"DD955","MaNguyenLieu":"NL955","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"346.00","ChatDam":"8.40","ChatBotDuong":"74.90","ChatBeo":"1.60","ChatXo":null,"natri":"3.00"}'),
+(N'NL964',N'Gạo tẻ (1 cốc)',365.00,7.13,79.95,0.66,1.30,5.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 20444',N'Rice, white, long-grain, regular, raw, unenriched',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Gạo tẻ trắng hạt dài KHÔ, không tăng cường vi chất. Không phải cơm chín. Chọn mẫu tham khảo này; không đại diện mọi giống gạo.',N'{"MaThongTin":"DD964","MaNguyenLieu":"NL964","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"344.00","ChatDam":"7.90","ChatBotDuong":"75.90","ChatBeo":"1.00","ChatXo":null,"natri":"5.00"}'),
+(N'NL965',N'Gạo nếp (1 cốc)',370.00,6.81,81.68,0.55,2.80,7.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 20054',N'Rice, white, glutinous, unenriched, uncooked',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Gạo nếp trắng KHÔ, không tăng cường vi chất. Không phải xôi/cơm nếp chín.',N'{"MaThongTin":"DD965","MaNguyenLieu":"NL965","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"346.00","ChatDam":"8.40","ChatBotDuong":"74.90","ChatBeo":"1.60","ChatXo":null,"natri":"3.00"}'),
+(N'NL972',N'Bột mì đa dụng',364.00,10.33,76.31,0.98,2.70,2.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 20481',N'Wheat flour, white, all-purpose, unenriched',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Bột mì đa dụng trắng KHÔ, không tăng cường vi chất, không tự nở. Không dùng cho hỗn hợp bột bánh bao pha sẵn.',N'{"MaThongTin":"DD972","MaNguyenLieu":"NL972","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"346.00","ChatDam":"10.30","ChatBotDuong":"73.60","ChatBeo":"1.10","ChatXo":null,"natri":"4.00"}');
+ IF EXISTS(SELECT 1 FROM #Nguon s LEFT JOIN dbo.NguyenLieu n ON n.MaNguyenLieu=s.MaNguyenLieu
+           WHERE n.MaNguyenLieu IS NULL OR n.TenNguyenLieu COLLATE Latin1_General_100_BIN2 <> s.TenNguyenLieu COLLATE Latin1_General_100_BIN2)
+  THROW 51001,N'Mã/tên nguyên liệu đã khác bản rà soát. Dừng để tránh gán nhầm nguồn.',1;
+ IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT001' AND KyHieu=N'g' AND HeSoGramChuan=1)
+  THROW 51002,N'DVT001 không còn là gam. Dừng cập nhật.',1;
+ -- Dữ liệu mới hơn snapshot sẽ KHÔNG bị ghi đè. Chấp nhận bản cũ hoặc đích giống hệt.
+ IF EXISTS (
+  SELECT 1 FROM #Nguon s LEFT JOIN dbo.ThongTinDinhDuong d WITH(UPDLOCK,HOLDLOCK) ON d.MaNguyenLieu=s.MaNguyenLieu
+  WHERE NOT (
+    (s.SnapshotCu IS NULL AND d.MaThongTin IS NULL)
+    OR (d.MaThongTin IS NOT NULL AND NOT EXISTS(
+      SELECT d.KhoiLuongChuan,d.MaDonVi,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri
+      EXCEPT SELECT CONVERT(decimal(10,2),100),CONVERT(nvarchar(20),N'DVT001'),s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri))
+    OR (s.SnapshotCu IS NOT NULL AND d.MaThongTin IS NOT NULL AND NOT EXISTS(
+      SELECT d.MaThongTin,d.KhoiLuongChuan,d.MaDonVi,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri
+      EXCEPT SELECT j.MaThongTin,j.KhoiLuongChuan,j.MaDonVi,j.NangLuong,j.ChatDam,j.ChatBotDuong,j.ChatBeo,j.ChatXo,j.natri
+      FROM OPENJSON(s.SnapshotCu) WITH(MaThongTin nvarchar(20),KhoiLuongChuan decimal(10,2),MaDonVi nvarchar(20),NangLuong decimal(10,2),ChatDam decimal(10,2),ChatBotDuong decimal(10,2),ChatBeo decimal(10,2),ChatXo decimal(10,2),natri decimal(10,2)) j))
+  )) THROW 51003,N'Có dữ liệu đã đổi sau bản rà soát. Đã dừng; cần đối chiếu trước khi cập nhật.',1;
+ -- NULL là thiếu bằng chứng, không phải 0. Chỉ mở NULL nếu cột đang NOT NULL.
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'NangLuong' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [NangLuong] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatDam' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatDam] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatBotDuong' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatBotDuong] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatBeo' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatBeo] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatXo' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatXo] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'natri' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [natri] decimal(10,2) NULL;
+
+ IF OBJECT_ID(N'dbo.NguonDinhDuongDaDoiChieu',N'U') IS NULL
+ CREATE TABLE dbo.NguonDinhDuongDaDoiChieu(
+  MaNguyenLieu nvarchar(20) NOT NULL PRIMARY KEY,
+  MaThucPhamNguon nvarchar(100) NOT NULL, TenTrongNguon nvarchar(1000) NOT NULL,
+  URL nvarchar(2048) NOT NULL, DieuKien nvarchar(2000) NOT NULL,
+  DuLieuNguonJSON nvarchar(max) NOT NULL, DuLieuTruocLanDauJSON nvarchar(max) NULL,
+  NgayDoiChieu date NOT NULL, NgayApDung datetime2 NOT NULL DEFAULT SYSUTCDATETIME());
+ -- Lưu bản gốc lần đầu để truy vết; chạy lại không làm mất bản gốc.
+ INSERT dbo.NguonDinhDuongDaDoiChieu(MaNguyenLieu,MaThucPhamNguon,TenTrongNguon,URL,DieuKien,DuLieuNguonJSON,DuLieuTruocLanDauJSON,NgayDoiChieu)
+ SELECT s.MaNguyenLieu,s.MaThucPhamNguon,s.TenTrongNguon,s.URL,s.DieuKien,
+   (SELECT CONVERT(decimal(10,2),100) KhoiLuongChuan,N'DVT001' MaDonVi,s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri FOR JSON PATH,INCLUDE_NULL_VALUES,WITHOUT_ARRAY_WRAPPER),
+   (SELECT d.* FROM dbo.ThongTinDinhDuong d WHERE d.MaNguyenLieu=s.MaNguyenLieu FOR JSON PATH,INCLUDE_NULL_VALUES,WITHOUT_ARRAY_WRAPPER),
+   CONVERT(date,'20261120',112)
+ FROM #Nguon s WHERE NOT EXISTS(SELECT 1 FROM dbo.NguonDinhDuongDaDoiChieu p WHERE p.MaNguyenLieu=s.MaNguyenLieu);
+ UPDATE p SET MaThucPhamNguon=s.MaThucPhamNguon,TenTrongNguon=s.TenTrongNguon,URL=s.URL,DieuKien=s.DieuKien,
+  DuLieuNguonJSON=(SELECT CONVERT(decimal(10,2),100) KhoiLuongChuan,N'DVT001' MaDonVi,s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri FOR JSON PATH,INCLUDE_NULL_VALUES,WITHOUT_ARRAY_WRAPPER),NgayDoiChieu=CONVERT(date,'20261120',112)
+ FROM dbo.NguonDinhDuongDaDoiChieu p JOIN #Nguon s ON s.MaNguyenLieu=p.MaNguyenLieu;
+ UPDATE d SET KhoiLuongChuan=100,MaDonVi=N'DVT001',NangLuong=s.NangLuong,ChatDam=s.ChatDam,
+  ChatBotDuong=s.ChatBotDuong,ChatBeo=s.ChatBeo,ChatXo=s.ChatXo,natri=s.natri
+ FROM dbo.ThongTinDinhDuong d JOIN #Nguon s ON s.MaNguyenLieu=d.MaNguyenLieu;
+ -- Giữ mã DD cũ. Bản mới dùng DD + số, tránh trùng mã và đúng quy ước DD[0-9].
+ DECLARE @MaxDD bigint=(SELECT ISNULL(MAX(TRY_CONVERT(bigint,SUBSTRING(MaThongTin,3,18))),0) FROM dbo.ThongTinDinhDuong WITH(UPDLOCK,HOLDLOCK) WHERE MaThongTin LIKE N'DD%');
+ INSERT dbo.ThongTinDinhDuong(MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+ SELECT N'DD'+CONVERT(nvarchar(18),@MaxDD+ROW_NUMBER() OVER(ORDER BY s.MaNguyenLieu)),s.MaNguyenLieu,100,N'DVT001',s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri
+ FROM #Nguon s WHERE NOT EXISTS(SELECT 1 FROM dbo.ThongTinDinhDuong d WHERE d.MaNguyenLieu=s.MaNguyenLieu);
+ IF EXISTS(SELECT 1 FROM #Nguon s JOIN dbo.ThongTinDinhDuong d ON d.MaNguyenLieu=s.MaNguyenLieu WHERE EXISTS(
+  SELECT d.KhoiLuongChuan,d.MaDonVi,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri
+  EXCEPT SELECT CONVERT(decimal(10,2),100),CONVERT(nvarchar(20),N'DVT001'),s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri))
+  THROW 51004,N'Kiểm tra sau ghi không khớp dữ liệu nguồn. Đã hủy giao dịch.',1;
+ COMMIT TRANSACTION;
+ SELECT s.MaNguyenLieu,s.TenNguyenLieu,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri,s.MaThucPhamNguon,s.URL
+ FROM #Nguon s JOIN dbo.ThongTinDinhDuong d ON d.MaNguyenLieu=s.MaNguyenLieu ORDER BY s.MaNguyenLieu;
+ DROP TABLE #Nguon;
+END TRY
+BEGIN CATCH
+ IF XACT_STATE()<>0 ROLLBACK TRANSACTION;
+ THROW;
+END CATCH;
+GO
+USE QuanLyThucDon;
+GO
+SET XACT_ABORT ON;
+SET NOCOUNT ON;
+-- Chỉ chạy sau khi đọc điều kiện trong quy-doi-co-nguon.csv. Không sửa công thức.
+BEGIN TRY
+BEGIN TRANSACTION;
+DECLARE @Lock int; EXEC @Lock=sys.sp_getapplock @Resource=N'CookHub_Conversions_Round3',@LockMode=N'Exclusive',@LockOwner=N'Transaction',@LockTimeout=10000; IF @Lock<0 THROW 51100,N'Không lấy được khóa cập nhật.',1;
+IF OBJECT_ID(N'dbo.NguonQuyDoiDaDoiChieu',N'U') IS NULL CREATE TABLE dbo.NguonQuyDoiDaDoiChieu(MaNguyenLieu nvarchar(20) NOT NULL,MaDonVi nvarchar(20) NOT NULL,Gram decimal(18,3) NOT NULL,URL nvarchar(2048) NOT NULL,MaNguon nvarchar(50) NOT NULL,DieuKien nvarchar(2000) NOT NULL,SnapshotCu nvarchar(max) NULL,NgayDoiChieu datetime2 NOT NULL, CONSTRAINT PK_NguonQuyDoiDaDoiChieu PRIMARY KEY(MaNguyenLieu,MaDonVi));
+DECLARE @NextQD bigint=(SELECT ISNULL(MAX(TRY_CONVERT(bigint,SUBSTRING(MaQuyDoi,3,18))),0) FROM dbo.QuyDoiDonViNguyenLieu WITH(UPDLOCK,HOLDLOCK) WHERE MaQuyDoi LIKE N'QD%');
+-- NL072 Dầu ăn; tbsp; NDB 04044
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL072' AND TenNguyenLieu=N'Dầu ăn') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT006' AND KyHieu=N'muỗng canh') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL072' AND MaDonVi=N'DVT006')<>1 OR NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL072' AND MaDonVi=N'DVT006' AND MaQuyDoi=N'QD016' AND KhoiLuongQuyDoiGram IN (15.000,13.600)) THROW 51102,N'Quy đổi đã khác bản rà soát; dừng để tránh ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL072' AND MaDonVi=N'DVT006') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL072',N'DVT006',13.600,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 04044',N'WEIGHT.txt USDA SR28: 1 tbsp = 13.6 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Chọn dầu đậu nành nguyên chất làm mẫu dầu ăn; 1 tbsp = 13.6 g, không phải 15 g. Không suy ra tỷ lệ hấp thụ khi chiên.',N'{"MaQuyDoi": "QD016", "MaNguyenLieu": "NL072", "MaDonVi": "DVT006", "KhoiLuongQuyDoiGram": "15.000"}',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=13.600,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 04044',DieuKien=N'WEIGHT.txt USDA SR28: 1 tbsp = 13.6 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Chọn dầu đậu nành nguyên chất làm mẫu dầu ăn; 1 tbsp = 13.6 g, không phải 15 g. Không suy ra tỷ lệ hấp thụ khi chiên.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL072' AND MaDonVi=N'DVT006';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL072' AND MaDonVi=N'DVT006') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=13.600 WHERE MaNguyenLieu=N'NL072' AND MaDonVi=N'DVT006'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL072',N'DVT006',13.600); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL072' AND MaDonVi=N'DVT006' AND KhoiLuongQuyDoiGram=13.600) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL072 Dầu ăn; tsp; NDB 04044
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL072' AND TenNguyenLieu=N'Dầu ăn') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT007' AND KyHieu=N'muỗng cà phê') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL072' AND MaDonVi=N'DVT007')<>1 OR NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL072' AND MaDonVi=N'DVT007' AND MaQuyDoi=N'QD023' AND KhoiLuongQuyDoiGram IN (5.000,4.500)) THROW 51102,N'Quy đổi đã khác bản rà soát; dừng để tránh ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL072' AND MaDonVi=N'DVT007') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL072',N'DVT007',4.500,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 04044',N'WEIGHT.txt USDA SR28: 1 tsp = 4.5 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Dầu đậu nành; 1 tsp = 4.5 g; không suy ra dầu ăn hết khi chiên.',N'{"MaQuyDoi": "QD023", "MaNguyenLieu": "NL072", "MaDonVi": "DVT007", "KhoiLuongQuyDoiGram": "5.000"}',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=4.500,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 04044',DieuKien=N'WEIGHT.txt USDA SR28: 1 tsp = 4.5 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Dầu đậu nành; 1 tsp = 4.5 g; không suy ra dầu ăn hết khi chiên.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL072' AND MaDonVi=N'DVT007';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL072' AND MaDonVi=N'DVT007') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=4.500 WHERE MaNguyenLieu=N'NL072' AND MaDonVi=N'DVT007'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL072',N'DVT007',4.500); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL072' AND MaDonVi=N'DVT007' AND KhoiLuongQuyDoiGram=4.500) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL091 Dầu mè; tablespoon; NDB 04058
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL091' AND TenNguyenLieu=N'Dầu mè') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT006' AND KyHieu=N'muỗng canh') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL091' AND MaDonVi=N'DVT006')<>1 OR NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL091' AND MaDonVi=N'DVT006' AND MaQuyDoi=N'QD042' AND KhoiLuongQuyDoiGram IN (15.000,13.600)) THROW 51102,N'Quy đổi đã khác bản rà soát; dừng để tránh ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL091' AND MaDonVi=N'DVT006') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL091',N'DVT006',13.600,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 04058',N'WEIGHT.txt USDA SR28: 1 tablespoon = 13.6 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Dầu mè nguyên chất; 1 tablespoon = 13.6 g.',N'{"MaQuyDoi": "QD042", "MaNguyenLieu": "NL091", "MaDonVi": "DVT006", "KhoiLuongQuyDoiGram": "15.000"}',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=13.600,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 04058',DieuKien=N'WEIGHT.txt USDA SR28: 1 tablespoon = 13.6 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Dầu mè nguyên chất; 1 tablespoon = 13.6 g.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL091' AND MaDonVi=N'DVT006';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL091' AND MaDonVi=N'DVT006') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=13.600 WHERE MaNguyenLieu=N'NL091' AND MaDonVi=N'DVT006'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL091',N'DVT006',13.600); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL091' AND MaDonVi=N'DVT006' AND KhoiLuongQuyDoiGram=13.600) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL091 Dầu mè; tsp; NDB 04058
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL091' AND TenNguyenLieu=N'Dầu mè') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT007' AND KyHieu=N'muỗng cà phê') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL091' AND MaDonVi=N'DVT007' AND KhoiLuongQuyDoiGram<>4.500) OR (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL091' AND MaDonVi=N'DVT007')>1 THROW 51102,N'Quy đổi mới đã khác bản rà soát.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL091' AND MaDonVi=N'DVT007') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL091',N'DVT007',4.500,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 04058',N'WEIGHT.txt USDA SR28: 1 tsp = 4.5 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Dầu mè nguyên chất; 1 tsp = 4.5 g.',N'null',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=4.500,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 04058',DieuKien=N'WEIGHT.txt USDA SR28: 1 tsp = 4.5 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Dầu mè nguyên chất; 1 tsp = 4.5 g.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL091' AND MaDonVi=N'DVT007';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL091' AND MaDonVi=N'DVT007') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=4.500 WHERE MaNguyenLieu=N'NL091' AND MaDonVi=N'DVT007'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL091',N'DVT007',4.500); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL091' AND MaDonVi=N'DVT007' AND KhoiLuongQuyDoiGram=4.500) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL073 Muối; tbsp; NDB 02047
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL073' AND TenNguyenLieu=N'Muối') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT006' AND KyHieu=N'muỗng canh') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL073' AND MaDonVi=N'DVT006')<>1 OR NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL073' AND MaDonVi=N'DVT006' AND MaQuyDoi=N'QD039' AND KhoiLuongQuyDoiGram IN (15.000,18.000)) THROW 51102,N'Quy đổi đã khác bản rà soát; dừng để tránh ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL073' AND MaDonVi=N'DVT006') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL073',N'DVT006',18.000,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 02047',N'WEIGHT.txt USDA SR28: 1 tbsp = 18 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Muối ăn dạng nguồn tham chiếu; không áp cho muối hột khác kích thước hạt.',N'{"MaQuyDoi": "QD039", "MaNguyenLieu": "NL073", "MaDonVi": "DVT006", "KhoiLuongQuyDoiGram": "15.000"}',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=18.000,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 02047',DieuKien=N'WEIGHT.txt USDA SR28: 1 tbsp = 18 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Muối ăn dạng nguồn tham chiếu; không áp cho muối hột khác kích thước hạt.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL073' AND MaDonVi=N'DVT006';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL073' AND MaDonVi=N'DVT006') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=18.000 WHERE MaNguyenLieu=N'NL073' AND MaDonVi=N'DVT006'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL073',N'DVT006',18.000); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL073' AND MaDonVi=N'DVT006' AND KhoiLuongQuyDoiGram=18.000) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL073 Muối; tsp; NDB 02047
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL073' AND TenNguyenLieu=N'Muối') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT007' AND KyHieu=N'muỗng cà phê') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL073' AND MaDonVi=N'DVT007')<>1 OR NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL073' AND MaDonVi=N'DVT007' AND MaQuyDoi=N'QD024' AND KhoiLuongQuyDoiGram IN (5.000,6.000)) THROW 51102,N'Quy đổi đã khác bản rà soát; dừng để tránh ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL073' AND MaDonVi=N'DVT007') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL073',N'DVT007',6.000,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 02047',N'WEIGHT.txt USDA SR28: 1 tsp = 6.0 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Muối ăn dạng nguồn tham chiếu; không áp cho muối hột khác kích thước hạt.',N'{"MaQuyDoi": "QD024", "MaNguyenLieu": "NL073", "MaDonVi": "DVT007", "KhoiLuongQuyDoiGram": "5.000"}',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=6.000,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 02047',DieuKien=N'WEIGHT.txt USDA SR28: 1 tsp = 6.0 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Muối ăn dạng nguồn tham chiếu; không áp cho muối hột khác kích thước hạt.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL073' AND MaDonVi=N'DVT007';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL073' AND MaDonVi=N'DVT007') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=6.000 WHERE MaNguyenLieu=N'NL073' AND MaDonVi=N'DVT007'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL073',N'DVT007',6.000); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL073' AND MaDonVi=N'DVT007' AND KhoiLuongQuyDoiGram=6.000) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL074 Đường; tsp; NDB 19335
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL074' AND TenNguyenLieu=N'Đường') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT007' AND KyHieu=N'muỗng cà phê') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL074' AND MaDonVi=N'DVT007')<>1 OR NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL074' AND MaDonVi=N'DVT007' AND MaQuyDoi=N'QD025' AND KhoiLuongQuyDoiGram IN (5.000,4.200)) THROW 51102,N'Quy đổi đã khác bản rà soát; dừng để tránh ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL074' AND MaDonVi=N'DVT007') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL074',N'DVT007',4.200,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 19335',N'WEIGHT.txt USDA SR28: 1 tsp = 4.2 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Đường kính sucrose, không phải đường phèn/caramel/siro.',N'{"MaQuyDoi": "QD025", "MaNguyenLieu": "NL074", "MaDonVi": "DVT007", "KhoiLuongQuyDoiGram": "5.000"}',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=4.200,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 19335',DieuKien=N'WEIGHT.txt USDA SR28: 1 tsp = 4.2 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Đường kính sucrose, không phải đường phèn/caramel/siro.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL074' AND MaDonVi=N'DVT007';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL074' AND MaDonVi=N'DVT007') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=4.200 WHERE MaNguyenLieu=N'NL074' AND MaDonVi=N'DVT007'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL074',N'DVT007',4.200); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL074' AND MaDonVi=N'DVT007' AND KhoiLuongQuyDoiGram=4.200) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL240 Hạt tiêu xay; tsp, ground; NDB 02030
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL240' AND TenNguyenLieu=N'Hạt tiêu xay') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT007' AND KyHieu=N'muỗng cà phê') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL240' AND MaDonVi=N'DVT007' AND KhoiLuongQuyDoiGram<>2.300) OR (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL240' AND MaDonVi=N'DVT007')>1 THROW 51102,N'Quy đổi mới đã khác bản rà soát.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL240' AND MaDonVi=N'DVT007') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL240',N'DVT007',2.300,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 02030',N'WEIGHT.txt USDA SR28: 1 tsp, ground = 2.3 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Tiêu đen XAY; 1 tsp ground = 2.3 g; không áp cho tiêu nguyên hạt.',N'null',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=2.300,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 02030',DieuKien=N'WEIGHT.txt USDA SR28: 1 tsp, ground = 2.3 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Tiêu đen XAY; 1 tsp ground = 2.3 g; không áp cho tiêu nguyên hạt.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL240' AND MaDonVi=N'DVT007';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL240' AND MaDonVi=N'DVT007') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=2.300 WHERE MaNguyenLieu=N'NL240' AND MaDonVi=N'DVT007'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL240',N'DVT007',2.300); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL240' AND MaDonVi=N'DVT007' AND KhoiLuongQuyDoiGram=2.300) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL1128 Tiêu xay; tsp, ground; NDB 02030
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL1128' AND TenNguyenLieu=N'Tiêu xay') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT007' AND KyHieu=N'muỗng cà phê') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL1128' AND MaDonVi=N'DVT007')<>1 OR NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL1128' AND MaDonVi=N'DVT007' AND MaQuyDoi=N'QD120' AND KhoiLuongQuyDoiGram IN (2.300,2.300)) THROW 51102,N'Quy đổi đã khác bản rà soát; dừng để tránh ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL1128' AND MaDonVi=N'DVT007') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL1128',N'DVT007',2.300,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 02030',N'WEIGHT.txt USDA SR28: 1 tsp, ground = 2.3 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Tiêu đen XAY; 1 tsp ground = 2.3 g; không áp cho tiêu nguyên hạt.',N'{"MaQuyDoi": "QD120", "MaNguyenLieu": "NL1128", "MaDonVi": "DVT007", "KhoiLuongQuyDoiGram": "2.300"}',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=2.300,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 02030',DieuKien=N'WEIGHT.txt USDA SR28: 1 tsp, ground = 2.3 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Tiêu đen XAY; 1 tsp ground = 2.3 g; không áp cho tiêu nguyên hạt.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL1128' AND MaDonVi=N'DVT007';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL1128' AND MaDonVi=N'DVT007') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=2.300 WHERE MaNguyenLieu=N'NL1128' AND MaDonVi=N'DVT007'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL1128',N'DVT007',2.300); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL1128' AND MaDonVi=N'DVT007' AND KhoiLuongQuyDoiGram=2.300) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL240 Hạt tiêu xay; tbsp, ground; NDB 02030
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL240' AND TenNguyenLieu=N'Hạt tiêu xay') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT006' AND KyHieu=N'muỗng canh') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL240' AND MaDonVi=N'DVT006' AND KhoiLuongQuyDoiGram<>6.900) OR (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL240' AND MaDonVi=N'DVT006')>1 THROW 51102,N'Quy đổi mới đã khác bản rà soát.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL240' AND MaDonVi=N'DVT006') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL240',N'DVT006',6.900,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 02030',N'WEIGHT.txt USDA SR28: 1 tbsp, ground = 6.9 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Tiêu đen XAY; 1 tbsp ground = 6.9 g.',N'null',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=6.900,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 02030',DieuKien=N'WEIGHT.txt USDA SR28: 1 tbsp, ground = 6.9 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Tiêu đen XAY; 1 tbsp ground = 6.9 g.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL240' AND MaDonVi=N'DVT006';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL240' AND MaDonVi=N'DVT006') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=6.900 WHERE MaNguyenLieu=N'NL240' AND MaDonVi=N'DVT006'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL240',N'DVT006',6.900); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL240' AND MaDonVi=N'DVT006' AND KhoiLuongQuyDoiGram=6.900) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL1128 Tiêu xay; tbsp, ground; NDB 02030
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL1128' AND TenNguyenLieu=N'Tiêu xay') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT006' AND KyHieu=N'muỗng canh') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL1128' AND MaDonVi=N'DVT006')<>1 OR NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL1128' AND MaDonVi=N'DVT006' AND MaQuyDoi=N'QD056' AND KhoiLuongQuyDoiGram IN (15.000,6.900)) THROW 51102,N'Quy đổi đã khác bản rà soát; dừng để tránh ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL1128' AND MaDonVi=N'DVT006') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL1128',N'DVT006',6.900,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 02030',N'WEIGHT.txt USDA SR28: 1 tbsp, ground = 6.9 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Tiêu đen XAY; 1 tbsp ground = 6.9 g.',N'{"MaQuyDoi": "QD056", "MaNguyenLieu": "NL1128", "MaDonVi": "DVT006", "KhoiLuongQuyDoiGram": "15.000"}',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=6.900,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 02030',DieuKien=N'WEIGHT.txt USDA SR28: 1 tbsp, ground = 6.9 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Tiêu đen XAY; 1 tbsp ground = 6.9 g.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL1128' AND MaDonVi=N'DVT006';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL1128' AND MaDonVi=N'DVT006') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=6.900 WHERE MaNguyenLieu=N'NL1128' AND MaDonVi=N'DVT006'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL1128',N'DVT006',6.900); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL1128' AND MaDonVi=N'DVT006' AND KhoiLuongQuyDoiGram=6.900) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL051 Tỏi; clove; NDB 11215
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL051' AND TenNguyenLieu=N'Tỏi') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT012' AND KyHieu=N'tép') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL051' AND MaDonVi=N'DVT012')<>1 OR NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL051' AND MaDonVi=N'DVT012' AND MaQuyDoi=N'QD012' AND KhoiLuongQuyDoiGram IN (5.000,3.000)) THROW 51102,N'Quy đổi đã khác bản rà soát; dừng để tránh ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL051' AND MaDonVi=N'DVT012') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL051',N'DVT012',3.000,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11215',N'WEIGHT.txt USDA SR28: 1 clove = 3.0 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Tỏi sống bóc vỏ, một TÉP mẫu = 3 g; không phải một CỦ tỏi.',N'{"MaQuyDoi": "QD012", "MaNguyenLieu": "NL051", "MaDonVi": "DVT012", "KhoiLuongQuyDoiGram": "5.000"}',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=3.000,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 11215',DieuKien=N'WEIGHT.txt USDA SR28: 1 clove = 3.0 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Tỏi sống bóc vỏ, một TÉP mẫu = 3 g; không phải một CỦ tỏi.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL051' AND MaDonVi=N'DVT012';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL051' AND MaDonVi=N'DVT012') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=3.000 WHERE MaNguyenLieu=N'NL051' AND MaDonVi=N'DVT012'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL051',N'DVT012',3.000); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL051' AND MaDonVi=N'DVT012' AND KhoiLuongQuyDoiGram=3.000) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL907 Tỏi băm; clove; NDB 11215
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL907' AND TenNguyenLieu=N'Tỏi băm') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT012' AND KyHieu=N'tép') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL907' AND MaDonVi=N'DVT012' AND KhoiLuongQuyDoiGram<>3.000) OR (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL907' AND MaDonVi=N'DVT012')>1 THROW 51102,N'Quy đổi mới đã khác bản rà soát.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL907' AND MaDonVi=N'DVT012') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL907',N'DVT012',3.000,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11215',N'WEIGHT.txt USDA SR28: 1 clove = 3.0 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Tỏi sống bóc vỏ, một TÉP mẫu = 3 g; không phải một CỦ tỏi.',N'null',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=3.000,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 11215',DieuKien=N'WEIGHT.txt USDA SR28: 1 clove = 3.0 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Tỏi sống bóc vỏ, một TÉP mẫu = 3 g; không phải một CỦ tỏi.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL907' AND MaDonVi=N'DVT012';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL907' AND MaDonVi=N'DVT012') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=3.000 WHERE MaNguyenLieu=N'NL907' AND MaDonVi=N'DVT012'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL907',N'DVT012',3.000); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL907' AND MaDonVi=N'DVT012' AND KhoiLuongQuyDoiGram=3.000) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL051 Tỏi; tsp; NDB 11215
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL051' AND TenNguyenLieu=N'Tỏi') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT007' AND KyHieu=N'muỗng cà phê') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL051' AND MaDonVi=N'DVT007' AND KhoiLuongQuyDoiGram<>2.800) OR (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL051' AND MaDonVi=N'DVT007')>1 THROW 51102,N'Quy đổi mới đã khác bản rà soát.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL051' AND MaDonVi=N'DVT007') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL051',N'DVT007',2.800,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11215',N'WEIGHT.txt USDA SR28: 1 tsp = 2.8 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Tỏi sống theo tsp nguồn tham khảo; chưa chiên dầu.',N'null',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=2.800,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 11215',DieuKien=N'WEIGHT.txt USDA SR28: 1 tsp = 2.8 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Tỏi sống theo tsp nguồn tham khảo; chưa chiên dầu.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL051' AND MaDonVi=N'DVT007';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL051' AND MaDonVi=N'DVT007') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=2.800 WHERE MaNguyenLieu=N'NL051' AND MaDonVi=N'DVT007'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL051',N'DVT007',2.800); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL051' AND MaDonVi=N'DVT007' AND KhoiLuongQuyDoiGram=2.800) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL907 Tỏi băm; tsp; NDB 11215
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL907' AND TenNguyenLieu=N'Tỏi băm') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT007' AND KyHieu=N'muỗng cà phê') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL907' AND MaDonVi=N'DVT007')<>1 OR NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL907' AND MaDonVi=N'DVT007' AND MaQuyDoi=N'QD088' AND KhoiLuongQuyDoiGram IN (5.000,2.800)) THROW 51102,N'Quy đổi đã khác bản rà soát; dừng để tránh ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL907' AND MaDonVi=N'DVT007') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL907',N'DVT007',2.800,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11215',N'WEIGHT.txt USDA SR28: 1 tsp = 2.8 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Tỏi sống theo tsp nguồn tham khảo; chưa chiên dầu.',N'{"MaQuyDoi": "QD088", "MaNguyenLieu": "NL907", "MaDonVi": "DVT007", "KhoiLuongQuyDoiGram": "5.000"}',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=2.800,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 11215',DieuKien=N'WEIGHT.txt USDA SR28: 1 tsp = 2.8 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Tỏi sống theo tsp nguồn tham khảo; chưa chiên dầu.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL907' AND MaDonVi=N'DVT007';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL907' AND MaDonVi=N'DVT007') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=2.800 WHERE MaNguyenLieu=N'NL907' AND MaDonVi=N'DVT007'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL907',N'DVT007',2.800); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL907' AND MaDonVi=N'DVT007' AND KhoiLuongQuyDoiGram=2.800) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL069 Bơ lạt; tbsp; NDB 01145
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL069' AND TenNguyenLieu=N'Bơ lạt') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT006' AND KyHieu=N'muỗng canh') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL069' AND MaDonVi=N'DVT006')<>1 OR NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL069' AND MaDonVi=N'DVT006' AND MaQuyDoi=N'QD028' AND KhoiLuongQuyDoiGram IN (15.000,14.200)) THROW 51102,N'Quy đổi đã khác bản rà soát; dừng để tránh ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL069' AND MaDonVi=N'DVT006') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL069',N'DVT006',14.200,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 01145',N'WEIGHT.txt USDA SR28: 1 tbsp = 14.2 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Bơ động vật không muối; 1 tbsp = 14.2 g. Không áp cho đơn vị một ít.',N'{"MaQuyDoi": "QD028", "MaNguyenLieu": "NL069", "MaDonVi": "DVT006", "KhoiLuongQuyDoiGram": "15.000"}',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=14.200,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 01145',DieuKien=N'WEIGHT.txt USDA SR28: 1 tbsp = 14.2 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Bơ động vật không muối; 1 tbsp = 14.2 g. Không áp cho đơn vị một ít.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL069' AND MaDonVi=N'DVT006';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL069' AND MaDonVi=N'DVT006') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=14.200 WHERE MaNguyenLieu=N'NL069' AND MaDonVi=N'DVT006'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL069',N'DVT006',14.200); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL069' AND MaDonVi=N'DVT006' AND KhoiLuongQuyDoiGram=14.200) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL048 Hành tây; tbsp chopped; NDB 11282
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL048' AND TenNguyenLieu=N'Hành tây') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT006' AND KyHieu=N'muỗng canh') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL048' AND MaDonVi=N'DVT006')<>1 OR NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL048' AND MaDonVi=N'DVT006' AND MaQuyDoi=N'QD149' AND KhoiLuongQuyDoiGram IN (15.000,10.000)) THROW 51102,N'Quy đổi đã khác bản rà soát; dừng để tránh ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL048' AND MaDonVi=N'DVT006') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL048',N'DVT006',10.000,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11282',N'WEIGHT.txt USDA SR28: 1 tbsp chopped = 10.0 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Hành tây sống ĐÃ BĂM (tbsp chopped), không phải muỗng củ nguyên.',N'{"MaQuyDoi": "QD149", "MaNguyenLieu": "NL048", "MaDonVi": "DVT006", "KhoiLuongQuyDoiGram": "15.000"}',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=10.000,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 11282',DieuKien=N'WEIGHT.txt USDA SR28: 1 tbsp chopped = 10.0 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Hành tây sống ĐÃ BĂM (tbsp chopped), không phải muỗng củ nguyên.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL048' AND MaDonVi=N'DVT006';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL048' AND MaDonVi=N'DVT006') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=10.000 WHERE MaNguyenLieu=N'NL048' AND MaDonVi=N'DVT006'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL048',N'DVT006',10.000); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL048' AND MaDonVi=N'DVT006' AND KhoiLuongQuyDoiGram=10.000) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL1176 Hành tây nhỏ; tbsp chopped; NDB 11282
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL1176' AND TenNguyenLieu=N'Hành tây nhỏ') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT006' AND KyHieu=N'muỗng canh') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL1176' AND MaDonVi=N'DVT006' AND KhoiLuongQuyDoiGram<>10.000) OR (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL1176' AND MaDonVi=N'DVT006')>1 THROW 51102,N'Quy đổi mới đã khác bản rà soát.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL1176' AND MaDonVi=N'DVT006') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL1176',N'DVT006',10.000,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11282',N'WEIGHT.txt USDA SR28: 1 tbsp chopped = 10.0 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Hành tây sống ĐÃ BĂM (tbsp chopped), không phải muỗng củ nguyên.',N'null',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=10.000,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 11282',DieuKien=N'WEIGHT.txt USDA SR28: 1 tbsp chopped = 10.0 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Hành tây sống ĐÃ BĂM (tbsp chopped), không phải muỗng củ nguyên.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL1176' AND MaDonVi=N'DVT006';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL1176' AND MaDonVi=N'DVT006') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=10.000 WHERE MaNguyenLieu=N'NL1176' AND MaDonVi=N'DVT006'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL1176',N'DVT006',10.000); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL1176' AND MaDonVi=N'DVT006' AND KhoiLuongQuyDoiGram=10.000) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL052 Gừng; tsp; NDB 11216
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL052' AND TenNguyenLieu=N'Gừng') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT007' AND KyHieu=N'muỗng cà phê') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL052' AND MaDonVi=N'DVT007' AND KhoiLuongQuyDoiGram<>2.000) OR (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL052' AND MaDonVi=N'DVT007')>1 THROW 51102,N'Quy đổi mới đã khác bản rà soát.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL052' AND MaDonVi=N'DVT007') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL052',N'DVT007',2.000,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11216',N'WEIGHT.txt USDA SR28: 1 tsp = 2.0 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Gừng tươi theo tsp nguồn; không gán cho một nhánh gừng.',N'null',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=2.000,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 11216',DieuKien=N'WEIGHT.txt USDA SR28: 1 tsp = 2.0 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Gừng tươi theo tsp nguồn; không gán cho một nhánh gừng.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL052' AND MaDonVi=N'DVT007';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL052' AND MaDonVi=N'DVT007') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=2.000 WHERE MaNguyenLieu=N'NL052' AND MaDonVi=N'DVT007'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL052',N'DVT007',2.000); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL052' AND MaDonVi=N'DVT007' AND KhoiLuongQuyDoiGram=2.000) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL1139 Gừng (2 củ); tsp; NDB 11216
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL1139' AND TenNguyenLieu=N'Gừng (2 củ)') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT007' AND KyHieu=N'muỗng cà phê') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL1139' AND MaDonVi=N'DVT007' AND KhoiLuongQuyDoiGram<>2.000) OR (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL1139' AND MaDonVi=N'DVT007')>1 THROW 51102,N'Quy đổi mới đã khác bản rà soát.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL1139' AND MaDonVi=N'DVT007') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL1139',N'DVT007',2.000,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11216',N'WEIGHT.txt USDA SR28: 1 tsp = 2.0 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Gừng tươi theo tsp nguồn; không gán cho một nhánh gừng.',N'null',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=2.000,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 11216',DieuKien=N'WEIGHT.txt USDA SR28: 1 tsp = 2.0 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Gừng tươi theo tsp nguồn; không gán cho một nhánh gừng.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL1139' AND MaDonVi=N'DVT007';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL1139' AND MaDonVi=N'DVT007') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=2.000 WHERE MaNguyenLieu=N'NL1139' AND MaDonVi=N'DVT007'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL1139',N'DVT007',2.000); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL1139' AND MaDonVi=N'DVT007' AND KhoiLuongQuyDoiGram=2.000) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL053 Sả; tbsp; NDB 11972
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL053' AND TenNguyenLieu=N'Sả') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT006' AND KyHieu=N'muỗng canh') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL053' AND MaDonVi=N'DVT006' AND KhoiLuongQuyDoiGram<>4.800) OR (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL053' AND MaDonVi=N'DVT006')>1 THROW 51102,N'Quy đổi mới đã khác bản rà soát.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL053' AND MaDonVi=N'DVT006') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL053',N'DVT006',4.800,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11972',N'WEIGHT.txt USDA SR28: 1 tbsp = 4.8 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Sả sống băm/xay nguyên chất, không quy đổi cả cây sả bằng muỗng.',N'null',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=4.800,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 11972',DieuKien=N'WEIGHT.txt USDA SR28: 1 tbsp = 4.8 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Sả sống băm/xay nguyên chất, không quy đổi cả cây sả bằng muỗng.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL053' AND MaDonVi=N'DVT006';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL053' AND MaDonVi=N'DVT006') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=4.800 WHERE MaNguyenLieu=N'NL053' AND MaDonVi=N'DVT006'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL053',N'DVT006',4.800); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL053' AND MaDonVi=N'DVT006' AND KhoiLuongQuyDoiGram=4.800) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL918 Sả băm; tbsp; NDB 11972
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL918' AND TenNguyenLieu=N'Sả băm') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT006' AND KyHieu=N'muỗng canh') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL918' AND MaDonVi=N'DVT006' AND KhoiLuongQuyDoiGram<>4.800) OR (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL918' AND MaDonVi=N'DVT006')>1 THROW 51102,N'Quy đổi mới đã khác bản rà soát.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL918' AND MaDonVi=N'DVT006') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL918',N'DVT006',4.800,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11972',N'WEIGHT.txt USDA SR28: 1 tbsp = 4.8 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Sả sống băm/xay nguyên chất, không quy đổi cả cây sả bằng muỗng.',N'null',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=4.800,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 11972',DieuKien=N'WEIGHT.txt USDA SR28: 1 tbsp = 4.8 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Sả sống băm/xay nguyên chất, không quy đổi cả cây sả bằng muỗng.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL918' AND MaDonVi=N'DVT006';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL918' AND MaDonVi=N'DVT006') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=4.800 WHERE MaNguyenLieu=N'NL918' AND MaDonVi=N'DVT006'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL918',N'DVT006',4.800); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL918' AND MaDonVi=N'DVT006' AND KhoiLuongQuyDoiGram=4.800) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL1118 Sả xay; tbsp; NDB 11972
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL1118' AND TenNguyenLieu=N'Sả xay') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT006' AND KyHieu=N'muỗng canh') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL1118' AND MaDonVi=N'DVT006' AND KhoiLuongQuyDoiGram<>4.800) OR (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL1118' AND MaDonVi=N'DVT006')>1 THROW 51102,N'Quy đổi mới đã khác bản rà soát.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL1118' AND MaDonVi=N'DVT006') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL1118',N'DVT006',4.800,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11972',N'WEIGHT.txt USDA SR28: 1 tbsp = 4.8 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Sả sống băm/xay nguyên chất, không quy đổi cả cây sả bằng muỗng.',N'null',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=4.800,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 11972',DieuKien=N'WEIGHT.txt USDA SR28: 1 tbsp = 4.8 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Sả sống băm/xay nguyên chất, không quy đổi cả cây sả bằng muỗng.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL1118' AND MaDonVi=N'DVT006';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL1118' AND MaDonVi=N'DVT006') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=4.800 WHERE MaNguyenLieu=N'NL1118' AND MaDonVi=N'DVT006'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL1118',N'DVT006',4.800); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL1118' AND MaDonVi=N'DVT006' AND KhoiLuongQuyDoiGram=4.800) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL055 Rau mùi; sprigs; NDB 11165
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL055' AND TenNguyenLieu=N'Rau mùi') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT011' AND KyHieu=N'nhánh') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL055' AND MaDonVi=N'DVT011' AND KhoiLuongQuyDoiGram<>2.222) OR (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL055' AND MaDonVi=N'DVT011')>1 THROW 51102,N'Quy đổi mới đã khác bản rà soát.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL055' AND MaDonVi=N'DVT011') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL055',N'DVT011',2.222,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11165',N'WEIGHT.txt USDA SR28: 9 sprigs = 20 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. LÁ ngò rí: 9 nhánh = 20 g, suy ra 20/9 g mỗi nhánh; không phải gốc/rễ ngò.',N'null',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=2.222,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 11165',DieuKien=N'WEIGHT.txt USDA SR28: 9 sprigs = 20 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. LÁ ngò rí: 9 nhánh = 20 g, suy ra 20/9 g mỗi nhánh; không phải gốc/rễ ngò.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL055' AND MaDonVi=N'DVT011';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL055' AND MaDonVi=N'DVT011') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=2.222 WHERE MaNguyenLieu=N'NL055' AND MaDonVi=N'DVT011'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL055',N'DVT011',2.222); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL055' AND MaDonVi=N'DVT011' AND KhoiLuongQuyDoiGram=2.222) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL160 Ngò rí; sprigs; NDB 11165
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL160' AND TenNguyenLieu=N'Ngò rí') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT011' AND KyHieu=N'nhánh') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL160' AND MaDonVi=N'DVT011')<>1 OR NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL160' AND MaDonVi=N'DVT011' AND MaQuyDoi=N'QD167' AND KhoiLuongQuyDoiGram IN (2.222,2.222)) THROW 51102,N'Quy đổi đã khác bản rà soát; dừng để tránh ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL160' AND MaDonVi=N'DVT011') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL160',N'DVT011',2.222,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11165',N'WEIGHT.txt USDA SR28: 9 sprigs = 20 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. LÁ ngò rí: 9 nhánh = 20 g, suy ra 20/9 g mỗi nhánh; không phải gốc/rễ ngò.',N'{"MaQuyDoi": "QD167", "MaNguyenLieu": "NL160", "MaDonVi": "DVT011", "KhoiLuongQuyDoiGram": "2.222"}',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=2.222,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 11165',DieuKien=N'WEIGHT.txt USDA SR28: 9 sprigs = 20 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. LÁ ngò rí: 9 nhánh = 20 g, suy ra 20/9 g mỗi nhánh; không phải gốc/rễ ngò.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL160' AND MaDonVi=N'DVT011';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL160' AND MaDonVi=N'DVT011') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=2.222 WHERE MaNguyenLieu=N'NL160' AND MaDonVi=N'DVT011'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL160',N'DVT011',2.222); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL160' AND MaDonVi=N'DVT011' AND KhoiLuongQuyDoiGram=2.222) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+-- NL050 Hành lá; tbsp chopped; NDB 11291
+IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL050' AND TenNguyenLieu=N'Hành lá') THROW 51101,N'Tên/mã nguyên liệu đã đổi.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT006' AND KyHieu=N'muỗng canh') THROW 51103,N'Đơn vị đã đổi so với bản rà soát.',1;
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL050' AND MaDonVi=N'DVT006' AND KhoiLuongQuyDoiGram<>6.000) OR (SELECT COUNT(*) FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL050' AND MaDonVi=N'DVT006')>1 THROW 51102,N'Quy đổi mới đã khác bản rà soát.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.NguonQuyDoiDaDoiChieu WHERE MaNguyenLieu=N'NL050' AND MaDonVi=N'DVT006') INSERT dbo.NguonQuyDoiDaDoiChieu VALUES(N'NL050',N'DVT006',6.000,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11291',N'WEIGHT.txt USDA SR28: 1 tbsp chopped = 6.0 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Hành lá sống ĐÃ CẮT NHỎ; 1 tbsp chopped = 6 g.',N'null',SYSUTCDATETIME());
+UPDATE dbo.NguonQuyDoiDaDoiChieu SET Gram=6.000,URL=N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',MaNguon=N'NDB 11291',DieuKien=N'WEIGHT.txt USDA SR28: 1 tbsp chopped = 6.0 g phần ăn được. Muỗng ĐONG CHUẨN, không phải mọi muỗng ăn gia đình. Hành lá sống ĐÃ CẮT NHỎ; 1 tbsp chopped = 6 g.',NgayDoiChieu=SYSUTCDATETIME() WHERE MaNguyenLieu=N'NL050' AND MaDonVi=N'DVT006';
+IF EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL050' AND MaDonVi=N'DVT006') UPDATE dbo.QuyDoiDonViNguyenLieu SET KhoiLuongQuyDoiGram=6.000 WHERE MaNguyenLieu=N'NL050' AND MaDonVi=N'DVT006'; ELSE BEGIN SET @NextQD+=1; INSERT dbo.QuyDoiDonViNguyenLieu(MaQuyDoi,MaNguyenLieu,MaDonVi,KhoiLuongQuyDoiGram) VALUES(N'QD'+RIGHT(N'000'+CONVERT(nvarchar(18),@NextQD),CASE WHEN @NextQD<1000 THEN 3 ELSE LEN(CONVERT(nvarchar(18),@NextQD)) END),N'NL050',N'DVT006',6.000); END;
+IF NOT EXISTS(SELECT 1 FROM dbo.QuyDoiDonViNguyenLieu WHERE MaNguyenLieu=N'NL050' AND MaDonVi=N'DVT006' AND KhoiLuongQuyDoiGram=6.000) THROW 51104,N'Kiểm tra sau ghi không khớp; hủy giao dịch.',1;
+COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+IF @@TRANCOUNT>0 ROLLBACK TRANSACTION;
+THROW;
+END CATCH;
+GO
+SELECT * FROM dbo.NguonQuyDoiDaDoiChieu ORDER BY MaNguyenLieu,MaDonVi;
+USE QuanLyThucDon;
+GO
+SELECT m.MaMonAn,m.TenMonAn,
+ COUNT(*) SoDongNguyenLieu,
+ SUM(CASE WHEN f.NangLuong IS NULL OR f.ChatDam IS NULL OR f.ChatBotDuong IS NULL OR f.ChatBeo IS NULL OR f.ChatXo IS NULL OR f.Natri IS NULL THEN 1 ELSE 0 END) SoDongChuaDu6,
+ SUM(CASE WHEN f.ThieuQuyDoiDinhDuong=1 THEN 1 ELSE 0 END) SoDongVuongQuyDoi,
+ SUM(CASE WHEN f.ThieuLuongAnDuoc=1 THEN 1 ELSE 0 END) SoDongChuaRoLuongAn,
+ SUM(CASE WHEN dv.KyHieu IN (N'ít',N'1 ít') THEN 1 ELSE 0 END) SoDongDinhLuongTuyY,
+ CASE WHEN COUNT(f.NangLuong)=COUNT(*) THEN SUM(f.NangLuong) END KcalDayDuMotPhan,
+ SUM(f.NangLuong) KcalPhanDaTinh
+FROM dbo.MonAn m
+CROSS APPLY dbo.FnTinhMonAn(m.MaMonAn,1,CAST(GETDATE() AS date),NULL) f
+LEFT JOIN dbo.DonViTinh dv ON dv.MaDonVi=f.MaDonVi
+GROUP BY m.MaMonAn,m.TenMonAn
+ORDER BY SoDongChuaDu6,SoDongChuaRoLuongAn,m.MaMonAn;
+-- KcalPhanDaTinh is incomplete when some rows are NULL; not a certified full serving.
+SELECT m.MaMonAn,m.TenMonAn,n.TenNguyenLieu,f.MaThanhPhan,f.SoLuongCan,dv.TenDonVi,
+ f.NangLuong,f.ChatDam,f.ChatBotDuong,f.ChatBeo,f.ChatXo,f.Natri,
+ f.ThieuDinhDuong,f.ThieuQuyDoiDinhDuong,f.ThieuLuongAnDuoc,f.LyDoLuongAnDuoc
+FROM dbo.MonAn m CROSS APPLY dbo.FnTinhMonAn(m.MaMonAn,1,CAST(GETDATE() AS date),NULL) f
+LEFT JOIN dbo.NguyenLieu n ON n.MaNguyenLieu=f.MaNguyenLieu
+LEFT JOIN dbo.DonViTinh dv ON dv.MaDonVi=f.MaDonVi
+WHERE f.NangLuong IS NULL OR f.ChatDam IS NULL OR f.ChatBotDuong IS NULL OR f.ChatBeo IS NULL OR f.ChatXo IS NULL OR f.Natri IS NULL
+ORDER BY m.MaMonAn,f.MaThanhPhan;
+GO
+USE QuanLyThucDon;
+GO
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+-- CHỈ cập nhật hồ sơ đã có đối chiếu chính thức; không sửa công thức, số lượng hoặc quy đổi.
+-- Tất cả số: 100 g PHẦN ĂN ĐƯỢC; kcal, g protein/carbs/béo/xơ, mg NATRI (không phải muối).
+-- Chưa công bố tổng chất xơ -> NULL, tuyệt đối không điền 0 thay thế.
+-- Mặc định chạy thật trong giao dịch. Có kiểm tra snapshot cũ, chạy lại an toàn nếu dữ liệu đã đúng đích.
+BEGIN TRY
+ BEGIN TRANSACTION;
+ DECLARE @LockResult int;
+ EXEC @LockResult = sys.sp_getapplock @Resource=N'CookHub_VerifiedNutrientSources_v1', @LockMode=N'Exclusive', @LockOwner=N'Transaction', @LockTimeout=10000;
+ IF @LockResult < 0 THROW 51000,N'Không lấy được khóa cập nhật. Hãy chạy lại sau.',1;
+ CREATE TABLE #Nguon (
+  MaNguyenLieu nvarchar(20) PRIMARY KEY, TenNguyenLieu nvarchar(200),
+  NangLuong decimal(10,2), ChatDam decimal(10,2), ChatBotDuong decimal(10,2),
+  ChatBeo decimal(10,2), ChatXo decimal(10,2), natri decimal(10,2),
+  URL nvarchar(2048), MaThucPhamNguon nvarchar(100), TenTrongNguon nvarchar(1000),
+  DieuKien nvarchar(2000), SnapshotCu nvarchar(max));
+ INSERT INTO #Nguon VALUES
+(N'NL958',N'Khoai tây',79.00,2.14,18.07,0.08,1.30,5.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11353',N'Potatoes, russet, flesh and skin, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Khoai tây SỐNG phần THỊT đã bỏ vỏ; không dùng bảng cả vỏ. Hồ sơ không tự xác minh khối lượng mỗi củ hiện có.',N'{"MaThongTin":"DD958","MaNguyenLieu":"NL958","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"93.00","ChatDam":"2.00","ChatBotDuong":"20.90","ChatBeo":"0.10","ChatXo":null,"natri":"7.00"}'),
+(N'NL029',N'Đậu hũ',76.00,8.08,1.87,4.78,0.30,7.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 16427',N'Tofu, raw, regular, prepared with calcium sulfate',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Chọn đậu hũ thường, sống, kết tủa calcium sulfate làm mẫu tham khảo. Không áp cho đậu hũ non/chiên hoặc mọi nhãn có thành phần khác.',N'{"MaThongTin":"DD029","MaNguyenLieu":"NL029","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"95.00","ChatDam":"10.90","ChatBotDuong":"0.70","ChatBeo":"5.40","ChatXo":null,"natri":"7.00"}'),
+(N'NL960',N'Tía tô',32.00,3.90,7.50,0.10,7.30,1.00,N'https://fooddb.mext.go.jp/details/details.pl?ITEM_NO=6_06095_7',N'MEXT 06095',N'Perilla frutescens var. crispa, leaves, raw',N'LÁ tía tô sống, không gồm cành/rễ; MEXT 2023. Mẫu shiso Nhật làm tham khảo cùng loại, không phải kiểm nghiệm giống tía tô Việt Nam; không dùng bảng hạt tía tô. Dùng protein 3.9, tổng carbohydrate 7.5, lipid 0.1; không nhầm protein theo amino acid hoặc carbohydrate khả dụng.',N'{"MaThongTin":"DD960","MaNguyenLieu":"NL960","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"25.00","ChatDam":"2.90","ChatBotDuong":"3.40","ChatBeo":null,"ChatXo":null,"natri":"3.00"}');
+ IF EXISTS(SELECT 1 FROM #Nguon s LEFT JOIN dbo.NguyenLieu n ON n.MaNguyenLieu=s.MaNguyenLieu
+           WHERE n.MaNguyenLieu IS NULL OR n.TenNguyenLieu COLLATE Latin1_General_100_BIN2 <> s.TenNguyenLieu COLLATE Latin1_General_100_BIN2)
+  THROW 51001,N'Mã/tên nguyên liệu đã khác bản rà soát. Dừng để tránh gán nhầm nguồn.',1;
+ IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT001' AND KyHieu=N'g' AND HeSoGramChuan=1)
+  THROW 51002,N'DVT001 không còn là gam. Dừng cập nhật.',1;
+ -- Dữ liệu mới hơn snapshot sẽ KHÔNG bị ghi đè. Chấp nhận bản cũ hoặc đích giống hệt.
+ IF EXISTS (
+  SELECT 1 FROM #Nguon s LEFT JOIN dbo.ThongTinDinhDuong d WITH(UPDLOCK,HOLDLOCK) ON d.MaNguyenLieu=s.MaNguyenLieu
+  WHERE NOT (
+    (s.SnapshotCu IS NULL AND d.MaThongTin IS NULL)
+    OR (d.MaThongTin IS NOT NULL AND NOT EXISTS(
+      SELECT d.KhoiLuongChuan,d.MaDonVi,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri
+      EXCEPT SELECT CONVERT(decimal(10,2),100),CONVERT(nvarchar(20),N'DVT001'),s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri))
+    OR (s.SnapshotCu IS NOT NULL AND d.MaThongTin IS NOT NULL AND NOT EXISTS(
+      SELECT d.MaThongTin,d.KhoiLuongChuan,d.MaDonVi,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri
+      EXCEPT SELECT j.MaThongTin,j.KhoiLuongChuan,j.MaDonVi,j.NangLuong,j.ChatDam,j.ChatBotDuong,j.ChatBeo,j.ChatXo,j.natri
+      FROM OPENJSON(s.SnapshotCu) WITH(MaThongTin nvarchar(20),KhoiLuongChuan decimal(10,2),MaDonVi nvarchar(20),NangLuong decimal(10,2),ChatDam decimal(10,2),ChatBotDuong decimal(10,2),ChatBeo decimal(10,2),ChatXo decimal(10,2),natri decimal(10,2)) j))
+  )) THROW 51003,N'Có dữ liệu đã đổi sau bản rà soát. Đã dừng; cần đối chiếu trước khi cập nhật.',1;
+ -- NULL là thiếu bằng chứng, không phải 0. Chỉ mở NULL nếu cột đang NOT NULL.
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'NangLuong' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [NangLuong] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatDam' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatDam] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatBotDuong' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatBotDuong] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatBeo' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatBeo] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatXo' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatXo] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'natri' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [natri] decimal(10,2) NULL;
+
+ IF OBJECT_ID(N'dbo.NguonDinhDuongDaDoiChieu',N'U') IS NULL
+ CREATE TABLE dbo.NguonDinhDuongDaDoiChieu(
+  MaNguyenLieu nvarchar(20) NOT NULL PRIMARY KEY,
+  MaThucPhamNguon nvarchar(100) NOT NULL, TenTrongNguon nvarchar(1000) NOT NULL,
+  URL nvarchar(2048) NOT NULL, DieuKien nvarchar(2000) NOT NULL,
+  DuLieuNguonJSON nvarchar(max) NOT NULL, DuLieuTruocLanDauJSON nvarchar(max) NULL,
+  NgayDoiChieu date NOT NULL, NgayApDung datetime2 NOT NULL DEFAULT SYSUTCDATETIME());
+ -- Lưu bản gốc lần đầu để truy vết; chạy lại không làm mất bản gốc.
+ INSERT dbo.NguonDinhDuongDaDoiChieu(MaNguyenLieu,MaThucPhamNguon,TenTrongNguon,URL,DieuKien,DuLieuNguonJSON,DuLieuTruocLanDauJSON,NgayDoiChieu)
+ SELECT s.MaNguyenLieu,s.MaThucPhamNguon,s.TenTrongNguon,s.URL,s.DieuKien,
+   (SELECT CONVERT(decimal(10,2),100) KhoiLuongChuan,N'DVT001' MaDonVi,s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri FOR JSON PATH,INCLUDE_NULL_VALUES,WITHOUT_ARRAY_WRAPPER),
+   (SELECT d.* FROM dbo.ThongTinDinhDuong d WHERE d.MaNguyenLieu=s.MaNguyenLieu FOR JSON PATH,INCLUDE_NULL_VALUES,WITHOUT_ARRAY_WRAPPER),
+   CONVERT(date,'20261120',112)
+ FROM #Nguon s WHERE NOT EXISTS(SELECT 1 FROM dbo.NguonDinhDuongDaDoiChieu p WHERE p.MaNguyenLieu=s.MaNguyenLieu);
+ UPDATE p SET MaThucPhamNguon=s.MaThucPhamNguon,TenTrongNguon=s.TenTrongNguon,URL=s.URL,DieuKien=s.DieuKien,
+  DuLieuNguonJSON=(SELECT CONVERT(decimal(10,2),100) KhoiLuongChuan,N'DVT001' MaDonVi,s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri FOR JSON PATH,INCLUDE_NULL_VALUES,WITHOUT_ARRAY_WRAPPER),NgayDoiChieu=CONVERT(date,'20261120',112)
+ FROM dbo.NguonDinhDuongDaDoiChieu p JOIN #Nguon s ON s.MaNguyenLieu=p.MaNguyenLieu;
+ UPDATE d SET KhoiLuongChuan=100,MaDonVi=N'DVT001',NangLuong=s.NangLuong,ChatDam=s.ChatDam,
+  ChatBotDuong=s.ChatBotDuong,ChatBeo=s.ChatBeo,ChatXo=s.ChatXo,natri=s.natri
+ FROM dbo.ThongTinDinhDuong d JOIN #Nguon s ON s.MaNguyenLieu=d.MaNguyenLieu;
+ -- Giữ mã DD cũ. Bản mới dùng DD + số, tránh trùng mã và đúng quy ước DD[0-9].
+ DECLARE @MaxDD bigint=(SELECT ISNULL(MAX(TRY_CONVERT(bigint,SUBSTRING(MaThongTin,3,18))),0) FROM dbo.ThongTinDinhDuong WITH(UPDLOCK,HOLDLOCK) WHERE MaThongTin LIKE N'DD%');
+ INSERT dbo.ThongTinDinhDuong(MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+ SELECT N'DD'+CONVERT(nvarchar(18),@MaxDD+ROW_NUMBER() OVER(ORDER BY s.MaNguyenLieu)),s.MaNguyenLieu,100,N'DVT001',s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri
+ FROM #Nguon s WHERE NOT EXISTS(SELECT 1 FROM dbo.ThongTinDinhDuong d WHERE d.MaNguyenLieu=s.MaNguyenLieu);
+ IF EXISTS(SELECT 1 FROM #Nguon s JOIN dbo.ThongTinDinhDuong d ON d.MaNguyenLieu=s.MaNguyenLieu WHERE EXISTS(
+  SELECT d.KhoiLuongChuan,d.MaDonVi,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri
+  EXCEPT SELECT CONVERT(decimal(10,2),100),CONVERT(nvarchar(20),N'DVT001'),s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri))
+  THROW 51004,N'Kiểm tra sau ghi không khớp dữ liệu nguồn. Đã hủy giao dịch.',1;
+ COMMIT TRANSACTION;
+ SELECT s.MaNguyenLieu,s.TenNguyenLieu,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri,s.MaThucPhamNguon,s.URL
+ FROM #Nguon s JOIN dbo.ThongTinDinhDuong d ON d.MaNguyenLieu=s.MaNguyenLieu ORDER BY s.MaNguyenLieu;
+ DROP TABLE #Nguon;
+END TRY
+BEGIN CATCH
+ IF XACT_STATE()<>0 ROLLBACK TRANSACTION;
+ THROW;
+END CATCH;
+GO
+USE QuanLyThucDon;
+GO
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+-- CHỈ cập nhật hồ sơ đã có đối chiếu chính thức; không sửa công thức, số lượng hoặc quy đổi.
+-- Tất cả số: 100 g PHẦN ĂN ĐƯỢC; kcal, g protein/carbs/béo/xơ, mg NATRI (không phải muối).
+-- Chưa công bố tổng chất xơ -> NULL, tuyệt đối không điền 0 thay thế.
+-- Mặc định chạy thật trong giao dịch. Có kiểm tra snapshot cũ, chạy lại an toàn nếu dữ liệu đã đúng đích.
+BEGIN TRY
+ BEGIN TRANSACTION;
+ DECLARE @LockResult int;
+ EXEC @LockResult = sys.sp_getapplock @Resource=N'CookHub_VerifiedNutrientSources_v1', @LockMode=N'Exclusive', @LockOwner=N'Transaction', @LockTimeout=10000;
+ IF @LockResult < 0 THROW 51000,N'Không lấy được khóa cập nhật. Hãy chạy lại sau.',1;
+ CREATE TABLE #Nguon (
+  MaNguyenLieu nvarchar(20) PRIMARY KEY, TenNguyenLieu nvarchar(200),
+  NangLuong decimal(10,2), ChatDam decimal(10,2), ChatBotDuong decimal(10,2),
+  ChatBeo decimal(10,2), ChatXo decimal(10,2), natri decimal(10,2),
+  URL nvarchar(2048), MaThucPhamNguon nvarchar(100), TenTrongNguon nvarchar(1000),
+  DieuKien nvarchar(2000), SnapshotCu nvarchar(max));
+ INSERT INTO #Nguon VALUES
+(N'NL958',N'Khoai tây',79.00,2.14,18.07,0.08,1.30,5.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 11353',N'Potatoes, russet, flesh and skin, raw',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Khoai tây SỐNG phần THỊT đã bỏ vỏ; không dùng bảng cả vỏ. Hồ sơ không tự xác minh khối lượng mỗi củ hiện có.',N'{"MaThongTin":"DD958","MaNguyenLieu":"NL958","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"93.00","ChatDam":"2.00","ChatBotDuong":"20.90","ChatBeo":"0.10","ChatXo":null,"natri":"7.00"}'),
+(N'NL029',N'Đậu hũ',76.00,8.08,1.87,4.78,0.30,7.00,N'https://www.ars.usda.gov/ARSUserFiles/80400535/DATA/SR/sr28/dnload/sr28asc.zip',N'NDB 16427',N'Tofu, raw, regular, prepared with calcium sulfate',N'USDA SR28, bản tháng 05/2016; 100 g phần ăn được. Chọn đậu hũ thường, sống, kết tủa calcium sulfate làm mẫu tham khảo. Không áp cho đậu hũ non/chiên hoặc mọi nhãn có thành phần khác.',N'{"MaThongTin":"DD029","MaNguyenLieu":"NL029","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"95.00","ChatDam":"10.90","ChatBotDuong":"0.70","ChatBeo":"5.40","ChatXo":null,"natri":"7.00"}'),
+(N'NL960',N'Tía tô',32.00,3.90,7.50,0.10,7.30,1.00,N'https://fooddb.mext.go.jp/details/details.pl?ITEM_NO=6_06095_7',N'MEXT 06095',N'Perilla frutescens var. crispa, leaves, raw',N'LÁ tía tô sống, không gồm cành/rễ; MEXT 2023. Mẫu shiso Nhật làm tham khảo cùng loại, không phải kiểm nghiệm giống tía tô Việt Nam; không dùng bảng hạt tía tô. Dùng protein 3.9, tổng carbohydrate 7.5, lipid 0.1; không nhầm protein theo amino acid hoặc carbohydrate khả dụng.',N'{"MaThongTin":"DD960","MaNguyenLieu":"NL960","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"25.00","ChatDam":"2.90","ChatBotDuong":"3.40","ChatBeo":null,"ChatXo":null,"natri":"3.00"}');
+ IF EXISTS(SELECT 1 FROM #Nguon s LEFT JOIN dbo.NguyenLieu n ON n.MaNguyenLieu=s.MaNguyenLieu
+           WHERE n.MaNguyenLieu IS NULL OR n.TenNguyenLieu COLLATE Latin1_General_100_BIN2 <> s.TenNguyenLieu COLLATE Latin1_General_100_BIN2)
+  THROW 51001,N'Mã/tên nguyên liệu đã khác bản rà soát. Dừng để tránh gán nhầm nguồn.',1;
+ IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT001' AND KyHieu=N'g' AND HeSoGramChuan=1)
+  THROW 51002,N'DVT001 không còn là gam. Dừng cập nhật.',1;
+ -- Dữ liệu mới hơn snapshot sẽ KHÔNG bị ghi đè. Chấp nhận bản cũ hoặc đích giống hệt.
+ IF EXISTS (
+  SELECT 1 FROM #Nguon s LEFT JOIN dbo.ThongTinDinhDuong d WITH(UPDLOCK,HOLDLOCK) ON d.MaNguyenLieu=s.MaNguyenLieu
+  WHERE NOT (
+    (s.SnapshotCu IS NULL AND d.MaThongTin IS NULL)
+    OR (d.MaThongTin IS NOT NULL AND NOT EXISTS(
+      SELECT d.KhoiLuongChuan,d.MaDonVi,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri
+      EXCEPT SELECT CONVERT(decimal(10,2),100),CONVERT(nvarchar(20),N'DVT001'),s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri))
+    OR (s.SnapshotCu IS NOT NULL AND d.MaThongTin IS NOT NULL AND NOT EXISTS(
+      SELECT d.MaThongTin,d.KhoiLuongChuan,d.MaDonVi,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri
+      EXCEPT SELECT j.MaThongTin,j.KhoiLuongChuan,j.MaDonVi,j.NangLuong,j.ChatDam,j.ChatBotDuong,j.ChatBeo,j.ChatXo,j.natri
+      FROM OPENJSON(s.SnapshotCu) WITH(MaThongTin nvarchar(20),KhoiLuongChuan decimal(10,2),MaDonVi nvarchar(20),NangLuong decimal(10,2),ChatDam decimal(10,2),ChatBotDuong decimal(10,2),ChatBeo decimal(10,2),ChatXo decimal(10,2),natri decimal(10,2)) j))
+  )) THROW 51003,N'Có dữ liệu đã đổi sau bản rà soát. Đã dừng; cần đối chiếu trước khi cập nhật.',1;
+ -- NULL là thiếu bằng chứng, không phải 0. Chỉ mở NULL nếu cột đang NOT NULL.
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'NangLuong' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [NangLuong] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatDam' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatDam] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatBotDuong' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatBotDuong] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatBeo' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatBeo] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatXo' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatXo] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'natri' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [natri] decimal(10,2) NULL;
+
+ IF OBJECT_ID(N'dbo.NguonDinhDuongDaDoiChieu',N'U') IS NULL
+ CREATE TABLE dbo.NguonDinhDuongDaDoiChieu(
+  MaNguyenLieu nvarchar(20) NOT NULL PRIMARY KEY,
+  MaThucPhamNguon nvarchar(100) NOT NULL, TenTrongNguon nvarchar(1000) NOT NULL,
+  URL nvarchar(2048) NOT NULL, DieuKien nvarchar(2000) NOT NULL,
+  DuLieuNguonJSON nvarchar(max) NOT NULL, DuLieuTruocLanDauJSON nvarchar(max) NULL,
+  NgayDoiChieu date NOT NULL, NgayApDung datetime2 NOT NULL DEFAULT SYSUTCDATETIME());
+ -- Lưu bản gốc lần đầu để truy vết; chạy lại không làm mất bản gốc.
+ INSERT dbo.NguonDinhDuongDaDoiChieu(MaNguyenLieu,MaThucPhamNguon,TenTrongNguon,URL,DieuKien,DuLieuNguonJSON,DuLieuTruocLanDauJSON,NgayDoiChieu)
+ SELECT s.MaNguyenLieu,s.MaThucPhamNguon,s.TenTrongNguon,s.URL,s.DieuKien,
+   (SELECT CONVERT(decimal(10,2),100) KhoiLuongChuan,N'DVT001' MaDonVi,s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri FOR JSON PATH,INCLUDE_NULL_VALUES,WITHOUT_ARRAY_WRAPPER),
+   (SELECT d.* FROM dbo.ThongTinDinhDuong d WHERE d.MaNguyenLieu=s.MaNguyenLieu FOR JSON PATH,INCLUDE_NULL_VALUES,WITHOUT_ARRAY_WRAPPER),
+   CONVERT(date,'20261120',112)
+ FROM #Nguon s WHERE NOT EXISTS(SELECT 1 FROM dbo.NguonDinhDuongDaDoiChieu p WHERE p.MaNguyenLieu=s.MaNguyenLieu);
+ UPDATE p SET MaThucPhamNguon=s.MaThucPhamNguon,TenTrongNguon=s.TenTrongNguon,URL=s.URL,DieuKien=s.DieuKien,
+  DuLieuNguonJSON=(SELECT CONVERT(decimal(10,2),100) KhoiLuongChuan,N'DVT001' MaDonVi,s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri FOR JSON PATH,INCLUDE_NULL_VALUES,WITHOUT_ARRAY_WRAPPER),NgayDoiChieu=CONVERT(date,'20261120',112)
+ FROM dbo.NguonDinhDuongDaDoiChieu p JOIN #Nguon s ON s.MaNguyenLieu=p.MaNguyenLieu;
+ UPDATE d SET KhoiLuongChuan=100,MaDonVi=N'DVT001',NangLuong=s.NangLuong,ChatDam=s.ChatDam,
+  ChatBotDuong=s.ChatBotDuong,ChatBeo=s.ChatBeo,ChatXo=s.ChatXo,natri=s.natri
+ FROM dbo.ThongTinDinhDuong d JOIN #Nguon s ON s.MaNguyenLieu=d.MaNguyenLieu;
+ -- Giữ mã DD cũ. Bản mới dùng DD + số, tránh trùng mã và đúng quy ước DD[0-9].
+ DECLARE @MaxDD bigint=(SELECT ISNULL(MAX(TRY_CONVERT(bigint,SUBSTRING(MaThongTin,3,18))),0) FROM dbo.ThongTinDinhDuong WITH(UPDLOCK,HOLDLOCK) WHERE MaThongTin LIKE N'DD%');
+ INSERT dbo.ThongTinDinhDuong(MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+ SELECT N'DD'+CONVERT(nvarchar(18),@MaxDD+ROW_NUMBER() OVER(ORDER BY s.MaNguyenLieu)),s.MaNguyenLieu,100,N'DVT001',s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri
+ FROM #Nguon s WHERE NOT EXISTS(SELECT 1 FROM dbo.ThongTinDinhDuong d WHERE d.MaNguyenLieu=s.MaNguyenLieu);
+ IF EXISTS(SELECT 1 FROM #Nguon s JOIN dbo.ThongTinDinhDuong d ON d.MaNguyenLieu=s.MaNguyenLieu WHERE EXISTS(
+  SELECT d.KhoiLuongChuan,d.MaDonVi,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri
+  EXCEPT SELECT CONVERT(decimal(10,2),100),CONVERT(nvarchar(20),N'DVT001'),s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri))
+  THROW 51004,N'Kiểm tra sau ghi không khớp dữ liệu nguồn. Đã hủy giao dịch.',1;
+ COMMIT TRANSACTION;
+ SELECT s.MaNguyenLieu,s.TenNguyenLieu,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri,s.MaThucPhamNguon,s.URL
+ FROM #Nguon s JOIN dbo.ThongTinDinhDuong d ON d.MaNguyenLieu=s.MaNguyenLieu ORDER BY s.MaNguyenLieu;
+ DROP TABLE #Nguon;
+END TRY
+BEGIN CATCH
+ IF XACT_STATE()<>0 ROLLBACK TRANSACTION;
+ THROW;
+END CATCH;
+GO
+USE QuanLyThucDon;
+GO
+SET XACT_ABORT ON;
+BEGIN TRY
+BEGIN TRANSACTION;
+IF OBJECT_ID(N'dbo.DinhDuongThanhPhanCheBien',N'U') IS NULL THROW 51300,N'Chưa có bảng xử lý lượng ăn được. Không chạy tiếp; cần kiểm tra backend hiện tại.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP1073' AND MaCongThuc=N'CT917' AND MaNguyenLieu=N'NL072' AND MaDonVi=N'DVT014' AND SoLuong=1.000) THROW 51301,N'Công thức đã đổi; cần rà lại trước khi thêm cờ xử lý.',1;
+IF EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP1073' AND (GramAnDuocMoiMe IS NOT NULL OR MaNguyenLieuDoiChieu<>N'NL072' OR MaDonViDoiChieu<>N'DVT014' OR SoLuongDoiChieu<>1.000 OR LyDo<>N'Dầu dùng cả chiên ngập và làm sốt sụn gà; chưa tách lượng hấp thụ, không quy một bát dầu thành lượng ăn vào.')) THROW 51302,N'Đã có quy tắc mới. Không ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP1073') INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,MaNguyenLieuAnDuoc,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N'TP1073',N'NL072',N'DVT014',1.000,NULL,NULL,NULL,N'Dầu dùng cả chiên ngập và làm sốt sụn gà; chưa tách lượng hấp thụ, không quy một bát dầu thành lượng ăn vào.',N'https://www.fao.org/4/y4705e/y4705e23.htm');
+IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP1066' AND MaCongThuc=N'CT917' AND MaNguyenLieu=N'NL146' AND MaDonVi=N'DVT001' AND SoLuong=30.000) THROW 51301,N'Công thức đã đổi; cần rà lại trước khi thêm cờ xử lý.',1;
+IF EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP1066' AND (GramAnDuocMoiMe IS NOT NULL OR MaNguyenLieuDoiChieu<>N'NL146' OR MaDonViDoiChieu<>N'DVT001' OR SoLuongDoiChieu<>30.000 OR LyDo<>N'Bột áo sụn gà trước chiên, chưa có lượng bám thực sự ăn vào.')) THROW 51302,N'Đã có quy tắc mới. Không ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP1066') INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,MaNguyenLieuAnDuoc,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N'TP1066',N'NL146',N'DVT001',30.000,NULL,NULL,NULL,N'Bột áo sụn gà trước chiên, chưa có lượng bám thực sự ăn vào.',N'https://www.fao.org/4/y4705e/y4705e23.htm');
+IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP1068' AND MaCongThuc=N'CT917' AND MaNguyenLieu=N'NL028' AND MaDonVi=N'DVT005' AND SoLuong=1.000) THROW 51301,N'Công thức đã đổi; cần rà lại trước khi thêm cờ xử lý.',1;
+IF EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP1068' AND (GramAnDuocMoiMe IS NOT NULL OR MaNguyenLieuDoiChieu<>N'NL028' OR MaDonViDoiChieu<>N'DVT005' OR SoLuongDoiChieu<>1.000 OR LyDo<>N'Trứng áo sụn gà trước chiên, chưa có lượng còn dư.')) THROW 51302,N'Đã có quy tắc mới. Không ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP1068') INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,MaNguyenLieuAnDuoc,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N'TP1068',N'NL028',N'DVT005',1.000,NULL,NULL,NULL,N'Trứng áo sụn gà trước chiên, chưa có lượng còn dư.',N'https://www.fao.org/4/y4705e/y4705e23.htm');
+IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP1089' AND MaCongThuc=N'CT918' AND MaNguyenLieu=N'NL1089' AND MaDonVi=N'DVT014' AND SoLuong=1.000) THROW 51301,N'Công thức đã đổi; cần rà lại trước khi thêm cờ xử lý.',1;
+IF EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP1089' AND (GramAnDuocMoiMe IS NOT NULL OR MaNguyenLieuDoiChieu<>N'NL1089' OR MaDonViDoiChieu<>N'DVT014' OR SoLuongDoiChieu<>1.000 OR LyDo<>N'Hỗn hợp gia vị chả giò có dầu chiên ngập, chưa tách tỷ lệ và lượng dầu ăn vào.')) THROW 51302,N'Đã có quy tắc mới. Không ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP1089') INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,MaNguyenLieuAnDuoc,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N'TP1089',N'NL1089',N'DVT014',1.000,NULL,NULL,NULL,N'Hỗn hợp gia vị chả giò có dầu chiên ngập, chưa tách tỷ lệ và lượng dầu ăn vào.',N'https://www.fao.org/4/y4705e/y4705e23.htm');
+IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP93837' AND MaCongThuc=N'CT942' AND MaNguyenLieu=N'NL036' AND MaDonVi=N'DVT010' AND SoLuong=2.000) THROW 51301,N'Công thức đã đổi; cần rà lại trước khi thêm cờ xử lý.',1;
+IF EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP93837' AND (GramAnDuocMoiMe IS NOT NULL OR MaNguyenLieuDoiChieu<>N'NL036' OR MaDonViDoiChieu<>N'DVT010' OR SoLuongDoiChieu<>2.000 OR LyDo<>N'Cà rốt xay rồi lọc bỏ bã; chưa xác định thành phần dịch ép thu được, không cộng toàn bộ xơ của cà rốt vào nước ép.')) THROW 51302,N'Đã có quy tắc mới. Không ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP93837') INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,MaNguyenLieuAnDuoc,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N'TP93837',N'NL036',N'DVT010',2.000,NULL,NULL,NULL,N'Cà rốt xay rồi lọc bỏ bã; chưa xác định thành phần dịch ép thu được, không cộng toàn bộ xơ của cà rốt vào nước ép.',N'https://www.fao.org/4/y4705e/y4705e23.htm');
+IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP93827' AND MaCongThuc=N'CT939' AND MaNguyenLieu=N'NL301' AND MaDonVi=N'DVT001' AND SoLuong=30.000) THROW 51301,N'Công thức đã đổi; cần rà lại trước khi thêm cờ xử lý.',1;
+IF EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP93827' AND (GramAnDuocMoiMe IS NOT NULL OR MaNguyenLieuDoiChieu<>N'NL301' OR MaDonViDoiChieu<>N'DVT001' OR SoLuongDoiChieu<>30.000 OR LyDo<>N'Bột mì dùng ngâm rửa dâu rồi xả sạch; không tính toàn bộ bột rửa thành thức ăn.')) THROW 51302,N'Đã có quy tắc mới. Không ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP93827') INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,MaNguyenLieuAnDuoc,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N'TP93827',N'NL301',N'DVT001',30.000,NULL,NULL,NULL,N'Bột mì dùng ngâm rửa dâu rồi xả sạch; không tính toàn bộ bột rửa thành thức ăn.',N'https://www.fao.org/4/y4705e/y4705e23.htm');
+IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP93826' AND MaCongThuc=N'CT939' AND MaNguyenLieu=N'NL074' AND MaDonVi=N'DVT001' AND SoLuong=300.000) THROW 51301,N'Công thức đã đổi; cần rà lại trước khi thêm cờ xử lý.',1;
+IF EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP93826' AND (GramAnDuocMoiMe IS NOT NULL OR MaNguyenLieuDoiChieu<>N'NL074' OR MaDonViDoiChieu<>N'DVT001' OR SoLuongDoiChieu<>300.000 OR LyDo<>N'Đường ngâm cả mẻ dâu nhưng đồ uống chỉ dùng 50 ml nước ngâm; chưa có thành phần phần dịch thực sự dùng.')) THROW 51302,N'Đã có quy tắc mới. Không ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP93826') INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,MaNguyenLieuAnDuoc,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N'TP93826',N'NL074',N'DVT001',300.000,NULL,NULL,NULL,N'Đường ngâm cả mẻ dâu nhưng đồ uống chỉ dùng 50 ml nước ngâm; chưa có thành phần phần dịch thực sự dùng.',N'https://www.fao.org/4/y4705e/y4705e23.htm');
+IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP93842' AND MaCongThuc=N'CT943' AND MaNguyenLieu=N'NL074' AND MaDonVi=N'DVT001' AND SoLuong=400.000) THROW 51301,N'Công thức đã đổi; cần rà lại trước khi thêm cờ xử lý.',1;
+IF EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP93842' AND (GramAnDuocMoiMe IS NOT NULL OR MaNguyenLieuDoiChieu<>N'NL074' OR MaDonViDoiChieu<>N'DVT001' OR SoLuongDoiChieu<>400.000 OR LyDo<>N'Đường dùng ngâm kiệu; chưa xác định lượng đường vào phần kiệu thực sự ăn, không cộng cả nước ngâm.')) THROW 51302,N'Đã có quy tắc mới. Không ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP93842') INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,MaNguyenLieuAnDuoc,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N'TP93842',N'NL074',N'DVT001',400.000,NULL,NULL,NULL,N'Đường dùng ngâm kiệu; chưa xác định lượng đường vào phần kiệu thực sự ăn, không cộng cả nước ngâm.',N'https://www.fao.org/4/y4705e/y4705e23.htm');
+IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP93843' AND MaCongThuc=N'CT943' AND MaNguyenLieu=N'NL952' AND MaDonVi=N'DVT003' AND SoLuong=500.000) THROW 51301,N'Công thức đã đổi; cần rà lại trước khi thêm cờ xử lý.',1;
+IF EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP93843' AND (GramAnDuocMoiMe IS NOT NULL OR MaNguyenLieuDoiChieu<>N'NL952' OR MaDonViDoiChieu<>N'DVT003' OR SoLuongDoiChieu<>500.000 OR LyDo<>N'Giấm ngâm kiệu; chưa xác định lượng vào phần kiệu ăn được.')) THROW 51302,N'Đã có quy tắc mới. Không ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP93843') INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,MaNguyenLieuAnDuoc,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N'TP93843',N'NL952',N'DVT003',500.000,NULL,NULL,NULL,N'Giấm ngâm kiệu; chưa xác định lượng vào phần kiệu ăn được.',N'https://www.fao.org/4/y4705e/y4705e23.htm');
+IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP93844' AND MaCongThuc=N'CT943' AND MaNguyenLieu=N'NL1210' AND MaDonVi=N'DVT007' AND SoLuong=1.000) THROW 51301,N'Công thức đã đổi; cần rà lại trước khi thêm cờ xử lý.',1;
+IF EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP93844' AND (GramAnDuocMoiMe IS NOT NULL OR MaNguyenLieuDoiChieu<>N'NL1210' OR MaDonViDoiChieu<>N'DVT007' OR SoLuongDoiChieu<>1.000 OR LyDo<>N'Phèn chua ngâm kiệu rồi rửa bỏ; chưa có lượng còn lại, không tính cả lượng sơ chế.')) THROW 51302,N'Đã có quy tắc mới. Không ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP93844') INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,MaNguyenLieuAnDuoc,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N'TP93844',N'NL1210',N'DVT007',1.000,NULL,NULL,NULL,N'Phèn chua ngâm kiệu rồi rửa bỏ; chưa có lượng còn lại, không tính cả lượng sơ chế.',N'https://www.fao.org/4/y4705e/y4705e23.htm');
+IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP93909' AND MaCongThuc=N'CT949' AND MaNguyenLieu=N'NL073' AND MaDonVi=N'DVT001' AND SoLuong=60.000) THROW 51301,N'Công thức đã đổi; cần rà lại trước khi thêm cờ xử lý.',1;
+IF EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP93909' AND (GramAnDuocMoiMe IS NOT NULL OR MaNguyenLieuDoiChieu<>N'NL073' OR MaDonViDoiChieu<>N'DVT001' OR SoLuongDoiChieu<>60.000 OR LyDo<>N'Muối trong nước ngâm dưa, chưa xác định lượng muối vào phần dưa ăn được.')) THROW 51302,N'Đã có quy tắc mới. Không ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP93909') INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,MaNguyenLieuAnDuoc,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N'TP93909',N'NL073',N'DVT001',60.000,NULL,NULL,NULL,N'Muối trong nước ngâm dưa, chưa xác định lượng muối vào phần dưa ăn được.',N'https://www.fao.org/4/y4705e/y4705e23.htm');
+IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP93910' AND MaCongThuc=N'CT949' AND MaNguyenLieu=N'NL074' AND MaDonVi=N'DVT001' AND SoLuong=20.000) THROW 51301,N'Công thức đã đổi; cần rà lại trước khi thêm cờ xử lý.',1;
+IF EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP93910' AND (GramAnDuocMoiMe IS NOT NULL OR MaNguyenLieuDoiChieu<>N'NL074' OR MaDonViDoiChieu<>N'DVT001' OR SoLuongDoiChieu<>20.000 OR LyDo<>N'Đường trong nước ngâm dưa, chưa xác định lượng còn trong phần ăn được.')) THROW 51302,N'Đã có quy tắc mới. Không ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP93910') INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,MaNguyenLieuAnDuoc,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N'TP93910',N'NL074',N'DVT001',20.000,NULL,NULL,NULL,N'Đường trong nước ngâm dưa, chưa xác định lượng còn trong phần ăn được.',N'https://www.fao.org/4/y4705e/y4705e23.htm');
+IF NOT EXISTS(SELECT 1 FROM dbo.ThanhPhanCongThuc WITH(UPDLOCK,HOLDLOCK) WHERE MaThanhPhan=N'TP93914' AND MaCongThuc=N'CT949' AND MaNguyenLieu=N'NL952' AND MaDonVi=N'DVT007' AND SoLuong=3.000) THROW 51301,N'Công thức đã đổi; cần rà lại trước khi thêm cờ xử lý.',1;
+IF EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP93914' AND (GramAnDuocMoiMe IS NOT NULL OR MaNguyenLieuDoiChieu<>N'NL952' OR MaDonViDoiChieu<>N'DVT007' OR SoLuongDoiChieu<>3.000 OR LyDo<>N'Giấm trong nước ngâm dưa, không ăn toàn bộ lượng nước ngâm.')) THROW 51302,N'Đã có quy tắc mới. Không ghi đè.',1;
+IF NOT EXISTS(SELECT 1 FROM dbo.DinhDuongThanhPhanCheBien WHERE MaThanhPhan=N'TP93914') INSERT dbo.DinhDuongThanhPhanCheBien(MaThanhPhan,MaNguyenLieuDoiChieu,MaDonViDoiChieu,SoLuongDoiChieu,MaNguyenLieuAnDuoc,GramAnDuocMoiMe,NguonKhoiLuong,LyDo,NguonPhuongPhap) VALUES(N'TP93914',N'NL952',N'DVT007',3.000,NULL,NULL,NULL,N'Giấm trong nước ngâm dưa, không ăn toàn bộ lượng nước ngâm.',N'https://www.fao.org/4/y4705e/y4705e23.htm');
+COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+IF @@TRANCOUNT>0 ROLLBACK TRANSACTION;
+THROW;
+END CATCH;
+GO
+USE QuanLyThucDon;
+GO
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+-- CHỈ cập nhật hồ sơ đã có đối chiếu chính thức; không sửa công thức, số lượng hoặc quy đổi.
+-- Tất cả số: 100 g PHẦN ĂN ĐƯỢC; kcal, g protein/carbs/béo/xơ, mg NATRI (không phải muối).
+-- Chưa công bố tổng chất xơ -> NULL, tuyệt đối không điền 0 thay thế.
+-- Mặc định chạy thật trong giao dịch. Có kiểm tra snapshot cũ, chạy lại an toàn nếu dữ liệu đã đúng đích.
+BEGIN TRY
+ BEGIN TRANSACTION;
+ DECLARE @LockResult int;
+ EXEC @LockResult = sys.sp_getapplock @Resource=N'CookHub_VerifiedNutrientSources_v1', @LockMode=N'Exclusive', @LockOwner=N'Transaction', @LockTimeout=10000;
+ IF @LockResult < 0 THROW 51000,N'Không lấy được khóa cập nhật. Hãy chạy lại sau.',1;
+ CREATE TABLE #Nguon (
+  MaNguyenLieu nvarchar(20) PRIMARY KEY, TenNguyenLieu nvarchar(200),
+  NangLuong decimal(10,2), ChatDam decimal(10,2), ChatBotDuong decimal(10,2),
+  ChatBeo decimal(10,2), ChatXo decimal(10,2), natri decimal(10,2),
+  URL nvarchar(2048), MaThucPhamNguon nvarchar(100), TenTrongNguon nvarchar(1000),
+  DieuKien nvarchar(2000), SnapshotCu nvarchar(max));
+ INSERT INTO #Nguon VALUES
+(N'NL956',N'Thịt xay',209.00,17.70,0.10,17.20,0.00,57.00,N'https://fooddb.mext.go.jp/details/details.pl?ITEM_NO=11_11163_7',N'MEXT 11163',N'Pork, ground meat, raw / Sus scrofa',N'Mẫu tham chiếu đã CHỌN: thịt HEO xay SỐNG, Sus scrofa, MEXT 11163, trên 100 g phần ăn được. Tên DB chung Thịt xay được dùng theo quy ước thịt heo xay cho demo; không áp cho bò/gà xay hoặc hỗn hợp khác. Không chỉ ghép natri vào bảng cũ: cập nhật đồng bộ 6 chỉ số từ cùng hồ sơ. Chất xơ (0) là giá trị ước tính do MEXT công bố, không phải kết quả đo. Protein 17.7 là protein thông thường, không dùng đạm theo amino acid 15.9; carbohydrate tổng 0.1, không dùng chênh lệch khả dụng 2.3. Thành phần thực tế thay đổi theo tỷ lệ nạc/mỡ; đây là mẫu tham khảo không phải xét nghiệm món cháo.',N'{"MaThongTin":"DD956","MaNguyenLieu":"NL956","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"244.00","ChatDam":"16.00","ChatBotDuong":"0.00","ChatBeo":"20.00","ChatXo":"0.00","natri":null}');
+ IF EXISTS(SELECT 1 FROM #Nguon s LEFT JOIN dbo.NguyenLieu n ON n.MaNguyenLieu=s.MaNguyenLieu
+           WHERE n.MaNguyenLieu IS NULL OR n.TenNguyenLieu COLLATE Latin1_General_100_BIN2 <> s.TenNguyenLieu COLLATE Latin1_General_100_BIN2)
+  THROW 51001,N'Mã/tên nguyên liệu đã khác bản rà soát. Dừng để tránh gán nhầm nguồn.',1;
+ IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT001' AND KyHieu=N'g' AND HeSoGramChuan=1)
+  THROW 51002,N'DVT001 không còn là gam. Dừng cập nhật.',1;
+ -- Dữ liệu mới hơn snapshot sẽ KHÔNG bị ghi đè. Chấp nhận bản cũ hoặc đích giống hệt.
+ IF EXISTS (
+  SELECT 1 FROM #Nguon s LEFT JOIN dbo.ThongTinDinhDuong d WITH(UPDLOCK,HOLDLOCK) ON d.MaNguyenLieu=s.MaNguyenLieu
+  WHERE NOT (
+    (s.SnapshotCu IS NULL AND d.MaThongTin IS NULL)
+    OR (d.MaThongTin IS NOT NULL AND NOT EXISTS(
+      SELECT d.KhoiLuongChuan,d.MaDonVi,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri
+      EXCEPT SELECT CONVERT(decimal(10,2),100),CONVERT(nvarchar(20),N'DVT001'),s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri))
+    OR (s.SnapshotCu IS NOT NULL AND d.MaThongTin IS NOT NULL AND NOT EXISTS(
+      SELECT d.MaThongTin,d.KhoiLuongChuan,d.MaDonVi,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri
+      EXCEPT SELECT j.MaThongTin,j.KhoiLuongChuan,j.MaDonVi,j.NangLuong,j.ChatDam,j.ChatBotDuong,j.ChatBeo,j.ChatXo,j.natri
+      FROM OPENJSON(s.SnapshotCu) WITH(MaThongTin nvarchar(20),KhoiLuongChuan decimal(10,2),MaDonVi nvarchar(20),NangLuong decimal(10,2),ChatDam decimal(10,2),ChatBotDuong decimal(10,2),ChatBeo decimal(10,2),ChatXo decimal(10,2),natri decimal(10,2)) j))
+  )) THROW 51003,N'Có dữ liệu đã đổi sau bản rà soát. Đã dừng; cần đối chiếu trước khi cập nhật.',1;
+ -- NULL là thiếu bằng chứng, không phải 0. Chỉ mở NULL nếu cột đang NOT NULL.
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'NangLuong' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [NangLuong] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatDam' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatDam] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatBotDuong' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatBotDuong] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatBeo' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatBeo] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatXo' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatXo] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'natri' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [natri] decimal(10,2) NULL;
+
+ IF OBJECT_ID(N'dbo.NguonDinhDuongDaDoiChieu',N'U') IS NULL
+ CREATE TABLE dbo.NguonDinhDuongDaDoiChieu(
+  MaNguyenLieu nvarchar(20) NOT NULL PRIMARY KEY,
+  MaThucPhamNguon nvarchar(100) NOT NULL, TenTrongNguon nvarchar(1000) NOT NULL,
+  URL nvarchar(2048) NOT NULL, DieuKien nvarchar(2000) NOT NULL,
+  DuLieuNguonJSON nvarchar(max) NOT NULL, DuLieuTruocLanDauJSON nvarchar(max) NULL,
+  NgayDoiChieu date NOT NULL, NgayApDung datetime2 NOT NULL DEFAULT SYSUTCDATETIME());
+ -- Lưu bản gốc lần đầu để truy vết; chạy lại không làm mất bản gốc.
+ INSERT dbo.NguonDinhDuongDaDoiChieu(MaNguyenLieu,MaThucPhamNguon,TenTrongNguon,URL,DieuKien,DuLieuNguonJSON,DuLieuTruocLanDauJSON,NgayDoiChieu)
+ SELECT s.MaNguyenLieu,s.MaThucPhamNguon,s.TenTrongNguon,s.URL,s.DieuKien,
+   (SELECT CONVERT(decimal(10,2),100) KhoiLuongChuan,N'DVT001' MaDonVi,s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri FOR JSON PATH,INCLUDE_NULL_VALUES,WITHOUT_ARRAY_WRAPPER),
+   (SELECT d.* FROM dbo.ThongTinDinhDuong d WHERE d.MaNguyenLieu=s.MaNguyenLieu FOR JSON PATH,INCLUDE_NULL_VALUES,WITHOUT_ARRAY_WRAPPER),
+   CONVERT(date,'20261120',112)
+ FROM #Nguon s WHERE NOT EXISTS(SELECT 1 FROM dbo.NguonDinhDuongDaDoiChieu p WHERE p.MaNguyenLieu=s.MaNguyenLieu);
+ UPDATE p SET MaThucPhamNguon=s.MaThucPhamNguon,TenTrongNguon=s.TenTrongNguon,URL=s.URL,DieuKien=s.DieuKien,
+  DuLieuNguonJSON=(SELECT CONVERT(decimal(10,2),100) KhoiLuongChuan,N'DVT001' MaDonVi,s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri FOR JSON PATH,INCLUDE_NULL_VALUES,WITHOUT_ARRAY_WRAPPER),NgayDoiChieu=CONVERT(date,'20261120',112)
+ FROM dbo.NguonDinhDuongDaDoiChieu p JOIN #Nguon s ON s.MaNguyenLieu=p.MaNguyenLieu;
+ UPDATE d SET KhoiLuongChuan=100,MaDonVi=N'DVT001',NangLuong=s.NangLuong,ChatDam=s.ChatDam,
+  ChatBotDuong=s.ChatBotDuong,ChatBeo=s.ChatBeo,ChatXo=s.ChatXo,natri=s.natri
+ FROM dbo.ThongTinDinhDuong d JOIN #Nguon s ON s.MaNguyenLieu=d.MaNguyenLieu;
+ -- Giữ mã DD cũ. Bản mới dùng DD + số, tránh trùng mã và đúng quy ước DD[0-9].
+ DECLARE @MaxDD bigint=(SELECT ISNULL(MAX(TRY_CONVERT(bigint,SUBSTRING(MaThongTin,3,18))),0) FROM dbo.ThongTinDinhDuong WITH(UPDLOCK,HOLDLOCK) WHERE MaThongTin LIKE N'DD%');
+ INSERT dbo.ThongTinDinhDuong(MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+ SELECT N'DD'+CONVERT(nvarchar(18),@MaxDD+ROW_NUMBER() OVER(ORDER BY s.MaNguyenLieu)),s.MaNguyenLieu,100,N'DVT001',s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri
+ FROM #Nguon s WHERE NOT EXISTS(SELECT 1 FROM dbo.ThongTinDinhDuong d WHERE d.MaNguyenLieu=s.MaNguyenLieu);
+ IF EXISTS(SELECT 1 FROM #Nguon s JOIN dbo.ThongTinDinhDuong d ON d.MaNguyenLieu=s.MaNguyenLieu WHERE EXISTS(
+  SELECT d.KhoiLuongChuan,d.MaDonVi,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri
+  EXCEPT SELECT CONVERT(decimal(10,2),100),CONVERT(nvarchar(20),N'DVT001'),s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri))
+  THROW 51004,N'Kiểm tra sau ghi không khớp dữ liệu nguồn. Đã hủy giao dịch.',1;
+ IF NOT EXISTS(SELECT 1 FROM dbo.NguyenLieu WHERE MaNguyenLieu=N'NL956' AND (MoTa=N'Thịt xay.' OR MoTa=N'Thịt heo xay sống; mẫu tham chiếu MEXT 11163, trên 100 g phần ăn được.')) THROW 51401,N'Mô tả thịt xay đã đổi; cần đối chiếu lại loại thịt.',1;
+ UPDATE dbo.NguyenLieu SET MoTa=N'Thịt heo xay sống; mẫu tham chiếu MEXT 11163, trên 100 g phần ăn được.' WHERE MaNguyenLieu=N'NL956';
+ COMMIT TRANSACTION;
+ SELECT s.MaNguyenLieu,s.TenNguyenLieu,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri,s.MaThucPhamNguon,s.URL
+ FROM #Nguon s JOIN dbo.ThongTinDinhDuong d ON d.MaNguyenLieu=s.MaNguyenLieu ORDER BY s.MaNguyenLieu;
+ DROP TABLE #Nguon;
+END TRY
+BEGIN CATCH
+ IF XACT_STATE()<>0 ROLLBACK TRANSACTION;
+ THROW;
+END CATCH;
+GO
+USE QuanLyThucDon;
+GO
+SET NOCOUNT ON;
+SET XACT_ABORT ON;
+-- CHỈ cập nhật hồ sơ đã có đối chiếu chính thức; không sửa công thức, số lượng hoặc quy đổi.
+-- Tất cả số: 100 g PHẦN ĂN ĐƯỢC; kcal, g protein/carbs/béo/xơ, mg NATRI (không phải muối).
+-- Chưa công bố tổng chất xơ -> NULL, tuyệt đối không điền 0 thay thế.
+-- Mặc định chạy thật trong giao dịch. Có kiểm tra snapshot cũ, chạy lại an toàn nếu dữ liệu đã đúng đích.
+BEGIN TRY
+ BEGIN TRANSACTION;
+ DECLARE @LockResult int;
+ EXEC @LockResult = sys.sp_getapplock @Resource=N'CookHub_VerifiedNutrientSources_v1', @LockMode=N'Exclusive', @LockOwner=N'Transaction', @LockTimeout=10000;
+ IF @LockResult < 0 THROW 51000,N'Không lấy được khóa cập nhật. Hãy chạy lại sau.',1;
+ CREATE TABLE #Nguon (
+  MaNguyenLieu nvarchar(20) PRIMARY KEY, TenNguyenLieu nvarchar(200),
+  NangLuong decimal(10,2), ChatDam decimal(10,2), ChatBotDuong decimal(10,2),
+  ChatBeo decimal(10,2), ChatXo decimal(10,2), natri decimal(10,2),
+  URL nvarchar(2048), MaThucPhamNguon nvarchar(100), TenTrongNguon nvarchar(1000),
+  DieuKien nvarchar(2000), SnapshotCu nvarchar(max));
+ INSERT INTO #Nguon VALUES
+(N'NL003',N'Bún tươi',103.00,1.43,23.70,0.31,0.30,47.00,N'https://inmu.mahidol.ac.th/thaifcd/foodsearch/food_name_result?selected_id=166&selected_dbcode=STD&selected_name=%E0%B8%82%E0%B8%99%E0%B8%A1%E0%B8%88%E0%B8%B5%E0%B8%99&food_name=%E0%B8%82%E0%B8%99%E0%B8%A1%E0%B8%88%E0%B8%B5%E0%B8%99&mode=food_group_result',N'Thai FCD A8 / STD 166',N'Noodles, rice, fermented (kanom-jeen), Oryza sativa',N'Chọn mẫu bún GẠO TƯƠI LÊN MEN kanom-jeen, không phải bún khô/bún gạo lứt; 100 g phần ăn được. Thai FCD A8, độ ẩm 74.4%. Kcal/đạm/béo/xơ/natri lấy cùng hồ sơ. Carbohydrate TỔNG 23.70 g được TÍNH theo chênh lệch: 100-74.4 nước-1.43 đạm-0.31 béo-0.16 tro. Không chép 23.42 g carbohydrate KHẢ DỤNG thành tổng. Có sai khác làm tròn giữa các giá trị trung bình nguồn. Đây là hồ sơ tham chiếu theo loại bún đã chọn, không phải kiểm nghiệm mọi loại bún Việt Nam; không tự coi bún không lên men là cùng mẫu.',N'{"MaThongTin":"DD003","MaNguyenLieu":"NL003","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"110.00","ChatDam":"1.70","ChatBotDuong":"25.70","ChatBeo":null,"ChatXo":null,"natri":null}'),
+(N'NL914',N'Bún ăn kèm',103.00,1.43,23.70,0.31,0.30,47.00,N'https://inmu.mahidol.ac.th/thaifcd/foodsearch/food_name_result?selected_id=166&selected_dbcode=STD&selected_name=%E0%B8%82%E0%B8%99%E0%B8%A1%E0%B8%88%E0%B8%B5%E0%B8%99&food_name=%E0%B8%82%E0%B8%99%E0%B8%A1%E0%B8%88%E0%B8%B5%E0%B8%99&mode=food_group_result',N'Thai FCD A8 / STD 166',N'Noodles, rice, fermented (kanom-jeen), Oryza sativa',N'Chọn mẫu bún GẠO TƯƠI LÊN MEN kanom-jeen, không phải bún khô/bún gạo lứt; 100 g phần ăn được. Thai FCD A8, độ ẩm 74.4%. Kcal/đạm/béo/xơ/natri lấy cùng hồ sơ. Carbohydrate TỔNG 23.70 g được TÍNH theo chênh lệch: 100-74.4 nước-1.43 đạm-0.31 béo-0.16 tro. Không chép 23.42 g carbohydrate KHẢ DỤNG thành tổng. Có sai khác làm tròn giữa các giá trị trung bình nguồn. Đây là hồ sơ tham chiếu theo loại bún đã chọn, không phải kiểm nghiệm mọi loại bún Việt Nam; không tự coi bún không lên men là cùng mẫu.',N'{"MaThongTin":"DD914","MaNguyenLieu":"NL914","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"110.00","ChatDam":"1.70","ChatBotDuong":"25.70","ChatBeo":null,"ChatXo":null,"natri":null}'),
+(N'NL1199',N'Riềng',35.00,0.69,7.79,0.17,NULL,82.00,N'https://inmu.mahidol.ac.th/thaifcd/foodsearch/food_name_result?selected_id=232&selected_dbcode=STD&selected_name=galanga&food_name=galanga&mode=food_group_result',N'Thai FCD N11 / STD 232',N'Galanga / Alpinia galanga',N'Chọn riềng Alpinia galanga sống làm mẫu tham khảo, 100 g phần ăn được. Không áp cho gừng hoặc riềng khô/bột. Nguồn không công bố chất xơ: giữ NULL. Chưa giải quyết khối lượng của một nhánh riềng; không mượn xơ của riềng NON để lấp.',N'{"MaThongTin":"DD111","MaNguyenLieu":"NL1199","KhoiLuongChuan":"100.00","MaDonVi":"DVT001","NangLuong":"26.00","ChatDam":"0.30","ChatBotDuong":"2.50","ChatBeo":null,"ChatXo":null,"natri":null}');
+ IF EXISTS(SELECT 1 FROM #Nguon s LEFT JOIN dbo.NguyenLieu n ON n.MaNguyenLieu=s.MaNguyenLieu
+           WHERE n.MaNguyenLieu IS NULL OR n.TenNguyenLieu COLLATE Latin1_General_100_BIN2 <> s.TenNguyenLieu COLLATE Latin1_General_100_BIN2)
+  THROW 51001,N'Mã/tên nguyên liệu đã khác bản rà soát. Dừng để tránh gán nhầm nguồn.',1;
+ IF NOT EXISTS(SELECT 1 FROM dbo.DonViTinh WHERE MaDonVi=N'DVT001' AND KyHieu=N'g' AND HeSoGramChuan=1)
+  THROW 51002,N'DVT001 không còn là gam. Dừng cập nhật.',1;
+ -- Dữ liệu mới hơn snapshot sẽ KHÔNG bị ghi đè. Chấp nhận bản cũ hoặc đích giống hệt.
+ IF EXISTS (
+  SELECT 1 FROM #Nguon s LEFT JOIN dbo.ThongTinDinhDuong d WITH(UPDLOCK,HOLDLOCK) ON d.MaNguyenLieu=s.MaNguyenLieu
+  WHERE NOT (
+    (s.SnapshotCu IS NULL AND d.MaThongTin IS NULL)
+    OR (d.MaThongTin IS NOT NULL AND NOT EXISTS(
+      SELECT d.KhoiLuongChuan,d.MaDonVi,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri
+      EXCEPT SELECT CONVERT(decimal(10,2),100),CONVERT(nvarchar(20),N'DVT001'),s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri))
+    OR (s.SnapshotCu IS NOT NULL AND d.MaThongTin IS NOT NULL AND NOT EXISTS(
+      SELECT d.MaThongTin,d.KhoiLuongChuan,d.MaDonVi,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri
+      EXCEPT SELECT j.MaThongTin,j.KhoiLuongChuan,j.MaDonVi,j.NangLuong,j.ChatDam,j.ChatBotDuong,j.ChatBeo,j.ChatXo,j.natri
+      FROM OPENJSON(s.SnapshotCu) WITH(MaThongTin nvarchar(20),KhoiLuongChuan decimal(10,2),MaDonVi nvarchar(20),NangLuong decimal(10,2),ChatDam decimal(10,2),ChatBotDuong decimal(10,2),ChatBeo decimal(10,2),ChatXo decimal(10,2),natri decimal(10,2)) j))
+  )) THROW 51003,N'Có dữ liệu đã đổi sau bản rà soát. Đã dừng; cần đối chiếu trước khi cập nhật.',1;
+ -- NULL là thiếu bằng chứng, không phải 0. Chỉ mở NULL nếu cột đang NOT NULL.
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'NangLuong' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [NangLuong] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatDam' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatDam] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatBotDuong' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatBotDuong] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatBeo' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatBeo] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'ChatXo' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [ChatXo] decimal(10,2) NULL;
+ IF EXISTS(SELECT 1 FROM sys.columns WHERE object_id=OBJECT_ID(N'dbo.ThongTinDinhDuong') AND name=N'natri' AND is_nullable=0)
+  ALTER TABLE dbo.ThongTinDinhDuong ALTER COLUMN [natri] decimal(10,2) NULL;
+
+ IF OBJECT_ID(N'dbo.NguonDinhDuongDaDoiChieu',N'U') IS NULL
+ CREATE TABLE dbo.NguonDinhDuongDaDoiChieu(
+  MaNguyenLieu nvarchar(20) NOT NULL PRIMARY KEY,
+  MaThucPhamNguon nvarchar(100) NOT NULL, TenTrongNguon nvarchar(1000) NOT NULL,
+  URL nvarchar(2048) NOT NULL, DieuKien nvarchar(2000) NOT NULL,
+  DuLieuNguonJSON nvarchar(max) NOT NULL, DuLieuTruocLanDauJSON nvarchar(max) NULL,
+  NgayDoiChieu date NOT NULL, NgayApDung datetime2 NOT NULL DEFAULT SYSUTCDATETIME());
+ -- Lưu bản gốc lần đầu để truy vết; chạy lại không làm mất bản gốc.
+ INSERT dbo.NguonDinhDuongDaDoiChieu(MaNguyenLieu,MaThucPhamNguon,TenTrongNguon,URL,DieuKien,DuLieuNguonJSON,DuLieuTruocLanDauJSON,NgayDoiChieu)
+ SELECT s.MaNguyenLieu,s.MaThucPhamNguon,s.TenTrongNguon,s.URL,s.DieuKien,
+   (SELECT CONVERT(decimal(10,2),100) KhoiLuongChuan,N'DVT001' MaDonVi,s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri FOR JSON PATH,INCLUDE_NULL_VALUES,WITHOUT_ARRAY_WRAPPER),
+   (SELECT d.* FROM dbo.ThongTinDinhDuong d WHERE d.MaNguyenLieu=s.MaNguyenLieu FOR JSON PATH,INCLUDE_NULL_VALUES,WITHOUT_ARRAY_WRAPPER),
+   CONVERT(date,'20261120',112)
+ FROM #Nguon s WHERE NOT EXISTS(SELECT 1 FROM dbo.NguonDinhDuongDaDoiChieu p WHERE p.MaNguyenLieu=s.MaNguyenLieu);
+ UPDATE p SET MaThucPhamNguon=s.MaThucPhamNguon,TenTrongNguon=s.TenTrongNguon,URL=s.URL,DieuKien=s.DieuKien,
+  DuLieuNguonJSON=(SELECT CONVERT(decimal(10,2),100) KhoiLuongChuan,N'DVT001' MaDonVi,s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri FOR JSON PATH,INCLUDE_NULL_VALUES,WITHOUT_ARRAY_WRAPPER),NgayDoiChieu=CONVERT(date,'20261120',112)
+ FROM dbo.NguonDinhDuongDaDoiChieu p JOIN #Nguon s ON s.MaNguyenLieu=p.MaNguyenLieu;
+ UPDATE d SET KhoiLuongChuan=100,MaDonVi=N'DVT001',NangLuong=s.NangLuong,ChatDam=s.ChatDam,
+  ChatBotDuong=s.ChatBotDuong,ChatBeo=s.ChatBeo,ChatXo=s.ChatXo,natri=s.natri
+ FROM dbo.ThongTinDinhDuong d JOIN #Nguon s ON s.MaNguyenLieu=d.MaNguyenLieu;
+ -- Giữ mã DD cũ. Bản mới dùng DD + số, tránh trùng mã và đúng quy ước DD[0-9].
+ DECLARE @MaxDD bigint=(SELECT ISNULL(MAX(TRY_CONVERT(bigint,SUBSTRING(MaThongTin,3,18))),0) FROM dbo.ThongTinDinhDuong WITH(UPDLOCK,HOLDLOCK) WHERE MaThongTin LIKE N'DD%');
+ INSERT dbo.ThongTinDinhDuong(MaThongTin,MaNguyenLieu,KhoiLuongChuan,MaDonVi,NangLuong,ChatDam,ChatBotDuong,ChatBeo,ChatXo,natri)
+ SELECT N'DD'+CONVERT(nvarchar(18),@MaxDD+ROW_NUMBER() OVER(ORDER BY s.MaNguyenLieu)),s.MaNguyenLieu,100,N'DVT001',s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri
+ FROM #Nguon s WHERE NOT EXISTS(SELECT 1 FROM dbo.ThongTinDinhDuong d WHERE d.MaNguyenLieu=s.MaNguyenLieu);
+ IF EXISTS(SELECT 1 FROM #Nguon s JOIN dbo.ThongTinDinhDuong d ON d.MaNguyenLieu=s.MaNguyenLieu WHERE EXISTS(
+  SELECT d.KhoiLuongChuan,d.MaDonVi,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri
+  EXCEPT SELECT CONVERT(decimal(10,2),100),CONVERT(nvarchar(20),N'DVT001'),s.NangLuong,s.ChatDam,s.ChatBotDuong,s.ChatBeo,s.ChatXo,s.natri))
+  THROW 51004,N'Kiểm tra sau ghi không khớp dữ liệu nguồn. Đã hủy giao dịch.',1;
+ COMMIT TRANSACTION;
+ SELECT s.MaNguyenLieu,s.TenNguyenLieu,d.NangLuong,d.ChatDam,d.ChatBotDuong,d.ChatBeo,d.ChatXo,d.natri,s.MaThucPhamNguon,s.URL
+ FROM #Nguon s JOIN dbo.ThongTinDinhDuong d ON d.MaNguyenLieu=s.MaNguyenLieu ORDER BY s.MaNguyenLieu;
+ DROP TABLE #Nguon;
+END TRY
+BEGIN CATCH
+ IF XACT_STATE()<>0 ROLLBACK TRANSACTION;
+ THROW;
+END CATCH;
+GO

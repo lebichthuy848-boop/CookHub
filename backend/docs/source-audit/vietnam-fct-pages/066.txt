@@ -1,0 +1,38 @@
+Các thực phẩm nhóm 3: Hạt, quả giàu đạm, béo và sản phẩm chế biến 
+M· sè BTP 
+ 2000 
+M· sè BTP 
+2007 Tªn thùc phÈm Trang 
+3001 3001 Cïi dõa gi μ 50 
+3002 3002 Cïi dõa non 51 
+3003 3003 §Ëu c« ve (h¹t) 52 
+3004 3004 §Ëu ®en (h¹t) 53 
+3005 3005 §Ëu ®òa (h¹t) 54 
+3006 3006 §Ëu H μ lan (h¹t) 55 
+3007 3007 §Ëu t −¬ng (®Ëu nμnh) 56 
+3008 3008 §Ëu tr¾ng h¹t (®Ëu t©y) 57 
+3009 3009 §Ëu trøng cuèc 58 
+3010 3010 §Ëu xanh (®Ëu t¾t) 59 
+3011 3011 H¹t dÎ to 60 
+3012 H¹t dÎ t −¬i 61 
+3013 H¹t dÎ kh« 62 
+3012 3014 H¹t ®en 63 
+3013 3015 H¹t ®iÒu  64 
+3014 3016 H¹t mÝt 65 
+3015 3017 L¹c h¹t 66 
+3016 3018 Qu¶ cä t −¬i 67 
+3017 3019 Qu¶ ®¹i h¸i t −¬i 68 
+3018 3020 Võng (®en, tr¾ng) 69 
+3019 3021 Bét ®Ëu t −¬ng ®· lo¹i bÐo (®Ëu nμnh) 70 
+3020 3022 Bét ®Ëu t −¬ng rang chÝn 71 
+3021 3023 Bét ®Ëu xanh 72 
+3022 3024 Bét l¹c 73 
+3023 3025 §Ëu phô 74 
+3024 3026 §Ëu phô chóc 75 
+3025 3027 §Ëu phô n −íng 76 
+3026 3028 H¹t bÝ ®á rang 77 
+3027 3029 H¹t da ®á rang (d −a hÊu) 78 
+3028 3030 H¹t ®iÒu kh«, chiªn dÇu 79 
+3029 3031 S÷a bét ®Ëu n μnh 80 
+3030 3032 S÷a ®Ëu n μnh (100g ®Ëu/lÝt) 81 
+3031 3033 T μo phí 82 
