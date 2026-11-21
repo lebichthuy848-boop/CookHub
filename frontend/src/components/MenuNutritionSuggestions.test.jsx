@@ -85,6 +85,39 @@ it('does not suggest a deficit match that would immediately need to be removed',
   expect(screen.getByText(/Tạm thời chưa nên bổ sung món/)).toBeInTheDocument();
 });
 
+it('pairs a selected reduction with a safe dish addition',()=>{
+  const goal={nang_luong:1000,chat_dam:100,chat_bot_duong:100,chat_beo:100,chat_xo:30,natri:2000};
+  const current={nang_luong:600,chat_dam:50,chat_bot_duong:110,chat_beo:50,chat_xo:20,natri:500};
+  const removed={nang_luong:200,chat_dam:5,chat_bot_duong:30,chat_beo:5,chat_xo:1,natri:100};
+  const replacement={nang_luong:300,chat_dam:30,chat_bot_duong:20,chat_beo:10,chat_xo:5,natri:200};
+  const props=base();
+  props.goals=goal;
+  props.result={totals:current,item_totals:{CT1:removed},view_label:'Cả nhóm · 3 người'};
+  props.items=[{id:'CT1',dish_id:'OLD',dish_name:'Món nhiều carbs',servings:1,meal:'Trưa'}];
+  props.dishes=[{id:'OLD',name:'Món nhiều carbs'},{id:'NEW',name:'Món bù cân đối'}];
+  props.options.data=[{id:'NEW',totals:replacement}];
+  render(view(props));
+  expect(screen.getByText(/Tính sau khi giảm 1 phần Món nhiều carbs/)).toBeInTheDocument();
+  expect(screen.getByRole('link',{name:'Món bù cân đối'})).toBeInTheDocument();
+});
+
+it('creates room with a near-limit nutrient before it becomes an excess',()=>{
+  const goal={nang_luong:1000,chat_dam:100,chat_bot_duong:100,chat_beo:100,chat_xo:30,natri:2000};
+  const current={nang_luong:600,chat_dam:50,chat_bot_duong:100,chat_beo:50,chat_xo:20,natri:500};
+  const removed={nang_luong:150,chat_dam:5,chat_bot_duong:30,chat_beo:3,chat_xo:1,natri:50};
+  const replacement={nang_luong:300,chat_dam:30,chat_bot_duong:20,chat_beo:10,chat_xo:5,natri:200};
+  const props=base();
+  props.goals=goal;
+  props.result={totals:current,item_totals:{CT1:removed},view_label:'Cả nhóm · 3 người'};
+  props.items=[{id:'CT1',dish_id:'OLD',dish_name:'Món nhiều carbs',servings:1,meal:'Trưa'}];
+  props.dishes=[{id:'OLD',name:'Món nhiều carbs'},{id:'NEW',name:'Món bù cân đối'}];
+  props.options.data=[{id:'NEW',totals:replacement}];
+  render(view(props));
+  expect(screen.getByText(/Cân đối để bổ sung món/)).toBeInTheDocument();
+  expect(screen.getAllByText(/Carbs/).length).toBeGreaterThan(0);
+  expect(screen.getByRole('link',{name:'Món bù cân đối'})).toBeInTheDocument();
+});
+
 it('does not offer a dish that fills energy but creates an immediate carbs excess',()=>{
   const props=base();
   props.result={totals:{...totals,nang_luong:5910,chat_bot_duong:950}};

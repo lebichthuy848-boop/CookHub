@@ -21,6 +21,7 @@ export default function MenuNutritionSuggestions({result, goals, options, dishes
   const [feedback, setFeedback] = useState(null);
   const [pendingAddition, setPendingAddition] = useState(null);
   const [showAllSuggestions,setShowAllSuggestions]=useState(false);
+  const [selectedReductionKey,setSelectedReductionKey]=useState('');
   const totals = result?.totals;
   const itemTotals = result?.item_totals || {};
   const hasCompleteTotals = result?.view_complete !== false;
@@ -29,11 +30,20 @@ export default function MenuNutritionSuggestions({result, goals, options, dishes
   // Energy remains useful as a gap until it reaches the target. The 95% band is
   // only used for macros/fibre so a small kcal shortfall can still produce a
   // portion-aware recommendation instead of the misleading "đã đạt" message.
-  const gaps = metrics.flatMap(([key, label, unit]) => hasKnownNutrients && goals?.[key] > 0 && Number.isFinite(totals?.[key]) && totals[key] < goals[key] * (key === 'nang_luong' ? 1 : .95)
+  const currentGaps = metrics.flatMap(([key, label, unit]) => hasKnownNutrients && goals?.[key] > 0 && Number.isFinite(totals?.[key]) && totals[key] < goals[key] * (key === 'nang_luong' ? 1 : .95)
     ? [{key, label, unit, amount: goals[key] - totals[key]}] : []);
   const planned = new Set(items.map(item => item.dish_id?.trim().toUpperCase()));
   const profiles = new Map((options.data || []).map(item => [item.id.trim().toUpperCase(), item]));
   const excesses = upperMetrics.filter(([key]) => exceedsNutritionTarget(key, totals?.[key], goals?.[key]));
+  // A nutrient can block every safe addition before it is high enough to show
+  // as an excess. In that case, create room first and evaluate a replacement
+  // against the projected menu instead of leaving the user with no action.
+  const gapKeys=new Set(currentGaps.map(gap=>gap.key));
+  const nearLimits=upperMetrics.filter(([key])=>{
+    if(gapKeys.has(key)||!Number.isFinite(totals?.[key])||!(goals?.[key]>0))return false;
+    return totals[key]/goals[key]>=(key==='natri'?.85:.95);
+  });
+  const reductionTargets=excesses.length?excesses:nearLimits;
   useEffect(() => {
     if (pendingAddition && result !== pendingAddition.result &&
         items.some(item => item.dish_id?.trim().toUpperCase() === pendingAddition.id)) {
@@ -42,7 +52,7 @@ export default function MenuNutritionSuggestions({result, goals, options, dishes
   }, [pendingAddition, result, items]);
   const reductions = items.flatMap(item => {
     // Goals are temporarily unavailable while household revisions synchronize.
-    if (!goals || !totals || !excesses.length) return [];
+    if (!goals || !totals || !reductionTargets.length) return [];
     const id = item.dish_id?.trim().toUpperCase();
     const profile = itemTotals[item.id.trim()];
     const dish = (dishes || []).find(dish => dish.id === id);
@@ -56,10 +66,12 @@ export default function MenuNutritionSuggestions({result, goals, options, dishes
     const candidates = Array.from({length: Math.floor(servings/step+1e-8)}, (_, index) => {
       const reduceBy = Number(((index + 1) * step).toFixed(2));
       const fraction = reduceBy / servings;
-      const impact = excesses.flatMap(([key, label, unit]) => profile[key] > 0
+      const impact = reductionTargets.flatMap(([key, label, unit]) => profile[key] > 0
         ? [{label, unit, amount: profile[key] * fraction,
             incomplete:profile.missing_metrics?.includes(key),
-            benefit: Math.min(profile[key] * fraction, totals[key] - goals[key]) / goals[key]}] : []);
+            benefit: (totals[key]>goals[key]
+              ? Math.min(profile[key]*fraction,totals[key]-goals[key])
+              : profile[key]*fraction)/goals[key]}] : []);
       const loss = metrics.reduce((sum, [key]) => {
         if (!(goals[key] > 0) || !(profile[key] > 0)) return sum;
         const remaining = Math.max(0, totals[key] - profile[key] * fraction);
@@ -76,8 +88,24 @@ export default function MenuNutritionSuggestions({result, goals, options, dishes
     });
     if(!candidates.length)return [];
     const best = candidates.reduce((best, candidate) => candidate.score > best.score ? candidate : best);
-    return best.impact.length ? [{item, name, servings, memberId, ...best}] : [];
+    return best.impact.length ? [{item, name, servings, memberId, profile, ...best}] : [];
   }).sort((a,b) => b.score-a.score).slice(0,3);
+  const reductionKey=reduction=>reduction?`${reduction.item.id}:${reduction.reduceBy}`:'';
+  const selectedReduction=reductions.find(reduction=>reductionKey(reduction)===selectedReductionKey)||reductions[0]||null;
+  useEffect(()=>{
+    if(reductions.length&&!reductions.some(reduction=>reductionKey(reduction)===selectedReductionKey))
+      setSelectedReductionKey(reductionKey(reductions[0]));
+    if(!reductions.length&&selectedReductionKey)setSelectedReductionKey('');
+  },[selectedReductionKey,reductions]);
+  const recommendationTotals=selectedReduction&&totals
+    ? Object.fromEntries(Object.entries(totals).map(([key,value])=>{
+        const nutrient=Number(selectedReduction.profile?.[key]);
+        const fraction=selectedReduction.reduceBy/selectedReduction.servings;
+        return [key,Number.isFinite(value)&&Number.isFinite(nutrient)?Math.max(0,value-nutrient*fraction):value];
+      }))
+    : totals;
+  const gaps = metrics.flatMap(([key,label,unit])=>hasKnownNutrients&&goals?.[key]>0&&Number.isFinite(recommendationTotals?.[key])&&recommendationTotals[key]<goals[key]*(key==='nang_luong'?1:.95)
+    ? [{key,label,unit,amount:goals[key]-recommendationTotals[key]}]:[]);
   const suggestions = (dishes || []).flatMap(dish => {
     const id = dish.id.trim().toUpperCase();
     const profileEntry = profiles.get(id);
@@ -94,15 +122,15 @@ export default function MenuNutritionSuggestions({result, goals, options, dishes
     if (!contributions.length) return [];
     const missingMetrics = allMetrics.filter(([key]) => unknown.has(key)).map(([,label])=>label);
     const potentialExcess = upperMetrics.flatMap(([key,label,unit])=>{
-      if(!Number.isFinite(profile[key])||!Number.isFinite(totals?.[key])||!(goals?.[key]>0))return [];
+      if(!Number.isFinite(profile[key])||!Number.isFinite(recommendationTotals?.[key])||!(goals?.[key]>0))return [];
       const limit=goals[key]*(key==='natri'?1:1.05);
-      const amount=totals[key]+profile[key]-Math.max(totals[key],limit);
+      const amount=recommendationTotals[key]+profile[key]-Math.max(recommendationTotals[key],limit);
       return amount>1e-8?[{key,label,unit,amount,incomplete:unknown.has(key)}]:[];
     });
     const penalty = upperMetrics.reduce((sum, [key]) => {
       if (!(goals[key] > 0)) return sum;
       if (unknown.has(key)) return sum + .005;
-      const room = Math.max(0, goals[key] - totals[key]);
+      const room = Math.max(0, goals[key] - recommendationTotals[key]);
       return sum + Math.max(0, profile[key] - room) / goals[key];
     }, 0);
     const score=contributions.reduce((sum, item)=>sum + item.score, 0) - penalty;
@@ -139,18 +167,18 @@ export default function MenuNutritionSuggestions({result, goals, options, dishes
 
   return <>
     <div className="menu-balance-row">
-      {excesses.length>0&&<aside className="menu-reduction-note" aria-label="Cảnh báo thực đơn" role="status">
-        <div className="menu-warning-heading"><strong>⚠ Vượt mục tiêu · {result?.view_label||'thực đơn'}</strong><span>{result?.view_goal||'Ước tính'}</span></div>
-        <div className="menu-excess-tags">{excesses.map(([key,label,unit])=><span key={key}>{key==='nang_luong'?'🔥':key==='natri'?'🧂':'↑'} {label} <b>+{format(totals[key]-goals[key])} {unit}</b></span>)}</div>
+      {reductionTargets.length>0&&<aside className="menu-reduction-note" aria-label="Cảnh báo thực đơn" role="status">
+        <div className="menu-warning-heading"><strong>{excesses.length?'⚠ Vượt mục tiêu':'↔ Cân đối để bổ sung món'} · {result?.view_label||'thực đơn'}</strong><span>{result?.view_goal||'Ước tính'}</span></div>
+        <div className="menu-excess-tags">{reductionTargets.map(([key,label,unit])=><span key={key}>{excesses.some(([excessKey])=>excessKey===key)?<>{key==='nang_luong'?'🔥':key==='natri'?'🧂':'↑'} {label} <b>+{format(totals[key]-goals[key])} {unit}</b></>:<>◷ {label} <b>đã gần giới hạn</b></>}</span>)}</div>
         {reductions.length>0&&<div className="menu-warning-subheading"><strong>↘ Món nên giảm</strong><small>Chọn 1 phương án</small></div>}
-        {reductions.length>0 ? <ul>{reductions.map(({item,name,servings,reduceBy,impact,worsens,memberId})=><li key={item.id}>
+        {reductions.length>0 ? <ul>{reductions.map((reduction)=><li key={reduction.item.id} className={reductionKey(reduction)===reductionKey(selectedReduction)?'selected':''} role="button" tabIndex="0" aria-pressed={reductionKey(reduction)===reductionKey(selectedReduction)} onClick={()=>setSelectedReductionKey(reductionKey(reduction))} onKeyDown={event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();setSelectedReductionKey(reductionKey(reduction));}}}>{(()=>{const {item,name,servings,reduceBy,impact,worsens,memberId}=reduction;return <>
           <div className="menu-reduction-meal"><span>{({'Sáng':'☀️','Trưa':'🌤️','Tối':'🌙','Ăn nhẹ':'🍎'})[item.meal]} {item.meal}</span><strong>−{reduceBy} phần</strong></div>
           <b className="menu-reduction-name">{name}</b>
           <small>{memberId ? `${result.view_label}: ${reduceBy>=servings?'bỏ phần của bạn':'còn '+format(servings-reduceBy)+' phần'}` : reduceBy>=servings?'Bỏ món':'Còn '+format(servings-reduceBy)+' phần'}</small>
           {!memberId&&result?.view_members?.length>1&&<small>Nếu chia đều lại: {format((Number(item.servings||1)-reduceBy)/result.view_members.length)} phần/người.</small>}
           <div className="menu-reduction-effects">{impact.sort((a,b)=>b.benefit-a.benefit).slice(0,2).map(({label,amount,unit,incomplete})=><span key={label}>↓ {label} {incomplete?'≥':''}{format(amount)} {unit}</span>)}</div>
           {worsens.length>0&&<small className="menu-reduction-tradeoff">Đổi lại có thể thiếu thêm: {worsens.slice(0,2).map(({label,amount,unit,incomplete})=>label+' '+(incomplete?'≥':'')+format(amount)+' '+unit).join(' · ')}.</small>}
-        </li>)}</ul> : <small>{result?.view_complete===false?'Chưa tìm được món có đủ dữ liệu ở chỉ số đang vượt để ước tính lượng giảm.':'Chưa xác định được món nên bớt từ dữ liệu thực đơn hiện có.'}</small>}
+        </>})()}</li>)}</ul> : <small>{result?.view_complete===false?'Chưa tìm được món có đủ dữ liệu ở chỉ số đang vượt để ước tính lượng giảm.':'Chưa xác định được món nên bớt từ dữ liệu thực đơn hiện có.'}</small>}
       </aside>}
       {tip}
     </div>
@@ -158,6 +186,7 @@ export default function MenuNutritionSuggestions({result, goals, options, dishes
     <header>
       <div><h2 id="menu-suggestions-heading">Món nên thêm</h2>
         {result?.view_label&&<small className="menu-suggestion-context">Đang xem: {result.view_label} · {result.view_goal||'mục tiêu hiện tại'}</small>}
+        {selectedReduction&&<p className="menu-replacement-context">Tính sau khi giảm {format(selectedReduction.reduceBy)} phần {selectedReduction.name}.</p>}
         {gaps.length>0&&<p>{hasCompleteTotals?'Còn thiếu so với mục tiêu ngày':'Còn thiếu theo số liệu đã tính'} · {gaps.map(gap=>gap.label+' '+format(gap.amount)+' '+gap.unit).join(' · ')}</p>}
       </div>
       {displayedSuggestions.length>0&&<label>Thêm vào bữa <select value={meal} disabled={busy} onChange={event=>setMeal(event.target.value)}>

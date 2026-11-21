@@ -45,6 +45,10 @@
 .menu-excess-tags > span { display:inline-flex; flex-wrap:wrap; gap:4px; padding:4px 7px; background:#fff9eb; border:1px solid #ecd8ae; border-radius:6px; font-size:12px; }
 .menu-reduction-note ul { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; padding:0; list-style:none; }
 .menu-reduction-note li { min-width:0; padding:8px 10px; background:#fffaf0; border:1px solid #ecd8ae; border-radius:8px; }
+.menu-reduction-note li[role="button"] { cursor:pointer; transition:border-color .2s,box-shadow .2s,background .2s; }
+.menu-reduction-note li[role="button"]:focus-visible { outline:2px solid #13805b; outline-offset:2px; }
+.menu-reduction-note li.selected { border-color:#159266; background:#f1fbf5; box-shadow:0 0 0 2px #15926624; }
+.menu-replacement-context { color:#247255; font-weight:700; }
 .menu-reduction-note li + li { margin:0; }
 .menu-reduction-meal { font-size:11px; margin-bottom:5px; }
 .menu-reduction-meal strong { border-radius:5px; padding:2px 5px; background:#ffe2b4; white-space:nowrap; }
