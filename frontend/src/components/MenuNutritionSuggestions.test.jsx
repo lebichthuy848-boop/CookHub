@@ -123,7 +123,7 @@ it('shows three valid dishes first and reveals every remaining dish on request',
   props.options.data=props.dishes.map((dish,index)=>({id:dish.id,totals:{...safe,nang_luong:100+index*10}}));
   render(view(props));
   expect(screen.getAllByRole('article')).toHaveLength(3);
-  expect(screen.getByText(/Natri chỉ dùng để kiểm tra giới hạn tối đa/)).toBeInTheDocument();
+  expect(screen.queryByText(/Natri chỉ dùng để kiểm tra giới hạn tối đa/)).not.toBeInTheDocument();
   fireEvent.click(screen.getByRole('button',{name:/Xem thêm >> \(2 món\)/}));
   expect(screen.getAllByRole('article')).toHaveLength(5);
   expect(screen.getByRole('button',{name:'Thu gọn ↑'})).toHaveAttribute('aria-expanded','true');

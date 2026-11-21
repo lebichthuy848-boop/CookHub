@@ -18,7 +18,7 @@
 .menu-nutrition-grid p { flex:1; }
 .menu-nutrition-grid .menu-suggestion-unknown { display:block; margin:2px 0 8px; padding:7px 8px; border-radius:7px; background:#fff7e6; color:#805d19; font-size:11px; line-height:1.4; }
 .menu-nutrition-grid .menu-suggestion-risk,.menu-reduction-tradeoff { display:block; margin:2px 0 8px; padding:7px 8px; border-radius:7px; background:#fff0ed; color:#963f35; font-size:11px; line-height:1.4; }
-.menu-sodium-rule{display:block;margin-top:5px;color:#647b70;font-size:11px}.menu-suggestions-more{display:block;margin:14px auto 0;padding:9px 18px;border:1px solid #b9ddc8;border-radius:10px;background:#f2faf5;color:#147554;font-weight:800;cursor:pointer}.menu-suggestions-more:hover{background:#e7f6ec}
+.menu-suggestions-more{display:block;margin:14px auto 0;padding:9px 18px;border:1px solid #b9ddc8;border-radius:10px;background:#f2faf5;color:#147554;font-weight:800;cursor:pointer}.menu-suggestions-more:hover{background:#e7f6ec}
 .menu-nutrition-grid button { padding:7px; border:1px solid #b9d8c7; border-radius:8px; color:#18543d; background:#edf7ef; font-weight:700; }
 .menu-balance-row {
   grid-column:1 / -1;

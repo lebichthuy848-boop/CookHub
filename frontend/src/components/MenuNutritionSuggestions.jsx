@@ -159,7 +159,6 @@ export default function MenuNutritionSuggestions({result, goals, options, dishes
       <div><h2 id="menu-suggestions-heading">Món nên thêm</h2>
         {result?.view_label&&<small className="menu-suggestion-context">Đang xem: {result.view_label} · {result.view_goal||'mục tiêu hiện tại'}</small>}
         {gaps.length>0&&<p>{hasCompleteTotals?'Còn thiếu so với mục tiêu ngày':'Còn thiếu theo số liệu đã tính'} · {gaps.map(gap=>gap.label+' '+format(gap.amount)+' '+gap.unit).join(' · ')}</p>}
-        {goals?.natri>0&&<small className="menu-sodium-rule">Natri chỉ dùng để kiểm tra giới hạn tối đa, không phải chỉ tiêu cần ăn đủ.</small>}
       </div>
       {displayedSuggestions.length>0&&<label>Thêm vào bữa <select value={meal} disabled={busy} onChange={event=>setMeal(event.target.value)}>
         {['Sáng','Trưa','Tối','Ăn nhẹ'].map(value=><option key={value}>{value}</option>)}

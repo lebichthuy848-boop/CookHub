@@ -1,4 +1,6 @@
-.profile-preferences .preference-bubble{justify-content:flex-start;flex-direction:row}
+.profile-preferences .preference-bubble{justify-content:flex-start;flex-direction:row;min-height:34px!important;height:auto;padding:6px 9px!important;gap:5px;border-radius:999px}
+.profile-preferences .preference-bubble>span{font-size:13px}
+.profile-preferences .preference-bubble>b{font-size:9px;line-height:1.25}
 .profile-preferences .preference-bubble>i{position:static;flex:0 0 auto;opacity:1}
 .profile-preferences .preference-bubble.picked::after{inset:-2px;border-color:#0d7a5360}
 
