@@ -9,7 +9,7 @@ const localDate = value => [
   value.getFullYear(),String(value.getMonth()+1).padStart(2,'0'),String(value.getDate()).padStart(2,'0')
 ].join('-');
 const metricNames = {new_users:'Tài khoản được tạo',new_menus:'Thực đơn được tạo',favorite_saves:'Lượt lưu yêu thích'};
-const chartNames = {...metricNames,menu_trend:'Xu hướng tạo thực đơn'};
+const chartNames = {...metricNames,planned_items:'Xu hướng tạo thực đơn'};
 const displayDate = value => value.split('-').reverse().join('-');
 const csvCell = value => {
   const text = String(value ?? '');
@@ -28,6 +28,7 @@ function periodFor(range,custom) {
   return {from:localDate(start),to:localDate(end)};
 }
 function Trend({data,metric}) {
+  const metricLabel = metric === 'planned_items' ? 'Lượt món lên kế hoạch' : (metricNames[metric] ?? 'Dữ liệu');
   const daily = data?.trends?.[metric] || [];
   const groupSize = Math.max(1, Math.ceil(daily.length / 24));
   const values = [];
@@ -37,11 +38,11 @@ function Trend({data,metric}) {
       value:group.reduce((sum,item) => sum + Number(item.value || 0),0)});
   }
   if (!values.length || values.every(item => item.value === 0))
-    return <p className="reports-empty">Không có {metricNames[metric].toLocaleLowerCase('vi-VN')} trong kỳ này.</p>;
+    return <p className="reports-empty">Không có {metricLabel.toLocaleLowerCase('vi-VN')} trong kỳ này.</p>;
   const max = Math.max(...values.map(item => item.value));
   return <div className="reports-chart-wrap">
-    <div className="report-bars" role="img" aria-label={`Biểu đồ ${metricNames[metric]} theo ngày`}>
-      {values.map((item,index) => <div className="report-bar" key={item.date} title={`${item.date}${item.end !== item.date ? ' → '+item.end : ''}: ${item.value} ${metricNames[metric].toLocaleLowerCase('vi-VN')}`}>
+    <div className="report-bars" role="img" aria-label={`Biểu đồ ${metricLabel} theo ngày`}>
+      {values.map((item,index) => <div className="report-bar" key={item.date} title={`${item.date}${item.end !== item.date ? ' → '+item.end : ''}: ${item.value} ${metricLabel.toLocaleLowerCase('vi-VN')}`}>
         <i style={{height:`${item.value ? Math.max(4,item.value/max*100) : 0}%`}}/>
         <small style={{visibility:index % Math.max(1,Math.ceil(values.length/6)) === 0 || index === values.length-1 ? 'visible':'hidden'}}>{item.date.slice(5)}</small>
       </div>)}
@@ -84,9 +85,10 @@ export default function SystemReports() {
         ]),
         ['Lượt món lên kế hoạch',data.kpis.planned_items,comparison.planned_items?.previous ?? '',comparison.planned_items?.change ?? ''],
         [],
-        ['Ngày',...Object.values(metricNames)],
+        ['Ngày',...Object.values(metricNames),'Lượt món lên kế hoạch'],
         ...(data.trends?.new_users || []).map((row,index) => [
           row.date,row.value,data.trends.new_menus[index]?.value ?? '',data.trends.favorite_saves[index]?.value ?? '',
+          data.trends.planned_items?.[index]?.value ?? '',
         ]),
       ];
       const blob = new Blob(['\ufeff'+rows.map(row => row.map(csvCell).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'});
@@ -119,14 +121,14 @@ export default function SystemReports() {
         {Object.entries(chartNames).map(([key,label]) => <article className="is-clickable" role="button" tabIndex={0} key={key}
           onClick={() => setFeature(key)} onKeyDown={event => (event.key === 'Enter' || event.key === ' ') && setFeature(key)}>
           <i className="reports-kpi-icon">{key === 'new_users' ? '♙' : key === 'new_menus' ? '▤' : '♥'}</i>
-          <small>{label}</small><strong>{data.kpis[key === 'menu_trend' ? 'new_menus' : key] ?? '—'}</strong>
-          <Compare item={data.comparison_by_metric?.[key === 'menu_trend' ? 'new_menus' : key]}/>
+          <small>{label}</small><strong>{data.kpis[key] ?? '—'}</strong>
+          <Compare item={data.comparison_by_metric?.[key]}/>
         </article>)}
       </section>
       <section className="reports-card reports-wide"><header><div><h2>{chartNames[feature]} theo ngày</h2></div>
         <div className="report-tabs">{Object.entries(chartNames).map(([key,label]) =>
           <button key={key} className={feature === key ? 'active' : ''} onClick={() => setFeature(key)}>{label}</button>)}</div>
-      </header><Trend data={data} metric={feature === 'menu_trend' ? 'new_menus' : feature}/></section>
+      </header><Trend data={data} metric={feature}/></section>
       <div className="reports-grid">
         <DishRanking title="Món được lên thực đơn nhiều nhất" items={data.top_dishes}/>
         <DishRanking title="Món được yêu thích nhiều nhất" items={data.top_favorites}/>

@@ -48,6 +48,18 @@ function RecipeLookupMenu({row, catalog, onChoose, onNameChange, label = "nguyê
           aria-label={custom ? `Tên ${label} mới` : `Tìm ${label}`}
           placeholder={custom ? `Nhập ${label} mới` : label === 'đơn vị' ? 'Tìm đơn vị…' : 'Tìm tên hoặc mã…'}
           value={custom ? row.name : open ? query : row.name.split('\n')[0]}
+          onKeyDown={event => {
+            if (event.key !== 'Enter' || event.nativeEvent.isComposing) return;
+            event.preventDefault();
+            const term = normalize(query.trim());
+            if (custom || !open || !term) return;
+            const exactMatches = matches.filter(item =>
+              [item.name.split('\n')[0], item.searchName, item.id]
+                .some(value => value && normalize(value) === term)
+            );
+            const item = exactMatches.length === 1 ? exactMatches[0] : matches.length === 1 ? matches[0] : null;
+            if (item) choose(event, item);
+          }}
           onFocus={() => { if (!custom) setOpen(true); }}
           onChange={event => {
             if (custom) onNameChange(event.target.value);
@@ -75,10 +87,24 @@ function RecipeLookupMenu({row, catalog, onChoose, onNameChange, label = "nguyê
 
 function Editor({kind, item, categories, dishes, recipes, units, onSaved, onCancel}) {
   const [error,setError]=useState(''), [busy,setBusy]=useState(false);
+  const [deletingVideo, setDeletingVideo] = useState(false);
+
+  async function deleteVideo() {
+    if (busy || deletingVideo || !window.confirm('Xóa video hướng dẫn này?')) return;
+    setDeletingVideo(true);
+    setError('');
+    try {
+      await api('/admin/videos/' + encodeURIComponent(item.id), {method: 'DELETE'});
+      onSaved();
+    } catch (err) {
+      setError(err.message);
+      setDeletingVideo(false);
+    }
+  }
   const ingredientCatalog=useApi(kind==='recipes'?'/ingredients':null);
   const [ingredientRows,setIngredientRows]=useState((item.ingredients || []).map(x=>({ingredient_id:x.ingredient_id||'',name:x.name||'',quantity:x.quantity||'',unit_id:x.unit_id||'',custom_unit:x.custom_unit||'',grams_per_unit:x.grams_per_unit||'',note:x.note||''})));
   const [stepRows,setStepRows]=useState(item.steps?.length ? item.steps.map(splitStepTitle) : [{title:'',text:''}]);
-  useEffect(()=>{setIngredientRows(rows=>{let changed=false;const next=rows.map(row=>{const unit=units.find(x=>x.id===row.unit_id);if((unit?.symbol||unit?.name)==='g'&&row.grams_per_unit!=='1'){changed=true;return {...row,grams_per_unit:'1'};}return row;});return changed?next:rows;});},[units]);
+  const isGramUnit = id => units.some(unit => unit.id === id && (unit.symbol || unit.name) === 'g');
   useEffect(()=>{document.querySelectorAll('.recipe-step-row input').forEach(input=>input.placeholder='~ Tên bước ~');},[stepRows]);
   useEffect(()=>{document.querySelectorAll('.recipe-step-row input').forEach((input,index)=>{const raw=stepRows[index]?.title||'';const clean=raw.replace(/^~\s*|\s*~$/g,'').trim();input.value=clean?`~ ${clean} ~`:'';});},[stepRows]);
   const [image,setImage]=useState(item.image || 'images/logo.jpg');
@@ -100,8 +126,9 @@ function Editor({kind, item, categories, dishes, recipes, units, onSaved, onCanc
         body.servings=Number(body.servings);
         body.ingredients=ingredientRows.filter(x=>x.name.trim()).map((x,index)=>{
           const custom=x.unit_id==='__custom__' ? x.custom_unit.trim() : '';
-          if(!(Number(x.quantity)>0) || !(Number(x.grams_per_unit)>0) || (!x.unit_id || (x.unit_id==='__custom__'&&!custom))) throw new Error(`Nguyên liệu dòng ${index+1} chưa đủ thông tin.`);
-          return {ingredient_id:x.ingredient_id||null,name:x.name.trim(),quantity:Number(x.quantity),unit_id:x.unit_id==='__custom__'?null:x.unit_id,custom_unit:custom||null,grams_per_unit:Number(x.grams_per_unit)};
+          const gramsPerUnit = isGramUnit(x.unit_id) ? 1 : Number(x.grams_per_unit);
+          if(!(Number(x.quantity)>0) || !(gramsPerUnit>0) || (!x.unit_id || (x.unit_id==='__custom__'&&!custom))) throw new Error(`Nguyên liệu dòng ${index+1} chưa đủ thông tin.`);
+          return {ingredient_id:x.ingredient_id||null,name:x.name.trim(),quantity:Number(x.quantity),unit_id:x.unit_id==='__custom__'?null:x.unit_id,custom_unit:custom||null,grams_per_unit:gramsPerUnit};
         });
         body.steps=stepRows.map(x=>{const title=x.title.trim().replace(/^~\s*|\s*~$/g,'').trim(),text=x.text.trim();return title&&text?`~ ${title} ~\n${text}`:title?`~ ${title} ~`:text;}).filter(Boolean);
       }
@@ -139,11 +166,12 @@ function Editor({kind, item, categories, dishes, recipes, units, onSaved, onCanc
             }}
             onChoose={(chosen,name)=>setIngredientRows(rows=>rows.map((item,i)=>i===index?{...item,unit_id:chosen?.id||(chosen===null?'__custom__':''),custom_unit:chosen===null?name:''}:item))}
             onNameChange={name=>setIngredientRows(rows=>rows.map((item,i)=>i===index?{...item,custom_unit:name}:item))}/>
-        </div><input type="number" min="0" step="any" value={row.grams_per_unit} placeholder="gam/1 đơn vị" disabled={units.some(unit=>unit.id===row.unit_id&&(unit.symbol||unit.name)==='g')} onChange={e=>setIngredientRows(v=>v.map((x,i)=>i===index?{...x,grams_per_unit:e.target.value}:x))}/><input value={row.note} placeholder="Không bắt buộc" onChange={e=>setIngredientRows(v=>v.map((x,i)=>i===index?{...x,note:e.target.value}:x))}/><button type="button" onClick={()=>setIngredientRows(v=>v.filter((_,i)=>i!==index))}>×</button></div>)}<button type="button" onClick={()=>setIngredientRows(v=>[...v,{name:'',quantity:'',unit_id:'',custom_unit:'',grams_per_unit:'',note:''}])}>＋ Thêm nguyên liệu</button></div>
+        </div><input type="number" min="0" step="any" value={isGramUnit(row.unit_id) ? 1 : row.grams_per_unit} placeholder="gam/1 đơn vị" disabled={isGramUnit(row.unit_id)} onChange={e=>setIngredientRows(v=>v.map((x,i)=>i===index?{...x,grams_per_unit:e.target.value}:x))}/><input value={row.note} placeholder="Không bắt buộc" onChange={e=>setIngredientRows(v=>v.map((x,i)=>i===index?{...x,note:e.target.value}:x))}/><button type="button" onClick={()=>setIngredientRows(v=>v.filter((_,i)=>i!==index))}>×</button></div>)}<button type="button" onClick={()=>setIngredientRows(v=>[...v,{name:'',quantity:'',unit_id:'',custom_unit:'',grams_per_unit:'',note:''}])}>＋ Thêm nguyên liệu</button></div>
         <div className="recipe-step-editor"><strong>Cách chế biến</strong><small className="recipe-step-note">Dùng từ khóa "Lưu ý" hoặc "Mách nhỏ" để nhấn mạnh khi cần</small>{stepRows.map((row,index)=><div className="recipe-step-row" key={index}><b>{index+1}</b><div className="recipe-step-title"><span aria-hidden="true">~</span><input value={row.title?row.title.replace(/^~\s*|\s*~$/g,'').trim():''} placeholder="Tên bước" onChange={e=>setStepRows(v=>v.map((x,i)=>i===index?{...x,title:e.target.value.replace(/^~\s*|\s*~$/g,'').trim()}:x))}/><span aria-hidden="true">~</span></div><textarea value={row.text} placeholder="Mô tả chi tiết cách thực hiện" onChange={e=>setStepRows(v=>v.map((x,i)=>i===index?{...x,text:e.target.value}:x))}/><button type="button" onClick={()=>setStepRows(v=>v.length>1?v.filter((_,i)=>i!==index):v)}>×</button></div>)}<button type="button" onClick={()=>setStepRows(v=>[...v,{title:'',text:''}])}>＋ Thêm bước</button></div>
       </>}
       {kind==='videos' && <>
         {select('recipe_id','Công thức',recipes.map(x=>({id:x.id,name:dishes.find(d=>d.id===x.dish_id)?.name || x.id})),item.recipe_id)}
+        {!item.id && !recipes.length && <p>Tất cả món đã có công thức đều đã có video, hoặc chưa có công thức để chọn.</p>}
         <Field label="Tiêu đề" name="title" defaultValue={item.title || ''} required maxLength={200}/>
         <Field label="Đường dẫn video hoặc URL HTTPS"><input name="path" value={video} onChange={e=>setVideo(e.target.value)} required maxLength={500}/></Field>
         <Field label="Tải video MP4 / WEBM (tối đa 100 MB)"><input key={videoFileKey} type="file" accept="video/mp4,video/webm" onChange={e=>upload(e,'videos')}/>{video && <button type="button" className="media-clear" onClick={()=>{setVideo('');setVideoFileKey(k=>k+1)}}>Xóa file MP4/WEBM</button>}</Field>
@@ -155,7 +183,14 @@ function Editor({kind, item, categories, dishes, recipes, units, onSaved, onCanc
         {select('status','Trạng thái',['Hoạt động','Tạm khóa'].map(x=>({id:x,name:x})),item.status)}
         <Field label="Mật khẩu mới (để trống để giữ nguyên)" type="password" name="password" minLength={8} autoComplete="new-password"/>
       </>}
-      <div className="actions"><button className="primary" disabled={busy}>{busy?'Đang lưu…':'Lưu thay đổi'}</button><button type="button" onClick={onCancel}>Hủy</button></div>
+      <div className="actions"><button className="primary" disabled={busy || deletingVideo}>{busy?'Đang lưu…':'Lưu thay đổi'}</button><button type="button" disabled={deletingVideo} onClick={onCancel}>Hủy</button></div>
+      {kind === 'videos' && item.id && (
+        <div className="actions">
+          <button type="button" className="video-delete-button" disabled={busy || deletingVideo} onClick={deleteVideo}>
+            {deletingVideo ? 'Đang xóa…' : 'Xóa video'}
+          </button>
+        </div>
+      )}
     </form></section>;
 }
 
@@ -260,7 +295,14 @@ function CategoryStudio(){
 
 function VideoStudio(){
   const resource=useApi('/admin/videos'), recipes=useApi('/admin/recipes'), dishes=useApi('/dishes?include_drafts=true'); const [editing,setEditing]=useState(null),[query,setQuery]=useState(''); const items=(resource.data||[]).filter(x=>`${x.title||''} ${x.description||''}`.toLocaleLowerCase('vi-VN').includes(query.toLocaleLowerCase('vi-VN'))); const dishFor=x=>dishes.data?.find(d=>d.id===recipes.data?.find(r=>r.id===x.recipe_id)?.dish_id); const name=x=>dishFor(x)?.name||'Video hướng dẫn';
-  return <div className="video-studio"><section className="video-command"><div><small>COOKHUB VIDEO CONTENT STUDIO</small><h1>Video hướng dẫn</h1><p><b>{items.length}</b> video trong thư viện · Chia sẻ kỹ thuật nấu ăn trực quan</p></div><button onClick={()=>setEditing({})}>＋ Thêm video mới</button></section><section className="video-toolbar"><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="⌕ Tìm video, công thức..."/><span>{items.length} video</span></section>{!items.length?<div className="video-empty">Chưa có video hướng dẫn. Hãy thêm video đầu tiên cho thư viện.</div>:<div className="video-grid">{items.map((x,i)=><article className="video-card" key={x.id}><div className="video-thumb" style={dishFor(x)?.image?{'--video-image':`url("${media(dishFor(x).image)}")`}:undefined}><span>▶</span><small>VIDEO {String(i+1).padStart(2,'0')}</small></div><div className="video-body"><small>{x.id}</small><h3>{x.title||name(x)}</h3><p>{x.description||'Hướng dẫn chế biến món ăn'}</p><a href={x.path} target="_blank" rel="noreferrer">Xem video ↗</a><button onClick={()=>setEditing(x)}>Sửa</button></div></article>)}</div>}{editing&&<div className="video-modal"><div className="video-modal-card"><Editor kind="videos" item={editing} categories={[]} dishes={dishes.data||[]} recipes={recipes.data||[]} units={[]} onCancel={()=>setEditing(null)} onSaved={()=>{setEditing(null);resource.reload()}}/></div></div>}</div>;
+  const recipeRows = recipes.data || [];
+  const dishIds = new Set((dishes.data || []).map(dish => dish.id));
+  const dishByRecipe = new Map(recipeRows.map(recipe => [recipe.id, recipe.dish_id]));
+  const dishesWithVideo = new Set((resource.data || []).map(video => dishByRecipe.get(video.recipe_id)));
+  const recipesWithoutVideo = recipeRows.filter(recipe =>
+    dishIds.has(recipe.dish_id) && !dishesWithVideo.has(recipe.dish_id)
+  );
+  return <div className="video-studio"><section className="video-command"><div><small>COOKHUB VIDEO CONTENT STUDIO</small><h1>Video hướng dẫn</h1><p><b>{items.length}</b> video trong thư viện · Chia sẻ kỹ thuật nấu ăn trực quan</p></div><button disabled={!resource.data || !recipes.data || !dishes.data} onClick={()=>setEditing({})}>＋ Thêm video mới</button></section><section className="video-toolbar"><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="⌕ Tìm video, công thức..."/><span>{items.length} video</span></section>{!items.length?<div className="video-empty">Chưa có video hướng dẫn. Hãy thêm video đầu tiên cho thư viện.</div>:<div className="video-grid">{items.map((x,i)=><article className="video-card" key={x.id}><div className="video-thumb" style={dishFor(x)?.image?{'--video-image':`url("${media(dishFor(x).image)}")`}:undefined}><span>▶</span><small>VIDEO {String(i+1).padStart(2,'0')}</small></div><div className="video-body"><small>{x.id}</small><h3>{x.title||name(x)}</h3><p>{x.description||'Hướng dẫn chế biến món ăn'}</p><a href={x.path} target="_blank" rel="noreferrer">Xem video ↗</a><button onClick={()=>setEditing(x)}>Sửa</button></div></article>)}</div>}{editing&&<div className="video-modal"><div className="video-modal-card"><Editor kind="videos" item={editing} categories={[]} dishes={dishes.data||[]} recipes={editing.id ? recipes.data || [] : recipesWithoutVideo} units={[]} onCancel={()=>setEditing(null)} onSaved={()=>{setEditing(null);resource.reload()}}/></div></div>}</div>;
 }
 
 function categoryColor(id, index){

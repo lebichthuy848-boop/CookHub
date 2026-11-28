@@ -1,4 +1,28 @@
 /* Restore the catalog appearance used by the previous CookHub build. */
+.search-hub .search-hero .voice-popover {
+  position: relative;
+  inset: auto;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  max-width: 100%;
+  margin: 12px auto 0;
+  padding: 6px 8px 6px 12px;
+  border-radius: 12px;
+  text-align: left;
+}
+.search-hub .search-hero .voice-popover > button {
+  position: static;
+  flex: none;
+  width: auto;
+  height: auto;
+  min-height: 28px;
+  padding: 3px 8px;
+  font-size: 12px;
+  transform: none;
+}
 .search-hub .ingredient-hub{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 28px!important;border-radius:0 0 28px 28px;background:linear-gradient(105deg,#f4fbf5,#fffaf0);box-shadow:0 12px 24px rgba(30,100,65,.06)}
 .search-hub .ingredient-hub>div:first-child{max-width:48%}.search-hub .ingredient-chips{max-width:56%;justify-content:flex-end;gap:8px}.search-hub .ingredient-chips button{padding:8px 12px;font-size:10px}
 .discover-categories{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 12px;scrollbar-width:thin;scrollbar-color:#a9cdb2 transparent}

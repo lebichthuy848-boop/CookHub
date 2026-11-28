@@ -279,7 +279,10 @@ def save_recipe(db, data, recipe_id=None, commit=True):
     return {'id': record.maCongThuc}
 
 def delete_recipe(db, recipe_id):
-    require(db, m.CongThuc, recipe_id)
+    recipe = require(db, m.CongThuc, recipe_id)
+    # The database requires published recipes to retain ingredients and steps.
+    recipe.daCongBo = 0
+    db.flush()
     for model in (m.DoanPhimHuongDan, m.ThanhPhanCongThuc, m.BuocCheBien):
         db.execute(delete(model).where(model.maCongThuc == recipe_id))
     db.execute(delete(m.CongThuc).where(m.CongThuc.maCongThuc == recipe_id))

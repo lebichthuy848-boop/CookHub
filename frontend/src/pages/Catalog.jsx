@@ -165,7 +165,7 @@ function ExploreCatalog({ dishes, categories, params, setParams, favorites, onFa
       const range = document.querySelector(`.range-filter input[name="${name}"]`);
       if (!range || range.parentElement.querySelector('.smart-number-input')) return () => {};
       range.max = max;
-      const input = document.createElement('input'); input.type = 'number'; input.className = 'smart-number-input'; input.min = min; input.max = max; input.step = name === 'max_time' ? 5 : 25; input.value = value; input.setAttribute('aria-label', `${name === 'max_time' ? 'Thời gian' : 'Calo tối đa'} bằng số`);
+      const input = document.createElement('input'); input.type = 'number'; input.className = 'smart-number-input'; input.min = min; input.max = max; input.step = name === 'max_time' ? 1 : 25; input.value = value; input.setAttribute('aria-label', `${name === 'max_time' ? 'Thời gian' : 'Calo tối đa'} bằng số`);
       const warning = document.createElement('small'); warning.className = 'smart-input-warning';
       const update = raw => { const parsed = Number(raw); if (!Number.isFinite(parsed) || parsed < 0) { warning.textContent = `Nhập số ${unit} hợp lệ`; return; } const next = parsed; input.value = next; warning.textContent = parsed < min ? `Nên nhập từ ${min} ${unit} trở lên` : ''; setValue(next); range.max = Math.max(Number(range.max) || max, next); range.value = next; };
       input.addEventListener('change', event => update(event.target.value)); input.addEventListener('blur', event => update(event.target.value)); range.addEventListener('input', event => { input.value = event.target.value; warning.textContent = ''; });
@@ -177,24 +177,107 @@ function ExploreCatalog({ dishes, categories, params, setParams, favorites, onFa
   useEffect(()=>{const resize=()=>setPageSize(window.innerWidth<768?10:window.innerWidth<1200?9:20);window.addEventListener('resize',resize);return()=>window.removeEventListener('resize',resize)},[]);
   useEffect(()=>setPageNumber(1),[params.toString(),pageSize]);
   const totalPages=Math.max(1,Math.ceil(dishes.length/pageSize)), currentPage=Math.min(pageNumber,totalPages);
-  function startVoiceSearch(){const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;if(!Recognition){setVoiceError('Trình duyệt chưa hỗ trợ giọng nói. Hãy dùng Chrome hoặc Edge.');setVoiceOpen(true);return}const recognition=new Recognition();voiceRef.current=recognition;recognition.lang='vi-VN';recognition.interimResults=true;recognition.onstart=()=>{setVoiceError('');setVoiceOpen(true)};recognition.onresult=event=>{const text=Array.from(event.results).map(r=>r[0].transcript).join('');const input=document.querySelector('.smart-search input');if(input)input.value=text;if(event.results[0].isFinal){const next=new URLSearchParams(params);next.set('q',text);setParams(next);setVoiceOpen(false)}};recognition.onerror=event=>{setVoiceError(event.error==='not-allowed'?'Hãy cấp quyền microphone cho trang này.':'Không nghe rõ, vui lòng thử lại.');setVoiceOpen(true)};recognition.onend=()=>{voiceRef.current=null};recognition.start()}
+  const searchInputRef = useRef(null);
+  const [listening, setListening] = useState(false);
+
+  function dismissVoiceSearch() {
+    const recognition = voiceRef.current;
+    voiceRef.current = null;
+    recognition?.abort();
+    setListening(false);
+    setVoiceOpen(false);
+  }
+
+  useEffect(() => () => {
+    const recognition = voiceRef.current;
+    voiceRef.current = null;
+    recognition?.abort();
+  }, []);
+
+  function startVoiceSearch() {
+    if (voiceRef.current) return;
+    setVoiceError('');
+    setVoiceOpen(true);
+    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!Recognition) {
+      setVoiceError('Trình duyệt chưa hỗ trợ tìm bằng giọng nói. Hãy thử Chrome hoặc Edge.');
+      return;
+    }
+
+    const recognition = new Recognition();
+    voiceRef.current = recognition;
+    recognition.lang = 'vi-VN';
+    recognition.interimResults = false;
+    recognition.onstart = () => {
+      if (voiceRef.current === recognition) setListening(true);
+    };
+    recognition.onresult = event => {
+      if (voiceRef.current !== recognition) return;
+      const result = event.results[event.resultIndex];
+      const text = result?.isFinal ? result[0]?.transcript?.trim() : '';
+      if (!text) return;
+      if (searchInputRef.current) searchInputRef.current.value = text;
+      setParams(previous => {
+        const next = new URLSearchParams(previous);
+        next.set('q', text);
+        return next;
+      });
+      dismissVoiceSearch();
+    };
+    recognition.onerror = event => {
+      if (voiceRef.current !== recognition) return;
+      setListening(false);
+      const errors = {
+        'not-allowed': 'Hãy cấp quyền mic cho trang này rồi thử lại.',
+        'service-not-allowed': 'Trình duyệt đã chặn dịch vụ nhận giọng nói.',
+        'audio-capture': 'Không nhận được âm thanh từ mic. Hãy kiểm tra thiết bị đầu vào.',
+        'network': 'Không kết nối được dịch vụ nhận giọng nói. Hãy kiểm tra mạng rồi thử lại.',
+        'no-speech': 'Chưa phát hiện giọng nói. Hãy nói sau khi mic bắt đầu nghe.',
+        'language-not-supported': 'Dịch vụ nhận giọng nói chưa hỗ trợ tiếng Việt trên trình duyệt này.',
+      };
+      setVoiceError(errors[event.error] || 'Không nhận được giọng nói. Vui lòng thử lại.');
+    };
+    recognition.onend = () => {
+      if (voiceRef.current !== recognition) return;
+      voiceRef.current = null;
+      setListening(false);
+      setVoiceError(previous => previous || 'Chưa nhận được giọng nói. Vui lòng thử lại.');
+    };
+    try {
+      recognition.start();
+    } catch {
+      voiceRef.current = null;
+      setVoiceError('Không khởi động được mic. Hãy kiểm tra quyền và thử lại.');
+    }
+  }
 
 
   function filterValue(key, value) { if (key === 'category') return categories.find(item => String(item.id) === value)?.name || value; if (key === 'topic' && value === 'warm_soup') return 'Món canh ấm bụng'; if (key === 'max_time') return `Tối đa ${value} phút`; if (key === 'calories') return `Tối đa ${value} kcal/khẩu phần`; return value; }
 
   function removeFilter(key) { const next = new URLSearchParams(params); next.delete(key); setParams(next); }
 
-  return <div className="explore-page search-hub"><Notice error={error}/><section className="explore-hero search-hero"><span>COOKHUB SMART SEARCH</span><h1>Hôm nay bạn muốn nấu gì?</h1><p>Tìm kiếm thông minh theo món ăn, nguyên liệu và thời gian của bạn.</p><form className="smart-search" onSubmit={event => { event.preventDefault(); const query = new FormData(event.currentTarget).get('q'); const next = new URLSearchParams(params); if (query) next.set('q', query); else next.delete('q'); setParams(next); }}><span className="search-glass">⌕</span><input name="q" defaultValue={params.get('q') || ''} placeholder="Thử tìm 'Cơm gà áp chảo'..."/><button type="button" className={'search-tool '+(voiceOpen?'active':'')} aria-label="Tìm bằng giọng nói" onClick={() => { if (voiceOpen) { voiceRef.current?.stop(); setVoiceOpen(false) } else { startVoiceSearch() } }}>🎙️</button><button className="search-submit" aria-label="Tìm kiếm">→</button></form>{voiceOpen&&<div className="voice-popover"><div className="soundwave">{[1,2,3,4,5,6,7].map(i=><i key={i}/>)}</div><b>Đang lắng nghe...</b><p>Hãy nói tên món ăn hoặc nguyên liệu</p>{voiceError&&<small className="voice-error">{voiceError}</small>}<button type="button" onClick={()=>setVoiceOpen(false)}>Hủy</button></div>}</section>
+  return <div className="explore-page search-hub"><Notice error={error}/><section className="explore-hero search-hero"><span>COOKHUB SMART SEARCH</span><h1>Hôm nay bạn muốn nấu gì?</h1><p>Tìm kiếm thông minh theo món ăn, nguyên liệu và thời gian của bạn.</p><form className="smart-search" onSubmit={event => { event.preventDefault(); const query = new FormData(event.currentTarget).get('q'); const next = new URLSearchParams(params); if (query) next.set('q', query); else next.delete('q'); setParams(next); }}><span className="search-glass">⌕</span><input ref={searchInputRef} name="q" defaultValue={params.get('q') || ''} placeholder="Thử tìm 'Cơm gà áp chảo'..."/><button type="button" className={'search-tool '+(voiceOpen?'active':'')} aria-label="Tìm bằng giọng nói" aria-expanded={voiceOpen} onClick={() => voiceOpen ? dismissVoiceSearch() : startVoiceSearch()}>🎙️</button><button className="search-submit" aria-label="Tìm kiếm">→</button></form>{voiceOpen&&<div className="voice-popover"><small role="status" className={voiceError ? "voice-error" : undefined}>{voiceError || (listening ? "Đang nghe… Hãy nói tên món hoặc nguyên liệu." : "Đang mở mic…")}</small>{voiceError && <button type="button" onClick={startVoiceSearch}>Thử lại</button>}<button type="button" aria-label="Đóng tìm kiếm bằng giọng nói" onClick={dismissVoiceSearch}>×</button></div>}</section>
 
-    <section className="ingredient-hub panel"><div><small>TỦ LẠNH NHÀ BẠN</small><h2>Tìm món theo nguyên liệu</h2><p>Món tìm được có đủ các nguyên liệu bạn chọn. Bấm Tìm món để áp dụng.</p></div><div className="ingredient-chips">{['Thịt gà','Nấm','Cà chua','Rau xanh','Trứng'].map(item => <button type="button" className={ingredients.includes(item) ? 'picked' : ''} key={item} onClick={() => setIngredients(value => value.includes(item) ? value.filter(x => x !== item) : [...value, item])}>{ingredients.includes(item) ? '✓ ' : '+ '}{item}</button>)}</div></section>
+    <section className="ingredient-hub panel"><div><small>TỦ LẠNH NHÀ BẠN</small><h2>Tìm món theo nguyên liệu</h2><p>{params.get('ingredient_match') === 'any' ? 'Món tìm được có ít nhất một nguyên liệu bạn chọn. Bấm Tìm món để áp dụng.' : 'Món tìm được có đủ các nguyên liệu bạn chọn. Bấm Tìm món để áp dụng.'}</p></div><div className="ingredient-chips">{['Thịt gà','Nấm','Cà chua','Rau xanh','Trứng'].map(item => <button type="button" className={ingredients.includes(item) ? 'picked' : ''} key={item} onClick={() => setIngredients(value => value.includes(item) ? value.filter(x => x !== item) : [...value, item])}>{ingredients.includes(item) ? '✓ ' : '+ '}{item}</button>)}</div></section>
 
     <div className="category-pills" aria-label="Danh mục nhanh">{categories.filter(category => dishes.some(dish => (dish.category_ids || [dish.category_id]).map(String).includes(String(category.id)))).map((category, index) => <button key={category.id} className={String(params.get('category')) === String(category.id) ? 'active' : ''} onClick={() => { const next = new URLSearchParams(params); if (String(params.get('category')) === String(category.id)) next.delete('category'); else next.set('category', category.id); setParams(next); }}><i>{labelForCategory('', index).split(' ')[0]}</i><span>{category.name}</span></button>)}</div>
 
-    <form className="filters premium-filters explore-filters visual-filters" onSubmit={event => { event.preventDefault(); const values = new FormData(event.currentTarget); if(timeValue<=0) values.delete('max_time'); if(calorieValue<=0) values.delete('calories'); if (ingredients.length) values.set('ingredient', ingredients.join(',')); if (params.get('q')) values.set('q', params.get('q')); if (params.get('category')) values.set('category', params.get('category')); if (difficultyValue) values.set('difficulty', difficultyValue); setParams(Object.fromEntries([...values].filter(([, value]) => value !== ''))); }}><label className="range-filter">Thời gian <output key={timeValue}>{timeValue} phút</output><span className="range-track"><input type="range" name="max_time" min="0" max="120" step="5" value={timeValue} onChange={event => { const value = Number(event.target.value); setTimeValue(value); }}/><em>{timeValue} phút</em></span></label><label className="range-filter">Calo tối đa / khẩu phần <output key={calorieValue}>{calorieValue} kcal</output><span className="range-track"><input type="range" name="calories" min="0" max="1500" step="25" value={calorieValue} onChange={event => { const value = Number(event.target.value); setCalorieValue(value); }}/><em>{calorieValue} kcal</em></span></label><div className="difficulty-filter"><span>Độ khó</span>{['Dễ','Trung bình','Khó'].map(item => <button type="button" className={difficultyValue === item ? 'active' : ''} key={item} onClick={() => setDifficultyValue(value => value === item ? '' : item)}>{item}</button>)}</div><button className="primary filter-submit" type="submit"><span>Tìm món</span><b>⌕</b></button><button className="filter-clear" type="button" onClick={() => { setIngredients([]); setTimeValue(0); setCalorieValue(0); setDifficultyValue(''); setParams({}); }}><span>↻</span> Xóa lọc</button></form>
+    <form className="filters premium-filters explore-filters visual-filters" onSubmit={event => { event.preventDefault(); const values = new FormData(event.currentTarget); if(timeValue<=0) values.delete('max_time'); if(calorieValue<=0) values.delete('calories'); if (ingredients.length) { values.set('ingredient', ingredients.join(',')); if (params.get('ingredient_match') === 'any') values.set('ingredient_match', 'any'); } if (params.get('q')) values.set('q', params.get('q')); if (params.get('category')) values.set('category', params.get('category')); if (difficultyValue) values.set('difficulty', difficultyValue); setParams(Object.fromEntries([...values].filter(([, value]) => value !== ''))); }}><label className="range-filter">Thời gian <output key={timeValue}>{timeValue} phút</output><span className="range-track"><input type="range" name="max_time" min="0" max="120" step="1" value={timeValue} onChange={event => { const value = Number(event.target.value); setTimeValue(value); }}/><em>{timeValue} phút</em></span></label><label className="range-filter">Calo tối đa / khẩu phần <output key={calorieValue}>{calorieValue} kcal</output><span className="range-track"><input type="range" name="calories" min="0" max="1500" step="25" value={calorieValue} onChange={event => { const value = Number(event.target.value); setCalorieValue(value); }}/><em>{calorieValue} kcal</em></span></label><div className="difficulty-filter"><span>Độ khó</span>{['Dễ','Trung bình','Khó'].map(item => <button type="button" className={difficultyValue === item ? 'active' : ''} key={item} onClick={() => setDifficultyValue(value => value === item ? '' : item)}>{item}</button>)}</div><button className="primary filter-submit" type="submit"><span>Tìm món</span><b>⌕</b></button><button className="filter-clear" type="button" onClick={() => { setIngredients([]); setTimeValue(0); setCalorieValue(0); setDifficultyValue(''); setParams({}); }}><span>↻</span> Xóa lọc</button></form>
 
     {activeFilters.length > 0 && <div className="filter-tags">{activeFilters.map(([key, value]) => <span className="filter-tag" key={key}>{filterNames[key]}: {filterValue(key, value)}<button type="button" onClick={() => removeFilter(key)}>×</button></span>)}</div>}
 
-    {dishes.length === 0 && activeFilters.length > 0 && <p className="empty">Không có công thức khớp tất cả bộ lọc. Hãy bỏ bớt nguyên liệu hoặc tăng giới hạn thời gian, calo.</p>}
+    {dishes.length === 0 && activeFilters.length > 0 && (
+      <div className="empty">
+        <p>Không có món phù hợp với bộ lọc hiện tại.</p>
+        {params.get('ingredient') && params.get('ingredient_match') !== 'any' && (
+          <button type="button" className="primary" onClick={() => {
+            const next = new URLSearchParams(params);
+            next.set('ingredient_match', 'any');
+            setParams(next);
+          }}>Tìm món có ít nhất một nguyên liệu</button>
+        )}
+      </div>
+    )}
 
     <section className="all-recipes"><div className="explore-heading"><div><small>THƯ VIỆN MÓN ĂN</small><h2>Đang hiển thị {dishes.length} món</h2></div><div className="view-switch"><button className={view === 'grid' ? 'active' : ''} onClick={() => setView('grid')} aria-label="Dạng lưới">▦</button><button className={view === 'list' ? 'active' : ''} onClick={() => setView('list')} aria-label="Dạng danh sách">☷</button></div></div><div className={'dish-grid explore-dishes ' + (view === 'list' ? 'list-view' : '')}>{dishes.slice((currentPage-1)*pageSize,currentPage*pageSize).map(dish => <DishCard key={dish.id} dish={dish} favorite={favorites.includes(dish.id)} onFavorite={onFavorite} onHide={onHide}/>)}</div>{dishes.length>0&&<nav className="discover-pagination" aria-label="Phân trang kết quả"><button disabled={currentPage===1} onClick={()=>setPageNumber(currentPage-1)}>‹ Trước</button><span>Trang {currentPage} / {totalPages}</span><button disabled={currentPage===totalPages} onClick={()=>setPageNumber(currentPage+1)}>Sau ›</button><small>{(currentPage-1)*pageSize+1}–{Math.min(currentPage*pageSize,dishes.length)} / {dishes.length} món</small></nav>}</section>
 

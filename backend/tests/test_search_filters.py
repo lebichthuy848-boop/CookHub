@@ -17,6 +17,12 @@ def test_search_uses_recipe_ingredients_without_fuzzy_false_positives(monkeypatc
     assert [dish['id'] for dish in catalog.dishes(ingredient='Thịt gà', **common)] == ['GA']
     assert [dish['id'] for dish in catalog.dishes(ingredient='Thịt gà,Cà chua', **common)] == ['GA']
     assert catalog.dishes(ingredient='Thịt gà,Bí đỏ', **common) == []
+    assert [dish['id'] for dish in catalog.dishes(
+        ingredient='Thịt gà,Bí đỏ', ingredient_match='any', **common
+    )] == ['GA', 'SUP']
+    assert [dish['id'] for dish in catalog.dishes(
+        ingredient='Thịt gà,Bí đỏ', ingredient_match='any', **{**common, 'max_time': 25}
+    )] == ['GA']
 
 
 def test_calorie_limit_uses_one_serving_and_excludes_unknown(monkeypatch):

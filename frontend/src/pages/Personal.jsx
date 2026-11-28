@@ -60,7 +60,24 @@ export function Pantry() {
   async function updateAmount(item,direction){const step=stepFor(item.unit);const quantity=Math.max(0,Number(item.quantity)+(direction*step));try{await api('/pantry/'+item.id,{method:'PUT',body:{quantity}});resource.reload();}catch(err){setError(err.message);}}
   async function remove(id){try{await api('/pantry/'+id,{method:'DELETE'});resource.reload();}catch(err){setError(err.message);}}
   async function clearAll(){setBusy(true);setError('');try{for(const item of pantryItems)await api('/pantry/'+item.id,{method:'DELETE'});resource.reload();}catch(err){setError(err.message);}finally{setBusy(false);}}
-  function cookFromPantry(){const names=pantryItems.map(item=>item.name).join(',');navigate('/search'+(names?'?ingredient='+encodeURIComponent(names):''));}
+  function cookFromPantry() {
+    const seasoningNames = new Set([
+      ...categories.find(category => category.id === 'spices').items.map(([name]) => name.toLocaleLowerCase('vi-VN')),
+      'mắm', 'muối', 'tiêu', 'nước tương', 'bột ngọt', 'mì chính', 'dầu hào',
+      'rau mùi', 'ngò rí', 'ngò', 'hành lá', 'tỏi', 'ớt tươi',
+    ]);
+    const ingredient = pantryItems
+      .map(item => item.name.trim())
+      .filter(name => name && !seasoningNames.has(name.toLocaleLowerCase('vi-VN').normalize('NFC')))
+      .join(',');
+    if (!ingredient) {
+      setError('Hãy thêm ít nhất một nguyên liệu chính như thịt, cá, trứng hoặc rau củ để tìm món.');
+      return;
+    }
+    setError('');
+    const query = new URLSearchParams({ ingredient, ingredient_match: 'any' });
+    navigate('/search?' + query);
+  }
   const visiblePresets=currentCategory.items.filter(([name])=>name.toLocaleLowerCase('vi-VN').includes(searchQuery.trim().toLocaleLowerCase('vi-VN')));
   return <div className="enhanced-pantry"><section className="pantry-hero"><div><span>✨ CĂN BẾP TỰ ĐỘNG COOKHUB</span><h1>Tủ Nguyên Liệu Của Bạn</h1><p>Chạm nhẹ để chọn nhanh nguyên liệu, CookHub sẽ gợi ý món ăn phù hợp cho bạn.</p></div><button type="button" onClick={cookFromPantry}>🍳 Nấu ngay từ tủ bếp ({pantryItems.length} món)</button></section><Notice error={error || units.error}/><section className="pantry-library"><header><div><h2>⚡ Thêm nhanh nguyên liệu</h2><p>Bấm một lần để thêm, bấm nhiều lần để cộng dồn số lượng.</p></div><input value={searchQuery} onChange={event=>setSearchQuery(event.target.value)} placeholder="🔍 Tìm nhanh nguyên liệu..."/></header><nav>{categories.map(category=><button type="button" key={category.id} className={activeCategory===category.id?'active':''} onClick={()=>{setActiveCategory(category.id);setSearchQuery('');}}>{category.label}</button>)}</nav><div className="pantry-preset-grid" key={activeCategory}>{visiblePresets.map(([name,symbol,icon])=>{const existing=pantryItems.find(item=>item.name.toLocaleLowerCase('vi-VN')===name.toLocaleLowerCase('vi-VN'));return <button type="button" disabled={busy} className={existing?'selected':''} key={name} onClick={()=>quickAdd(name,symbol)}><span>{icon}</span>{existing&&<b>x{existing.quantity} {existing.unit}</b>}<strong>{name}</strong><small>＋ Thêm nhanh</small></button>;})}</div></section><section className="pantry-current"><header><h2>🧊 Các nguyên liệu hiện có trong tủ ({pantryItems.length})</h2>{pantryItems.length>0&&<button type="button" disabled={busy} onClick={clearAll}>Xóa tất cả</button>}</header><State resource={resource}>{items=>items.length?<div className="pantry-item-grid">{items.map(item=>{const preset=presetFor(item.name);return <article key={item.id}><span>{preset?.icon||'🥣'}</span><div><h3>{item.name}</h3><small>{preset?.category||'Nguyên liệu'} · Cập nhật {item.date}</small></div><div className="pantry-stepper"><button type="button" onClick={()=>updateAmount(item,-1)}>−</button><b>{item.quantity} {item.unit}</b><button type="button" onClick={()=>updateAmount(item,1)}>＋</button></div><button type="button" className="pantry-remove" aria-label={'Xóa '+item.name} onClick={()=>remove(item.id)}>×</button></article>;})}</div>:<div className="pantry-empty"><span>🧺</span><b>Tủ bếp hiện đang trống.</b><p>Hãy chọn các thẻ nguyên liệu phía trên để lấp đầy tủ bếp.</p></div>}</State></section></div>;
 }

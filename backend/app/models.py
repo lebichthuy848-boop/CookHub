@@ -56,8 +56,8 @@ class CheDoAnNguoiDung(Base):
 class DanhMucMonAn(Base):
     __tablename__ = "DanhMucMonAn"
     maDanhMuc = Column(String(50), primary_key=True)
-    tenDanhMuc = Column(String(150), nullable=True)
-    moTa = Column(String(500), nullable=True)
+    tenDanhMuc = Column(Unicode(150), nullable=True)
+    moTa = Column(Unicode(500), nullable=True)
 
 
 class NguyenLieu(Base):

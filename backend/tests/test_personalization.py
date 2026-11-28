@@ -143,7 +143,8 @@ def test_avoidance_excludes_dish_from_preview_and_saved_recommendations(client, 
     assert client.post('/api/v1/user/preferences', json=answers).status_code == 200
     assert client.get('/api/recommendations?mode=for_you').json() == []
     assert client.get('/api/recommendations?mode=taste').json() == []
-    assert client.get('/api/recommendations?mode=trending').json() == []
+    assert client.put('/api/favorites/MA001').status_code == 204
+    assert [dish['id'] for dish in client.get('/api/recommendations?mode=trending').json()] == ['MA001']
     assert client.post('/api/v1/user/preferences', json={**ANSWERS, 'avoid': ['none']}).status_code == 200
     assert [dish['id'] for dish in client.get('/api/recommendations?mode=for_you').json()] == ['MA001']
 
@@ -166,12 +167,36 @@ def test_dish_recommendations_do_not_calculate_or_filter_by_sample_prices(client
     preview = client.post('/api/v1/user/preferences/preview', json=answers).json()
     assert [dish['id'] for dish in preview] == [dish['id'] for dish in unpriced]
     assert client.post('/api/v1/user/preferences', json=answers).status_code == 200
+    assert client.put('/api/favorites/MA001').status_code < 300
     assert 'cost' not in client.get('/api/recommendations?mode=trending').json()[0]
     with factory() as db:
         db.get(m.GiaNguyenLieu, 'G001').giaThamKhao = 300000
         db.commit()
     assert client.post('/api/v1/user/preferences/preview', json=answers).json() == preview
     assert client.get('/api/recommendations?mode=trending').json()
+
+
+def test_trending_sort_preserves_rated_and_favorited_dishes(client, monkeypatch):
+    from app.routers import catalog
+
+    login(client)
+    dishes = [
+        dict(id='rated', rating=5, review_count=1, favorite_count=0),
+        dict(id='favorited', rating=0, review_count=0, favorite_count=3),
+        dict(id='both', rating=4, review_count=2, favorite_count=1),
+        dict(id='neither', rating=0, review_count=0, favorite_count=0),
+    ]
+    monkeypatch.setattr(catalog, 'dish_data', lambda db: dishes)
+    for sort_by, expected in (
+        ('rating', ['rated', 'both', 'favorited']),
+        ('favorites', ['favorited', 'both', 'rated']),
+    ):
+        for direction in ('asc', 'desc'):
+            response = client.get(f'/api/recommendations?mode=trending&sort_by={sort_by}&direction={direction}')
+            assert response.status_code == 200
+            assert [dish['id'] for dish in response.json()] == (
+                expected if direction == 'desc' else expected[::-1]
+            )
 
 
 def test_group_difficulty_and_meal_answers_change_ranking(setup, monkeypatch):

@@ -51,7 +51,7 @@ def dishes(q: str = '', category: list[str] = Query(default=[]),
            max_time: int | None = Query(default=None, ge=1), difficulty: str = '',
            ingredient: str = '', calories: int | None = Query(default=None, ge=1),
            display: Literal['all', 'home', 'foods'] = 'all', include_drafts: bool = False,
-           topic: str = '',
+           topic: str = '', ingredient_match: Literal['all', 'any'] = 'all',
            db: Session = Depends(get_db)):
     result = dish_data(db)
     if not include_drafts:
@@ -81,8 +81,9 @@ def dishes(q: str = '', category: list[str] = Query(default=[]),
             if term == 'thit ga' and name in {'uc ga', 'dui ga', 'canh ga', 'ga ta'}:
                 return True
             return contains_words(name, term)
-        return all(any(matches_ingredient(name, term) for name in names)
+        matches = (any(matches_ingredient(name, term) for name in names)
                    for term in ingredient_terms)
+        return any(matches) if ingredient_match == 'any' else all(matches)
 
     result = [x for x in result if (not normalized_q or query_score(x) >= .45)
               and (not category or set(x.get('category_ids', [x['category_id']])) & set(category))
@@ -149,8 +150,12 @@ def recommendations(mode: Literal['for_you', 'taste', 'quick', 'healthy', 'trend
         return rank_dishes(db, user.maNguoiDung, answers)
     if mode == 'healthy':
         mode = 'quick'
-    result = [x for x in dish_data(db) if x.get('recipe')]
-    if answers and answers.get('avoid'):
+    result = dish_data(db)
+    if mode == 'trending':
+        result = [dish for dish in result if dish['review_count'] > 0 or dish['favorite_count'] > 0]
+    else:
+        result = [dish for dish in result if dish.get('recipe')]
+    if mode != 'trending' and answers and answers.get('avoid'):
         result = [dish for dish in result if not conflicts_with_avoid(dish, answers['avoid'])]
     hidden = set(db.scalars(select(m.MonKhongThich.maMonAn)
                            .where(m.MonKhongThich.maNguoiDung == user.maNguoiDung)))
@@ -163,10 +168,6 @@ def recommendations(mode: Literal['for_you', 'taste', 'quick', 'healthy', 'trend
     if mode == 'taste':
         result.sort(key=lambda x: (x['id'] not in preferred, x['id']))
     elif mode == 'trending':
-        if sort_by == 'rating':
-            result = [x for x in result if x['rating'] > 0]
-        elif sort_by == 'favorites':
-            result = [x for x in result if x['favorite_count'] >= 1]
         key = {'rating': lambda x: x['rating'], 'favorites': lambda x: x['favorite_count'], 'popular': lambda x: x['favorite_count'] + x['review_count']}[sort_by]
         result.sort(key=key, reverse=direction == 'desc')
     else:

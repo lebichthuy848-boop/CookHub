@@ -250,6 +250,7 @@ def system_reports(from_date: date | None = Query(None), to_date: date | None = 
                 'new_users': [{'date': day, 'value': user_trend.get(day, 0)} for day in calendar],
                 'new_menus': [{'date': day, 'value': menu_trend.get(day, 0)} for day in calendar],
                 'favorite_saves': [{'date': day, 'value': favorite_trend.get(day, 0)} for day in calendar],
+                'planned_items': [{'date': day, 'value': trend.get(day, 0)} for day in calendar],
             },
             'comparison': {'current': len(rows_items), 'previous': previous_count, 'change': change},
             'comparison_by_metric': {
